@@ -388,6 +388,10 @@ test lreverse {basic} {
 	lreverse {{a b} c {d e}}
 } {{d e} c {a b}}
 
+test list::change {basic} {
+	list::change {a b aa c aa g} aa x g y
+} {a b x c x y}
+
 # no test yet for
 # ffind <switches> filelist pattern ?varName? ?pattern? ?varname?
 # ffind -matches -allfiles <switches> filelist pattern nulvalue ?varName? ?pattern? ?nulvalue? ?varname? ..

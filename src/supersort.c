@@ -9,8 +9,13 @@
  *
  */
 
-#include "tclInt.h"
-#include "tclPort.h"
+/*
+ #include "tclInt.h"
+ #include "tclPort.h"
+*/
+#define UCHAR(c) ((unsigned char) (c))
+#include <ctype.h>
+#include "tcl.h"
 
 /*
  * During execution of the "lsort" command, structures of the following
@@ -74,6 +79,15 @@ static SortElement *    MergeLists _ANSI_ARGS_((SortElement *leftPtr,
 			    SortElement *rightPtr, SortInfo *infoPtr));
 static int		SortCompare _ANSI_ARGS_((Tcl_Obj *firstPtr,
 			    Tcl_Obj *second, SortInfo *infoPtr));
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * function from tclUtil.c that is not exported, but needed here.
+ *
+ *----------------------------------------------------------------------
+ */
+extern int TclGetIntForIndex(Tcl_Interp *interp,Tcl_Obj *objPtr, int endValue, int *indexPtr);
 
 /*
  *----------------------------------------------------------------------
@@ -210,7 +224,7 @@ ExtraL_SSortObjCmd(clientData, interp, objc, objv)
 			goto done;
 		}
 	}
-    elementArray = (SortElement *) ckalloc(length * sizeof(SortElement));
+    elementArray = (SortElement *) Tcl_Alloc(length * sizeof(SortElement));
     for (i=0; i < length; i++){
 		if (reflist!=NULL) {
 			elementArray[i].refobjPtr = reflistObjv[i];
@@ -234,11 +248,11 @@ ExtraL_SSortObjCmd(clientData, interp, objc, objv)
 		    Tcl_ListObjAppendElement(interp, resultPtr, elementPtr->objPtr);
 		}
     }
-    ckfree((char*) elementArray);
+    Tcl_Free((char*) elementArray);
 
     done:
     if (sortInfo.sortMode == SORTMODE_COMMAND) {
-	Tcl_DStringFree(&sortInfo.compareCmd);
+		Tcl_DStringFree(&sortInfo.compareCmd);
     }
     return sortInfo.resultCode;
 }

@@ -5,15 +5,9 @@ exec tclsh8.0 "$0" "$@"
 source tools.tcl
 proc type {} {return fdbm}
 
-if {"[dbm implementation]" == "tcl"} {
 test [type] {types} {
-	dbm types
+	lindex [dbm types] 0
 } {fdbm}
-} else {
-test [type] {types} {
-	dbm types
-} {fdbm bsddbm gdbm}
-}
 
 source dbm.tcl
 

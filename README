@@ -51,6 +51,12 @@ The Tcl script makedist.tcl creates a package distribution
 If no compiled version (.so, .dll) is available, a Tcl-only version will 
 be created.
 
+During compilation, the Tcl sources must be availble; if the Tcl source
+directory is not a sibling of the Extral source directory, you will have to
+specify its position by giving a parameter to the ./configure script:
+./configure --with-tcl=DIR (where DIR is the Tcl source tree)
+in the following description.
+
 compiled packages for most Unix platform should be created using the following 
 steps:
 cd Extral-src-x.x.x/src

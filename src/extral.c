@@ -721,3 +721,66 @@ ExtraL_LreverseObjCmd(notUsed, interp, objc, objv)
 	Tcl_SetObjResult(interp,resultObj);
 	return TCL_OK;
 }
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ExtraL_LchangeCmd --
+ *
+ *		This procedure is invoked to process the "lremdup" command.
+ *		It creates a subset of a list
+ *
+ * Results:
+ *		A standard Tcl result.
+ *
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+ExtraL_LchangeObjCmd(dummy, interp, objc, objv)
+	ClientData dummy;		/* Not used. */
+	Tcl_Interp *interp;		/* Current interpreter. */
+	int objc;			/* Number of arguments. */
+	Tcl_Obj *CONST objv[];	/* Argument objects. */
+{
+	Tcl_Obj *listPtr;
+	Tcl_Obj **elemPtrs;
+	Tcl_Obj *resultObj;
+	int listLen, result;
+	char *string,*cstring;
+	int i,y,len,clen;
+	if ((objc < 4)&&( (objc&1) != 0)) {
+		Tcl_WrongNumArgs(interp, 1, objv, "list change by ?change by ...?");
+		return TCL_ERROR;
+	}
+	/*
+	 * Convert the first argument to a list if necessary.
+	 */
+	listPtr = objv[1];
+	result = Tcl_ListObjGetElements(interp, listPtr, &listLen, &elemPtrs);
+	if (result != TCL_OK) {return result;}
+	/* Initialise result */
+	Tcl_ResetResult(interp);
+	resultObj = Tcl_GetObjResult(interp);
+	if (listLen==0) {
+		Tcl_SetObjResult(interp, listPtr);
+		return TCL_OK;
+	}
+	for(i = 0 ; i < objc ; i++) {
+		string = Tcl_GetStringFromObj(elemPtrs[i], &len);
+		for(y = 2 ; y < objc ; y += 2) {	
+			cstring = Tcl_GetStringFromObj(objv[y], &clen);
+			if ((len == clen) && (strncmp(string,cstring,len) == 0)) {
+				break;
+			}
+		}
+		if (y < objc) {
+			result = Tcl_ListObjAppendElement(interp,resultObj,objv[y+1]);
+		} else {
+			result = Tcl_ListObjAppendElement(interp,resultObj,elemPtrs[i]);
+		}
+	}
+	return TCL_OK;
+}
+

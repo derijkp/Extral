@@ -447,6 +447,24 @@ proc lreverse {list} {
 	return $result
 }
 
+#doc {listcommands list::change} cmd {
+#list::change list change to ?change to ...?
+#} descr {
+# change matching elements in a list to other values
+#}
+proc list::change {list change to args} {
+	set trans($change) $to
+	array set trans $args
+	foreach element $list {
+		if [info exists trans($element)] {
+			lappend result $trans($element)
+		} else {
+			lappend result $element
+		}
+	}
+	return $result
+}
+
 #doc stringcommands title {
 #General string manipulation commands
 #}
