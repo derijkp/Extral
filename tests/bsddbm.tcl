@@ -1,11 +1,6 @@
 #!/usr/local/bin/tclsh8.0
 source tools.tcl
-loaddbm bsddbm
 proc type {} {return bsddbm}
-
-test [type] {types} {
-	dbm types
-} {bsddbm fdbm}
 
 source dbm.tcl
 

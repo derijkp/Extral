@@ -55,6 +55,11 @@ laddnew listName ?item? ...
 	adds the items to the list if not already there
 
 <b><dt>
+oneof element list
+</b><dd>
+	returns 1 if the lement occurs in the list, 0 if it does not.
+
+<b><dt>
 lregsub ?switches? exp list subSpec
 </b><dd>
 	does a regsub for each element in the list, and returns the resulting list.
@@ -111,6 +116,19 @@ lcor <referencelist> <list>
 lremdup list
 </b><dd>
 returns a list in which all duplactes are removed
+	with the -sorted option the command will usually be a lot faster,
+	but $list must be sorted with lsort;
+	The optional $var gives the name of a variable in which the removed items
+	will be stored.
+
+<b><dt>
+llremove ?-sorted? list1 list2
+</b><dd>
+	returns a list with all items in list1 that are not in list2
+	with the -sorted option the command will usually be a lot faster,
+	but both given lists must be sorted with lsort;
+	The optional $var gives the name of a variable in which the removed items
+	will be stored.
 
 <b><dt>
 lmerge ?list1? ?list2? ??spacing??

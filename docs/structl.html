@@ -34,7 +34,7 @@ However, structured lists have some advantages to arrays:
  are available by default (*any, *int, *regexp, *date, *named *list, ...). 
  New types can be added using either Tcl or C code.
  <p>
- names consisting of a list where element 0 is a questionmark are treated specially: 
+ If a schema contains names consisting of a list where element 0 is a questionmark these are treated specially: 
  The list must have 2 further elements: element 1 is the long name for the value, and element
  2 the short name. Both long and short name can be used to set or get values from the structured list.
  However, structlset will always return a struct with the short name (efficient storage), while

@@ -511,8 +511,8 @@ test structlunset-list {list parameter num} {
 test structlunset-list {list parameter: non existing num} {
 	set struct {a {*list {*int ?}}}
 	set try {}
-	structlunset -struct $struct $try {a 2} 4
-} {empty list at field "a"} 1
+	structlunset -struct $struct $try {a 2}
+} {}
 
 test structlunset-list {list parameter end} {
 	set struct {a {*list {*int ?}}}
@@ -529,7 +529,7 @@ test structlunset-list {struct in list: simple} {
 	}
 	set try {a {{a 1}}}
 	structlunset -struct $struct $try {a end a}
-} {}
+} {a {{}}}
 
 test structlunset-list {struct in list} {
 	set struct {a {*list {
@@ -548,6 +548,15 @@ test structlunset-list {struct in list with parameter} {
 	set try {a {{a 1} {a 2 b 2}}}
 	structlunset -struct $struct $try {a 1 b}
 } {a {{a 1} {a 2}}}
+
+test structlunset-list {struct in list with parameters; gets empty} {
+	set struct {a {*list {
+		a {*int ?}
+		b {*int ?}
+	}}}
+	set try {a {{a 1 b 1} {b 2} {b 3}}}
+	structlunset -struct $struct $try {a 1 b}
+} {a {{a 1 b 1} {} {b 3}}}
 
 test structlunset-list {struct in list with parameter 0} {
 	set struct {a {*list {
@@ -737,5 +746,11 @@ test structlget-named {get all from empty tag in named} {
 	set schema {nums {*named {*any ?}}}
 	Extral::structlget -struct $schema {} {nums a}
 } ?
+
+test structlget-named {with bool} {
+	set schema {{? bool b} {*named {*bool 0}}}
+	structlset -struct $schema {} {bool gvf} 1
+} {b {gvf 1}}
+
 
 testsummarize

@@ -156,6 +156,13 @@ test lremdup {large} {
 	set list {}
 	for {set i 0} {$i < 10000} {incr i} {lappend list "try $i"}
 	lappend list "try 100" "try 200"
+	llength [lremdup $list]
+} 10000
+
+test lremdup {large sorted} {
+	set list {}
+	for {set i 0} {$i < 10000} {incr i} {lappend list "try $i"}
+	lappend list "try 100" "try 200"
 	llength [lremdup -sorted [lsort $list]]
 } 10000
 
@@ -411,6 +418,30 @@ puts [list $try $try2]
 } {
 puts [list {try it} $try2]
 }
+
+test ? {basic true} {
+	set try 1
+	? {$try<10} under over
+} {under}
+
+test ? {basic false} {
+	set try 20
+	? {$try<10} under over
+} {over}
+
+test arraytrans {basic} {
+	array set a {a 1 b 2 c 3 d 4}
+	arraytrans a {a c}
+} {1 3}
+
+test arraytrans {basic with default} {
+	array set a {a 1 b 2 c 3 d 4}
+	arraytrans a {a e} def
+} {1 def}
+
+test invoke {basic} {
+	invoke {a} {list $a $args} 1 2 3
+} {1 {2 3}}
 
 # no test yet for
 # ffind <switches> filelist pattern ?varName? ?pattern? ?varname?

@@ -1,4 +1,4 @@
-proc ::Extral::setany {structure data oldvalue field value} {
+proc ::Extral::setstring {structure data oldvalue field value} {
 	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
 	if {"$value" == "[lindex $structure end]"} {
 		return -code 5 $value
@@ -6,8 +6,32 @@ proc ::Extral::setany {structure data oldvalue field value} {
 	return $value
 }
 
-proc ::Extral::unsetany {structure data oldvalue field} {
-	return -code 5 ""
+proc ::Extral::getstring {structure data field value} {
+	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
+	if {"$value" == ""} {return [lindex $structure end]}
+	return $value
+}
+
+proc ::Extral::settext {structure data oldvalue field value} {
+	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
+	if {"$value" == "[lindex $structure end]"} {
+		return -code 5 $value
+	}
+	return $value
+}
+
+proc ::Extral::gettext {structure data field value} {
+	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
+	if {"$value" == ""} {return [lindex $structure end]}
+	return $value
+}
+
+proc ::Extral::setany {structure data oldvalue field value} {
+	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
+	if {"$value" == "[lindex $structure end]"} {
+		return -code 5 $value
+	}
+	return $value
 }
 
 proc ::Extral::getany {structure data field value} {
@@ -77,7 +101,7 @@ proc ::Extral::setregexp {structure data oldvalue field value} {
 		return -code 5 $value
 	}
 	if {[llength $structure] != 4} {
-		return -code error "error: wrong number of arguments in structure \"$structure\""
+		return -code error "error: wrong number of arguments in structure \"$structure\": should be \"*regexp pattern errormsg default\""
 	}
 	set pattern [lindex $structure 1]
 	if ![regexp $pattern $value] {
@@ -267,7 +291,6 @@ proc ::Extral::unsetnamed {structure data oldvalue field} {
 
 proc ::Extral::getnamed {structure data field value} {
 #putsvars structure data field value
-	if {"$value" == ""} {return [lindex $structure end]}
 	set struc [lindex $structure 1]
 	if {"$field" == ""} {
 		set result ""
@@ -278,7 +301,11 @@ proc ::Extral::getnamed {structure data field value} {
 	} else {
 		set tag [lshift field]
 		set pos [structlfind $value $tag]
-		return [structlgetstruct $struc $data [lindex $value $pos] [llength $field] $field]
+		if {$pos != -1} {
+			return [structlgetstruct $struc $data [lindex $value $pos] [llength $field] $field]
+		} else {
+			return [structlgetstruct $struc $data {} [llength $field] $field]
+		}
 	}
 }
 
@@ -327,29 +354,56 @@ proc ::Extral::setlist {structure data oldvalue field value} {
 
 proc ::Extral::unsetlist {structure data oldvalue field} {
 #putsvars structure oldvalue field
-	set tag [lshift field]
-	set struct [lindex $structure 1]
-	if {"$tag" == ""} {
+	set len [llength $oldvalue]
+	if {$len == 0} {
 		return -code 5 ""
-	} elseif {[llength $tag] == 1} {
-		set len [llength $oldvalue]
-		if {$len == 0} {
-			return $oldvalue
-		}
-		incr len -1
-		if {("$tag"!="end")&&($tag>$len)} {
-			return $oldvalue
-		}
-		set code [catch {::Extral::structlunsetstruct $struct $data [lindex $oldvalue $tag] [llength $field] $field} res]
-		if {$code == 1} {
-			error $res
-		} elseif {$code == 5} {
-			return [lreplace $oldvalue $tag $tag]
+	}
+	incr len -1
+	set tag [lshift field]
+	set fieldlen [llength $field]
+	set struct [lindex $structure 1]
+	if {$fieldlen != 0} {
+		set result ""
+		if {"$tag" == ""} {
+			foreach element $oldvalue {
+				set code [catch {::Extral::structlunsetstruct $struct $data $element $fieldlen $field} res]
+				if {$code == 1} {
+					error $res
+				} elseif {$code == 5} {
+					lappend result {}
+				} else {
+					lappend result $res
+				}
+			}
+		} elseif {[llength $tag] == 1} {
+			if {("$tag"!="end")&&($tag>$len)} {
+				return $oldvalue
+			}
+			set code [catch {::Extral::structlunsetstruct $struct $data [lindex $oldvalue $tag] $fieldlen $field} res]
+			if {$code == 1} {
+				error $res
+			} else {
+				set result [lreplace $oldvalue $tag $tag $res]
+			}
 		} else {
-			return [lreplace $oldvalue $tag $tag $res]
+			return -code error "wrong # args to list: \"$tag\""
 		}
 	} else {
-		return -code error "wrong # args to list: \"$tag\""
+		if {"$tag" == ""} {
+			return -code 5 ""
+		} elseif {[llength $tag] == 1} {
+			if {("$tag"!="end")&&($tag>$len)} {
+				return $oldvalue
+			}
+			set result [lreplace $oldvalue $tag $tag]
+		} else {
+			return -code error "wrong # args to list: \"$tag\""
+		}
+	}
+	if {"$result" == ""} {
+		return -code 5 ""
+	} else {
+		return $result
 	}
 }
 
@@ -384,7 +438,7 @@ proc ::Extral::getlist {structure data field value} {
 		} else {
 			return $res
 		}
-	} elseif {($taglen == 2) || ($taglen == 3} {
+	} elseif {($taglen == 2) || ($taglen == 3)} {
 		set len [llength $value]
 		if {$len == 0} {
 			return ""

@@ -3,12 +3,7 @@
 exec tclsh8.0 "$0" "$@"
 
 source tools.tcl
-loaddbm gdbm
 proc type {} {return gdbm}
-
-test [type] {types} {
-	dbm types
-} {fdbm gdbm}
 
 source dbm.tcl
 

@@ -18,8 +18,102 @@ proc Extral::random {} {}
 proc Extral::extractoption {} {}
 proc Extral::extractbool {} {}
 proc Extral::inlist {} {}
+proc Extral::echo {} {}
+proc Extral::get {} {}
+proc Extral::? {} {}
+proc Extral::invoke {} {}
+proc Extral::arraytrans {} {}
 }
-Extral::export {rem REM remoff true setglobal random extractoption extractbool inlist} {
+Extral::export {rem REM remoff true setglobal random extractoption extractbool inlist ? echo get invoke arraytrans} {
+
+#doc {convenience invoke} cmd {
+#invoke vars cmd ...
+#} descr {
+# invoke simply evals $cmd in a private space. This eg. allows using
+# temporary variables in bindings without creating these in global scope.
+# It is also very convenient to use values appended to a command given
+# to a binding:
+# Further arguments (when given) are parameters that will be available in the
+# variables given in vars. If more parameters are supplied than vars are given,
+# the remaining parameters will be stored in the variable args.
+#}
+proc invoke {vars cmd args} {
+	foreach var $vars {
+		set $var [lshift args]
+	}
+	eval $cmd
+}
+
+#doc {convenience arraytrans} cmd {
+#arraytrans varName list ?default?
+#} descr {
+# returns a list of all the values in the array corresponding to the
+# indices in the given list. If the index is not present in the array,
+# the index itself will be returned.
+# If $default is given, it will be returned for indices not in the array.
+#}
+proc arraytrans {varName list args} {
+	upvar $varName var
+	set result ""
+	if {"$args" == ""} {
+		foreach item $list {
+			if [info exists var($item)] {
+				lappend result $var($item)
+			} else {
+				lappend result $item
+			}
+		}
+	} else {
+		set def [lindex $args 0]
+		foreach item $list {
+			if [info exists var($item)] {
+				lappend result $var($item)
+			} else {
+				lappend result $def
+			}
+		}
+	}
+	return $result
+}
+
+#doc {convenience ?} cmd {
+#? expr truevalue falsevalue
+#} descr {
+# ? expr truevalue falsevalue
+#}
+proc ? {expr truevalue falsevalue} {
+	uplevel if [list $expr] {{set ::Extral::temp 1} else {set ::Extral::temp 0}}
+	if $::Extral::temp {return $truevalue} else {return $falsevalue}
+}
+
+#doc {convenience ?} cmd {
+#echo string
+#} descr {
+# echo returns its argument as a result
+# This is useful when you want a command that will be evalled or upleveled
+# to return a certain value
+# 
+#}
+proc echo {string} {
+	return $string
+}
+
+#doc {convenience ?} cmd {
+#get varName ?default?
+#} descr {
+# get returns the value of the variable given by varName if it exists.
+# If the variable does not exists, it returns an empty string, or
+# value given by $default if present
+# 
+#}
+proc get {varName {default {}}} {
+	upvar $varName var
+	if [info exists var] {
+		return $var
+	} else {
+		return $default
+	}
+}
 
 #doc {convenience rem} cmd {
 #rem args

@@ -362,23 +362,22 @@ ExtraL_LremdupObjCmd(dummy, interp, objc, objv)
 			TCL_LEAVE_ERR_MSG|TCL_PARSE_PART1) == NULL) {return TCL_ERROR;}
 	}
 	if (sort == 0) {
+		Tcl_HashTable table;
+		int new;
+		Tcl_InitHashTable(&table,TCL_STRING_KEYS);
 		for(i=0;i<listLen;i++) {
 			string = Tcl_GetStringFromObj(elemPtrs[i], &len);
-			for(j=0;j<i;j++) {
-				checkstring = Tcl_GetStringFromObj(elemPtrs[j], &checklen);
-				if ((len==checklen)&&(memcmp(string,checkstring,len)==0))	{
-					break;
-				}
-			}
-			if (i==j)	{
-				result=Tcl_ListObjAppendElement(interp,resultObj,elemPtrs[i]);
-				if (result!=TCL_OK) {return result;}
+			Tcl_CreateHashEntry(&table,string,&new);
+			if (new != 0) {
+				result = Tcl_ListObjAppendElement(interp,resultObj,elemPtrs[i]);
+				if (result!=TCL_OK) {Tcl_DeleteHashTable(&table);return result;}
 			} else if (var == 1) {
 				if (Tcl_ObjSetVar2(interp,objv[sort+2],NULL,elemPtrs[i],
 					TCL_LEAVE_ERR_MSG|TCL_APPEND_VALUE|
-					TCL_LIST_ELEMENT|TCL_PARSE_PART1) == NULL) {return TCL_ERROR;}
+					TCL_LIST_ELEMENT|TCL_PARSE_PART1) == NULL) {Tcl_DeleteHashTable(&table);return TCL_ERROR;}
 			}
 		}
+		Tcl_DeleteHashTable(&table);
 	} else {
 		checkstring = Tcl_GetStringFromObj(elemPtrs[0], &checklen);
 		result = Tcl_ListObjAppendElement(interp,resultObj,elemPtrs[0]);

@@ -19,6 +19,28 @@
 	first given by literate.
 
 <b><dt>
+invoke vars cmd ...
+</b><dd>
+ invoke simply evals $cmd in a private space. This eg. allows using
+ temporary variables in bindings without creating these in global scope.
+ Further arguments (when given) are parameters that will be available in the
+ variables given in vars. If more parameters are supplied than vars are given,
+ the remaining parameters will be stored in the variable args.
+
+<b><dt>
+arraytrans varName list ?default?
+</b><dd>
+ returns a list of all the values in the array corresponding to the
+ indices in the given list. If the index is not present in the array,
+ the index itself will be returned.
+ If $default is given, it will be returned for indices not in the array.
+
+<b><dt>
+? expr truevalue falsevalue
+</b><dd>
+ ? expr truevalue falsevalue
+
+<b><dt>
 rem args
 </b><dd>
 	does nothing<br>

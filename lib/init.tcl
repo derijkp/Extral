@@ -53,13 +53,5 @@ if [file exists [file join ${Extral::dir} extral[info sharedlibextension]]] {
 #
 
 lappend auto_path [file join ${Extral::dir} lib]
-Extral::export loaddbm {
-	proc loaddbm {name} {
-		variable dir
-		if [catch {load [file join $dir dbm $name[info sharedlibextension]]}] {
-			return -code error "could not load dbm type \"$name\""
-		}
-	}
-}
 
 source [file join ${Extral::dir} lib atexit.tcl]

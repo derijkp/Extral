@@ -134,7 +134,7 @@ proc lcommon {args} {
 #}
 proc lunion {args} {
 	set result [eval concat $args]
-	return [lmanip remdup $result]
+	return [lremdup $result]
 }
 
 #doc {listcommands leor} cmd {

@@ -30,14 +30,6 @@
 #	% lmanip extract {Results {A: 50%} {B: 25%} {C: 25%}} { ([0-9+]+)\%}
 #		{} 50 25 25
 #}
-#doc {lmanip remdup} cmd {
-#lmanip remdup ?list?
-#} descr {
-#	removes duplicates from list
-#} example {
-#	% lmanip remdup {a b c a b d}
-#	a b c d
-#}
 #doc {lmanip split} cmd {
 #lmanip split ?list? -before/-after/-outside ?positions?
 #} descr {
@@ -121,18 +113,6 @@ proc lmanip {option args} {
 				}
 			}
 			return $result
-		}
-		remdup {
-			if {[llength $args]!=1} {
-				error "wrong # args: should be \"lmanip remdup list\""
-			}
-			set done ""
-			foreach e [lindex $args 0] {
-				if {[lsearch $done $e]==-1} {
-					lappend done $e
-				}
-			}
-			return $done
 		}
 		split {
 			if {[llength $args]!=3} {
@@ -221,7 +201,7 @@ proc lmanip {option args} {
 			return $result
 		}
 		default {
-			error "bad option \"$option\": should be subindex, mangle, extract, remdup, split, join, lengths, fill or ffill"
+			error "bad option \"$option\": should be subindex, mangle, extract, split, join, lengths, fill or ffill"
 		}
 	}
 }

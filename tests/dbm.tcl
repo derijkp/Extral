@@ -1,6 +1,3 @@
-test dbm-general {load not existing type} {
-	loaddbm notexists
-} {could not load dbm type "notexists"} 1
 
 test [type] {create} {
 	catch {file delete -force db.test}

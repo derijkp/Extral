@@ -381,6 +381,8 @@ int ExtraL_DbmObjCmd(
 				objv += 2;
 			}
 			typestring = Tcl_GetStringFromObj(objv[0],&error);
+			error = Tcl_VarEval(interp,"Extral::loaddbm ",typestring,(char *)NULL);
+			if (error != TCL_OK) {return error;}
 			dbminfo = ExtraL_DbmOpen(interp,typestring,objv[2],readonly,objc-3,objv+3);
 			if (dbminfo == NULL) {
 				return TCL_ERROR;
@@ -395,6 +397,29 @@ int ExtraL_DbmObjCmd(
 		}
 	} else if (cmdlen == 5) {
 		if (strcmp(cmd,"types") == 0) {
+			return Tcl_Eval(interp,"Extral::types");
+		}
+	} else if (cmdlen == 6) {
+		if (strcmp(cmd,"create") == 0) {
+			if (objc < 4) {
+				Tcl_WrongNumArgs(interp, 1, objv, "create type database ?options?");
+				return TCL_ERROR;
+			}
+			typestring = Tcl_GetStringFromObj(objv[2],&error);
+			error = Tcl_VarEval(interp,"Extral::loaddbm ",typestring,(char *)NULL);
+			if (error != TCL_OK) {return error;}
+			entry = Tcl_FindHashEntry(&dbmtypesTable, typestring);
+			if (entry == NULL) {
+				Tcl_ResetResult(interp);
+				Tcl_AppendResult(interp,"no such type: \"",typestring ,"\"", (char *)NULL);
+				return TCL_ERROR;
+			}
+			type = (DbmType *)Tcl_GetHashValue(entry);
+			error = (type->create)(interp,objv[3],objc-4,objv+4);
+			if (error != TCL_OK) {return error;}
+			Tcl_ResetResult(interp);
+			return TCL_OK;
+		} else if (strcmp(cmd,"_types") == 0) {
 			Tcl_HashSearch search;
 			char *key;
 
@@ -412,22 +437,10 @@ int ExtraL_DbmObjCmd(
 			}
 			return TCL_OK;
 		}
-	} else if (cmdlen == 6) {
-		if (strcmp(cmd,"create") == 0) {
-			if (objc < 4) {
-				Tcl_WrongNumArgs(interp, 1, objv, "create type database ?options?");
-				return TCL_ERROR;
-			}
-			typestring = Tcl_GetStringFromObj(objv[2],&error);
-			entry = Tcl_FindHashEntry(&dbmtypesTable, typestring);
-			if (entry == NULL) {
-				Tcl_ResetResult(interp);
-				Tcl_AppendResult(interp,"no such type: \"",typestring ,"\"", (char *)NULL);
-				return TCL_ERROR;
-			}
-			type = (DbmType *)Tcl_GetHashValue(entry);
-			error = (type->create)(interp,objv[3],objc-4,objv+4);
-			if (error != TCL_OK) {return error;}
+	} else if (cmdlen == 14) {
+		if (strcmp(cmd,"implementation") == 0) {
+			Tcl_ResetResult(interp);
+			Tcl_AppendResult(interp,"C", (char *)NULL);
 			return TCL_OK;
 		}
 	}

@@ -28,76 +28,33 @@
 #The database code can also be used from C using the ExtraL_DbmOpen function.
 #}
 
-if 0 {
-proc Extral::loaddbm {} {}
-}
-Extral::export loaddbm {
-	proc loaddbm {name} {
-		variable dir
-		if [catch {source [file join $dir dbm $name.tcl]}] {
-			return -code error "could not load dbm type \"$name\""
+proc Extral::types {} {
+	set list ""
+	foreach item [lunion [array names ::auto_index ::Extral::dbmtype_*] [info commands ::Extral::dbmtype_*]] {
+		if [uplevel #0 $item] {
+			regsub ::Extral::dbmtype_ $item {} item
+			lappend list $item
 		}
-		source [file join $dir dbm $name.tcl]
 	}
+	return $list
 }
 
-proc Extral::fdbm__create {database arg} {
-	if {"$arg" != ""} {
-		return  -code error "fdbm create has no options"
+proc Extral::loaddbm {type} {
+	if [info exists ::Extral::dbm_loaded_types($type)] {
+		return
 	}
-	if [file exists $database] {
-		return -code error "could not create database \"$database\""
+	if [catch {uplevel #0 ::Extral::dbminittype_$type} result] {
+		return -code error -errorinfo $::errorInfo "Could not load type \"$type\": $result"
 	}
-	file mkdir $database
+	set ::Extral::dbm_loaded_types($type) 1
 }
 
-proc Extral::fdbm__open {object readonly database arg} {
-	if {"$arg" != ""} {
-		return  -code error "fdbm open has no options"
-	}
-	set ::Extral::dbm($object,dir) $database
-	if ![file exists $database] {
-		return -code error "could not open database \"$database\""
-	}
+if {"[info commands Extral::dbm]" != ""} {
+	set Extral::temp [::Extral::dbm implementation]
+} else {
+	set Extral::temp tcl
 }
-
-proc Extral::fdbm__close {object} {
-	unset ::Extral::dbm($object,dir)
-}
-
-proc Extral::fdbm__set {object key value} {
-	set file [file join [set ::Extral::dbm($object,dir)] $key]
-	if [catch {writefile $file $value}] {
-		return -code error "could not store key \"$key\""
-	}
-	return ""
-}
-
-proc Extral::fdbm__get {object key} {
-	set file [file join [set ::Extral::dbm($object,dir)] $key]
-	if ![file readable $file] {
-		return -code error "error: key \"$key\" not found"
-	}
-	return [readfile $file]
-}
-
-proc Extral::fdbm__keys {object {pattern *}} {
-	return [dirglob [set ::Extral::dbm($object,dir)] $pattern]
-}
-
-proc Extral::fdbm__unset {object key} {
-	set file [file join [set ::Extral::dbm($object,dir)] $key]
-	catch {file delete $file}
-	return ""
-}
-
-proc Extral::fdbm__sync {object} {
-}
-
-proc Extral::fdbm__reorganize {object} {
-}
-
-laddnew ::Extral::dbm(types) fdbm
+if {"$Extral::temp" == "tcl"} {
 
 #doc {dbm dbm} h2 "dbm command"
 #doc {dbm dbm types} cmd {
@@ -136,13 +93,11 @@ proc Extral::dbm {cmd args} {
 			set type [lindex $args 0]
 			set object [lindex $args 1]
 			set database [lindex $args 2]
-			if {[lsearch -exact [set ::Extral::dbm(types)] $type] == -1} {
-				return -code error "no such type: \"$type\""
-			}
+			Extral::loaddbm $type
 			${type}__open $object $readonly $database [lrange $args 3 end]
 			set ::Extral::dbm($object,type) $type
 			set ::Extral::dbm($object,readonly) $readonly
-			proc $object {args} "Extral::dbmcmd $object \$args"
+			proc ::$object {args} "Extral::dbmcmd $object \$args"
 			return $object
 		}
 		create {
@@ -150,13 +105,14 @@ proc Extral::dbm {cmd args} {
 				return -code error "wrong # args: should be \"dbm create type database ?options?\""
 			}
 			set type [lindex $args 0]
-			if {[lsearch -exact [set ::Extral::dbm(types)] $type] == -1} {
-				return -code error "no such type: \"$type\""
-			}
+			Extral::loaddbm $type
 			${type}__create [lindex $args 1] [lrange $args 2 end]
 		}
 		types {
-			return [set ::Extral::dbm(types)]
+			return [::Extral::types]
+		}
+		implementation {
+			return tcl
 		}
 		default {
 			return -code error "bad option \"$cmd\": must be one of create, open or types"
@@ -283,3 +239,4 @@ proc Extral::dbmcmd {object arg} {
 	}
 }
 
+}

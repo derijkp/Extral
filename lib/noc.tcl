@@ -200,8 +200,9 @@ proc lremdup {args} {
 	set done ""
 	if !$sorted {
 		foreach e $list {
-			if {[lsearch $done $e]==-1} {
+			if {![info exists a($e)]} {
 				lappend done $e
+				set a($e) {}
 			} elseif $usevar {
 				lappend v $e
 			}

@@ -153,7 +153,7 @@ int ExtraL_StructlSetRegexp(interp,structure,data,oldvalue,tagsc,tagsv,value)
 	if (error != TCL_OK) {return error;}
 	if (temp != 4) {
 		Tcl_ResetResult(interp);
-		Tcl_AppendResult(interp,"error: wrong number of arguments in structure \"", Tcl_GetStringFromObj(structure,&temp), "\"",(char *)NULL);
+		Tcl_AppendResult(interp,"error: wrong number of arguments in structure \"", Tcl_GetStringFromObj(structure,&temp), "\": should be \"*regexp pattern errormsg default\"",(char *)NULL);
 		return TCL_ERROR;
 	}
 	error = Tcl_ListObjIndex(interp, structure, 1, &patternObj);
@@ -619,12 +619,9 @@ int ExtraL_StructlUnsetList(interp,structure,data,oldvalue,tagsc,tagsv,value)
 	int taglen;
 	char *tag;
 
-	error = Tcl_ListObjLength(interp,structure,&len);
-	if (error != TCL_OK) {return error;}
-	if (len != 2) {
-		Tcl_ResetResult(interp);
-		Tcl_AppendResult(interp,"error: wrong number of arguments in structure \"", Tcl_GetStringFromObj(structure,NULL), "\"",(char *)NULL);
-		return TCL_ERROR;
+	if (oldvalue == NULL) {
+		*value = NULL;
+		return 5;
 	}
 	if (tagsc == 0) {
 		*value = NULL;
@@ -635,95 +632,124 @@ int ExtraL_StructlUnsetList(interp,structure,data,oldvalue,tagsc,tagsv,value)
 		tagsc--;
 		tagsv++;
 	}
+	error = Tcl_ListObjLength(interp,structure,&len);
+	if (error != TCL_OK) {return error;}
+	if (len != 2) {
+		Tcl_ResetResult(interp);
+		Tcl_AppendResult(interp,"error: wrong number of arguments in structure \"", Tcl_GetStringFromObj(structure,NULL), "\"",(char *)NULL);
+		return TCL_ERROR;
+	}
 	error = Tcl_ListObjIndex(interp, structure, 1, &struc);
 	if (error != TCL_OK) {return error;}
-	if (taglen==0) {
-		Tcl_Obj **oldv;
-		int oldc,i;
-		if (oldvalue != NULL) {
+	if (tagsc != 0) {
+fprintf(stdout,"non zero tagsc\n");
+fflush(stdout);
+		if (taglen == 0) {
+			Tcl_Obj **oldv;
+			int oldc,i;
 			error = Tcl_ListObjGetElements(interp, oldvalue, &oldc, &oldv);
 			if (error != TCL_OK) {return error;}
-		} else {
-			oldc = 0;
-		}
-		result = Tcl_NewObj();
-		i=0;
-		while(i<oldc) {
-			error = ExtraL_StructlunsetStruct(interp,struc,data,oldv[i],tagsc,tagsv,&res);
-			if (error == 5) {
-				Tcl_ListObjAppendElement(interp,result,Tcl_NewObj());
-			} else if (error != TCL_OK) {
-				Tcl_DecrRefCount(result);
-				return TCL_ERROR;
-			} else {
-				Tcl_ListObjAppendElement(interp,result,res);
-			}
-			i++;
-		}
-		*value = result;
-		return TCL_OK;
-	} else {
-		Tcl_Obj **tagv, *oldval;
-		int tagc,pos,len;
-		error = Tcl_ListObjGetElements(interp, tagObj, &tagc, &tagv);
-		if (error != TCL_OK) {return error;}
-		if (tagc==1) {
-			if (oldvalue == NULL) {
-				len = 0;
-			} else {
-				error = Tcl_ListObjLength(interp,oldvalue,&len);
-			}
-			if (len == 0) {
-				Tcl_ResetResult(interp);
-				Tcl_AppendResult(interp,"empty list",(char *)NULL);
-				return TCL_ERROR;
-			}
-			if (strcmp(tag,"end") == 0) {
-				pos = len-1;
-				if (error != TCL_OK) {return error;}
-			} else {
-				error = Tcl_GetIntFromObj(interp, tagv[0], &pos);
-				if (pos>=len) {
-					Tcl_ResetResult(interp);
-					Tcl_AppendResult(interp,"list doesn't contain element ",
-						Tcl_GetStringFromObj(tagv[0],NULL),(char *)NULL);
+			result = Tcl_NewObj();
+			i=0;
+			while(i<oldc) {
+				error = ExtraL_StructlunsetStruct(interp,struc,data,oldv[i],tagsc,tagsv,&res);
+				if (error == 5) {
+					Tcl_ListObjAppendElement(interp,result,Tcl_NewObj());
+				} else if (error != TCL_OK) {
+					Tcl_DecrRefCount(result);
 					return TCL_ERROR;
+				} else {
+					Tcl_ListObjAppendElement(interp,result,res);
 				}
-				if (error != TCL_OK) {return error;}
+				i++;
 			}
-			error = Tcl_ListObjIndex(interp, oldvalue, pos, &oldval);
+			*value = result;
+			return TCL_OK;
+		} else {
+			Tcl_Obj **tagv, *oldval;
+			int tagc,pos,len;
+			error = Tcl_ListObjGetElements(interp, tagObj, &tagc, &tagv);
 			if (error != TCL_OK) {return error;}
-			if (oldval == NULL) {oldval = Tcl_NewObj();}
-			if (tagsc == 0) {
-				error = 5;
-			} else {
-				error = ExtraL_StructlunsetStruct(interp,struc,data,oldval,tagsc,tagsv,&res);
-				if (error == TCL_ERROR) {return TCL_ERROR;}
-			}
-			if (error != 5) {
-				result = Tcl_DuplicateObj(oldvalue);
-				error = Tcl_ListObjReplace(interp,result,pos,1,1,&res);
-			} else {
+			if (tagc==1) {
 				error = Tcl_ListObjLength(interp,oldvalue,&len);
-				if (error == TCL_ERROR) {return TCL_ERROR;}
+				if (error != TCL_OK) {return error;}
+				if (strcmp(tag,"end") == 0) {
+					pos = len-1;
+				} else {
+					error = Tcl_GetIntFromObj(interp, tagv[0], &pos);
+					if (error != TCL_OK) {return error;}
+					if (pos>=len) {
+						*value = oldvalue;
+						return TCL_OK;
+					}
+				}
+				error = Tcl_ListObjIndex(interp, oldvalue, pos, &oldval);
+				if (error != TCL_OK) {return error;}
+				error = ExtraL_StructlunsetStruct(interp,struc,data,oldval,tagsc,tagsv,&res);
+				if (error == TCL_ERROR) {
+					return TCL_ERROR;
+				} else if (error == 5) {
+					*value = Tcl_DuplicateObj(oldvalue);
+					res = Tcl_NewObj();
+					error = Tcl_ListObjReplace(interp,*value,pos,1,1,&res);
+					if (error != TCL_OK) {Tcl_DecrRefCount(*value);}
+					return error;
+				} else {
+					*value = Tcl_DuplicateObj(oldvalue);
+					error = Tcl_ListObjReplace(interp,*value,pos,1,1,&res);
+					if (error != TCL_OK) {Tcl_DecrRefCount(*value);}
+					return error;
+				}
+			} else {
+				Tcl_ResetResult(interp);
+				Tcl_AppendResult(interp,"wrong # args to list",(char *)NULL);
+				*value = NULL;
+				return TCL_ERROR;
+			}
+		}
+	} else {
+		if (taglen==0) {
+			*value = NULL;
+			return 5;
+		} else {
+			Tcl_Obj **tagv;
+			int tagc,pos,len;
+			error = Tcl_ListObjGetElements(interp, tagObj, &tagc, &tagv);
+			if (error != TCL_OK) {return error;}
+			if (tagc==1) {
+				error = Tcl_ListObjLength(interp,oldvalue,&len);
+				if (error != TCL_OK) {return error;}
+				if (strcmp(tag,"end") == 0) {
+					pos = len-1;
+				} else {
+					error = Tcl_GetIntFromObj(interp, tagv[0], &pos);
+					if (error != TCL_OK) {return error;}
+					if (pos>=len) {
+						Tcl_ResetResult(interp);
+						Tcl_AppendResult(interp,"list doesn't contain element ",
+							Tcl_GetStringFromObj(tagv[0],NULL),(char *)NULL);
+						return TCL_ERROR;
+					}
+				}
 				if (len==1) {
 					*value = NULL;
 					return 5;
 				} else {
-					result = Tcl_DuplicateObj(oldvalue);
-					error = Tcl_ListObjReplace(interp,result,pos,1,0,NULL);
+					*value = Tcl_DuplicateObj(oldvalue);
+					error = Tcl_ListObjReplace(interp,*value,pos,1,0,NULL);
+					if (error != TCL_OK) {Tcl_DecrRefCount(*value);}
+					return error;
 				}
+			} else {
+				Tcl_ResetResult(interp);
+				Tcl_AppendResult(interp,"wrong # args to list",(char *)NULL);
+				*value = NULL;
+				return TCL_ERROR;
 			}
-			if (error != TCL_OK) {return error;}
-			*value = result;
-			return TCL_OK;
-		} else {
-			Tcl_ResetResult(interp);
-			Tcl_AppendResult(interp,"wrong # args to list",(char *)NULL);
-			*value = NULL;
-			return TCL_ERROR;
 		}
 	}
+	*value = result;
+	return TCL_OK;
 }
 
 int ExtraL_StructlGetList(interp,structure,data,tagsc,tagsv,value)
@@ -923,8 +949,12 @@ int ExtraL_StructlSetNamed(interp,structure,data,oldvalue,tagsc,tagsv,value)
 			return TCL_ERROR;
 		}
 		tag = Tcl_GetStringFromObj(tagsv[0],&taglen);
-		error = ExtraL_StructlFindTag(interp, oldvalue, tag, taglen, &oldval, &pos);
-		if (error != TCL_OK) {return TCL_ERROR;}
+		if (oldvalue != NULL) {
+			error = ExtraL_StructlFindTag(interp, oldvalue, tag, taglen, &oldval, &pos);
+			if (error != TCL_OK) {return TCL_ERROR;}
+		} else {
+			pos = -1;
+		}
 		if (pos == -1) {
 			error = ExtraL_StructlsetStruct(interp,struc,data,NULL,tagsc-1,tagsv+1,*value,&res);
 			if (error == TCL_ERROR) {
@@ -933,7 +963,11 @@ int ExtraL_StructlSetNamed(interp,structure,data,oldvalue,tagsc,tagsv,value)
 			} else if (error == 5) {
 				result = oldvalue;
 			} else {
-				result = Tcl_DuplicateObj(oldvalue);
+				if (oldvalue != NULL) {
+					result = Tcl_DuplicateObj(oldvalue);
+				} else {
+					result = Tcl_NewObj();
+				}
 				error = Tcl_ListObjAppendElement(interp,result,Tcl_DuplicateObj(tagsv[0]));
 				if (error != TCL_OK) {Tcl_DecrRefCount(result);return error;}
 				error = Tcl_ListObjAppendElement(interp,result,res);
