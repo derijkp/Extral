@@ -1,6 +1,9 @@
 set auto_path {/home/peter/dev/Extral1a /home/peter/bin/Peos1a /usr/local/lib/tcl8.0 /usr/local/lib/tk8.0}
 package require Extral 1.1
 
+set long [lmanip fill 10000 1 1]
+time {lregsub {c$} $long {!}}
+
 ffind -regexp -matches -allmatches [glob ../test/*] "\norg:(\[^\n\]*)\n"
 ffind -regexp -matches -allfiles [glob ../test/*] "\norg:(\[^\n\]*)\n" null
 ffind -regexp [glob ../test/*] "\norg:(\[^\n\]*)\n"

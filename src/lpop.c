@@ -65,6 +65,9 @@ ExtraL_LpopObjCmd(dummy, interp, objc, objv)
 	if (result==TCL_ERROR) {
 		return TCL_ERROR;
 	}
+	if (listLen==0) {
+		return TCL_OK;
+	}
 	if (objc==2) {
 		first = (listLen - 1);
 	} else {
@@ -80,13 +83,13 @@ ExtraL_LpopObjCmd(dummy, interp, objc, objv)
 		if (first < 0)  {
 			first = 0;
 		}
-	}
-	if (first >= listLen) {
-		Tcl_ResetObjResult(interp);
-		resultPtr = iPtr->objResult;
-		Tcl_StringObjAppend(resultPtr, "list doesn't contain element ", -1);
-		Tcl_StringObjAppendObj(resultPtr, objv[2]);
-		return TCL_ERROR;
+		if (first >= listLen) {
+			Tcl_ResetObjResult(interp);
+			resultPtr = iPtr->objResult;
+			Tcl_StringObjAppend(resultPtr, "list doesn't contain element ", -1);
+			Tcl_StringObjAppendObj(resultPtr, objv[2]);
+			return TCL_ERROR;
+		}
 	}
 
 	result = Tcl_ListObjIndex(interp,listObjPtr,first,&popPtr);

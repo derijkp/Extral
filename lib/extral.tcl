@@ -22,30 +22,6 @@ proc lwrite {filename list} {
 	close $f
 }
 
-#proc lpop {ulist args} {
-#	upvar $ulist list
-#	if {[llength $args]>1} {
-#		error "Format is \"lpop listname ?position?\""
-#	}
-#	if {[llength $list]==0} {return ""}
-#	if {"$args"==""} { 
-#		set end [llength $list]
-#		incr end -1
-#		set result [lindex $list $end]
-#		incr end -1
-#		set list [lrange $list 0 $end]
-#	} else {
-#		set pos $args
-#		if {$pos>=[llength $list]} {
-#			return {}
-#		}
-#		set result [lindex $list $pos]
-#		set list [lsub $list -exclude $pos]
-#	}
-#	return $result
-#}
-#
-
 proc lpush {ulist item {pos {}}} {
 	upvar $ulist list
 	if {("$list"=="")||("$pos"=="")} { 
@@ -58,11 +34,6 @@ proc lpush {ulist item {pos {}}} {
 		set list [lreplace $list $pos $pos $temp $item]
 	}
 }
-
-#proc lshift {ulist} {
-#	upvar $ulist list
-#	lpop list 0
-#}
 
 proc lunshift {ulist item} {
 	upvar $ulist list
