@@ -28,9 +28,10 @@ proc dirglob {dir pattern} {
 #} descr {
 #	returns the contents of the file given by filename
 #}
-proc file_read {filename} {
+proc file_read {args} {
+	set filename [list_pop args]
 	set f [open $filename "r"]
-	fconfigure $f -buffersize 100000
+	eval fconfigure $f -buffersize 100000 $args
 	set result [read $f]
 	close $f
 	return $result

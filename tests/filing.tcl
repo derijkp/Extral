@@ -20,6 +20,13 @@ test file_write {basic} {
 	set c
 } {try it}
 
+test file_read {binary} {
+	set f [open try.txt w]
+	puts $f "try\n\r\nit"
+	close $f
+	file_read -translation binary try.txt
+} "try\n\r\nit\n"
+
 test list_write-list_load {basic} {
 	set list {a {b c} {d e}}
 	file delete try.txt

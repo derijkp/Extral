@@ -10,8 +10,8 @@
 PROJECT = extral
 
 # Definitions: comment second line instead of first to compile with debugging information
-CFLAGS = -g -Wall -Wno-implicit-int 
-#CFLAGS = -O -D__NO_STRING_INLINES -D__NO_MATH_INLINES -Wall -Wno-implicit-int
+#CFLAGS = -g -Wall -Wno-implicit-int 
+CFLAGS = -O -D__NO_STRING_INLINES -D__NO_MATH_INLINES -Wall -Wno-implicit-int
 
 # Definitions: comment second line instead of first to compile with debugging information
 #LDFLAGS = 
