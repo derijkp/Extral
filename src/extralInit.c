@@ -62,9 +62,11 @@ extern int ExtraL_TaglfieldsObjCmd _ANSI_ARGS_((ClientData clientData,
 extern int ExtraL_TaglfindObjCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
 
-extern int ExtraL_ScanDateObjCmd _ANSI_ARGS_((ClientData clientData,
+extern int ExtraL_ScanTimeObjCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
 
+extern int ExtraL_FormatTimeObjCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int argc, char *argv[]));
 
 #ifdef windows
 /*
@@ -106,7 +108,8 @@ Extral_Init(interp)
 	Tcl_CreateObjCommand(interp,"taglget",(Tcl_ObjCmdProc *)ExtraL_TaglgetObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"taglfields",(Tcl_ObjCmdProc *)ExtraL_TaglfieldsObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"taglfind",(Tcl_ObjCmdProc *)ExtraL_TaglfindObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"scandate",(Tcl_ObjCmdProc *)ExtraL_ScanDateObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"scantime",(Tcl_ObjCmdProc *)ExtraL_ScanTimeObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"formattime",(Tcl_ObjCmdProc *)ExtraL_FormatTimeObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Extral_taglInit(interp);
 
 /*	dld_AddTclCommand(interp, "ffind", ExtraL_FfindCmd); */
