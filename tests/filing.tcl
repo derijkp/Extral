@@ -27,4 +27,12 @@ test list_write-list_load {basic} {
 	list_load try.txt
 } {a {b c} {d e}}
 
+test file_fullpath {basic} {
+	file_fullpath /tmp/try.txt
+} /tmp/try.txt
+
+test file_fullpath {basic} {
+	file_fullpath try.txt
+} [file join [pwd] try.txt]
+
 testsummarize

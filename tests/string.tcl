@@ -99,4 +99,8 @@ test string_replace {insert} {
 	string_replace "abcdefgh" 2 1 23
 } ab23cdefgh
 
+test string_fill {basic} {
+	string_fill ab 5
+} ababababab
+
 testsummarize

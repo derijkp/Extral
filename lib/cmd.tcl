@@ -174,3 +174,108 @@ proc cmd_load {filename} {
 	return $result
 }
 
+#doc {cmd cmd_args} cmd {
+#	cmd_args cmd vars args
+#} descr {
+#	parses the arguments given to a command, deals with options and optional arguments
+#	
+#}
+proc cmd_args {cmd options vars arg} {
+	# Handle options
+	set pos 0
+	if [llength $options] {
+		upvar opt opt
+		array set op $options
+		while 1 {
+			set curopt [lindex $arg $pos]
+			if [string_equal $curopt --] {
+				incr pos
+				break
+			}
+			if ![info exists op($curopt)] break
+			set type [lindex $op($curopt) 0]
+			if [string_equal [lindex $type 0] switch] {
+				set value 1
+				incr pos
+			} else {
+				set value 1
+				incr pos
+				set value [lindex $arg $pos]
+				incr pos
+				switch [lindex $type 0] {
+					int {
+						if ![isint $value] {
+							return -code error "invalid value \"$value\" for option $curopt: should be an integer"
+						}
+					}
+					real {
+						if ![isreal $value] {
+							return -code error "invalid value \"$value\" for option $curopt: should be a real number"
+						}
+					}
+					oneof {
+						if ![inlist [lrange $type 1 end] $value] {
+							return -code error "invalid value \"$value\" for option $curopt: should be one of: [lrange $type 1 end]"
+						}
+					}
+				}
+			}
+			set opt($curopt) $value
+		}
+		set arg [lrange $arg $pos end]
+	}
+	# Handle arguments
+	set len [llength $arg]
+	set vlen [llength $vars]
+	set poss [list_find -regexp $vars {^[^?]}]
+	set numvar [expr {$len - [llength $poss]}]
+	set maxvar [expr {$vlen - [llength $poss]}]
+	set margspos [lsearch $vars ?...?]
+	if {$numvar < 0} {
+		set error 1
+	} elseif {$numvar > $maxvar} {
+		if {$margspos != -1} {
+			set error 0
+		} else {
+			set error 1
+		}
+	} else {
+		set error 0
+	}
+	if $error {
+		if [llength $options] {
+			set format "$cmd ?options? $vars"
+			set opterror "\nPossible options are:"
+			foreach {option descr} $options {
+				if [string_equal [lindex $descr 0] switch] {
+					append opterror "\n\t$option \"[lindex $descr end]\""
+				} else {
+					append opterror "\n\t$option $descr"
+				}
+			}
+		} else {
+			set format "$cmd $vars"
+			set opterror ""
+		}
+		return -code error "wrong # of args: should be \"$format\"$opterror"
+	}
+	if {($margspos == -1)||($len < $vlen)} {
+		set pos 0
+		foreach var $vars {
+			if [regexp {^\?(.*)\?$} $var temp var] {
+				if {$numvar <= 0} continue
+				incr numvar -1
+			}
+			lappend dovars $var
+			incr pos
+		}
+	} else {
+		set pos2 [expr {$margspos+$len-$vlen}]
+		uplevel [list set args [lrange $arg $margspos $pos2]]
+		set arg [list_concat [lrange $arg 0 [expr {$margspos-1}]] [lrange $arg [expr {$pos2+1}] end]]
+		list_pop vars $margspos
+		regsub -all {\?} $vars {} dovars
+	}
+	uplevel [list foreach $dovars $arg {}]
+}
+

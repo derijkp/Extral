@@ -1,13 +1,14 @@
 package require Extral
 catch {tk appname test}
 
-if ![info exists testleak] {
-	if {"$argv" != ""} {
-		set testleak [lindex $argv 0]
-	} else {
-		set testleak 0
-	}
-}
+#if ![info exists testleak] {
+#	if {"$argv" != ""} {
+#		set testleak [lindex $argv 0]
+#	} else {
+#		set testleak 0
+#	}
+#}
+set testleak [get testleak 0]
 
 proc putsvars args {
 	foreach arg $args {
@@ -61,7 +62,7 @@ proc test {name description script expected {causeerror 0} args} {
 			return
 		}
 	}
-	if {"$result"!="$expected"} {
+	if ![string_equal $result $expected] {
 		puts "error: result is:\n$result\nshould be\n$expected"
 		lappend errors "$name:$description" "error: result is:\n$result\nshould be\n$expected"
 	}

@@ -46,3 +46,16 @@ proc string_equal {s1 s2} {
 		return 0
 	}
 }
+
+#doc {stringcommands string_fill} cmd {
+#string_fill string number
+#} descr {
+# returns a string consisting of the argument string number times repeated
+#}
+proc string_fill {string number} {
+	set result ""
+	for {set i 0} {$i < $number} {incr i} {
+		append result $string
+	}
+	return $result
+}

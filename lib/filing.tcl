@@ -48,6 +48,19 @@ proc file_write {filename list} {
 	close $f
 }
 
+#doc {filing file_fullpath} cmd {
+#	file_fullpath filename
+#} descr {
+#	returns a absolute path to the given file
+#}
+proc file_fullpath {filename} {
+	if [string_equal [file pathtype $filename] absolute] {
+		return $filename
+	} else {
+		return [file join [pwd] $filename]
+	}
+}
+
 # Using the Unix tools
 # --------------------
 
