@@ -9,9 +9,9 @@
 
 namespace eval Extral {}
 
-# $Format: "set ::Extral::version 2.0$ProjectMajorVersion$"$
+# $Format: "set ::Extral::version $ProjectMajorVersion$.$ProjectMinorVersion$"$
 set ::Extral::version 2.0
-# $Format: "set ::Extral::patchlevel $ProjectMinorVersion$"$
+# $Format: "set ::Extral::patchlevel $ProjectPatchLevel$"$
 set ::Extral::patchlevel 3
 
 package provide Extral $::Extral::version

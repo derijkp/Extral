@@ -7,7 +7,7 @@
 # script is sourced, the variable $dir must contain the
 # full path name of this file's directory.
 
-# $Format: "package ifneeded Extral 2.0$ProjectMajorVersion: 0 $ \"$
+# $Format: "package ifneeded Extral $ProjectMajorVersion$.$ProjectMinorVersion$ \\"$
 package ifneeded Extral 2.0 \
 [subst -nocommands {
 	namespace eval ::Extral {}

@@ -46,9 +46,11 @@ proc file_read {args} {
 #} descr {
 #	create a file by the name filename with data as its content
 #}
-proc file_write {filename list} {
+proc file_write {args} {
+	set list [list_pop args]
+	set filename [list_pop args]
 	set f [open $filename "w"]
-	fconfigure $f -buffersize 100000
+	eval fconfigure $f -buffersize 100000 $args
 	puts -nonewline $f $list
 	close $f
 }
