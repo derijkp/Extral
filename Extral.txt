@@ -2,16 +2,6 @@ ExtraL Commands
 ===============  extra list manipulation commands for Tcl
                  by Peter De Rijk (Universiteit Antwerpen) 
 
-ffind <switches> filelist pattern
-	returns a list of all files in filelist which match a pattern.
-	<switches> can be -matches, -all, -allfiles -exact, -glob, or -regexp
-		-matches    : the text matching the bracketed pattern will be mangled 
-					    into the result. 
-		-allmatches : all matches in the file will be returned. 
-		-allfiles nullvalue : non matching files will return the value 
-                             given by nullvalue. matching filenames will 
-                             not be in the result
-
 lregsub ?switches? exp list subSpec
 	does a regsub for each element in the list, and returns the resulting list.
 	eg.
@@ -147,6 +137,25 @@ lpop listName ?pos?
 lshift listName
 	returns the first element from a list, thereby removing it from the list.
 
+ffind <switches> filelist pattern ?varName? ?pattern? ?varname?
+	returns the files in filelist whose content match the given pattern.
+	if varName is given, the results will be stored in this variable.
+	several patterns can be searched, the results for each being stored
+	in the apropriate variable.
+	<switches> can be -matches, -all -exact, -glob, or -regexp
+		-matches    : the text matched by the bracketed part of 
+		              the pattern will be mangled into the result. 
+		-allmatches : all matches in the file will be returned in
+		              the form of: 
+		              file1 match1 file1 match2 file2 match2
+		-allfiles   : see next
+ffind -matches -allfiles <switches> filelist pattern nulvalue ?varName? ?pattern? ?nulvalue? ?varname? ..
+	ffind with these options will return a list containing one element
+	for each file in the filelist. if the pattern was found in a file,
+	the the element contains the match; if it was not found, it will
+	contain the nulvalue. This is not compatible with the -allmatches
+	options
+
 ssort ?-ascii? ?-integer? ?-real? ?-increasing? ?-decreasing? ?-dictionary? ?-command string? ?-reflist list? list
 	enhanced lsort:
 		by D. Richard Hipp -- drh@tobit.vnet.net -- 704.948.4565 :
@@ -172,13 +181,10 @@ lwrite ?file? ?list?
 	writes a list to a file
 
 lpush listName ?item? [position]
-	for completeness, it is actually the same command as lappend.
-
-lshift listName
-	returns the first element from a list, thereby removing it from the list.
+	opposite of lpop.
 
 lunshift listName ?item?
-	prepends ?item? to the list.
+	opposite of lshift: prepends ?item? to the list.
 
 lset listName ?item? ?indexlist?
 	sets all elements of the list at the given indices to value ?item?
@@ -186,6 +192,12 @@ lset listName ?item? ?indexlist?
 larrayset array varlist valuelist
 	sets the values of valuelist to the respective elements in varlist for
 	the given array
+
+lcommon list list ...
+	returns the common elements of the lists
+
+lunion list list ...
+	returns the union of the lists
 
 leor list1 list2
 	returns the elements that are not shared between both lists
@@ -272,6 +284,7 @@ true expr
 
 Filing commands
 ---------------
+These will disappear as Tcl now has these commands in the file command
 commands to mimick (for some part) the Unix filing commands. Under Unix, they
 call the actual Unix commands after doing wildcart substitution. Under Windows
 functionality is more limited.

@@ -86,12 +86,12 @@ proc larrayset {array varlist valuelist} {
 	uplevel "array set $array \[lmanip join \[lmanip merge [list $varlist] [list $valuelist]\] \{ \} all\]"
 }
 
-proc leor {list1 list2} {
-	set cor [lcor $list1 $list2]
-	set exclusive [lfind $cor -1]
-	set join [lsub $cor -exclude $exclusive]
-	set result [lsub $list1 -exclude $join]
-	eval lappend result [lsub $list2 $exclusive]
+proc lcommon {args} {
+	set result [lpop args]
+	foreach arg $args {
+		set result [lsub $arg [lcor $arg $result]]
+	}
+	return [lmanip remdup $result]
 }
 
 proc lunion {args} {
@@ -99,12 +99,12 @@ proc lunion {args} {
 	return [lmanip remdup $result]
 }
 
-proc lcommon {args} {
-	set result [lpop args]
-	foreach arg $args {
-		set result [lsub $arg [lcor $arg $result]]
-	}
-	return [lmanip remdup $result]
+proc leor {list1 list2} {
+	set cor [lcor $list1 $list2]
+	set exclusive [lfind $cor -1]
+	set join [lsub $cor -exclude $exclusive]
+	set result [lsub $list1 -exclude $join]
+	eval lappend result [lsub $list2 $exclusive]
 }
 
 proc lremove {listref args} {
@@ -117,7 +117,7 @@ proc lremove {listref args} {
 	}
 	return $list
 }
-
+ 
 proc laddnew {listref args} {
 	upvar $listref list
 	if ![info exists list] {set list ""}

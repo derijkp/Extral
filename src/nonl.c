@@ -260,6 +260,9 @@ ffind -regexp [glob ../test/*] "\nt2:(\[^\n\]*)\n"
 			}   
 			return TCL_ERROR;
 		}
+		if (Tcl_Close(interp, file) != TCL_OK) {
+			return TCL_ERROR;
+		}
 	}
 	ckfree((char *) listArgv);
 	return TCL_OK;

@@ -293,6 +293,7 @@ MergeLists(leftPtr, rightPtr, infoPtr)
 {
     SortElement *headPtr;
     SortElement *tailPtr;
+	int b;
 
     if (leftPtr == 0) {
         headPtr = rightPtr;
@@ -364,6 +365,7 @@ SortCompareProc(firstString, secondString, infoPtr)
 		 * so as to preserve the error message in sortInterp->result.
 		 */
 	
+		if (order==0) {order=1;}
 		return order;
 	}
 	if (infoPtr->sortMode == SORTMODE_ASCII) {
@@ -378,6 +380,7 @@ SortCompareProc(firstString, secondString, infoPtr)
 			Tcl_AddErrorInfo(infoPtr->interp,
 				"\n    (converting list element from string to integer)");
 			infoPtr->resultCode = TCL_ERROR;
+			if (order==0) {order=1;}
 			return order;
 		}
 		if (a > b) {
@@ -393,6 +396,7 @@ SortCompareProc(firstString, secondString, infoPtr)
 			Tcl_AddErrorInfo(infoPtr->interp,
 				"\n    (converting list element from string to real)");
 			infoPtr->resultCode = TCL_ERROR;
+			if (order==0) {order=1;}
 			return order;
 		}
 		if (a > b) {
@@ -417,6 +421,7 @@ SortCompareProc(firstString, secondString, infoPtr)
 		if (infoPtr->resultCode != TCL_OK) {
 			Tcl_AddErrorInfo(infoPtr->interp,
 				"\n    (user-defined comparison command)");
+			if (order==0) {order=1;}
 			return order;
 		}
 	
@@ -431,12 +436,14 @@ SortCompareProc(firstString, secondString, infoPtr)
 				"comparison command returned non-numeric result",
 				(char *) NULL);
 			infoPtr->resultCode = TCL_ERROR;
+			if (order==0) {order=1;}
 			return order;
 		}
 	}
 	if (!infoPtr->isIncreasing) {
 		order = -order;
 	}
+	if (order==0) {order=1;}
 	return order;
 }
 
@@ -508,6 +515,7 @@ DictionaryCompare(left, right)
         left++;
         right++;
     }
+/* This is necessary to keep the order of the sort list for doubles in the reflist */
     if (diff == 0) diff = secondaryDiff;
     return diff;
 }
