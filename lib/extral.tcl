@@ -9,6 +9,31 @@
 #
 # =============================================================
 
+if ![info exists Extral__noc] {
+proc lremove {list args} {
+	if {"$args"==""} {
+		return $list
+	}
+	set result ""
+	foreach item $list {
+		set pos [lsearch $args $item]
+		if {$pos==-1} {
+			lappend result $item
+		}
+	}
+	return $result
+}
+} else {
+proc lremove {list args} {
+	if {"$args"==""} {
+		return $list
+	} else {
+		return [llremove $list $args]
+	}
+}
+}
+
+
 proc lmerge {args} {
 	if {([llength $args]!=2)&&([llength $args]!=3)} {
 		error "wrong # args: should be \"lmerge list1 list2 ?spacing?\""

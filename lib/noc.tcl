@@ -104,8 +104,7 @@ proc lremdup list {
 	return $done
 }
 
-if ![info exists Extral__noc] {
-proc lremove {list removelist} {
+proc llremove {list removelist} {
 	if {"$removelist"==""} {
 		set removelist {{}}
 	}
@@ -117,34 +116,6 @@ proc lremove {list removelist} {
 		}
 	}
 	return $result
-}
-} else {
-proc lremove {list removelist} {
-	if {"$removelist"==""} {
-		set removelist {{}}
-	}
-	set result ""
-	set len [llength $list]
-	set rlen [llength $removelist]
-	if {$rlen>$len} {
-		foreach item $list {
-			set pos [lsearch $removelist $item]
-			if {$pos==-1} {
-				lappend result $item
-			}
-		}
-		return $result
-	} else {
-		foreach item $removelist {
-			while 1 {
-				set pos [lsearch -exact $list $item]
-				if {$pos==-1} break
-				set list [lreplace $list $pos $pos]
-			}
-		}
-		return $list	
-	}
-}
 }
  
 #not really the same

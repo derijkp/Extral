@@ -364,9 +364,9 @@ ExtraL_LremdupObjCmd(dummy, interp, objc, objv)
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_LremoveCmd --
+ * ExtraL_LlremoveCmd --
  *
- *		This procedure is invoked to process the "lremove" command.
+ *		This procedure is invoked to process the "llremove" command.
  *
  * Results:
  *		A standard Tcl result.
@@ -376,7 +376,7 @@ ExtraL_LremdupObjCmd(dummy, interp, objc, objv)
  */
 
 int
-ExtraL_LremoveObjCmd(notUsed, interp, objc, objv)
+ExtraL_LlremoveObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;				 /* Not used. */
 	Tcl_Interp *interp;					/* Current interpreter. */
 	int objc;						/* Number of arguments. */
