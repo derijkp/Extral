@@ -6,8 +6,8 @@ VERSION=0.92
 # TCL_DIR =	../tcl7.4
 # TCL_DIR2 =	../tcl7.4
 # To build against Tcl7.5
-TCL_DIR =	../tcl7.5a2/generic
-TCL_DIR2 =	../tcl7.5a2/unix
+TCL_DIR =	/home/peter/tcl/tcl7.5b1/generic
+TCL_DIR2 =	/home/peter/tcl/tcl7.5b1/unix
 
 # compiler flags: -KPICT is to create position independed code, this might be
 # different for your compiler
@@ -40,6 +40,7 @@ depend:
 	$(CC) -c $(CC_SWITCHES) $<
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
+
 
 
 

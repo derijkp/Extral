@@ -1541,7 +1541,7 @@ ExtraL_LmathCmd(notUsed, interp, argc, argv)
 {
     int listArgc;
     char **listArgv;
-    char val[TCL_DOUBLE_SPACE];
+    char *result;
     int *list;
     int c,len;
     int i;
@@ -1556,7 +1556,7 @@ ExtraL_LmathCmd(notUsed, interp, argc, argv)
     if ((c == 's')&&(strncmp(argv[1], "sum",len) == 0)) {
         int listArgcres;
         char **listArgvres;
-        double value, sum=0;
+        int value, sum=0;
     
         if (argc != 3) {
             Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
@@ -1569,19 +1569,21 @@ ExtraL_LmathCmd(notUsed, interp, argc, argv)
 
         i=0;
         while(i<listArgc) {
-            if (Tcl_GetDouble(interp, listArgv[i], &value) != TCL_OK) {
+            if (Tcl_GetInt(interp, listArgv[i], &value) != TCL_OK) {
         	return TCL_ERROR;
             }
             sum+=value;
             i++;
         }
-        Tcl_PrintDouble(interp,sum,val);
-        Tcl_AppendResult(interp, val, (char *) NULL);
+        Tcl_ResetResult(interp);
+        result=numstr(sum);
+        Tcl_AppendResult(interp, result, (char *) NULL);
+        free(result);
         ckfree((char *) listArgv);
     } else if ((c == 'm')&&(strncmp(argv[1], "max",len) == 0)) {
         int listArgcres;
         char **listArgvres;
-        double value, max;
+        int value, max;
     
         if (argc != 3) {
             Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
@@ -1593,23 +1595,25 @@ ExtraL_LmathCmd(notUsed, interp, argc, argv)
         }
 
         i=0;
-        if (Tcl_GetDouble(interp, listArgv[i], &max) != TCL_OK) {
+        if (Tcl_GetInt(interp, listArgv[i], &max) != TCL_OK) {
             return TCL_ERROR;
         }
         while(i<listArgc) {
-            if (Tcl_GetDouble(interp, listArgv[i], &value) != TCL_OK) {
+            if (Tcl_GetInt(interp, listArgv[i], &value) != TCL_OK) {
         	return TCL_ERROR;
             }
             if (value>max) max=value;
             i++;
         }
-        Tcl_PrintDouble(interp,max,val);
-        Tcl_AppendResult(interp, val, (char *) NULL);
+        Tcl_ResetResult(interp);
+        result=numstr(max);
+        Tcl_AppendResult(interp, result, (char *) NULL);
+        free(result);
         ckfree((char *) listArgv);
     } else if ((c == 'm')&&(strncmp(argv[1], "min",len) == 0)) {
         int listArgcres;
         char **listArgvres;
-        double value, min;
+        int value, min;
     
         if (argc != 3) {
             Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
@@ -1621,23 +1625,26 @@ ExtraL_LmathCmd(notUsed, interp, argc, argv)
         }
 
         i=0;
-        if (Tcl_GetDouble(interp, listArgv[i], &min) != TCL_OK) {
+        if (Tcl_GetInt(interp, listArgv[i], &min) != TCL_OK) {
             return TCL_ERROR;
         }
         while(i<listArgc) {
-            if (Tcl_GetDouble(interp, listArgv[i], &value) != TCL_OK) {
+            if (Tcl_GetInt(interp, listArgv[i], &value) != TCL_OK) {
         	return TCL_ERROR;
             }
             if (value<min) min=value;
             i++;
         }
-        Tcl_PrintDouble(interp,min,val);
-        Tcl_AppendResult(interp, val, (char *) NULL);
+        Tcl_ResetResult(interp);
+        result=numstr(min);
+        Tcl_AppendResult(interp, result, (char *) NULL);
+        free(result);
         ckfree((char *) listArgv);
     } else if ((c == 'c')&&(strncmp(argv[1], "cumul",len) == 0)) {
         int listArgcres;
         char **listArgvres;
-        double value, current=0;
+        int value, current=0;
+        char val[30];
     
         if (argc != 3) {
             Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
@@ -1649,15 +1656,15 @@ ExtraL_LmathCmd(notUsed, interp, argc, argv)
         }
 
         i=0;
-        if (Tcl_GetDouble(interp, listArgv[i], &value) != TCL_OK) {
+        if (Tcl_GetInt(interp, listArgv[i], &value) != TCL_OK) {
             return TCL_ERROR;
         }
         while(i<listArgc) {
-            if (Tcl_GetDouble(interp, listArgv[i], &value) != TCL_OK) {
+            if (Tcl_GetInt(interp, listArgv[i], &value) != TCL_OK) {
         	return TCL_ERROR;
             }
             current+=value;
-            Tcl_PrintDouble(interp,current,val);
+            sprintf(val, "%d", current);
             Tcl_AppendElement(interp, val);
             i++;
         }
@@ -1665,14 +1672,15 @@ ExtraL_LmathCmd(notUsed, interp, argc, argv)
     } else if ((c == 'i')&&(strncmp(argv[1], "incr", len) == 0)) {
         int listArgcres;
         char **listArgvres;
-        double value, incr=0;
+        int value, incr=0;
+        char val[30];
     
         if (argc != 4) {
             Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
         	    " incr ?list? ?value?\"", (char *) NULL);
             return TCL_ERROR;
         }
-        if (Tcl_GetDouble(interp, argv[3], &incr) != TCL_OK) {
+        if (Tcl_GetInt(interp, argv[3], &incr) != TCL_OK) {
             return TCL_ERROR;
         }
         if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
@@ -1680,15 +1688,15 @@ ExtraL_LmathCmd(notUsed, interp, argc, argv)
         }
 
         i=0;
-        if (Tcl_GetDouble(interp, listArgv[i], &value) != TCL_OK) {
+        if (Tcl_GetInt(interp, listArgv[i], &value) != TCL_OK) {
             return TCL_ERROR;
         }
         while(i<listArgc) {
-            if (Tcl_GetDouble(interp, listArgv[i], &value) != TCL_OK) {
+            if (Tcl_GetInt(interp, listArgv[i], &value) != TCL_OK) {
         	return TCL_ERROR;
             }
             value+=incr;
-            Tcl_PrintDouble(interp,value,val);
+            sprintf(val, "%d", value);
             Tcl_AppendElement(interp, val);
             i++;
         }
@@ -1698,6 +1706,7 @@ ExtraL_LmathCmd(notUsed, interp, argc, argv)
         char **listArgv2;
         int what;
         double value1, value2,value;
+        char val[TCL_DOUBLE_SPACE];
     
         if (argc != 5) {
             Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
