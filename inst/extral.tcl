@@ -1,4 +1,4 @@
-package provide extral 0.92
+package provide extral 0.94
 
 # Some list commands
 # ==================
@@ -102,6 +102,14 @@ proc lremove {listref args} {
 		}
 	}
 	return $list
+}
+
+proc laddnew {listref args} {
+	upvar $listref list
+	foreach item $args {
+		lappend list $item
+	}
+	set list [lmanip remdup $list]
 }
 
 # Code to let a variable iterate over a list

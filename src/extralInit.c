@@ -36,6 +36,9 @@ extern int ExtraL_LregsubCmd _ANSI_ARGS_((ClientData clientData,
 extern int ExtraL_RandomCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
 
+extern int ExtraL_AmanipCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int argc, char *argv[]));
+
 
 int
 Extral_Init(interp)
@@ -43,7 +46,7 @@ Extral_Init(interp)
 {
     char *libDir;
 
-    Tcl_PkgProvide(interp, "extral", "0.92");
+    Tcl_PkgProvide(interp, "extral", "0.94");
     dld_AddTclCommand(interp, "lfind", ExtraL_LfindCmd);
     dld_AddTclCommand(interp, "ffind", ExtraL_FfindCmd);
     dld_AddTclCommand(interp, "lsub", ExtraL_LsubCmd);
@@ -54,6 +57,7 @@ Extral_Init(interp)
     dld_AddTclCommand(interp, "lmanip", ExtraL_LmanipCmd);
     dld_AddTclCommand(interp, "lmath", ExtraL_LmathCmd);
     dld_AddTclCommand(interp, "lregsub", ExtraL_LregsubCmd);
+    dld_AddTclCommand(interp, "amanip", ExtraL_AmanipCmd);
     dld_AddTclCommand(interp, "random", ExtraL_RandomCmd);
     srand((unsigned int)time(0));
     return TCL_OK;
@@ -70,4 +74,3 @@ dld_AddTclCommand(interp, command, function)
 	(Tcl_CmdDeleteProc *)NULL);
     return TCL_OK;
 }
-

@@ -7,7 +7,7 @@
 # script is sourced, the variable $dir must contain the
 # full path name of this file's directory.
 
-package ifneeded extral 0.92 [subst {
-load $dir/libextral[info sharedlibextension]
-source $dir/extral.tcl
+package ifneeded extral 0.94 [subst {
+load [file join $dir extral[info sharedlibextension]]
+source [file join $dir extral.tcl]
 }]
