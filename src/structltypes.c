@@ -642,8 +642,6 @@ int ExtraL_StructlUnsetList(interp,structure,data,oldvalue,tagsc,tagsv,value)
 	error = Tcl_ListObjIndex(interp, structure, 1, &struc);
 	if (error != TCL_OK) {return error;}
 	if (tagsc != 0) {
-fprintf(stdout,"non zero tagsc\n");
-fflush(stdout);
 		if (taglen == 0) {
 			Tcl_Obj **oldv;
 			int oldc,i;

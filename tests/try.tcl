@@ -1,3 +1,7 @@
+if 0 {
+	set auto_path {/opt/tcltk/lib/tcl8.2 /opt/tcltk/lib /home/peter/tmp/install/lib /home/peter/tmp/install/i386/lib}
+	package require Extral
+}
 source tools.tcl
 
 test structlist_get-list {list test type, 1 to end} {

@@ -22,6 +22,7 @@ test file_write {basic} {
 
 test file_read {binary} {
 	set f [open try.txt w]
+	fconfigure $f -translation binary
 	puts $f "try\n\r\nit"
 	close $f
 	file_read -translation binary try.txt

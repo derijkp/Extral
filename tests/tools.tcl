@@ -17,52 +17,29 @@ proc putsvars args {
 	puts "\n"
 }
 
-#proc test {name description script expected {causeerror 0}} {
-#	global errors
-#	
-#	puts "testing $name: $description"
-#	proc tools__try {} $script
-#	set error [catch tools__try result]
-#	if $causeerror {
-#		if !$error {
-#			puts "test should cause an error\nresult is \n$result"
-#			lappend errors "$name:$description" "test should cause an error\nresult is \n$result"
-#			return
-#		}	
-#	} else {
-#		if $error {
-#			puts "test caused an error\nerror is \n$result\n"
-#			lappend errors "$name:$description" "test caused an error\nerror is \n$result\n"
-#			return
-#		}
-#	}
-#	if {"$result"!="$expected"} {
-#		puts "error: result is:\n$result\nshould be\n$expected"
-#		lappend errors "$name:$description" "error: result is:\n$result\nshould be\n$expected"
-#	}
-#	return
-#}
-
 proc test {name description script expected {causeerror 0} args} {
 	global errors testleak
 	
-	puts "testing $name: $description"
+	if ![info exists ::env(TCL_TEST_ONLYERRORS)] {puts "testing $name: $description"}
 	proc tools__try {} $script
 	set error [catch tools__try result]
 	if $causeerror {
 		if !$error {
+			if [info exists ::env(TCL_TEST_ONLYERRORS)] {puts "-- test $name: $description --"}
 			puts "test should cause an error\nresult is \n$result"
 			lappend errors "$name:$description" "test should cause an error\nresult is \n$result"
 			return
 		}	
 	} else {
 		if $error {
+			if [info exists ::env(TCL_TEST_ONLYERRORS)] {puts "-- test $name: $description --"}
 			puts "test caused an error\nerror is \n$result\n"
-			lappend errors "$name:$description" "test caused an error\nerror is \n$result\n"
+			lappend errors "$name:$description" "-- test caused an error\nerror is \n$result\n"
 			return
 		}
 	}
 	if ![string_equal $result $expected] {
+		if [info exists ::env(TCL_TEST_ONLYERRORS)] {puts "-- test $name: $description --"}
 		puts "error: result is:\n$result\nshould be\n$expected"
 		lappend errors "$name:$description" "error: result is:\n$result\nshould be\n$expected"
 	}
@@ -72,6 +49,7 @@ proc test {name description script expected {causeerror 0} args} {
 		set line2 [lindex [split [exec ps l [pid]] "\n"] 1]
 		if {([lindex $line1 6] != [lindex $line2 6])||([lindex $line1 7] != [lindex $line2 7])} {
 			if {"$args" != "noleak"} {
+				if [info exists ::env(TCL_TEST_ONLYERRORS)] {puts "-- test $name: $description --"}
 				puts "possible leak:"
 				puts $line1
 				puts $line2
@@ -84,17 +62,18 @@ proc test {name description script expected {causeerror 0} args} {
 
 
 proc testsummarize {} {
-global errors
-if [info exists errors] {
-	set error "***********************\nThere were errors in the tests"
-	foreach {test err} $errors {
-		append error "\n$test  ----------------------------"
-		append error "\n$err"
+	if [info exists ::env(TCL_TEST_ONLYERRORS)] return
+	global errors
+	if [info exists errors] {
+		set error "***********************\nThere were errors in the tests"
+		foreach {test err} $errors {
+			append error "\n$test  ----------------------------"
+			append error "\n$err"
+		}
+		return -code error $error
+	} else {
+		puts "All tests ok"
 	}
-	return -code error $error
-} else {
-	puts "All tests ok"
-}
 }
 
 catch {unset errors}

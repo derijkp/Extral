@@ -1,3 +1,19 @@
+namespace eval ::Extral {}
+set ::Extral::dir /home/peter/dev/Extral
+source /home/peter/dev/Extral/lib/init.tcl
+
+
+set auto_path {/usr/lib/tcl8.0 /usr/lib /home/peter/tmp/install/lib}
+package require Extral
+info body list_pop
+info commands list_pop
+cd ../tests
+set a {1 2 3 4}
+list_pop a
+info body list_pop
+
+info body list_pop
+
 source tools.tcl
 
 set cmd test

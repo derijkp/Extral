@@ -31,7 +31,7 @@ proc array_lappend {args} {
 #array_lget arrayName list ?default?
 #} example {
 #	% array set try {a 1 b 2}
-#	% array_get try {b c} def
+#	% array_lget try {b c} def
 #	b 2 c def
 #}
 proc array_lget {args} {
@@ -90,5 +90,19 @@ proc array_trans {varName list args} {
 		}
 	}
 	return $result
+}
+
+#doc {arraycommands array_lset} cmd {
+#array_lset arrayName keylist valuelist
+#} example {
+#	% array_lset try {a b} {1 2}
+#	% array get try
+#	a 1 b 2
+#}
+proc array_lset {arrayName keylist valuelist} {
+	upvar [lindex $arrayName 0] var
+	foreach key $keylist value $valuelist {
+		set var($key) $value
+	}
 }
 

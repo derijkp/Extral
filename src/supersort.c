@@ -87,7 +87,141 @@ static int		SortCompare _ANSI_ARGS_((Tcl_Obj *firstPtr,
  *
  *----------------------------------------------------------------------
  */
-extern int TclGetIntForIndex(Tcl_Interp *interp,Tcl_Obj *objPtr, int endValue, int *indexPtr);
+/*
+ *----------------------------------------------------------------------
+ *
+ * Extral_TclGetIntForIndex --
+ *
+ *	This procedure returns an integer corresponding to the list index
+ *	held in a Tcl object. The Tcl object's value is expected to be
+ *	either an integer or a string of the form "end([+-]integer)?". 
+ *
+ * Results:
+ *	The return value is normally TCL_OK, which means that the index was
+ *	successfully stored into the location referenced by "indexPtr".  If
+ *	the Tcl object referenced by "objPtr" has the value "end", the
+ *	value stored is "endValue". If "objPtr"s values is not of the form
+ *	"end([+-]integer)?" and
+ *	can not be converted to an integer, TCL_ERROR is returned and, if
+ *	"interp" is non-NULL, an error message is left in the interpreter's
+ *	result object.
+ *
+ * Side effects:
+ *	The object referenced by "objPtr" might be converted to an
+ *	integer object.
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+Extral_TclGetIntForIndex(interp, objPtr, endValue, indexPtr)
+    Tcl_Interp *interp;		/* Interpreter to use for error reporting. 
+				 * If NULL, then no error message is left
+				 * after errors. */
+    Tcl_Obj *objPtr;		/* Points to an object containing either
+				 * "end" or an integer. */
+    int endValue;		/* The value to be stored at "indexPtr" if
+				 * "objPtr" holds "end". */
+    int *indexPtr;		/* Location filled in with an integer
+				 * representing an index. */
+{
+    char *bytes;
+    int length, offset;
+
+    if (objPtr->typePtr == Tcl_GetObjType("int")) {
+	*indexPtr = (int)objPtr->internalRep.longValue;
+	return TCL_OK;
+    }
+
+    bytes = Tcl_GetStringFromObj(objPtr, &length);
+
+    if ((*bytes != 'e') || (strncmp(bytes, "end",
+	    (size_t)((length > 3) ? 3 : length)) != 0)) {
+	if (Tcl_GetIntFromObj(NULL, objPtr, &offset) != TCL_OK) {
+	    goto intforindex_error;
+	}
+	*indexPtr = offset;
+	return TCL_OK;
+    }
+
+    if (length <= 3) {
+	*indexPtr = endValue;
+    } else if (bytes[3] == '-') {
+	/*
+	 * This is our limited string expression evaluator
+	 */
+	if (Tcl_GetInt(interp, bytes+3, &offset) != TCL_OK) {
+	    return TCL_ERROR;
+	}
+	*indexPtr = endValue + offset;
+    } else {
+		intforindex_error:
+		if (interp != NULL) {
+		    Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
+			    "bad index \"", bytes,
+			    "\": must be integer or end?-integer?", (char *) NULL);
+		    Extral_TclCheckBadOctal(interp, bytes);
+		}
+		return TCL_ERROR;
+    }
+    return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Extral_TclCheckBadOctal --
+ *
+ *	This procedure checks for a bad octal value and appends a
+ *	meaningful error to the interp's result.
+ *
+ * Results:
+ *	1 if the argument was a bad octal, else 0.
+ *
+ * Side effects:
+ *	The interpreter's result is modified.
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+Extral_TclCheckBadOctal(interp, value)
+    Tcl_Interp *interp;		/* Interpreter to use for error reporting. 
+				 * If NULL, then no error message is left
+				 * after errors. */
+    char *value;		/* String to check. */
+{
+    register char *p = value;
+
+    /*
+     * A frequent mistake is invalid octal values due to an unwanted
+     * leading zero. Try to generate a meaningful error message.
+     */
+
+    while (isspace(UCHAR(*p))) {	/* INTL: ISO space. */
+	p++;
+    }
+    if (*p == '+' || *p == '-') {
+	p++;
+    }
+    if (*p == '0') {
+	while (isdigit(UCHAR(*p))) {	/* INTL: digit. */
+	    p++;
+	}
+	while (isspace(UCHAR(*p))) {	/* INTL: ISO space. */
+	    p++;
+	}
+	if (*p == '\0') {
+	    /* Reached end of string */
+	    if (interp != NULL) {
+		Tcl_AppendResult(interp, " (looks like invalid octal number)",
+			(char *) NULL);
+	    }
+	    return 1;
+	}
+    }
+    return 0;
+}
 
 /*
  *----------------------------------------------------------------------
@@ -180,7 +314,7 @@ ExtraL_SSortObjCmd(clientData, interp, objc, objv)
 				    -1);
 			    return TCL_ERROR;
 			}
-			if (TclGetIntForIndex(interp, objv[i+1], -2, &sortInfo.index)
+			if (Extral_TclGetIntForIndex(interp, objv[i+1], -2, &sortInfo.index)
 				!= TCL_OK) {
 			    return TCL_ERROR;
 			}

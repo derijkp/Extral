@@ -11,7 +11,6 @@
 #include <string.h>
 #include <malloc.h>
 #include "tcl.h"
-#include "tclRegexp.h"
 #include "general.h"
 #define EXACT		0
 #define GLOB		1
