@@ -41,8 +41,11 @@ proc aproc {args body} {
 # ? expr truevalue falsevalue
 #}
 proc ? {expr truevalue falsevalue} {
-	uplevel if [list $expr] {{set ::Extral::temp 1} else {set ::Extral::temp 0}}
-	if $::Extral::temp {return $truevalue} else {return $falsevalue}
+	if {[uplevel expr $expr]} {
+		return $truevalue
+	} else {
+		return $falsevalue
+	}
 }
 
 #doc {convenience echo} cmd {

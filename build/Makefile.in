@@ -11,7 +11,7 @@
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
-# RCS: @(#) $Id: Makefile.in 1.1 Tue, 27 Jun 2000 10:02:22 +0200 peter $
+# RCS: @(#) $Id: Makefile.in 1.2 Tue, 08 Aug 2000 10:07:19 +0200 peter $
 
 #========================================================================
 # Edit the following few lines when writing a new extension
@@ -439,6 +439,28 @@ uninstall-binaries:
 	list='$(BINARIES)'; for p in $$list; do \
 	  rm -f $(DESTDIR)$(libdir)/$$p; \
 	done
+
+uninstall:
+	@list='$(lib_BINARIES)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    ext=`echo $$p|sed -e "s/.*\.//"`; \
+	    if test "x$$ext" = "xdll"; then \
+	        echo " rm -f $(DESTDIR)$(bindir)/$$p"; \
+	        rm -f $(DESTDIR)$(bindir)/$$p; \
+		lib=`basename $$p|sed -e 's/.[^.]*$$//'`.lib; \
+		if test -f $$lib; then \
+		    echo " rm -f $(DESTDIR)$(libdir)/$$lib"; \
+	            rm -f $(DESTDIR)$(libdir)/$$lib; \
+		fi; \
+	    else \
+		echo " rm -f $(DESTDIR)$(libdir)/$$p"; \
+	        rm -f $(DESTDIR)$(libdir)/$$p; \
+	    fi; \
+	  else :; fi; \
+	done
+	rm -rf $(DESTDIR)$(pkglibdir)
+	rm -rf $(DESTDIR)$(pkgtcllibdir)
+	rm -rf $(DESTDIR)$(pkgdatadir)
 
 installdirs:
 	$(mkinstalldirs)  $(DESTDIR)$(libdir)

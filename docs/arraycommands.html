@@ -16,7 +16,7 @@ array_lappend arrayName list
 array_lget arrayName list ?default?
 </b><br>eg.:<pre>
 	% array set try {a 1 b 2}
-	% array_get try {b c} def
+	% array_lget try {b c} def
 	b 2 c def
 </pre>
 <b><dt>
@@ -27,4 +27,11 @@ array_trans varName list ?default?
  the index itself will be returned.
  If $default is given, it will be returned for indices not in the array.
 
+<b><dt>
+array_lset arrayName keylist valuelist
+</b><br>eg.:<pre>
+	% array_lset try {a b} {1 2}
+	% array get try
+	a 1 b 2
+</pre>
 </body>
