@@ -1,33 +1,5 @@
-set struct {a int b int c int}
-set try {a 1 b 2 c 1}
-taglset -struct $struct $try d 10
-taglset -struct $struct $try b 10
-
-set struct {a int b int c {a int b {* int}}}
-set try {a 1 b 2 c {a 1 b {a 1 b 2}}}
-taglset -struct $struct $try {c b a} 10
-taglset -struct $struct $try {c b d} 10
-taglset -struct $struct $try {c c a} 10
-taglset -struct $struct $try {c a} 10
-taglset -struct $struct $try {c d} 10
-
-set struct {a {*int ?} b {*int ?} c {* {*int ?} a {*int ?} b {* {*int ?}}}}
-set try {a 1 b 2 c {a 1 b {a 1 b 2}}}
-taglset -struct $struct $try {c b} {d 10}
-taglset -struct $struct $try {c b} 10
-taglset -struct $struct $try {c b a} 10
-taglset -struct $struct $try {c d} 10
-taglset -struct $struct $try {c b d} 10
-taglset -struct $struct $try {c d a} 10
-
 package require Extral 1
 set try {a 1 b 2 c {a 1 b 2 c {a 1 b 2}}}
-taglset $try {d a a} 10
-taglset $try b 10
-taglset $try {c c a} 10
-taglset $try {c d} 10
-taglset $try {c c d} 10
-
 taglunset $try {c c a}
 taglunset $try {c a}
 taglunset $try c

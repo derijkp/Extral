@@ -9,6 +9,69 @@
 
 #include "tcl.h"
 
+int ExtraL_ObjEqual(interp, obj1, obj2)
+	Tcl_Interp *interp;
+	Tcl_Obj *obj1;
+	Tcl_Obj *obj2;
+{
+	char *obj1string, *obj2string;
+	int obj1len, obj2len;
+	obj1string=Tcl_GetStringFromObj(obj1,&obj1len);
+	obj2string=Tcl_GetStringFromObj(obj2,&obj2len);
+	if ((obj1len == obj2len)&&(memcmp(obj1string,obj2string,obj1len)==0)) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+int ExtraL_TaglFindTag(interp, list, tag, taglen, resultPtr, posPtr)
+	Tcl_Interp *interp;
+	Tcl_Obj *list;
+	char *tag;
+	int taglen;
+	Tcl_Obj **resultPtr;
+	int *posPtr;
+{
+	Tcl_Obj **listv;
+	int listc;
+	char *ctag;
+	int clen, pos;
+
+	if (list == NULL) {
+		*posPtr = -1;
+		*resultPtr = NULL;
+		return TCL_OK;
+	}
+
+	if (Tcl_ListObjGetElements(interp, list, &listc, &listv) != TCL_OK) {
+		return TCL_ERROR;
+	}
+	if ((listc != 0)&&(listc & 1)) {
+		Tcl_ResetResult(interp);
+		Tcl_AppendResult(interp,"error: \"", Tcl_GetStringFromObj(list,&pos),"\" does not have an even number of elements",(char *)NULL);
+		return TCL_ERROR;
+	}
+	for(pos=0;pos<listc;pos+=2) {
+		ctag=Tcl_GetStringFromObj(listv[pos],&clen);
+		if ((clen==taglen)&&(strncmp(ctag,tag,taglen)==0)) {
+			pos++;
+			*posPtr = pos;
+			*resultPtr = listv[pos];
+			return TCL_OK;
+		}
+	}
+	ctag=Tcl_GetStringFromObj(listv[0],&clen);
+	if (strcmp(ctag,"*")==0) {
+		*posPtr = 1;
+		*resultPtr = listv[1];
+	} else {
+		*posPtr = -1;
+		*resultPtr = NULL;
+	}
+	return TCL_OK;
+}
+
 /*
  *----------------------------------------------------------------------
  *
@@ -36,199 +99,148 @@ int ExtraL_Taglset(interp, structure, list, tagsc, tagsv, value, resultPtr)
 	Tcl_Obj *substructure, *sublist;
 	int sublistpos;
 	int clen,len;
-	int result;
+	int error;
 	int pos;
 
-	if (Tcl_ListObjGetElements(interp, list, &listc, &listv) != TCL_OK) {
-		return TCL_ERROR;
-	}
-	if ((listc != 0)&&(listc & 1)) {
-		Tcl_ResetResult(interp);
-		Tcl_AppendResult(interp,"error: list \"", Tcl_GetStringFromObj(list,&len),"\" does not have an even number of elements",(char *)NULL);
-		return TCL_ERROR;
-	}
-
+	/*
+			if (Tcl_ListObjGetElements(interp, list, &listc, &listv) != TCL_OK) {
+				return TCL_ERROR;
+			}
+			if ((listc != 0)&&(listc & 1)) {
+				Tcl_ResetResult(interp);
+				Tcl_AppendResult(interp,"error: list \"", Tcl_GetStringFromObj(list,&len),"\" does not have an even number of elements",(char *)NULL);
+				return TCL_ERROR;
+			}
+	*/
 	tag=Tcl_GetStringFromObj(tagsv[0],&len);
 
 	/* check structure if needed */
 	if (structure!=NULL) {
-		if (Tcl_ListObjGetElements(interp, structure, &structurec, &structurev) != TCL_OK) {
-			return TCL_ERROR;
-		}
-		if ((structurec != 0)&&(structurec & 1)) {
+		error = ExtraL_TaglFindTag(interp, structure, tag, len, &substructure, &pos);
+		if (error != TCL_OK) {return TCL_ERROR;}
+		if (pos == -1) {
 			Tcl_ResetResult(interp);
-			Tcl_AppendResult(interp,"error: structure \"", Tcl_GetStringFromObj(structure,&len),"\" does not have an even number of elements",(char *)NULL);
-			return TCL_ERROR;
+			Tcl_AppendResult(interp,"error: tag \"", tag, "\" not present in structure \"", Tcl_GetStringFromObj(structure,&len),"\"",(char *)NULL);
+			return TCL_ERROR;	
 		}
-		for(pos=0;pos<structurec;pos+=2) {
-			ctag=Tcl_GetStringFromObj(structurev[pos],&clen);
-			if ((clen==len)&&(strncmp(ctag,tag,len)==0)) {
-				break;
-			}
-		}
-		if (pos<structurec) {
-			substructure=structurev[++pos];
-		} else {
-			ctag=Tcl_GetStringFromObj(structurev[0],&clen);
-			if (strcmp(ctag,"*")==0) {
-				substructure=structurev[1];
-			} else {
-				Tcl_ResetResult(interp);
-				Tcl_AppendResult(interp,"error: tag \"", tag, "\" not present in structure \"", Tcl_GetStringFromObj(structure,&len),"\"",(char *)NULL);
-				return TCL_ERROR;	
-			}
-		}
+	} else {
+		substructure = NULL;
 	}
 
 	/* try to find the next tag */
-	for(pos=0;pos<listc;pos+=2) {
-		ctag=Tcl_GetStringFromObj(listv[pos],&clen);
-		if (clen==len) {
-			if (strncmp(ctag,tag,len)==0) break;
-		}
-	}
-	if (pos<listc) {
-		pos++;
-		sublist=listv[pos];
-		sublistpos=pos;
-	} else {
-		sublist=Tcl_NewObj();
-		sublistpos=0;
-	}
+	error = ExtraL_TaglFindTag(interp, list, tag, len, &sublist, &sublistpos);
+	if (error != TCL_OK) {return TCL_ERROR;}
+	/*
+			if (sublistpos == -1) {
+				sublist=Tcl_NewObj();
+			}
+	*/
 
 	/* more tags to go: change sublist accordingly */
-	if (tagsc>1) {
-		result=ExtraL_Taglset(interp, substructure, sublist, tagsc-1, tagsv+1, value, &temp);
-		if (result != TCL_OK) {return result;}
-		sublist=temp;
-	} else if (structure!=NULL) {
-		/* check element to structure if needed */
-		Tcl_ListObjIndex(interp, substructure, 0, &temp);
-		ctag=Tcl_GetStringFromObj(temp,&clen);
-		if ((clen>1)&&(ctag[0]=='*')) {
-			/* endnode */
-			/*
-			result=ExtraL_TaglsetValidate(interp,substructure,&value);
-			if (result == 1) {
-				return TCL_ERROR;
-			} else if (result == 0) {
-				list = Tcl_DuplicateObj(list);
-				result = Tcl_ListObjAppendElement(interp,list,tagsv[0]);
-				if (result != TCL_OK) {
-					Tcl_DecrRefCount(list);
-					return result;
-				}
-				result = Tcl_ListObjAppendElement(interp,list,value);
-				if (result != TCL_OK) {
-					Tcl_DecrRefCount(list);
-					return result;
-				}
-			}
-			*/
-			sublist=value;
+	if (structure == NULL) {
+		if (tagsc>1) {
+			error=ExtraL_Taglset(interp, NULL, sublist, tagsc-1, tagsv+1, value, &temp);
+			if (error != TCL_OK) {return error;}
+			sublist=temp;
 		} else {
-			/* no endnode */
-			int tempc;
-			Tcl_Obj **tempv, *temp;
-			if (Tcl_ListObjGetElements(interp, value, &tempc, &tempv) != TCL_OK) {
-				return TCL_ERROR;
-			}
-			if (tempc==0) {
-				sublist=value;
-			} else if (tempc & 1) {
-				Tcl_ResetResult(interp);
-				Tcl_AppendResult(interp,"error: incorrect value trying to assign \"", Tcl_GetStringFromObj(value,&len),"\" to struct \"", Tcl_GetStringFromObj(substructure,&len),"\"",(char *)NULL);
-				return TCL_ERROR;
+			sublist=value;
+		}
+	} else {
+		if (tagsc>1) {
+			error=ExtraL_Taglset(interp, substructure, sublist, tagsc-1, tagsv+1, value, &temp);
+			if (error != TCL_OK) {return error;}
+			sublist=temp;
+		} else {
+			/* check element to structure if needed */
+			Tcl_ListObjIndex(interp, substructure, 0, &temp);
+			ctag=Tcl_GetStringFromObj(temp,&clen);
+			if ((clen>1)&&(ctag[0]=='*')) {
+				/* endnode */
+				error = Tcl_ListObjLength(interp,substructure, &pos);
+				if (error != TCL_OK) {return error;}
+				error = Tcl_ListObjIndex(interp, substructure, pos-1, &temp);
+				if (error != TCL_OK) {return error;}
+				if (ExtraL_ObjEqual(interp,temp,value)==1) {
+					sublist = NULL;
+				} else {
+					sublist = value;
+				}			
+				/*
+				error=ExtraL_TaglsetValidate(interp,substructure,&value);
+				if (error == 1) {
+					return TCL_ERROR;
+				}
+				*/
 			} else {
-				for(pos=0;pos<tempc;pos+=2) {
-					result=ExtraL_Taglset(interp, substructure, sublist, 1, tempv+pos, tempv[pos+1], &temp);
-					if (result != TCL_OK) {
-						return result;
+				/* no endnode */
+				int tempc;
+				Tcl_Obj **tempv, *temp;
+				if (Tcl_ListObjGetElements(interp, value, &tempc, &tempv) != TCL_OK) {
+					return TCL_ERROR;
+				}
+				if (tempc & 1) {
+					Tcl_ResetResult(interp);
+					Tcl_AppendResult(interp,"error: incorrect value trying to assign \"", Tcl_GetStringFromObj(value,&len),"\" to struct \"", Tcl_GetStringFromObj(substructure,&len),"\"",(char *)NULL);
+					return TCL_ERROR;
+				} else if (tempc!=0) {
+					for(pos=0;pos<tempc;pos+=2) {
+						error=ExtraL_Taglset(interp, substructure, sublist, 1, tempv+pos, tempv[pos+1], &temp);
+						if (error != TCL_OK) {
+							return error;
+						}
+						sublist=temp;
 					}
-					sublist=temp;
 				}
 			}
 		}
 	}
 
 	/* change or ad the element */
-	if (sublistpos!=0) {
-		list = Tcl_DuplicateObj(list);
-		result = Tcl_ListObjReplace(interp,list,sublistpos,1,1,&sublist);
-		if (result != TCL_OK) {
-			Tcl_DecrRefCount(list);
-			return result;
-		}
-	} else {
-		list = Tcl_DuplicateObj(list);
-		result = Tcl_ListObjAppendElement(interp,list,tagsv[0]);
-		if (result != TCL_OK) {
-			Tcl_DecrRefCount(list);
-			Tcl_DecrRefCount(temp);
-			return result;
-		}
-		result = Tcl_ListObjAppendElement(interp,list,sublist);
-		if (result != TCL_OK) {
-			Tcl_DecrRefCount(list);
-			Tcl_DecrRefCount(temp);
-			return result;
-		}
-	}
-	*resultPtr=list;
-	return TCL_OK;
-}
-
-/*
- *----------------------------------------------------------------------
- *
- *		C backend for taglget
- *
- *----------------------------------------------------------------------
- */
-
-int ExtraL_Taglget(interp, list, tags, result)
-	Tcl_Interp *interp;
-	Tcl_Obj *list;
-	Tcl_Obj *tags;
-	Tcl_Obj **result;
-{
-	int listc;
-	Tcl_Obj **listv;
-	int tagsc;
-	Tcl_Obj **tagsv;
-	char *ctag,*tag;
-	int clen,len,curtag;
-	int pos;
-	int i;
-
-	if (Tcl_ListObjGetElements(interp, tags, &tagsc, &tagsv) != TCL_OK) {
-		return TCL_ERROR;
-	}
-	for(curtag=0;curtag<tagsc;curtag++) {
-		if (Tcl_ListObjGetElements(interp, list, &listc, &listv) != TCL_OK) {
-			return TCL_ERROR;
-		}
-		if ((listc != 0)&&(listc & 1)) {
-			Tcl_ResetResult(interp);
-			Tcl_AppendResult(interp,"error: list \"", Tcl_GetStringFromObj(list,&len),"\" does not have an even number of elements",(char *)NULL);
-			return TCL_ERROR;
-		}
-		tag=Tcl_GetStringFromObj(tagsv[curtag],&len);
-		for(pos=0;pos<listc;pos+=2) {
-			ctag=Tcl_GetStringFromObj(listv[pos],&clen);
-			if (clen==len) {
-				if (strncmp(ctag,tag,len)==0) {
-					list=listv[++pos];
-					break;
+	if (sublist == NULL) {
+		if (sublistpos != -1) {
+			if (list != NULL) {
+				error = Tcl_ListObjLength(interp,list,&len);
+				if (error != TCL_OK) {return error;}
+				if (len > 2) {
+					list = Tcl_DuplicateObj(list);
+					error = Tcl_ListObjReplace(interp,list,sublistpos-1,2,0,NULL);
+					if (error != TCL_OK) {
+						Tcl_DecrRefCount(list);
+						return error;
+					}
+				} else {
+					list = NULL;
 				}
 			}
 		}
-		if (pos==listc) {
-			list=NULL;
-			break;
+	} else {
+		if (list == NULL) {
+			list = Tcl_NewObj();
+		} else {
+			list = Tcl_DuplicateObj(list);
+		}
+		if (sublistpos != -1) {
+			error = Tcl_ListObjReplace(interp,list,sublistpos,1,1,&sublist);
+			if (error != TCL_OK) {
+				Tcl_DecrRefCount(list);
+				return error;
+			}
+		} else {
+			error = Tcl_ListObjAppendElement(interp,list,tagsv[0]);
+			if (error != TCL_OK) {
+				Tcl_DecrRefCount(list);
+				Tcl_DecrRefCount(temp);
+				return error;
+			}
+			error = Tcl_ListObjAppendElement(interp,list,sublist);
+			if (error != TCL_OK) {
+				Tcl_DecrRefCount(list);
+				Tcl_DecrRefCount(temp);
+				return error;
+			}
 		}
 	}
-	*result=list;
+	*resultPtr=list;
 	return TCL_OK;
 }
 
@@ -301,6 +313,185 @@ int ExtraL_Taglunset(interp, list, tagsc, tagsv, resultPtr)
 /*
  *----------------------------------------------------------------------
  *
+ *		C backend for taglget with struct
+ *
+ *----------------------------------------------------------------------
+ */
+
+int ExtraL_TaglgetStruct(interp, structure, list, tagsc, tagsv, resultPtr)
+	Tcl_Interp *interp;
+	Tcl_Obj *structure;
+	Tcl_Obj *list;
+	int tagsc;
+	Tcl_Obj **tagsv;
+	Tcl_Obj **resultPtr;
+{
+	Tcl_Obj **listv;
+	int listc;
+	Tcl_Obj **structurev;
+	int structurec;
+	Tcl_Obj *temp;
+	char *ctag,*tag;
+	Tcl_Obj *substructure, *sublist;
+	int clen,len;
+	int endnode;
+	int error;
+	int pos,i;
+
+	Tcl_ListObjIndex(interp, structure, 0, &temp);
+	ctag=Tcl_GetStringFromObj(temp,&clen);
+	if ((clen>1)&&(ctag[0]=='*')) {
+		endnode=1;
+	} else {
+		endnode=0;
+	}
+
+	/* 
+		is this an endnode
+		------------------
+	*/
+	if ((endnode == 1)) {
+		if (list == NULL) {
+			if (Tcl_ListObjLength(interp, structure, &i) != TCL_OK) {
+				return TCL_ERROR;
+			}
+			error=Tcl_ListObjIndex(interp, structure, i-1, resultPtr);
+			if (error!=TCL_OK) {
+				return error;
+			}
+			return TCL_OK;
+		} else if (tagsc>0) {
+			Tcl_ResetResult(interp);
+			Tcl_AppendResult(interp,"error: not all tags in structure",(char *)NULL);
+			return TCL_ERROR;	
+		} else {
+			*resultPtr=list;
+			return TCL_OK;
+		}
+	}
+
+	/* 
+		out of tags
+		-----------
+	*/
+	if (tagsc == 0) {
+		Tcl_Obj **tempv;
+		int tempc;
+		Tcl_Obj *temp, *result;
+		int i;
+
+		if (Tcl_ListObjGetElements(interp, structure, &tempc, &tempv) != TCL_OK) {
+			return TCL_ERROR;
+		}
+		if ((temp != 0)&&(tempc & 1)) {
+			Tcl_ResetResult(interp);
+			Tcl_AppendResult(interp,"error: structure \"", Tcl_GetStringFromObj(substructure,&len),"\" does not have an even number of elements",(char *)NULL);
+			return TCL_ERROR;
+		} else if (tempc != 0) {
+			result=Tcl_NewObj();
+			for(pos=0;pos<tempc;pos+=2) {
+				ctag=Tcl_GetStringFromObj(tempv[pos],&clen);
+				if (ctag[0] == '*') continue;
+				error = Tcl_ListObjAppendElement(interp,result,tempv[pos]);
+				if (error != TCL_OK) {return error;}
+
+				error=ExtraL_TaglFindTag(interp,list,ctag,clen,&sublist,&i);
+				if (error != TCL_OK) {return error;}
+				error=ExtraL_TaglgetStruct(interp, tempv[pos+1], sublist, 0, NULL, &temp);
+				if (error != TCL_OK) {return error;}
+				error = Tcl_ListObjAppendElement(interp,result,temp);
+				if (error != TCL_OK) {return error;}
+			}
+			Tcl_IncrRefCount(result);
+		}
+		*resultPtr = result;
+		return TCL_OK;
+	}
+	
+
+	/* 
+		find substructure corresponding to tag 
+		--------------------------------------
+	*/
+	tag=Tcl_GetStringFromObj(tagsv[0],&len);
+	error=ExtraL_TaglFindTag(interp,structure,tag,len,&substructure,&pos);
+	if (error != TCL_OK) {return error;}
+	if (pos == -1) {
+		Tcl_ResetResult(interp);
+		Tcl_AppendResult(interp,"error: tag \"", tag, "\" not present in structure \"", Tcl_GetStringFromObj(structure,&len),"\"",(char *)NULL);
+		return TCL_ERROR;	
+	}
+
+	/* 
+		find the tag
+		------------
+	*/
+	error=ExtraL_TaglFindTag(interp,list,tag,len,&sublist,&pos);
+	if (error != TCL_OK) {return error;}
+
+	/* set the result */
+	error=ExtraL_TaglgetStruct(interp, substructure, sublist, tagsc-1, tagsv+1, &temp);
+	if (error != TCL_OK) {return error;}
+	*resultPtr = temp;
+	return TCL_OK;
+}
+/*
+ *----------------------------------------------------------------------
+ *
+ *		C backend for taglget
+ *
+ *----------------------------------------------------------------------
+ */
+
+int ExtraL_Taglget(interp, list, tags, result)
+	Tcl_Interp *interp;
+	Tcl_Obj *list;
+	Tcl_Obj *tags;
+	Tcl_Obj **result;
+{
+	int listc;
+	Tcl_Obj **listv;
+	int tagsc;
+	Tcl_Obj **tagsv;
+	char *ctag,*tag;
+	int clen,len,curtag;
+	int pos;
+	int i;
+
+	if (Tcl_ListObjGetElements(interp, tags, &tagsc, &tagsv) != TCL_OK) {
+		return TCL_ERROR;
+	}
+	for(curtag=0;curtag<tagsc;curtag++) {
+		if (Tcl_ListObjGetElements(interp, list, &listc, &listv) != TCL_OK) {
+			return TCL_ERROR;
+		}
+		if ((listc != 0)&&(listc & 1)) {
+			Tcl_ResetResult(interp);
+			Tcl_AppendResult(interp,"error: list \"", Tcl_GetStringFromObj(list,&len),"\" does not have an even number of elements",(char *)NULL);
+			return TCL_ERROR;
+		}
+		tag=Tcl_GetStringFromObj(tagsv[curtag],&len);
+		for(pos=0;pos<listc;pos+=2) {
+			ctag=Tcl_GetStringFromObj(listv[pos],&clen);
+			if (clen==len) {
+				if (strncmp(ctag,tag,len)==0) {
+					list=listv[++pos];
+					break;
+				}
+			}
+		}
+		if (pos==listc) {
+			list=NULL;
+			break;
+		}
+	}
+	*result=list;
+	return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
  * ExtraL_TaglsetObjCmd --
  *
  *		This procedure is invoked to process the "taglset" command.
@@ -321,12 +512,12 @@ ExtraL_TaglsetObjCmd(notUsed, interp, objc, objv)
 {
 	Tcl_Obj *resultObj;
 	Tcl_Obj **tagsv;
+	int tagsc;
 	Tcl_Obj *structure;
 	int pos;
-	int tagsc;
 
 	if ((objc != 4)&&(objc != 6)) {
-		Tcl_WrongNumArgs(interp, 1, objv, "list ?-struct schema? taglist value");
+		Tcl_WrongNumArgs(interp, 1, objv, "?-struct schema? list taglist value");
 		return TCL_ERROR;
 	}
 
@@ -340,8 +531,16 @@ ExtraL_TaglsetObjCmd(notUsed, interp, objc, objv)
 	if (Tcl_ListObjGetElements(interp, objv[pos+1], &tagsc, &tagsv) != TCL_OK) {
 		return TCL_ERROR;
 	}
+	if (tagsc == 0) {
+		Tcl_ResetResult(interp);
+		Tcl_AppendResult(interp,"error: empty taglist",(char *)NULL);
+		return TCL_ERROR;
+	}
 	if (ExtraL_Taglset(interp, structure, objv[pos], tagsc, tagsv, objv[pos+2], &resultObj) != TCL_OK) {
 		return TCL_ERROR;
+	}
+	if (resultObj == NULL) {
+		resultObj = Tcl_NewObj();
 	}
 	Tcl_SetObjResult(interp,resultObj);
 	return TCL_OK;
@@ -408,26 +607,42 @@ ExtraL_TaglgetObjCmd(notUsed, interp, objc, objv)
 	int objc;
 	Tcl_Obj *CONST objv[];
 {
+	Tcl_Obj **tagsv;
+	int tagsc;
 	Tcl_Obj *result;
-	int error;
+	int pos;
 
-	if ((objc != 3)&&(objc != 4)) {
-		Tcl_WrongNumArgs(interp, 1, objv, "list taglist ?default?");
+	if ((objc != 3)&&(objc != 5)) {
+		Tcl_WrongNumArgs(interp, 1, objv, "?-struct schema? list taglist");
 		return TCL_ERROR;
 	}
 
-	if (ExtraL_Taglget(interp,objv[1], objv[2], &result)==TCL_ERROR) {
-		return error;
+	if (objc == 5) {
+		if (Tcl_ListObjGetElements(interp, objv[4], &tagsc, &tagsv) != TCL_OK) {
+			return TCL_ERROR;
+		}
+		if (tagsc == 0) {
+			Tcl_ResetResult(interp);
+			Tcl_AppendResult(interp,"error: empty taglist",(char *)NULL);
+			return TCL_ERROR;
+		}
+		if (ExtraL_TaglgetStruct(interp, objv[2], objv[3], tagsc, tagsv, &result)==TCL_ERROR) {
+			return TCL_ERROR;
+		}
+		pos=4;
+	} else {
+		if (ExtraL_Taglget(interp, objv[1], objv[2], &result)==TCL_ERROR) {
+			return TCL_ERROR;
+		}
+		pos=2;
 	}
+
 	if (result!=NULL) {
 		Tcl_SetObjResult(interp,result);
 		return TCL_OK;
-	} else if (objc==4) {
-		Tcl_SetObjResult(interp,objv[3]);
-		return TCL_OK;
 	} else {
 		Tcl_ResetResult(interp);
-		Tcl_AppendResult(interp,"taglist \"", Tcl_GetStringFromObj(objv[2],&error),"\" not found",(char *) NULL);
+		Tcl_AppendResult(interp,"taglist \"", Tcl_GetStringFromObj(objv[pos],&pos),"\" not found",(char *) NULL);
 		return TCL_ERROR;
 	}
 }

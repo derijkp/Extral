@@ -23,11 +23,11 @@ test taglset {set, 3 tags} {
 
 test taglset {check uneven} {
 	taglset {a 1 bb 2 ccc} dddd 4
-} {error: list "a 1 bb 2 ccc" does not have an even number of elements} 1
+} {error: "a 1 bb 2 ccc" does not have an even number of elements} 1
 
 test taglset {check uneven, 2 tags} {
 	taglset {a 1 b 2 c {a 1 b}} {c a} 4
-} {error: list "a 1 b" does not have an even number of elements} 1
+} {error: "a 1 b" does not have an even number of elements} 1
 
 test taglset {empty list} {
 	taglset {} a 1
@@ -70,10 +70,6 @@ test taglget {get partial} {
 test taglget {check uneven} {
 	taglget {a 1 bb 2 ccc} bb
 } {error: list "a 1 bb 2 ccc" does not have an even number of elements} 1
-
-test taglget {tag not present with default} {
-	taglget {a 1 bb 2 cc 3} e def
-} {def}
 
 test taglunset {} {
 	taglunset {a 1 bb 2 ccc 3} bb
