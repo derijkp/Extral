@@ -20,35 +20,35 @@ USE_STUBS=no
 
 PROJECT = extral
 TCLEXE = extratcl
-OBJECTS = extralInit.o extral.o list_pop.o string.o array.o supersort.o general.o \
-			structl.o structltypes.o date.o
+OBJECTS = extralInit.o extral.o list_pop.o string.o array.o supersort.o general.o structl.o structltypes.o date.o
+SRCS = extralInit.c extral.c list_pop.c string.c array.c supersort.c general.c structl.c structltypes.c date.c
 
 ifeq ($(DEBUG),yes)
 	CFLAGS = -g  
 else
-	CFLAGS = -O 
+	CFLAGS = -O -D__NO_STRING_INLINES -D__NO_MATH_INLINES 
 endif
 
 ifeq ($(USE_STUBS),yes)
-	LD_LIBS =  ${LIBS}
-	DEFS =  -DHAVE_GETCWD=1 -DHAVE_UNISTD_H=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 -DHAVE_TM_ZONE=1 -DHAVE_TM_GMTOFF=1 -DHAVE_TIMEZONE_VAR=1 -DHAVE_ST_BLKSIZE=1 -DSTDC_HEADERS=1 -DNEED_MATHERR=1 -DRETSIGTYPE=void -DHAVE_SIGNED_CHAR=1 -DHAVE_SYS_IOCTL_H=1  -DUSE_TCL_STUBS
+	LD_LIBS = -L/opt/tcltk/lib -ltclstub8.2${TCL_DBGX} ${LIBS}
+	DEFS =  -DHAVE_UNISTD_H=1 -DHAVE_LIMITS_H=1 -DHAVE_GETCWD=1 -DHAVE_OPENDIR=1 -DHAVE_STRSTR=1 -DHAVE_STRTOL=1 -DHAVE_TMPNAM=1 -DHAVE_WAITPID=1 -DHAVE_UNISTD_H=1 -DHAVE_SYS_PARAM_H=1 -DUSE_TERMIOS=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 -DHAVE_TM_ZONE=1 -DHAVE_TM_GMTOFF=1 -DHAVE_TIMEZONE_VAR=1 -DHAVE_ST_BLKSIZE=1 -DSTDC_HEADERS=1 -DNEED_MATHERR=1 -DRETSIGTYPE=void -DHAVE_SIGNED_CHAR=1 -DHAVE_SYS_IOCTL_H=1  -DUSE_TCL_STUBS
 else
-	LD_LIBS = -L/usr/lib -ltcl8.0${TCL_DBGX} ${LIBS}
+	LD_LIBS = -L/opt/tcltk/lib -ltcl8.2${TCL_DBGX} ${LIBS}
 	LD_LIBS = ${LIBS}
-	DEFS =  -DHAVE_GETCWD=1 -DHAVE_UNISTD_H=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 -DHAVE_TM_ZONE=1 -DHAVE_TM_GMTOFF=1 -DHAVE_TIMEZONE_VAR=1 -DHAVE_ST_BLKSIZE=1 -DSTDC_HEADERS=1 -DNEED_MATHERR=1 -DRETSIGTYPE=void -DHAVE_SIGNED_CHAR=1 -DHAVE_SYS_IOCTL_H=1 
+	DEFS =  -DHAVE_UNISTD_H=1 -DHAVE_LIMITS_H=1 -DHAVE_GETCWD=1 -DHAVE_OPENDIR=1 -DHAVE_STRSTR=1 -DHAVE_STRTOL=1 -DHAVE_TMPNAM=1 -DHAVE_WAITPID=1 -DHAVE_UNISTD_H=1 -DHAVE_SYS_PARAM_H=1 -DUSE_TERMIOS=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 -DHAVE_TM_ZONE=1 -DHAVE_TM_GMTOFF=1 -DHAVE_TIMEZONE_VAR=1 -DHAVE_ST_BLKSIZE=1 -DSTDC_HEADERS=1 -DNEED_MATHERR=1 -DRETSIGTYPE=void -DHAVE_SIGNED_CHAR=1 -DHAVE_SYS_IOCTL_H=1 
 endif
 
-INCLUDES = -I/usr/include
-CC = gcc -pipe
-SHLIB_LD =		gcc -pipe -shared
+INCLUDES = -I/opt/tcltk/include
+CC = cc
+SHLIB_LD =		cc -shared
 SHLIB_SUFFIX =		.so
 
 CC_SWITCHES = $(INCLUDES) $(CFLAGS)	-fPIC $(DEFS)
-TCL_LD_LIBS = -L/usr/lib -ltcl8.0${TCL_DBGX} ${LIBS} -ldl  -lm
+TCL_LD_LIBS = -L/opt/tcltk/lib -ltcl8.2${TCL_DBGX} ${LIBS} -ldl  -lieee -lm
 
 # --------------------------- Rules -----------------------------
 
-all: $(PROJECT)${SHLIB_SUFFIX}
+all: depend $(PROJECT)${SHLIB_SUFFIX}
 
 $(PROJECT)${SHLIB_SUFFIX}: $(OBJECTS)
 	${SHLIB_LD} $(OBJECTS) -o ../$(PROJECT)$(SHLIB_SUFFIX) $(LD_LIBS)
@@ -56,17 +56,20 @@ $(PROJECT)${SHLIB_SUFFIX}: $(OBJECTS)
 $(TCLEXE): tclAppInit.o $(OBJECTS)
 	${CC} tclAppInit.o $(OBJECTS) -o $(TCLEXE) $(TCL_LD_LIBS)
 
+test:
+	cd ../tests ; ./all.tcl
+
 install: 
 	../makedoc.tcl
-	../makedist.tcl /usr/lib
+	../makedist.tcl /opt/tcltk/lib
 
 clean:
-	rm -f *.o *${SHLIB_SUFFIX} config.cache config.log lib.exp
-	rm -f core ../core extratcl
-	rm -f ../*.so ../*.dll ./*.so ./*.dll ../win/tmp/*.obj ../win/*.csm
+	rm -f ../$(PROJECT)$(SHLIB_SUFFIX) $(TCLEXE) $(WISHEXE) *.o
+	rm -rf win/*.csm ../*.dll ./*.dll win/tmp/*
+	rm -f core ../core ../tests/core
 
 distclean: clean
-	rm -f Makefile
+	rm -f config.cache config.log config.status Makefile
 
 Makefile: Makefile.in
 	./config.status
@@ -76,3 +79,125 @@ depend:
 
 .c.o:
 	$(CC) -c $(CC_SWITCHES) $<
+# DO NOT DELETE
+
+extralInit.o: /opt/tcltk/include/tcl.h /usr/include/stdio.h
+extralInit.o: /usr/include/features.h /usr/include/sys/cdefs.h
+extralInit.o: /usr/include/gnu/stubs.h
+extralInit.o: /usr/lib/gcc-lib/i586-mandrake-linux/2.95.2/include/stddef.h
+extralInit.o: /usr/lib/gcc-lib/i586-mandrake-linux/2.95.2/include/stdarg.h
+extralInit.o: /usr/include/bits/types.h /usr/include/libio.h
+extralInit.o: /usr/include/_G_config.h /usr/include/bits/stdio_lim.h
+extralInit.o: /opt/tcltk/include/tclDecls.h extral.h /usr/include/sys/types.h
+extralInit.o: /usr/include/time.h /usr/include/endian.h
+extralInit.o: /usr/include/bits/endian.h /usr/include/sys/select.h
+extralInit.o: /usr/include/bits/select.h /usr/include/bits/sigset.h
+extralInit.o: /usr/include/sys/sysmacros.h /usr/include/math.h
+extralInit.o: /usr/include/bits/huge_val.h /usr/include/bits/mathdef.h
+extralInit.o: /usr/include/bits/mathcalls.h
+extralInit.o: /usr/lib/gcc-lib/i586-mandrake-linux/2.95.2/include/float.h
+extral.o: /usr/include/stdlib.h /usr/include/features.h
+extral.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+extral.o: /usr/lib/gcc-lib/i586-mandrake-linux/2.95.2/include/stddef.h
+extral.o: /usr/include/sys/types.h /usr/include/bits/types.h
+extral.o: /usr/include/time.h /usr/include/endian.h
+extral.o: /usr/include/bits/endian.h /usr/include/sys/select.h
+extral.o: /usr/include/bits/select.h /usr/include/bits/sigset.h
+extral.o: /usr/include/sys/sysmacros.h /usr/include/alloca.h
+extral.o: /usr/include/string.h /usr/include/malloc.h
+extral.o: /opt/tcltk/include/tcl.h /usr/include/stdio.h
+extral.o: /usr/lib/gcc-lib/i586-mandrake-linux/2.95.2/include/stdarg.h
+extral.o: /usr/include/libio.h /usr/include/_G_config.h
+extral.o: /usr/include/bits/stdio_lim.h /opt/tcltk/include/tclDecls.h
+extral.o: /usr/include/tclRegexp.h general.h
+list_pop.o: /usr/include/stdlib.h /usr/include/features.h
+list_pop.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+list_pop.o: /usr/lib/gcc-lib/i586-mandrake-linux/2.95.2/include/stddef.h
+list_pop.o: /usr/include/sys/types.h /usr/include/bits/types.h
+list_pop.o: /usr/include/time.h /usr/include/endian.h
+list_pop.o: /usr/include/bits/endian.h /usr/include/sys/select.h
+list_pop.o: /usr/include/bits/select.h /usr/include/bits/sigset.h
+list_pop.o: /usr/include/sys/sysmacros.h /usr/include/alloca.h
+list_pop.o: /usr/include/string.h /usr/include/malloc.h
+list_pop.o: /opt/tcltk/include/tcl.h /usr/include/stdio.h
+list_pop.o: /usr/lib/gcc-lib/i586-mandrake-linux/2.95.2/include/stdarg.h
+list_pop.o: /usr/include/libio.h /usr/include/_G_config.h
+list_pop.o: /usr/include/bits/stdio_lim.h /opt/tcltk/include/tclDecls.h
+string.o: /usr/include/stdlib.h /usr/include/features.h
+string.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+string.o: /usr/lib/gcc-lib/i586-mandrake-linux/2.95.2/include/stddef.h
+string.o: /usr/include/sys/types.h /usr/include/bits/types.h
+string.o: /usr/include/time.h /usr/include/endian.h
+string.o: /usr/include/bits/endian.h /usr/include/sys/select.h
+string.o: /usr/include/bits/select.h /usr/include/bits/sigset.h
+string.o: /usr/include/sys/sysmacros.h /usr/include/alloca.h
+string.o: /usr/include/string.h /usr/include/malloc.h
+string.o: /opt/tcltk/include/tcl.h /usr/include/stdio.h
+string.o: /usr/lib/gcc-lib/i586-mandrake-linux/2.95.2/include/stdarg.h
+string.o: /usr/include/libio.h /usr/include/_G_config.h
+string.o: /usr/include/bits/stdio_lim.h /opt/tcltk/include/tclDecls.h
+string.o: /usr/include/tclRegexp.h general.h
+array.o: /usr/include/stdlib.h /usr/include/features.h
+array.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+array.o: /usr/lib/gcc-lib/i586-mandrake-linux/2.95.2/include/stddef.h
+array.o: /usr/include/sys/types.h /usr/include/bits/types.h
+array.o: /usr/include/time.h /usr/include/endian.h /usr/include/bits/endian.h
+array.o: /usr/include/sys/select.h /usr/include/bits/select.h
+array.o: /usr/include/bits/sigset.h /usr/include/sys/sysmacros.h
+array.o: /usr/include/alloca.h /usr/include/string.h /usr/include/malloc.h
+array.o: /opt/tcltk/include/tcl.h /usr/include/stdio.h
+array.o: /usr/lib/gcc-lib/i586-mandrake-linux/2.95.2/include/stdarg.h
+array.o: /usr/include/libio.h /usr/include/_G_config.h
+array.o: /usr/include/bits/stdio_lim.h /opt/tcltk/include/tclDecls.h
+array.o: general.h
+supersort.o: /usr/include/ctype.h /usr/include/features.h
+supersort.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+supersort.o: /usr/include/bits/types.h
+supersort.o: /usr/lib/gcc-lib/i586-mandrake-linux/2.95.2/include/stddef.h
+supersort.o: /usr/include/endian.h /usr/include/bits/endian.h
+supersort.o: /opt/tcltk/include/tcl.h /usr/include/stdio.h
+supersort.o: /usr/lib/gcc-lib/i586-mandrake-linux/2.95.2/include/stdarg.h
+supersort.o: /usr/include/libio.h /usr/include/_G_config.h
+supersort.o: /usr/include/bits/stdio_lim.h /opt/tcltk/include/tclDecls.h
+general.o: /usr/include/stdlib.h /usr/include/features.h
+general.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+general.o: /usr/lib/gcc-lib/i586-mandrake-linux/2.95.2/include/stddef.h
+general.o: /usr/include/sys/types.h /usr/include/bits/types.h
+general.o: /usr/include/time.h /usr/include/endian.h
+general.o: /usr/include/bits/endian.h /usr/include/sys/select.h
+general.o: /usr/include/bits/select.h /usr/include/bits/sigset.h
+general.o: /usr/include/sys/sysmacros.h /usr/include/alloca.h
+general.o: /usr/include/string.h /usr/include/malloc.h
+general.o: /opt/tcltk/include/tcl.h /usr/include/stdio.h
+general.o: /usr/lib/gcc-lib/i586-mandrake-linux/2.95.2/include/stdarg.h
+general.o: /usr/include/libio.h /usr/include/_G_config.h
+general.o: /usr/include/bits/stdio_lim.h /opt/tcltk/include/tclDecls.h
+general.o: general.h
+structl.o: /opt/tcltk/include/tcl.h /usr/include/stdio.h
+structl.o: /usr/include/features.h /usr/include/sys/cdefs.h
+structl.o: /usr/include/gnu/stubs.h
+structl.o: /usr/lib/gcc-lib/i586-mandrake-linux/2.95.2/include/stddef.h
+structl.o: /usr/lib/gcc-lib/i586-mandrake-linux/2.95.2/include/stdarg.h
+structl.o: /usr/include/bits/types.h /usr/include/libio.h
+structl.o: /usr/include/_G_config.h /usr/include/bits/stdio_lim.h
+structl.o: /opt/tcltk/include/tclDecls.h extral.h /usr/include/string.h
+structltypes.o: /opt/tcltk/include/tcl.h /usr/include/stdio.h
+structltypes.o: /usr/include/features.h /usr/include/sys/cdefs.h
+structltypes.o: /usr/include/gnu/stubs.h
+structltypes.o: /usr/lib/gcc-lib/i586-mandrake-linux/2.95.2/include/stddef.h
+structltypes.o: /usr/lib/gcc-lib/i586-mandrake-linux/2.95.2/include/stdarg.h
+structltypes.o: /usr/include/bits/types.h /usr/include/libio.h
+structltypes.o: /usr/include/_G_config.h /usr/include/bits/stdio_lim.h
+structltypes.o: /opt/tcltk/include/tclDecls.h extral.h /usr/include/string.h
+date.o: /opt/tcltk/include/tcl.h /usr/include/stdio.h /usr/include/features.h
+date.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+date.o: /usr/lib/gcc-lib/i586-mandrake-linux/2.95.2/include/stddef.h
+date.o: /usr/lib/gcc-lib/i586-mandrake-linux/2.95.2/include/stdarg.h
+date.o: /usr/include/bits/types.h /usr/include/libio.h
+date.o: /usr/include/_G_config.h /usr/include/bits/stdio_lim.h
+date.o: /opt/tcltk/include/tclDecls.h extral.h /usr/include/ctype.h
+date.o: /usr/include/endian.h /usr/include/bits/endian.h
+date.o: /usr/include/string.h /usr/include/math.h
+date.o: /usr/include/bits/huge_val.h /usr/include/bits/mathdef.h
+date.o: /usr/include/bits/mathcalls.h
+date.o: /usr/lib/gcc-lib/i586-mandrake-linux/2.95.2/include/float.h

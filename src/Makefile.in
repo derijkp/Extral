@@ -19,8 +19,8 @@ USE_STUBS=@USE_STUBS@
 
 PROJECT = extral
 TCLEXE = extratcl
-OBJECTS = extralInit.o extral.o list_pop.o string.o array.o supersort.o general.o \
-			structl.o structltypes.o date.o
+OBJECTS = extralInit.o extral.o list_pop.o string.o array.o supersort.o general.o structl.o structltypes.o date.o
+SRCS = extralInit.c extral.c list_pop.c string.c array.c supersort.c general.c structl.c structltypes.c date.c
 
 ifeq ($(DEBUG),yes)
 	CFLAGS = @TCL_CFLAGS_DEBUG@ @TCL_CFLAGS_WARNING@ 
@@ -47,7 +47,7 @@ TCL_LD_LIBS = @TCL_LIB_SPEC@ @TCL_SHLIB_LD_LIBS@ @TCL_LIBS@
 
 # --------------------------- Rules -----------------------------
 
-all: $(PROJECT)${SHLIB_SUFFIX}
+all: depend $(PROJECT)${SHLIB_SUFFIX}
 
 $(PROJECT)${SHLIB_SUFFIX}: $(OBJECTS)
 	${SHLIB_LD} $(OBJECTS) -o ../$(PROJECT)$(SHLIB_SUFFIX) $(LD_LIBS)
@@ -55,17 +55,20 @@ $(PROJECT)${SHLIB_SUFFIX}: $(OBJECTS)
 $(TCLEXE): tclAppInit.o $(OBJECTS)
 	${CC} tclAppInit.o $(OBJECTS) -o $(TCLEXE) $(TCL_LD_LIBS)
 
+test:
+	cd ../tests ; ./all.tcl
+
 install: 
 	../makedoc.tcl
 	../makedist.tcl @INSTALL_DIR@
 
 clean:
-	rm -f *.o *${SHLIB_SUFFIX} config.cache config.log lib.exp
-	rm -f core ../core extratcl
-	rm -f ../*.so ../*.dll ./*.so ./*.dll ../win/tmp/*.obj ../win/*.csm
+	rm -f ../$(PROJECT)$(SHLIB_SUFFIX) $(TCLEXE) $(WISHEXE) *.o
+	rm -rf win/*.csm ../*.dll ./*.dll win/tmp/*
+	rm -f core ../core ../tests/core
 
 distclean: clean
-	rm -f Makefile
+	rm -f config.cache config.log config.status Makefile
 
 Makefile: Makefile.in
 	./config.status
