@@ -7,13 +7,13 @@
 #
 # =============================================================
 
+namespace eval Extral {}
+
 # $Format: "set ::Extral::version 2.$ProjectMajorVersion$"$
 set ::Extral::version 2.0
 # $Format: "set ::Extral::patchlevel $ProjectMinorVersion$"$
-set ::Extral::patchlevel 2
+set ::Extral::patchlevel 3
 package provide Extral $::Extral::version
-
-namespace eval Extral {}
 
 proc ::Extral::init {name testcmd} {
 	global tcl_platform

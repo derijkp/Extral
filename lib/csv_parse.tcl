@@ -11,7 +11,8 @@ proc csv_parse {data {sep ,}} {
 		foreach el $line {
 			if {![info exists quotedstring]} {
 				if {[string equal [string index $el 0] \"]} {
-					if {[regexp {([^"]|\A)("")*"$} $el]} {
+					# check if the el is the proper ending of a quoted string
+					if {[string equal $el \"\"] || [regexp {([^"]|\A)("")*"$} $el]} {
 						lappend resultline [string map $quotereplace [string range $el 1 end-1]]
 					} else {
 						set quotedstring [string range $el 1 end]
