@@ -1,4 +1,16 @@
-set Extral_noc 1
+# File containing the Tcl part of the list commands in the Extral extension
+#
+# Copyright (c) 1996 Peter De Rijk
+#
+# See the file "README.txt" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# =============================================================
+
+Extral::export {
+	lpop lshift lsub lfind lcor lremdup llremove lmerge lunmerge replace
+} {
+
 proc lpop {listname {pos end}} {
 	upvar $listname list
 	if {"$list"==""} {
@@ -196,39 +208,4 @@ proc replace {string replacelist} {
 
 #ffind
 
-#tagl
-proc taglget {list tag args} {
-	foreach {ctag value} $list {
-		if {"$tag"=="$ctag"} {
-			return $value
-		}
-	}
-	if {"$args"==""} {
-		error "tag \"$tag\" not found"
-	} else {
-		return [lindex $args 0]
-	}
 }
-
-proc taglset {list tag value} {
-	set pos 1
-	foreach {ctag cvalue} $list {
-		if {"$tag"=="$ctag"} {
-			return [lreplace $list $pos $pos $value]
-		}
-		incr pos 2
-	}
-	return [concat $list $tag $value]
-}
-
-proc taglunset {list tag} {
-	set pos 0
-	foreach {ctag cvalue} $list {
-		if {"$tag"=="$ctag"} {
-			return [lreplace $list $pos [expr $pos+1]]
-		}
-		incr pos 2
-	}
-	return $list
-}
-

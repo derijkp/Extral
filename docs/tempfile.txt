@@ -1,0 +1,8 @@
+tempfile ?get?
+	creates an (empty) temporary file and returns its name. You should remove
+	the temporary file when not used any longer. However, leftover temporary 
+	files will be removed by an atexit handler
+
+tempfile clean
+	remove all temporary files for the running program.
+

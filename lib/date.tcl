@@ -1,3 +1,14 @@
+# Tcl version of scantime and formattime
+#
+# Copyright (c) 1997 Peter De Rijk
+#
+# See the file "README.txt" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# =============================================================
+
+Extral::export {scantime formattime} {
+
 proc scantime {time {musthave date}} {
 	foreach {var val} {
 		bc 0 year -1 month -1 day -1 hour -1 min -1 sec -1 ms -1
@@ -299,4 +310,6 @@ proc formattime {time {format {%Y %b %d %H:%M:%S}}} {
 		incr pos
 	}
 	return $buffer
+}
+
 }

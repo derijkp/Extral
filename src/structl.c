@@ -1,5 +1,5 @@
 /*	
- *	 File:    tagl.c
+ *	 File:    structl.c
  *	 Purpose: extraL extension to Tcl
  *	 Author:  Copyright (c) 1995 Peter De Rijk
  *
@@ -11,13 +11,13 @@
 #include "extral.h"
 
 struct Type {
-	ExtraL_TaglTypeProc *setproc;
-	ExtraL_TaglTypeProc *getproc;
+	ExtraL_StructlTypeProc *setproc;
+	ExtraL_StructlTypeProc *getproc;
 };
 
 static Tcl_HashTable typesTable;
 
-int ExtraL_TaglSetInt(interp,substructure,value)
+int ExtraL_StructlSetInt(interp,substructure,value)
 	Tcl_Interp *interp;
 	Tcl_Obj *substructure;
 	Tcl_Obj **value;
@@ -29,7 +29,7 @@ int ExtraL_TaglSetInt(interp,substructure,value)
 	return TCL_OK;
 }
 
-int ExtraL_TaglSetDouble(interp,substructure,value)
+int ExtraL_StructlSetDouble(interp,substructure,value)
 	Tcl_Interp *interp;
 	Tcl_Obj *substructure;
 	Tcl_Obj **value;
@@ -42,7 +42,7 @@ int ExtraL_TaglSetDouble(interp,substructure,value)
 	return TCL_OK;
 }
 
-int ExtraL_TaglSetBool(interp,substructure,value)
+int ExtraL_StructlSetBool(interp,substructure,value)
 	Tcl_Interp *interp;
 	Tcl_Obj *substructure;
 	Tcl_Obj **value;
@@ -58,7 +58,7 @@ int ExtraL_TaglSetBool(interp,substructure,value)
 	return TCL_OK;
 }
 
-int ExtraL_TaglSetRegexp(interp,substructure,value)
+int ExtraL_StructlSetRegexp(interp,substructure,value)
 	Tcl_Interp *interp;
 	Tcl_Obj *substructure;
 	Tcl_Obj **value;
@@ -89,7 +89,7 @@ int ExtraL_TaglSetRegexp(interp,substructure,value)
 	return TCL_OK;
 }
 
-int ExtraL_TaglSetBetween(interp,substructure,value)
+int ExtraL_StructlSetBetween(interp,substructure,value)
 	Tcl_Interp *interp;
 	Tcl_Obj *substructure;
 	Tcl_Obj **value;
@@ -127,7 +127,7 @@ int ExtraL_TaglSetBetween(interp,substructure,value)
 
 }
 
-int ExtraL_TaglSetDBetween(interp,substructure,value)
+int ExtraL_StructlSetDBetween(interp,substructure,value)
 	Tcl_Interp *interp;
 	Tcl_Obj *substructure;
 	Tcl_Obj **value;
@@ -164,7 +164,7 @@ int ExtraL_TaglSetDBetween(interp,substructure,value)
 	return TCL_OK;
 }
 
-int ExtraL_TaglSetDate(interp,substructure,value)
+int ExtraL_StructlSetDate(interp,substructure,value)
 	Tcl_Interp *interp;
 	Tcl_Obj *substructure;
 	Tcl_Obj **value;
@@ -172,7 +172,7 @@ int ExtraL_TaglSetDate(interp,substructure,value)
 	double result;
 	int temp, error;
 
-	error = ExtraL_TaglScanTime(interp,1,0,*value,&result);
+	error = ExtraL_ScanTime(interp,1,0,*value,&result);
 	if (error != TCL_OK) {return error;}
 	if Tcl_IsShared(*value) {
 		*value = Tcl_DuplicateObj(*value);
@@ -181,7 +181,7 @@ int ExtraL_TaglSetDate(interp,substructure,value)
 	return TCL_OK;
 }
 
-int ExtraL_TaglGetDate(interp,substructure,value)
+int ExtraL_StructlGetDate(interp,substructure,value)
 	Tcl_Interp *interp;
 	Tcl_Obj *substructure;
 	Tcl_Obj **value;
@@ -202,7 +202,7 @@ int ExtraL_TaglGetDate(interp,substructure,value)
 	return TCL_OK;
 }
 
-int ExtraL_TaglSetTime(interp,substructure,value)
+int ExtraL_StructlSetTime(interp,substructure,value)
 	Tcl_Interp *interp;
 	Tcl_Obj *substructure;
 	Tcl_Obj **value;
@@ -210,7 +210,7 @@ int ExtraL_TaglSetTime(interp,substructure,value)
 	double result;
 	int temp, error;
 
-	error = ExtraL_TaglScanTime(interp,1,1,*value,&result);
+	error = ExtraL_ScanTime(interp,1,1,*value,&result);
 	if (error != TCL_OK) {return error;}
 	if Tcl_IsShared(*value) {
 		*value = Tcl_DuplicateObj(*value);
@@ -219,7 +219,7 @@ int ExtraL_TaglSetTime(interp,substructure,value)
 	return TCL_OK;
 }
 
-int ExtraL_TaglGetTime(interp,substructure,value)
+int ExtraL_StructlGetTime(interp,substructure,value)
 	Tcl_Interp *interp;
 	Tcl_Obj *substructure;
 	Tcl_Obj **value;
@@ -240,11 +240,11 @@ int ExtraL_TaglGetTime(interp,substructure,value)
 	return TCL_OK;
 }
 
-int ExtraL_TaglCreateType(interp,key,setproc,getproc)
+int ExtraL_StructlCreateType(interp,key,setproc,getproc)
 	Tcl_Interp *interp;
 	char *key;
-	ExtraL_TaglTypeProc *setproc;
-	ExtraL_TaglTypeProc *getproc;
+	ExtraL_StructlTypeProc *setproc;
+	ExtraL_StructlTypeProc *getproc;
 {
 	Tcl_HashEntry *entry, *newentry;
 	struct Type *type;
@@ -261,22 +261,7 @@ int ExtraL_TaglCreateType(interp,key,setproc,getproc)
 	type->getproc = getproc;
 }
 
-int Extral_taglInit(interp)
-	Tcl_Interp *interp;
-{
-	Tcl_InitHashTable(&typesTable,TCL_STRING_KEYS);
-	ExtraL_TaglCreateType(interp,"*any",(ExtraL_TaglTypeProc *)NULL,(ExtraL_TaglTypeProc *)NULL);
-	ExtraL_TaglCreateType(interp,"*int",(ExtraL_TaglTypeProc *)ExtraL_TaglSetInt,(ExtraL_TaglTypeProc *)NULL);
-	ExtraL_TaglCreateType(interp,"*double",(ExtraL_TaglTypeProc *)ExtraL_TaglSetDouble,(ExtraL_TaglTypeProc *)NULL);
-	ExtraL_TaglCreateType(interp,"*bool",(ExtraL_TaglTypeProc *)ExtraL_TaglSetBool,(ExtraL_TaglTypeProc *)NULL);
-	ExtraL_TaglCreateType(interp,"*regexp",(ExtraL_TaglTypeProc *)ExtraL_TaglSetRegexp,(ExtraL_TaglTypeProc *)NULL);
-	ExtraL_TaglCreateType(interp,"*between",(ExtraL_TaglTypeProc *)ExtraL_TaglSetBetween,(ExtraL_TaglTypeProc *)NULL);
-	ExtraL_TaglCreateType(interp,"*dbetween",(ExtraL_TaglTypeProc *)ExtraL_TaglSetDBetween,(ExtraL_TaglTypeProc *)NULL);
-	ExtraL_TaglCreateType(interp,"*date",(ExtraL_TaglTypeProc *)ExtraL_TaglSetDate,(ExtraL_TaglTypeProc *)ExtraL_TaglGetDate);
-	ExtraL_TaglCreateType(interp,"*time",(ExtraL_TaglTypeProc *)ExtraL_TaglSetTime,(ExtraL_TaglTypeProc *)ExtraL_TaglGetTime);
-}
-
-int ExtraL_TaglsetValidate(interp,substructure,ctag,clen,value) 
+int ExtraL_StructlsetValidate(interp,substructure,ctag,clen,value) 
 	Tcl_Interp *interp;
 	Tcl_Obj *substructure;
 	char *ctag;
@@ -285,7 +270,7 @@ int ExtraL_TaglsetValidate(interp,substructure,ctag,clen,value)
 {
 	Tcl_HashEntry *entry;
 	struct Type *type;
-	ExtraL_TaglTypeProc *cmd;
+	ExtraL_StructlTypeProc *cmd;
 	int error;
 	int temp;
 	
@@ -325,7 +310,7 @@ int ExtraL_TaglsetValidate(interp,substructure,ctag,clen,value)
 	}
 }
 
-int ExtraL_TaglgetValidate(interp,substructure,ctag,clen,value) 
+int ExtraL_StructlgetValidate(interp,substructure,ctag,clen,value) 
 	Tcl_Interp *interp;
 	Tcl_Obj *substructure;
 	char *ctag;
@@ -334,7 +319,7 @@ int ExtraL_TaglgetValidate(interp,substructure,ctag,clen,value)
 {
 	Tcl_HashEntry *entry;
 	struct Type *type;
-	ExtraL_TaglTypeProc *cmd;
+	ExtraL_StructlTypeProc *cmd;
 	int error;
 	int temp;
 	
@@ -390,11 +375,11 @@ int ExtraL_ObjEqual(interp, obj1, obj2)
 	}
 }
 
-int ExtraL_TaglFindTag(interp, list, tag, taglen, resultPtr, posPtr)
+int ExtraL_StructlFindTag(interp, list, tag, structlen, resultPtr, posPtr)
 	Tcl_Interp *interp;
 	Tcl_Obj *list;
 	char *tag;
-	int taglen;
+	int structlen;
 	Tcl_Obj **resultPtr;
 	int *posPtr;
 {
@@ -417,9 +402,14 @@ int ExtraL_TaglFindTag(interp, list, tag, taglen, resultPtr, posPtr)
 		Tcl_AppendResult(interp,"error: \"", Tcl_GetStringFromObj(list,&pos),"\" does not have an even number of elements",(char *)NULL);
 		return TCL_ERROR;
 	}
+   if (listc == 0) {
+		*posPtr = -1;
+		*resultPtr = NULL;
+		return TCL_OK;
+   }
 	for(pos=0;pos<listc;pos+=2) {
 		ctag=Tcl_GetStringFromObj(listv[pos],&clen);
-		if ((clen==taglen)&&(memcmp(ctag,tag,taglen)==0)) {
+		if ((clen==structlen)&&(memcmp(ctag,tag,structlen)==0)) {
 			pos++;
 			*posPtr = pos;
 			*resultPtr = listv[pos];
@@ -440,13 +430,13 @@ int ExtraL_TaglFindTag(interp, list, tag, taglen, resultPtr, posPtr)
 /*
  *----------------------------------------------------------------------
  *
- *		C backend for taglset
+ *		C backend for structlset
  *     list gets changed directly, so should not be shared
  *
  *----------------------------------------------------------------------
  */
 
-int ExtraL_Taglset(interp, structure, list, tagsc, tagsv, value, resultPtr)
+int ExtraL_Structlset(interp, structure, list, tagsc, tagsv, value, resultPtr)
 	Tcl_Interp *interp;
 	Tcl_Obj *structure;
 	Tcl_Obj *list;
@@ -471,7 +461,7 @@ int ExtraL_Taglset(interp, structure, list, tagsc, tagsv, value, resultPtr)
 
 	/* check structure if needed */
 	if (structure!=NULL) {
-		error = ExtraL_TaglFindTag(interp, structure, tag, len, &substructure, &pos);
+		error = ExtraL_StructlFindTag(interp, structure, tag, len, &substructure, &pos);
 		if (error != TCL_OK) {return TCL_ERROR;}
 		if (pos == -1) {
 			Tcl_ResetResult(interp);
@@ -483,13 +473,13 @@ int ExtraL_Taglset(interp, structure, list, tagsc, tagsv, value, resultPtr)
 	}
 
 	/* try to find the next tag */
-	error = ExtraL_TaglFindTag(interp, list, tag, len, &sublist, &sublistpos);
+	error = ExtraL_StructlFindTag(interp, list, tag, len, &sublist, &sublistpos);
 	if (error != TCL_OK) {return TCL_ERROR;}
 
 	/* more tags to go: change sublist accordingly */
 	if (structure == NULL) {
 		if (tagsc>1) {
-			error=ExtraL_Taglset(interp, NULL, sublist, tagsc-1, tagsv+1, value, &temp);
+			error=ExtraL_Structlset(interp, NULL, sublist, tagsc-1, tagsv+1, value, &temp);
 			if (error != TCL_OK) {return error;}
 			sublist=temp;
 		} else {
@@ -497,7 +487,7 @@ int ExtraL_Taglset(interp, structure, list, tagsc, tagsv, value, resultPtr)
 		}
 	} else {
 		if (tagsc>1) {
-			error=ExtraL_Taglset(interp, substructure, sublist, tagsc-1, tagsv+1, value, &temp);
+			error=ExtraL_Structlset(interp, substructure, sublist, tagsc-1, tagsv+1, value, &temp);
 			if (error != TCL_OK) {return error;}
 			sublist=temp;
 		} else {
@@ -513,7 +503,7 @@ int ExtraL_Taglset(interp, structure, list, tagsc, tagsv, value, resultPtr)
 				if (ExtraL_ObjEqual(interp,temp,value)==1) {
 					sublist = NULL;
 				} else {
-					error=ExtraL_TaglsetValidate(interp,substructure,ctag,clen,&value);
+					error=ExtraL_StructlsetValidate(interp,substructure,ctag,clen,&value);
 					if (error != TCL_OK) {return TCL_ERROR;}
 					sublist = value;
 				}			
@@ -530,7 +520,7 @@ int ExtraL_Taglset(interp, structure, list, tagsc, tagsv, value, resultPtr)
 					return TCL_ERROR;
 				} else if (tempc!=0) {
 					for(pos=0;pos<tempc;pos+=2) {
-						error=ExtraL_Taglset(interp, substructure, sublist, 1, tempv+pos, tempv[pos+1], &temp);
+						error=ExtraL_Structlset(interp, substructure, sublist, 1, tempv+pos, tempv[pos+1], &temp);
 						if (error != TCL_OK) {
 							return error;
 						}
@@ -593,13 +583,13 @@ int ExtraL_Taglset(interp, structure, list, tagsc, tagsv, value, resultPtr)
 /*
  *----------------------------------------------------------------------
  *
- *		C backend for taglunset
+ *		C backend for structlunset
  *     list gets changed directly, so should not be shared
  *
  *----------------------------------------------------------------------
  */
 
-int ExtraL_Taglunset(interp, list, tagsc, tagsv, resultPtr)
+int ExtraL_Structlunset(interp, list, tagsc, tagsv, resultPtr)
 	Tcl_Interp *interp;
 	Tcl_Obj *list;
 	int tagsc;
@@ -637,7 +627,7 @@ int ExtraL_Taglunset(interp, list, tagsc, tagsv, resultPtr)
 					break;
 				} else {
 					pos++;
-					result=ExtraL_Taglunset(interp, workv[pos], tagsc-1, tagsv+1, &temp);
+					result=ExtraL_Structlunset(interp, workv[pos], tagsc-1, tagsv+1, &temp);
 					if (result != TCL_OK) {
 						return result;
 					}
@@ -659,12 +649,12 @@ int ExtraL_Taglunset(interp, list, tagsc, tagsv, resultPtr)
 /*
  *----------------------------------------------------------------------
  *
- *		C backend for taglget with struct
+ *		C backend for structlget with struct
  *
  *----------------------------------------------------------------------
  */
 
-int ExtraL_TaglgetStruct(interp, structure, list, tagsc, tagsv, resultPtr)
+int ExtraL_StructlgetStruct(interp, structure, list, tagsc, tagsv, resultPtr)
 	Tcl_Interp *interp;
 	Tcl_Obj *structure;
 	Tcl_Obj *list;
@@ -711,7 +701,7 @@ int ExtraL_TaglgetStruct(interp, structure, list, tagsc, tagsv, resultPtr)
 			Tcl_AppendResult(interp,"error: not all tags in structure",(char *)NULL);
 			return TCL_ERROR;	
 		} else {
-			error=ExtraL_TaglgetValidate(interp,structure,ctag,clen,&list);
+			error=ExtraL_StructlgetValidate(interp,structure,ctag,clen,&list);
 			if (error != TCL_OK) {return TCL_ERROR;}
 			*resultPtr=list;
 			return TCL_OK;
@@ -743,9 +733,9 @@ int ExtraL_TaglgetStruct(interp, structure, list, tagsc, tagsv, resultPtr)
 				error = Tcl_ListObjAppendElement(interp,result,tempv[pos]);
 				if (error != TCL_OK) {return error;}
 
-				error=ExtraL_TaglFindTag(interp,list,ctag,clen,&sublist,&i);
+				error=ExtraL_StructlFindTag(interp,list,ctag,clen,&sublist,&i);
 				if (error != TCL_OK) {return error;}
-				error=ExtraL_TaglgetStruct(interp, tempv[pos+1], sublist, 0, NULL, &temp);
+				error=ExtraL_StructlgetStruct(interp, tempv[pos+1], sublist, 0, NULL, &temp);
 				if (error != TCL_OK) {return error;}
 				error = Tcl_ListObjAppendElement(interp,result,temp);
 				if (error != TCL_OK) {return error;}
@@ -762,7 +752,7 @@ int ExtraL_TaglgetStruct(interp, structure, list, tagsc, tagsv, resultPtr)
 		--------------------------------------
 	*/
 	tag=Tcl_GetStringFromObj(tagsv[0],&len);
-	error=ExtraL_TaglFindTag(interp,structure,tag,len,&substructure,&pos);
+	error=ExtraL_StructlFindTag(interp,structure,tag,len,&substructure,&pos);
 	if (error != TCL_OK) {return error;}
 	if (pos == -1) {
 		Tcl_ResetResult(interp);
@@ -774,11 +764,11 @@ int ExtraL_TaglgetStruct(interp, structure, list, tagsc, tagsv, resultPtr)
 		find the tag
 		------------
 	*/
-	error=ExtraL_TaglFindTag(interp,list,tag,len,&sublist,&pos);
+	error=ExtraL_StructlFindTag(interp,list,tag,len,&sublist,&pos);
 	if (error != TCL_OK) {return error;}
 
 	/* set the result */
-	error=ExtraL_TaglgetStruct(interp, substructure, sublist, tagsc-1, tagsv+1, &temp);
+	error=ExtraL_StructlgetStruct(interp, substructure, sublist, tagsc-1, tagsv+1, &temp);
 	if (error != TCL_OK) {return error;}
 	*resultPtr = temp;
 	return TCL_OK;
@@ -786,12 +776,12 @@ int ExtraL_TaglgetStruct(interp, structure, list, tagsc, tagsv, resultPtr)
 /*
  *----------------------------------------------------------------------
  *
- *		C backend for taglget
+ *		C backend for structlget
  *
  *----------------------------------------------------------------------
  */
 
-int ExtraL_Taglget(interp, list, tags, result)
+int ExtraL_Structlget(interp, list, tags, result)
 	Tcl_Interp *interp;
 	Tcl_Obj *list;
 	Tcl_Obj *tags;
@@ -840,9 +830,9 @@ int ExtraL_Taglget(interp, list, tags, result)
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_TaglsetObjCmd --
+ * ExtraL_StructlsetObjCmd --
  *
- *		This procedure is invoked to process the "taglset" command.
+ *		This procedure is invoked to process the "structlset" command.
  *
  * Results:
  *		A standard Tcl result.
@@ -852,7 +842,7 @@ int ExtraL_Taglget(interp, list, tags, result)
  */
 
 int
-ExtraL_TaglsetObjCmd(notUsed, interp, objc, objv)
+ExtraL_StructlsetObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;				 /* Not used. */
 	Tcl_Interp *interp;					/* Current interpreter. */
 	int objc;						/* Number of arguments. */
@@ -865,7 +855,7 @@ ExtraL_TaglsetObjCmd(notUsed, interp, objc, objv)
 	int pos;
 
 	if ((objc != 4)&&(objc != 6)) {
-		Tcl_WrongNumArgs(interp, 1, objv, "?-struct schema? list taglist value");
+		Tcl_WrongNumArgs(interp, 1, objv, "?-struct schema? list structlist value");
 		return TCL_ERROR;
 	}
 
@@ -881,10 +871,10 @@ ExtraL_TaglsetObjCmd(notUsed, interp, objc, objv)
 	}
 	if (tagsc == 0) {
 		Tcl_ResetResult(interp);
-		Tcl_AppendResult(interp,"error: empty taglist",(char *)NULL);
+		Tcl_AppendResult(interp,"error: empty structlist",(char *)NULL);
 		return TCL_ERROR;
 	}
-	if (ExtraL_Taglset(interp, structure, objv[pos], tagsc, tagsv, objv[pos+2], &resultObj) != TCL_OK) {
+	if (ExtraL_Structlset(interp, structure, objv[pos], tagsc, tagsv, objv[pos+2], &resultObj) != TCL_OK) {
 		return TCL_ERROR;
 	}
 	if (resultObj == NULL) {
@@ -897,9 +887,9 @@ ExtraL_TaglsetObjCmd(notUsed, interp, objc, objv)
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_TaglunsetCmd --
+ * ExtraL_StructlunsetCmd --
  *
- *		This procedure is invoked to process the "taglunset" command.
+ *		This procedure is invoked to process the "structlunset" command.
  *
  * Results:
  *		A standard Tcl result.
@@ -909,7 +899,7 @@ ExtraL_TaglsetObjCmd(notUsed, interp, objc, objv)
  */
 
 int
-ExtraL_TaglunsetObjCmd(notUsed, interp, objc, objv)
+ExtraL_StructlunsetObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;				 /* Not used. */
 	Tcl_Interp *interp;					/* Current interpreter. */
 	int objc;						/* Number of arguments. */
@@ -920,14 +910,14 @@ ExtraL_TaglunsetObjCmd(notUsed, interp, objc, objv)
 	int tagsc;
 
 	if (objc != 3) {
-		Tcl_WrongNumArgs(interp, 1, objv, "list taglist");
+		Tcl_WrongNumArgs(interp, 1, objv, "list structlist");
 		return TCL_ERROR;
 	}
 	if (Tcl_ListObjGetElements(interp, objv[2], &tagsc, &tagsv) != TCL_OK) {
 		return TCL_ERROR;
 	}
 
-	if (ExtraL_Taglunset(interp,objv[1], tagsc, tagsv, &resultObj) != TCL_OK) {
+	if (ExtraL_Structlunset(interp,objv[1], tagsc, tagsv, &resultObj) != TCL_OK) {
 		return TCL_ERROR;
 	}
 	Tcl_SetObjResult(interp,resultObj);
@@ -937,9 +927,9 @@ ExtraL_TaglunsetObjCmd(notUsed, interp, objc, objv)
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_TaglgetCmd --
+ * ExtraL_StructlgetCmd --
  *
- *		This procedure is invoked to process the "taglget" command.
+ *		This procedure is invoked to process the "structlget" command.
  *
  * Results:
  *		A standard Tcl result.
@@ -949,7 +939,7 @@ ExtraL_TaglunsetObjCmd(notUsed, interp, objc, objv)
  */
 
 int
-ExtraL_TaglgetObjCmd(notUsed, interp, objc, objv)
+ExtraL_StructlgetObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;
 	Tcl_Interp *interp;
 	int objc;
@@ -961,7 +951,7 @@ ExtraL_TaglgetObjCmd(notUsed, interp, objc, objv)
 	int pos;
 
 	if ((objc != 3)&&(objc != 5)) {
-		Tcl_WrongNumArgs(interp, 1, objv, "?-struct schema? list taglist");
+		Tcl_WrongNumArgs(interp, 1, objv, "?-struct schema? list structlist");
 		return TCL_ERROR;
 	}
 
@@ -971,15 +961,15 @@ ExtraL_TaglgetObjCmd(notUsed, interp, objc, objv)
 		}
 		if (tagsc == 0) {
 			Tcl_ResetResult(interp);
-			Tcl_AppendResult(interp,"error: empty taglist",(char *)NULL);
+			Tcl_AppendResult(interp,"error: empty structlist",(char *)NULL);
 			return TCL_ERROR;
 		}
-		if (ExtraL_TaglgetStruct(interp, objv[2], objv[3], tagsc, tagsv, &result)==TCL_ERROR) {
+		if (ExtraL_StructlgetStruct(interp, objv[2], objv[3], tagsc, tagsv, &result)==TCL_ERROR) {
 			return TCL_ERROR;
 		}
 		pos=4;
 	} else {
-		if (ExtraL_Taglget(interp, objv[1], objv[2], &result)==TCL_ERROR) {
+		if (ExtraL_Structlget(interp, objv[1], objv[2], &result)==TCL_ERROR) {
 			return TCL_ERROR;
 		}
 		pos=2;
@@ -990,7 +980,7 @@ ExtraL_TaglgetObjCmd(notUsed, interp, objc, objv)
 		return TCL_OK;
 	} else {
 		Tcl_ResetResult(interp);
-		Tcl_AppendResult(interp,"taglist \"", Tcl_GetStringFromObj(objv[pos],&pos),"\" not found",(char *) NULL);
+		Tcl_AppendResult(interp,"structlist \"", Tcl_GetStringFromObj(objv[pos],&pos),"\" not found",(char *) NULL);
 		return TCL_ERROR;
 	}
 }
@@ -998,9 +988,9 @@ ExtraL_TaglgetObjCmd(notUsed, interp, objc, objv)
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_TaglfieldsCmd --
+ * ExtraL_StructlfieldsCmd --
  *
- *		This procedure is invoked to process the "taglfields" command.
+ *		This procedure is invoked to process the "structlfields" command.
  *
  * Results:
  *		A standard Tcl result.
@@ -1010,7 +1000,7 @@ ExtraL_TaglgetObjCmd(notUsed, interp, objc, objv)
  */
 
 int
-ExtraL_TaglfieldsObjCmd(notUsed, interp, objc, objv)
+ExtraL_StructlfieldsObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;				 /* Not used. */
 	Tcl_Interp *interp;					/* Current interpreter. */
 	int objc;						/* Number of arguments. */
@@ -1067,9 +1057,9 @@ ExtraL_TaglfieldsObjCmd(notUsed, interp, objc, objv)
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_TaglfindCmd --
+ * ExtraL_StructlfindCmd --
  *
- *		This procedure is invoked to process the "taglfind" command.
+ *		This procedure is invoked to process the "structlfind" command.
  *
  * Results:
  *		A standard Tcl result.
@@ -1079,7 +1069,7 @@ ExtraL_TaglfieldsObjCmd(notUsed, interp, objc, objv)
  */
 
 int
-ExtraL_TaglfindObjCmd(notUsed, interp, objc, objv)
+ExtraL_StructlfindObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;				 /* Not used. */
 	Tcl_Interp *interp;					/* Current interpreter. */
 	int objc;						/* Number of arguments. */
@@ -1125,3 +1115,24 @@ ExtraL_TaglfindObjCmd(notUsed, interp, objc, objv)
 	Tcl_SetIntObj(resultObj,0);
 	return TCL_OK;
 }
+
+int Extral_StructlInit(interp)
+	Tcl_Interp *interp;
+{
+	Tcl_InitHashTable(&typesTable,TCL_STRING_KEYS);
+	Tcl_CreateObjCommand(interp,"Extral::structlset",(Tcl_ObjCmdProc *)ExtraL_StructlsetObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"Extral::structlunset",(Tcl_ObjCmdProc *)ExtraL_StructlunsetObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"Extral::structlget",(Tcl_ObjCmdProc *)ExtraL_StructlgetObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"Extral::structlfields",(Tcl_ObjCmdProc *)ExtraL_StructlfieldsObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"Extral::structlfind",(Tcl_ObjCmdProc *)ExtraL_StructlfindObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	ExtraL_StructlCreateType(interp,"*any",(ExtraL_StructlTypeProc *)NULL,(ExtraL_StructlTypeProc *)NULL);
+	ExtraL_StructlCreateType(interp,"*int",(ExtraL_StructlTypeProc *)ExtraL_StructlSetInt,(ExtraL_StructlTypeProc *)NULL);
+	ExtraL_StructlCreateType(interp,"*double",(ExtraL_StructlTypeProc *)ExtraL_StructlSetDouble,(ExtraL_StructlTypeProc *)NULL);
+	ExtraL_StructlCreateType(interp,"*bool",(ExtraL_StructlTypeProc *)ExtraL_StructlSetBool,(ExtraL_StructlTypeProc *)NULL);
+	ExtraL_StructlCreateType(interp,"*regexp",(ExtraL_StructlTypeProc *)ExtraL_StructlSetRegexp,(ExtraL_StructlTypeProc *)NULL);
+	ExtraL_StructlCreateType(interp,"*between",(ExtraL_StructlTypeProc *)ExtraL_StructlSetBetween,(ExtraL_StructlTypeProc *)NULL);
+	ExtraL_StructlCreateType(interp,"*dbetween",(ExtraL_StructlTypeProc *)ExtraL_StructlSetDBetween,(ExtraL_StructlTypeProc *)NULL);
+	ExtraL_StructlCreateType(interp,"*date",(ExtraL_StructlTypeProc *)ExtraL_StructlSetDate,(ExtraL_StructlTypeProc *)ExtraL_StructlGetDate);
+	ExtraL_StructlCreateType(interp,"*time",(ExtraL_StructlTypeProc *)ExtraL_StructlSetTime,(ExtraL_StructlTypeProc *)ExtraL_StructlGetTime);
+}
+

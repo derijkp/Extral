@@ -2,7 +2,6 @@
 # the next line restarts using wish \
 exec tclsh8.0 "$0" "$@"
 
-source ../lib/tools.tcl
 source tools.tcl
 load ../extral.so
 proc type {} {return fdbm}

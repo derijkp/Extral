@@ -1,0 +1,6 @@
+atexit add command
+	adds a command to the atexit handler: This command will be executed when
+	the program exits. It can be used to do a cleanup. This command redefines
+	the exit command. If you use it in Tk, and you exit by calling "destroy ."
+	it will not work. You can redefine the destroy command to call exit when it 
+	has . as an argument.

@@ -1,4 +1,7 @@
-lappend auto_path /peter/dev/Extral /tcl/lib/Peos0.82
+lappend auto_path /peter/dev/Extral
 package require Extral
-package require Peos
-Peos__cmd
+cd /peter/dev/Extral/tests
+	formattime [scantime {31 Jan 0001 BC 23:50}]
+
+   source date.tcl
+

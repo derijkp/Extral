@@ -237,7 +237,7 @@ test [type] {see if sync doesn't fail} {
 	catch {file delete -force db.test}
 	dbm create [type] db.test
 	dbm open [type] db db.test
-	for {set i 0} {$i<1000} {incr i} {
+	for {set i 0} {$i<100} {incr i} {
 		db set "try $i" "try it the $i time"
 	}
 	db sync
@@ -247,7 +247,7 @@ test [type] {see if reorganize doesn't fail} {
 	catch {file delete -force db.test}
 	dbm create [type] db.test
 	dbm open [type] db db.test
-	for {set i 0} {$i<1000} {incr i} {
+	for {set i 0} {$i<100} {incr i} {
 		db set "try $i" "try it the $i time"
 	}
 	db unset {try 10}

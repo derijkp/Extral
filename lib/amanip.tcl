@@ -1,9 +1,18 @@
+# Copyright (c) 1996 Peter De Rijk
+#
+# See the file "README.txt" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# =============================================================
+
+Extral::export {amanip} {
+
 proc amanip {option args} {
 	set len [llength $args]
 	switch $option {
 		lappend {
 			if {$len!=2} {
-				error "wrong # args: should be \"amanip append arrayName list\""
+				error "wrong # args: should be \"amanip lappend arrayName list\""
 			}
 			upvar [lindex $args 0] var
 			foreach {e val} [lindex $args 1] {
@@ -30,4 +39,6 @@ proc amanip {option args} {
 			error "bad option \"$option\": should be lappend or get"
 		}
 	}
+}
+
 }

@@ -1,0 +1,99 @@
+
+}
+namespace import Extral::*
+
+General list manipulation commands
+----------------------------------
+lregsub ?switches? exp list subSpec
+	does a regsub for each element in the list, and returns the resulting list.
+	eg.
+	% lregsub {c$} {afdsg asdc sfgh {dfgh shgfc} dfhg} {!}
+	afdsg asd! sfgh {dfgh shgf!} dfhg
+	% lregsub {^([^.]+)\.([^.]+)$} {start.sh help.ps h.sh} {\2 \1}
+	{sh start} {ps help} {sh h}
+
+lfind <mode> list pattern
+	returns a list of all indices which match a pattern.
+	<mode> can be -exact, -glob, or -regexp
+	eg.
+	% lfind -regexp {Ape Ball Field {Antwerp city} Egg} {^A}
+	0 3
+
+lsub list ?-exclude? [index list]
+	create a sublist from a set of indices
+	When -exclude is specified, the elements of which the indexes are not in the list 
+	will be given.
+	eg.
+		% lsub {Ape Ball Field {Antwerp city} Egg} {0 3}
+		Ape {Antwerp city}
+		% lsub {Ape Ball Field {Antwerp city} Egg} -exclude {0 3}
+		Ball Field Egg
+
+lcor <referencelist> <list>
+	gives the positions of the elements in list in the reference list. If an element is not
+	found in the reference list, it returns -1. Elements are matched only once.
+	% lcor {a b c d e f} {d b}
+	3 1
+	% lcor {a b c d e f} {b d d}
+	1 3 -1
+
+lmerge ?list1? ?list2? ??spacing??
+	merges two lists into one
+	eg.
+	% lmerge {a b c} {1 2 3}
+	a 1 b 2 c 3
+	% lmerge {a b c d} {1 2} 2
+	a b 1 c d 2
+
+lunmerge ?list? ??spacing?? ??var??
+	unmerges items from a list to the result; the remaining items are stored
+	in the given variable ?var?
+	eg.
+		% lunmerge {a 1 b 2 c 3}
+		a b c
+		% lunmerge {a b 1 c d 2} 2 var
+		a b c d
+		% set var
+		1 2
+
+lpop listName ?pos?
+	returns the last element from a list, thereby removing it from the list.
+	If pos is given it will return the pos element of the list.
+
+lshift listName
+	returns the first element from a list, thereby removing it from the list.
+
+lload <filename>
+	returns all lines in the specified files as a list 
+
+lwrite ?file? ?list?
+	writes a list to a file
+
+lpush listName ?item? [position]
+	opposite of lpop.
+
+lunshift listName ?item?
+	opposite of lshift: prepends ?item? to the list.
+
+lset listName ?item? ?indexlist?
+	sets all elements of the list at the given indices to value ?item?
+
+larrayset array varlist valuelist
+	sets the values of valuelist to the respective elements in varlist for
+	the given array
+
+lcommon list list ...
+	returns the common elements of the lists
+
+lunion list list ...
+	returns the union of the lists
+
+leor list1 list2
+	returns the elements that are not shared between both lists
+
+lremove listName ?item? ...
+	removes the items from the list
+
+laddnew listName ?item? ...
+	adds the items to the list if not already there
+

@@ -1,5 +1,3 @@
-# extral.tcl --
-#
 # File containing the Tcl part of the list commands in the Extral extension
 #
 # Copyright (c) 1996 Peter De Rijk
@@ -9,7 +7,11 @@
 #
 # =============================================================
 
-if ![info exists Extral__noc] {
+Extral::export {
+	lremove lpush lunshift lset larrayset lcommon lunion leor laddnew
+} {
+
+if ![info exists noc] {
 proc lremove {list args} {
 	if {"$args"==""} {
 		return $list
@@ -31,34 +33,6 @@ proc lremove {list args} {
 		return [llremove $list $args]
 	}
 }
-}
-
-proc lload {filename} {
-	set f [open $filename "r"]
-	set result [split [read $f] "\n"]
-	close $f
-	return $result
-}
-
-proc lwrite {filename list} {
-	set f [open $filename "a"]
-	puts $f [join $list "\n"] nonewline
-	close $f
-}
-
-proc readfile {filename} {
-	set f [open $filename "r"]
-	fconfigure $f -buffersize 100000
-	set result [read $f]
-	close $f
-	return $result
-}
-
-proc writefile {filename list} {
-	set f [open $filename "w"]
-	fconfigure $f -buffersize 100000
-	puts -nonewline $f $list
-	close $f
 }
 
 proc lpush {ulist item {pos {}}} {
@@ -133,33 +107,4 @@ proc laddnew {listref args} {
 	return $list
 }
 
-# Code to let a variable iterate over a list
-# handy when checking a foreach loop manually
-# literate ?variable name? ?list?
-# ===========================================
-
-proc literate {var list} {
-	global extraL__Priv_iterate
-	upvar $var ref
-	set extraL__Priv_iterate($var:list) $list
-	set extraL__Priv_iterate($var:len) [llength $list]
-	set extraL__Priv_iterate($var:pos) 0
-	set ref [lindex $extraL__Priv_iterate($var:list) 0]
-}
-
-proc lnext {var} {
-	global extraL__Priv_iterate
-	upvar $var ref
-	if ![info exists extraL__Priv_iterate($var:list)] {
-		error "No iteration over $var set"
-	}
-	incr extraL__Priv_iterate($var:pos)
-	if {$extraL__Priv_iterate($var:pos)==$extraL__Priv_iterate($var:len)} {
-		unset extraL__Priv_iterate($var:list)
-		unset extraL__Priv_iterate($var:len)
-		unset extraL__Priv_iterate($var:pos)
-		unset ref
-	} else {
-		set ref [lindex $extraL__Priv_iterate($var:list) $extraL__Priv_iterate($var:pos)]
-	}
 }

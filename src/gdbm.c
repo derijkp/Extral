@@ -108,7 +108,7 @@ int ExtraL_GdbmOpen(
 	dbf = gdbm_open(name, blocksize, readonly, fast, NULL);
 	if (dbf == NULL) {
 		Tcl_ResetResult(interp);
-		Tcl_AppendResult(interp,"could not open database \"",name, "\": ", (char *)NULL);
+		Tcl_AppendResult(interp,"could not open database \"",name, "\"", (char *)NULL);
 		return TCL_ERROR;
 	}
 	*token = (ClientData)dbf;

@@ -1,5 +1,3 @@
-# extral.tcl --
-#
 # Create atexit handler
 #
 # Copyright (c) 1996 Peter De Rijk
@@ -9,25 +7,31 @@
 #
 # =============================================================
 
-rename exit Extral__exit
+rename exit Extral::exit
 proc exit {{returnCode 0}} {
-	global Extral__priv
-	if [info exists Extral__priv(atexit)] {
-		foreach command $Extral__priv(atexit) {
+	global Extral::atexit
+	if [info exists Extral::atexit] {
+		foreach command $Extral::atexit {
 			eval $command
 		}
 	}
-	Extral__exit $returnCode
+	Extral::exit $returnCode
 }
 
+auto_load laddnew
+
+Extral::export {atexit} {
+
 proc atexit {action command} {
-	global Extral__priv
+	variable atexit
 	switch $action {
 		add {
-			laddnew Extral__priv(atexit) $command
+			laddnew atexit $command
 		}
 		remove {
-			lremove Extral__priv(atexit) $command
+			lremove atexit $command
 		}
 	}
+}
+
 }

@@ -1,3 +1,12 @@
+# Copyright (c) 1996 Peter De Rijk
+#
+# See the file "README.txt" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# =============================================================
+
+Extral::export {lmath} {
+
 proc lmath {option args} {
 	switch $option {
 		calc {
@@ -75,3 +84,4 @@ proc lmath {option args} {
 	}
 }
 
+}

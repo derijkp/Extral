@@ -1,4 +1,4 @@
-/*	
+/*
  *	 File:    date.c
  *	 Purpose: extraL extension to Tcl
  *	 Author:  Copyright (c) 1995 Peter De Rijk
@@ -8,6 +8,7 @@
  */
 
 #include "tcl.h"
+#include <math.h>
 
 /*
  *----------------------------------------------------------------------
@@ -17,7 +18,7 @@
  *----------------------------------------------------------------------
  */
 
-int ExtraL_TaglScanTime(interp,musthavedate,musthavetime,dateObj,resultPtr)
+int ExtraL_ScanTime(interp,musthavedate,musthavetime,dateObj,resultPtr)
 	Tcl_Interp *interp;
 	int musthavedate;
 	int musthavetime;
@@ -341,7 +342,7 @@ ExtraL_ScanTimeObjCmd(notUsed, interp, objc, objv)
 		musthavedate = 1;
 		musthavetime = 0;
 	}
-	error = ExtraL_TaglScanTime(interp,musthavedate,musthavetime,objv[1],&result);
+	error = ExtraL_ScanTime(interp,musthavedate,musthavetime,objv[1],&result);
 	if (error != TCL_OK) {return error;}
 	Tcl_SetObjResult(interp,Tcl_NewDoubleObj(result));
 	return TCL_OK;
@@ -371,8 +372,8 @@ ExtraL_FormatTime(Tcl_Interp *interp, double time, char *format, char **result)
 		bc = 1;
 		time = -time;
 	}
-	days = (int)(time/86400.0);
-	year = (int)(days/365.25);
+	days = (int)floor(time/86400.0);
+	year = (int)floor((double)days/365.25);
 	while(1) {
 		i = year+1;
 		i = i*365 + i/4 - i/100 + i/400;
@@ -450,9 +451,9 @@ ExtraL_FormatTime(Tcl_Interp *interp, double time, char *format, char **result)
 	}
 
 	/* get time */
-	hour = (int)(seconds/3600.0);
+	hour = (int)floor(seconds/3600.0);
 	seconds = seconds - (hour*3600.0);
-	min = (int)(seconds/60.0);
+	min = (int)floor(seconds/60.0);
 	seconds = seconds - (min*60.0);
 	sec = (int)(seconds);
 	seconds = seconds - sec;

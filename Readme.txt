@@ -1,28 +1,33 @@
 ExtraL
-======  extra list manipulation commands for Tcl
+======  extra commands for Tcl
         by Peter De Rijk (Universiteit Antwerpen) 
 
 What is ExtraL
 --------------
 
-Most percieved performance problems with Tcl were caused by the large
-overhead on loops, that have to be reinterpreted for each iteration.
-This became especially noticable when working with large lists. This
-extension was originally written to overcome this problem. With the
-advent of the Tcl byte compiler, the performance is not such a great 
-issue any longer, but I still find many of the functions very
-convenient, and some of those that were now rewritten using the
-object system in C are still faster. Extral is also growing into
-my own generally useful library.
+Extral is a generally useful library which extends Tcl with a.o.:
+	- extral list manipulation commands
+	- array manipulation
+	- atexit
+	- dbm support: file based, gdbm and bsd-db support
+	- tempfile
+	- filing commands
+	- light eval (Viktor Dukhovni)
+	
+The name comes from the fact that ExtraL originally only contained
+extra list processing commands to overcome some of the performance 
+problems in Tcl when processing large lists. Later other commands
+were added. With the advent of the Tcl byte compiler, the 
+performance is not such a great issue any longer, but I still find 
+many of the list manipulation functions very convenient, and some 
+of those that were now rewritten using the object system in C are 
+still faster. 
+Most functions are now also available in Tcl-only form as well. Using 
+the C code just gives a speedup.
 
-Most functions in Extral.txt are now available in Tcl-only form as well.
-Using the C code just gives a speedup. Several of the functions are now
-only in Tcl.
-
-Documentation is still rather scarce unfortunately. You can find a short
-description of the commands in the extral.txt file. For some of the 
-commands, you can find out a lot by checking the testing suite in the 
-directory tests.
+You can find a short description of the commands in the files in the 
+docs subdirectory. For some of the commands, you can find out a lot 
+by checking the testing suite in the directory tests.
 
 INCOMPATIBLE CHANGES
 --------------------
@@ -46,6 +51,13 @@ src directory and type
 Then run make. This should produce the loadable module. The build.tcl and
 buildwin.tcl files are a tool to make a nice package in a different
 directory.
+
+If you want to make gdbm and bsd-db support, you will have to create a 
+libgdbm.a and libdb.a (should position independend code) and put these
+in the extern directory together with their header files. (gdbm.h and 
+db_185.h) and do a 
+make gdbm.so
+make bsddbm.so
 
 How to contact me
 -----------------

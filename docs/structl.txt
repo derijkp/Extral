@@ -1,0 +1,51 @@
+Structured lists
+----------------
+In a structured list tags alternate with the value attached to this tag, 
+eg.: {tag1 {value of tag1} tag2 {value of tag2} ...}
+Using the structured list commands, you can use a list as a sort of array.
+However, structured lists have some advantages to arrays:
+ - They can be passed to functions easily
+ - tagged lists can be nested: an element of a tagged list can 
+   contain another tagged list, etc.
+ - although finding a value in an array should be faster,
+   creating the array can take more time.
+ - tagged list can be handled according to a certain structure
+
+structlset ?-struct schema? list structlist value
+structlget ?-struct schema? list structlist
+structlunset list tag
+structlfields list ?valueVar?
+	examples.:
+	set the value for tag
+		% set list {a 1 b 4}
+		a 1 b 4
+		% set list [structlset $list c 3]
+		a 1 b 4 c 3
+		% structlset {a 1 b 4 c 3} b 2
+		a 1 b 2 c 3
+	example of nesting:
+		% structlset {a 1 b {a 1 b 4} c 3} {b b} 2
+		a 1 b {a 1 b 2} c 3
+	example of structure:
+		% set struct {
+			reg {*regexp {^a[0-9]} ?}
+			sub {
+				a {*any ?}
+				b {*between 0 10 ?}
+			}
+			ints {
+				* {*int ?}
+			}
+		}
+		% set data {}
+		% set data [structlset -struct $struct $data {sub b} 9]
+		sub {b 9}
+		% set data [structlset -struct $struct $data {sub b} 11]
+		error: 11 is not between 0 and 10
+		% set data [structlset -struct $struct $data ints {a 9}]
+		sub {b 9} ints {a 9}
+		% set data [structlset -struct $struct $data {sub b} ?]
+		ints {a 9}
+		% structlget -struct $struct $data {sub b}
+		?
+

@@ -1,5 +1,3 @@
-# tools.tcl --
-#
 # Some convenience functions I often use, so they ended up here
 #
 # Copyright (c) 1996 Peter De Rijk
@@ -8,6 +6,8 @@
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
 # =============================================================
+
+Extral::export {rem REM remoff true setglobal random} {
 
 # Remark
 # rem: 
@@ -43,15 +43,6 @@ proc true {expr} {
 	return $result
 }
 
-# fload filename
-#	suck up the entire contents of a file, and return them as the result
-proc fload {fileName} {
-	set f [open $fileName]
-	set result [read $f]
-	close $f
-	return $result
-}
-
 # setglobal varName ?newValue?
 #	same as the set command, but then for global variables
 proc setglobal {varName args} {
@@ -72,10 +63,4 @@ proc random {min max} {
 	return [expr int($min+rand()*$r)]
 }
 
-proc dirglob {dir pattern} {
-	set pwd [pwd]
-	cd $dir
-	set result [glob -nocomplain -- $pattern]
-	cd $pwd
-	return $result
 }

@@ -1,0 +1,12 @@
+amanip lappend arrayName list
+	eg.:
+	% array set try {a 1 b 2}
+	% amanip lappend try {a a c 3}
+	% array get try
+	a {1 a} b 2 c 3
+
+amanip get arrayName list ?default?
+	eg.:
+	% array set try {a 1 b 2}
+	% amanip get try {b c} def
+	b 2 c def

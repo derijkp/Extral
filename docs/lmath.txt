@@ -1,0 +1,16 @@
+lmath calc ?list1? ?action? ?list2?
+	makes calculations on lists. Action can be one of +, -, * or /
+		eg.
+		% lmath calc {1 2 3.2 4} + {1 2 3.2 4}
+		2.0 4.0 6.4 8.0
+lmath sum ?list?
+	returns the sum of the numbers in the list
+lmath min ?list?
+	returns the minimum of the numbers in the list
+lmath max ?list?
+	returns the maximum of the numbers in the list
+lmath cumul ?list?
+	returns a list containing the cumulative sums of the numbers in the list
+lmath incr ?list? ?value?
+	returns a list containing the numbers in the list incremented by value
+

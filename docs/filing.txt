@@ -1,0 +1,20 @@
+Filing commands
+---------------
+dirglob dir pattern
+lload filename
+lwrite filename list
+readfile filename
+writefile filename list
+
+Extras
+------
+These will disappear as Tcl now has these commands in the file command
+commands to mimick (for some part) the Unix filing commands. Under Unix, they
+call the actual Unix commands after doing wildcart substitution. Under Windows
+functionality is more limited.
+mkdir		make a directory
+ls		list files
+chmod		change permissions
+cp		copy files
+mv		move files
+rm		remove files

@@ -1,0 +1,12 @@
+ssort ?-ascii? ?-integer? ?-real? ?-increasing? ?-decreasing? ?-dictionary? ?-command string? ?-reflist list? list
+	enhanced lsort:
+		by D. Richard Hipp -- drh@tobit.vnet.net -- 704.948.4565 :
+			- re-entrant and thread-safe: eg. ssort can be used in its
+			  own -command proc
+				- 10% faster
+			- option -dictionary: Using -dict, "B" comes in between
+			  "a" and "b".  Also "x10" comes after "x9" 
+		by Peter De Rijk :
+			extra option -reflist: sort the elements in the list according
+			to the comparisons of the corresponding elements in the 
+			reflist.

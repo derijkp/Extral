@@ -4,7 +4,7 @@
 #include <time.h>
 #include <math.h>
 
-int Extral_taglInit _ANSI_ARGS_((Tcl_Interp *interp));
+int Extral_StructlInit _ANSI_ARGS_((Tcl_Interp *interp));
 
 extern int	ExtraL_LevalObjCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]));
@@ -50,21 +50,6 @@ extern int ExtraL_SSortCmd _ANSI_ARGS_((ClientData clientData,
 
 extern int ExtraL_AtexitCmd _ANSI_ARGS_((ClientData clientData));
 
-extern int ExtraL_TaglsetObjCmd _ANSI_ARGS_((ClientData clientData,
-	Tcl_Interp *interp, int argc, char *argv[]));
-
-extern int ExtraL_TaglunsetObjCmd _ANSI_ARGS_((ClientData clientData,
-	Tcl_Interp *interp, int argc, char *argv[]));
-
-extern int ExtraL_TaglgetObjCmd _ANSI_ARGS_((ClientData clientData,
-	Tcl_Interp *interp, int argc, char *argv[]));
-
-extern int ExtraL_TaglfieldsObjCmd _ANSI_ARGS_((ClientData clientData,
-	Tcl_Interp *interp, int argc, char *argv[]));
-
-extern int ExtraL_TaglfindObjCmd _ANSI_ARGS_((ClientData clientData,
-	Tcl_Interp *interp, int argc, char *argv[]));
-
 extern int ExtraL_ScanTimeObjCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
 
@@ -97,41 +82,26 @@ Extral_Init(interp)
 	char *libDir;
 
 	Tcl_PkgProvide(interp, "extral", "0.94");
-	Tcl_CreateObjCommand(interp,"lpop",(Tcl_ObjCmdProc *)ExtraL_LpopObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"lshift",(Tcl_ObjCmdProc *)ExtraL_LshiftObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"lfind",(Tcl_ObjCmdProc *)ExtraL_LfindObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"lsub",(Tcl_ObjCmdProc *)ExtraL_LsubObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"lcor",(Tcl_ObjCmdProc *)ExtraL_LcorObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"lremdup",(Tcl_ObjCmdProc *)ExtraL_LremdupObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"llremove",(Tcl_ObjCmdProc *)ExtraL_LlremoveObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"lunmerge",(Tcl_ObjCmdProc *)ExtraL_LunmergeObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"lmerge",(Tcl_ObjCmdProc *)ExtraL_LmergeObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"taglset",(Tcl_ObjCmdProc *)ExtraL_TaglsetObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"taglunset",(Tcl_ObjCmdProc *)ExtraL_TaglunsetObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"taglget",(Tcl_ObjCmdProc *)ExtraL_TaglgetObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"taglfields",(Tcl_ObjCmdProc *)ExtraL_TaglfieldsObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"taglfind",(Tcl_ObjCmdProc *)ExtraL_TaglfindObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"scantime",(Tcl_ObjCmdProc *)ExtraL_ScanTimeObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"formattime",(Tcl_ObjCmdProc *)ExtraL_FormatTimeObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"leval",(Tcl_ObjCmdProc *)ExtraL_LevalObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Extral_taglInit(interp);
-	Extral_DbmInit(interp);
-	Gdbm_Init(interp);
+	Tcl_CreateObjCommand(interp,"Extral::lpop",(Tcl_ObjCmdProc *)ExtraL_LpopObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"Extral::lshift",(Tcl_ObjCmdProc *)ExtraL_LshiftObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"Extral::lfind",(Tcl_ObjCmdProc *)ExtraL_LfindObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"Extral::lsub",(Tcl_ObjCmdProc *)ExtraL_LsubObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"Extral::lcor",(Tcl_ObjCmdProc *)ExtraL_LcorObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"Extral::lremdup",(Tcl_ObjCmdProc *)ExtraL_LremdupObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"Extral::llremove",(Tcl_ObjCmdProc *)ExtraL_LlremoveObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"Extral::lunmerge",(Tcl_ObjCmdProc *)ExtraL_LunmergeObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"Extral::lmerge",(Tcl_ObjCmdProc *)ExtraL_LmergeObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"Extral::scantime",(Tcl_ObjCmdProc *)ExtraL_ScanTimeObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"Extral::formattime",(Tcl_ObjCmdProc *)ExtraL_FormatTimeObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"Extral::leval",(Tcl_ObjCmdProc *)ExtraL_LevalObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 
-/*	dld_AddTclCommand(interp, "ffind", ExtraL_FfindCmd); */
-	dld_AddTclCommand(interp, "amanip", ExtraL_AmanipCmd);
-	dld_AddTclCommand(interp, "replace", ExtraL_ReplaceCmd);
-	dld_AddTclCommand(interp, "ssort", ExtraL_SSortCmd);
-#ifdef windows
-/*
-	dld_AddTclCommand(interp, "win_mkdir", ExtraL_MkdirCmd);
-	dld_AddTclCommand(interp, "win_remove", ExtraL_RemoveCmd);
-	dld_AddTclCommand(interp, "win_rmdir", ExtraL_RmdirCmd);
-	dld_AddTclCommand(interp, "win_rename", ExtraL_RenameCmd);
-	dld_AddTclCommand(interp, "win_chmod", ExtraL_ChmodCmd);
-	dld_AddTclCommand(interp, "win_cp", ExtraL_CpCmd);
-*/
-#endif
+	dld_AddTclCommand(interp, "Extral::amanip", ExtraL_AmanipCmd);
+	dld_AddTclCommand(interp, "Extral::replace", ExtraL_ReplaceCmd);
+	dld_AddTclCommand(interp, "Extral::ssort", ExtraL_SSortCmd);
+/*	dld_AddTclCommand(interp, "Extral::ffind", ExtraL_FfindCmd); */
+
+	Extral_StructlInit(interp);
+	Extral_DbmInit(interp);
 	return TCL_OK;
 }
 

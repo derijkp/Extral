@@ -35,7 +35,7 @@ if [info exists errors] {
 		append error "\n$test  ----------------------------"
 		append error "\n$err"
 	}
-	error $error
+	return -code error -errorinfo "" $error
 }
 }
 

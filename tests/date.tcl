@@ -14,12 +14,29 @@ test scantime {scan: 1 Jan 0001} {
 	scantime {1 Jan 0001}
 } {0.0}
 
+test formattime {format: 0.0} {
+	formattime 0.0
+} {0001 Jan 01 00:00:00}
+
 test scantime {scan: 1 Jan 0001 0:0:10} {
 	scantime {1 Jan 0001 0:0:10}
 } {10.0}
+
+test formattime {format: 10.0} {
+	formattime {10.0}
+} {0001 Jan 01 00:00:10}
+
 test scantime {scan: 2 Jan 0001} {
 	scantime {2 Jan 0001}
 } {86400.0}
+
+test formattime {format: 86400.0} {
+	formattime 86400.0
+} {0001 Jan 02 00:00:00}
+
+test formattime {format: -86400.0} {
+	formattime -86400.0
+} {0001 BC Dec 31 00:00:00}
 
 test scantime {error: 1 Jan 0000} {
 	scantime {1 Jan 0000}

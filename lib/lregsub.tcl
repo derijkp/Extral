@@ -1,3 +1,11 @@
+# Copyright (c) 1996 Peter De Rijk
+#
+# See the file "README.txt" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# =============================================================
+
+Extral::export {lregsub} {
 proc lregsub {args} {
 	set len [llength $args]
 	if {$len<3} {
@@ -26,3 +34,4 @@ proc lregsub {args} {
 	return $result
 }
 
+}

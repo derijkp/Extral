@@ -1,3 +1,12 @@
+# Copyright (c) 1996 Peter De Rijk
+#
+# See the file "README.txt" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# =============================================================
+
+Extral::export lmanip {
+
 proc lmanip {option args} {
 	switch $option {
 		subindex {
@@ -140,3 +149,4 @@ proc lmanip {option args} {
 	}
 }
 
+}

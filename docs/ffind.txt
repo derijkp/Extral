@@ -1,0 +1,19 @@
+ffind <switches> filelist pattern ?varName? ?pattern? ?varname?
+	returns the files in filelist whose content match the given pattern.
+	if varName is given, the results will be stored in this variable.
+	several patterns can be searched, the results for each being stored
+	in the apropriate variable.
+	<switches> can be -matches, -all -exact, -glob, or -regexp
+		-matches    : the text matched by the bracketed part of 
+		              the pattern will be mangled into the result. 
+		-allmatches : all matches in the file will be returned in
+		              the form of: 
+		              file1 match1 file1 match2 file2 match2
+		-allfiles   : see next
+ffind -matches -allfiles <switches> filelist pattern nulvalue ?varName? ?pattern? ?nulvalue? ?varname? ..
+	ffind with these options will return a list containing one element
+	for each file in the filelist. if the pattern was found in a file,
+	the the element contains the match; if it was not found, it will
+	contain the nulvalue. This is not compatible with the -allmatches
+	options
+

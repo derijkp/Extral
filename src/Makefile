@@ -31,18 +31,20 @@ CFLAGS = -g
 CC_SWITCHES = $(CFLAGS) $(SHLIB_CFLAGS) -I${TCL_GENERIC_DIR} -I$(TCL_UNIX_DIR) -I${TK_GENERIC_DIR} ${SHLIB_CFLAGS} -I../extern/
 
 OBJECTS = extralInit.o extral.o lpop.o nonl.o supersort.o general.o \
-			tagl.o date.o leval.o dbm.o gdbm.o ../extern/libgdbm.a
+			structl.o date.o leval.o dbm.o
 
-all: extral${SHLIB_SUFFIX} bsddbm$(SHLIB_SUFFIX) gdbm$(SHLIB_SUFFIX) extratcl
+all: extral${SHLIB_SUFFIX} extratcl
 
 extral$(SHLIB_SUFFIX): $(OBJECTS)
-	$(SHLIB_LD) $(SHLIB_CFLAGS) -o ../extral$(SHLIB_SUFFIX) $(OBJECTS)  ${LIBS}
+	$(SHLIB_LD) $(SHLIB_CFLAGS) -o ./extral$(SHLIB_SUFFIX) $(OBJECTS)  ${LIBS}
+	cp ./extral$(SHLIB_SUFFIX) ../extral$(SHLIB_SUFFIX)
 
 bsddbm$(SHLIB_SUFFIX): bsddbm.o ../extern/libdb.a  ../extral$(SHLIB_SUFFIX)
-	$(SHLIB_LD) $(SHLIB_CFLAGS) -o ../bsddbm$(SHLIB_SUFFIX) bsddbm.o ../extern/libdb.a ../extral$(SHLIB_SUFFIX)  ${LIBS}
+	$(SHLIB_LD) $(SHLIB_CFLAGS) -o ../bsddbm$(SHLIB_SUFFIX) bsddbm.o ../extern/libdb.a  ${LIBS}
 
-gdbm$(SHLIB_SUFFIX): gdbm.o ../extral$(SHLIB_SUFFIX) ../extern/libgdbm.a
-	$(SHLIB_LD) $(SHLIB_CFLAGS) -o ../gdbm$(SHLIB_SUFFIX) gdbm.o ../extern/libgdbm.a ../extral$(SHLIB_SUFFIX)  ${LIBS} -lgdbm
+gdbm$(SHLIB_SUFFIX): gdbm.o ./extral$(SHLIB_SUFFIX) ../extern/libgdbm.a
+	$(SHLIB_LD) $(SHLIB_CFLAGS) -o ./gdbm$(SHLIB_SUFFIX) gdbm.o ../extern/libgdbm.a ./extral$(SHLIB_SUFFIX)  ${LIBS}
+	cp ./gdbm$(SHLIB_SUFFIX) ../gdbm$(SHLIB_SUFFIX)
 
 extratcl: tclAppInit.o $(OBJECTS)
 	$(CC) $(CC_SWITCHES) -o extratcl tclAppInit.o $(OBJECTS) ${TCL_LIB_SPEC} ${LIBS}
@@ -50,8 +52,7 @@ extratcl: tclAppInit.o $(OBJECTS)
 clean:
 	rm -f *.o *${SHLIB_SUFFIX} config.cache config.log lib.exp
 	rm -f core ../core extratcl
-	rm -f ../extral$(SHLIB_SUFFIX) ../extral.dll ../win/tmp/*.obj ../win/*.csm
-	rm -f ../bsddbm$(SHLIB_SUFFIX) ../bsddbm.dll
+	rm -f ../*.so ../*.dll ./*.so ./*.dll ../win/tmp/*.obj ../win/*.csm
 
 Makefile: Makefile.in
 	./config.status

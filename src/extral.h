@@ -7,11 +7,15 @@
  *	 of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  */
 
-typedef int ExtraL_TaglTypeProc _ANSI_ARGS_((Tcl_Interp *interp,
+/*
+ * structl functions and definitions
+ */
+
+typedef int ExtraL_StructlTypeProc _ANSI_ARGS_((Tcl_Interp *interp,
 	Tcl_Obj *structure, Tcl_Obj **value));
 
-EXTERN int ExtraL_TaglCreateType _ANSI_ARGS_((Tcl_Interp *interp,
-	char *key,ExtraL_TaglTypeProc *setproc,ExtraL_TaglTypeProc *getproc));
+EXTERN int ExtraL_StructlCreateType _ANSI_ARGS_((Tcl_Interp *interp,
+	char *key,ExtraL_StructlTypeProc *setproc,ExtraL_StructlTypeProc *getproc));
 
 /*
  * dbm functions and definitions

@@ -7,25 +7,18 @@
 # script is sourced, the variable $dir must contain the
 # full path name of this file's directory.
 
-# $Format: "set version $ProjectVersion$"$
-set version 1a.20
-regsub -all {[ab]} $Extral__version {} Extral__version
-set Extral__temp {
-	if [file exists [file join $dir extral[info sharedlibextension]]] {
-		load [file join $dir extral[info sharedlibextension]]
-	} else {
-		source [file join $dir lib noc.tcl]
+namespace eval __temp {
+	# $Format: "set version $ProjectVersion$"$
+set version 1a.21
+	regsub -all {[ab]} $version {} version
+	set loadcmd {
+		package provide Extral @version@
+		namespace eval Extral {set dir @dir@}
+		source [file join @dir@ lib init.tcl]
+		namespace eval Extral {set version @version@}
 	}
-	lappend auto_path [file join $dir lib]
-	set Extral__version $Extral__version
-	set Extral__dir $dir
-	package provide Extral $Extral__version
-	namespace eval ::Extral {set version $Extral__version}
+	regsub -all {@version@} $loadcmd [list $version] loadcmd
+	regsub -all {@dir@} $loadcmd [list $dir] loadcmd
+	package ifneeded Extral $version $loadcmd
 }
-regsub -all {\$Extral__version} $Extral__temp [list $Extral__version] Extral__temp
-regsub -all {\$dir} $Extral__temp [list $dir] Extral__temp
-
-#package ifneeded Extral $Extral__version $Extral__temp
-package ifneeded Extral $Extral__version $Extral__temp
-unset Extral__version
-unset Extral__temp
+namespace delete __temp

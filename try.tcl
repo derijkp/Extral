@@ -1,9 +1,9 @@
 package require Extral 1
 set try {a 1 b 2 c {a 1 b 2 c {a 1 b 2}}}
-taglunset $try {c c a}
-taglunset $try {c a}
-taglunset $try c
-taglunset $try {c d}
+structlunset $try {c c a}
+structlunset $try {c a}
+structlunset $try c
+structlunset $try {c d}
 
 set try
 
@@ -15,7 +15,7 @@ wm withdraw .
 catch {unset try}
 set try {a 1 b 2 c 3 d 4 e 5 f 6 g 7 h 8 i 9 j 10}
 time {
-taglget try g
+structlget try g
 } 100
 
 catch {unset try}
@@ -23,17 +23,17 @@ for {set i 0} {$i<100} {incr i} {
 lappend try tryingit$i tryingit$i
 }
 time {
-taglget try tryingit98
+structlget try tryingit98
 } 100
 
 
 # 210
 time {
-taglset $try g try
+structlset $try g try
 }
 # 501 422
 time {
-taglunset $try g
+structlunset $try g
 }
 
 set file temp
