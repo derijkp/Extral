@@ -10,7 +10,7 @@
 namespace eval __temp [list set dir $dir]
 namespace eval __temp {
 	# $Format: "\tset version 0.$ProjectMajorVersion$"$
-	set version 0.1
+	set version 0.0
 	# $Format: "\tset minorversion $ProjectMinorVersion$"$
 	set minorversion 1
 	regsub -all {[ab]} $version {} version
