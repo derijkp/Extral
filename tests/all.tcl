@@ -22,6 +22,7 @@ if ![info exists env(TCL_TEST_ONLYERRORS)] {
 
 alltest list.tcl
 alltest lmanip.tcl
+alltest lmath.tcl
 alltest string.tcl
 alltest convenience.tcl
 alltest array.tcl

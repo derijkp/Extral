@@ -47,7 +47,7 @@ proc time_scan {time {musthave date}} {
 		time {set musthavedate 0;set musthavetime 1}
 		both {set musthavedate 1;set musthavetime 1}
 	}
-	set list [split $time "/- _"]
+	set list [list_remove [split $time "/- _,"] {}]
 	foreach item $list {
 		switch -glob $item {
 			{[0-9][0-9][0-9]*} {

@@ -885,6 +885,7 @@ fflush(stdout);
 	Tcl_ListObjIndex(interp, map, 0, &temp);
 	if (temp == NULL) {
 		ctag="";
+		clen=0;
 	} else {
 		ctag = Tcl_GetStringFromObj(temp,&clen);
 	}
@@ -1375,6 +1376,7 @@ int ExtraL_MapfieldsObjCmd(notUsed, interp, objc, objv)
 			ctag = Tcl_GetStringFromObj(subtag,&clen);
 		} else {
 			ctag = "";
+			clen = 0;
 		}
 		if ((clen==1)&&(ctag[0]=='?')) {
 			error = Tcl_ListObjIndex(interp, listArgv[pos], 1, &subtag);

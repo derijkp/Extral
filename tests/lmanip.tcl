@@ -52,5 +52,17 @@ test lmanip {fill negative counting} {
 	list_fill 5 10 -2
 } {10 8 6 4 2}
 
+test lmanip {fill} {
+	list_fill 3 0.0
+} {0.0 0.0 0.0}
+
+test lmanip {ffill negative counting} {
+	list_fill 5 10.2 -2
+} {10.2 8.2 6.2 4.2 2.2}
+
+test lmanip {ffill counting} {
+	list_fill 5 10 0.1
+} {10.0 10.1 10.2 10.3 10.4}
+
 testsummarize
 

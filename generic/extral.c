@@ -677,7 +677,6 @@ ExtraL_List_mergeObjCmd(notUsed, interp, objc, objv)
 	return TCL_OK;
 }
 
-
 /*
  *----------------------------------------------------------------------
  *
@@ -726,7 +725,7 @@ ExtraL_List_reverseObjCmd(notUsed, interp, objc, objv)
  *
  * ExtraL_List_changeCmd --
  *
- *		This procedure is invoked to process the "lremdup" command.
+ *		This procedure is invoked to process the "list_change" command.
  *		It creates a subset of a list
  *
  * Results:
@@ -786,3 +785,196 @@ ExtraL_List_changeObjCmd(dummy, interp, objc, objv)
 	return TCL_OK;
 }
 
+/*
+ *----------------------------------------------------------------------
+ *
+ * ExtraL_GetObjCmd --
+ *
+ *		This procedure is invoked to process the "get" command.
+ *		It returns the value of a variable, if the variable does not exist, 
+ *		an empty string or a default value is returned
+ *
+ * Results:
+ *		A standard Tcl result.
+ *
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+ExtraL_GetObjCmd(dummy, interp, objc, objv)
+	ClientData dummy;		/* Not used. */
+	Tcl_Interp *interp;		/* Current interpreter. */
+	int objc;			/* Number of arguments. */
+	Tcl_Obj *CONST objv[];	/* Argument objects. */
+{
+	Tcl_Obj *result;
+	if ((objc != 2) && (objc != 3)) {
+		Tcl_WrongNumArgs(interp, 1, objv, "varName ?default?");
+		return TCL_ERROR;
+	}
+	result = Tcl_ObjGetVar2(interp,objv[1],NULL,0);
+	if (result == NULL) {
+		if (objc == 2) {
+			Tcl_SetObjResult(interp,Tcl_NewObj());
+		} else {
+			Tcl_SetObjResult(interp,objv[2]);
+		}
+	} else {
+		Tcl_SetObjResult(interp,result);
+	}
+	return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ExtraL_List_fillObjCmd --
+ *
+ *		This procedure is invoked to process the "list_fill" command.
+ *		It returns the value of a variable, if the variable does not exist, 
+ *		an empty string or a default value is returned
+ *
+ * Results:
+ *		A standard Tcl result.
+ *
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+ExtraL_List_fillObjCmd(dummy, interp, objc, objv)
+	ClientData dummy;		/* Not used. */
+	Tcl_Interp *interp;		/* Current interpreter. */
+	int objc;			/* Number of arguments. */
+	Tcl_Obj *CONST objv[];	/* Argument objects. */
+{
+	Tcl_Obj *result,el;
+	double start,incr;
+	int size, error, error2, i, type, starti,incri;
+	if ((objc != 3) && (objc != 4)) {
+		Tcl_WrongNumArgs(interp, 1, objv, "size start ?incr?");
+		return TCL_ERROR;
+	}
+	error = Tcl_GetIntFromObj(interp,objv[1],&size);
+	if (error) {return error;}
+	if (objc == 3) {
+		result = Tcl_NewListObj(0,NULL);
+		for (i = 0 ; i < size ; i++) {
+			error = Tcl_ListObjAppendElement(interp,result,objv[2]);
+		}
+		Tcl_SetObjResult(interp,result);
+		return TCL_OK;
+	}
+	error = Tcl_GetIntFromObj(interp,objv[2],&starti);
+	error2 = Tcl_GetIntFromObj(interp,objv[3],&incri);
+	if (!error && !error2) {
+		result = Tcl_NewListObj(0,NULL);
+		for (i = 0 ; i < size ; i++) {
+			error = Tcl_ListObjAppendElement(interp,result,Tcl_NewIntObj(starti));
+			if (error) {
+				Tcl_DecrRefCount(result);
+				return error;
+			}
+			starti += incri;
+		}
+		Tcl_SetObjResult(interp,result);
+		return TCL_OK;
+	}
+	error = Tcl_GetDoubleFromObj(interp,objv[2],&start);
+	if (error) {return error;}
+	error = Tcl_GetDoubleFromObj(interp,objv[3],&incr);
+	if (error) {return error;}
+	result = Tcl_NewListObj(0,NULL);
+	for (i = 0 ; i < size ; i++) {
+		error = Tcl_ListObjAppendElement(interp,result,Tcl_NewDoubleObj(start));
+		if (error) {
+			Tcl_DecrRefCount(result);
+			return error;
+		}
+		start += incr;
+	}
+	Tcl_SetObjResult(interp,result);
+	return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ExtraL_List_concatObjCmd --
+ *
+ *		This procedure is invoked to process the "list_concat" command.
+ *		It returns the value of a variable, if the variable does not exist, 
+ *		an empty string or a default value is returned
+ *
+ * Results:
+ *		A standard Tcl result.
+ *
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+ExtraL_List_concatObjCmd(dummy, interp, objc, objv)
+	ClientData dummy;		/* Not used. */
+	Tcl_Interp *interp;		/* Current interpreter. */
+	int objc;			/* Number of arguments. */
+	Tcl_Obj *CONST objv[];	/* Argument objects. */
+{
+	Tcl_Obj *result;
+	int i,error;
+	result = Tcl_NewListObj(0,NULL);
+	for (i = 1 ; i < objc ; i++) {
+		error = Tcl_ListObjAppendList(interp,result,objv[i]);
+		if (error) {Tcl_DecrRefCount(result);return error;}
+	}
+	Tcl_SetObjResult(interp,result);
+	return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ExtraL_List_inlistObjCmd --
+ *
+ *		This procedure is invoked to process the "list_ffill" command.
+ *		It returns the value of a variable, if the variable does not exist, 
+ *		an empty string or a default value is returned
+ *
+ * Results:
+ *		A standard Tcl result.
+ *
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+ExtraL_List_inlistObjCmd(dummy, interp, objc, objv)
+	ClientData dummy;		/* Not used. */
+	Tcl_Interp *interp;		/* Current interpreter. */
+	int objc;			/* Number of arguments. */
+	Tcl_Obj *CONST objv[];	/* Argument objects. */
+{
+	int listobjc;
+	Tcl_Obj **listobjv;
+	char *string1,*string;
+	int i,error,len1,len;
+	if (objc != 3) {
+		Tcl_WrongNumArgs(interp, 1, objv, "list value");
+		return TCL_ERROR;
+	}
+	string = Tcl_GetStringFromObj(objv[2],&len);
+	if (Tcl_ListObjGetElements(interp, objv[1], &listobjc, &listobjv) != TCL_OK) {
+		return TCL_ERROR;
+	}
+	for ( i = 0 ; i < listobjc ; i++ ) {
+		string1 = Tcl_GetStringFromObj(listobjv[i],&len1);
+		if ((len1 == len) && (strncmp(string1,string,len) == 0)) break;
+	}
+	if (i == listobjc) {
+		Tcl_SetObjResult(interp,Tcl_NewIntObj(0));
+	} else {
+		Tcl_SetObjResult(interp,Tcl_NewIntObj(1));
+	}
+	return TCL_OK;
+}

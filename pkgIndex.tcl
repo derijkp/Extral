@@ -11,10 +11,6 @@
 package ifneeded Extral 2.0 \
 [subst -nocommands {
 	namespace eval ::Extral {}
-	set ::Extral::execdir $dir
-	if [file exists [file join $dir lib init.tcl]] {
-		source [file join $dir lib init.tcl]
-	} else {
-		source [file join @TCLLIBDIR@ lib init.tcl]
-	}
+	set ::Extral::dir [list $dir]
+	source [file join [list $dir] lib init.tcl]
 }]

@@ -1,10 +1,10 @@
 Summary:	extra commands for Tcl
 Name:		extral
-Version:	2.0.0
+Version:	2.0.3
 Release:	1
 Copyright:	BSD
 Group:	Development/Languages/Tcl
-Source:	Extral-2.0.0.src.tar.gz
+Source:	Extral-2.0.3.src.tar.gz
 URL: http://rrna.uia.ac.be/extral
 Packager: Peter De Rijk <derijkp@uia.ua.ac.be>
 Requires: tcl >= 8.3.2

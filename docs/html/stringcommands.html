@@ -1,0 +1,25 @@
+<HEAD>
+<TITLE>Extra string manipulation commands</TITLE>
+</HEAD>
+<BODY>
+<h1>Extra string manipulation commands</h1>
+
+<dl><b><dt>
+string__split string splitstring
+</b><dd>
+ split string on exact occurence off splitstring<br>
+<br>eg.:<pre>
+	% string_split "test1||test2" "||"
+	test1 test2
+</pre>
+<b><dt>
+string_equal s1 s2
+</b><dd>
+ returns 1 if the strings are equal, 0 if the are not
+
+<b><dt>
+string_fill string number
+</b><dd>
+ returns a string consisting of the argument string number times repeated
+
+</body>

@@ -166,6 +166,10 @@ test time_scan {date: schrikkeljaar 1996} {
 	time_format [time_scan {09/08/1996 0:0:0}]
 } {1996-09-08 00:00:00}
 
+test time_scan {format: Nov 26, 2000 11:41 PM} {
+	time_format [time_scan {Nov 26, 2000 11:41 PM}]
+} {2000-11-26 11:41:00}
+
 test time_format {miliseconds 08} {
 	time_format [time_scan {29 Feb 1996 17:30:15.08}] "%% %Y %d %e %j %m %b %B %H %M %S %s"
 } {% 1996 29 29 060 02 Feb February 17 30 15 080}

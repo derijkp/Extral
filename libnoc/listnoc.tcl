@@ -132,6 +132,7 @@ proc list_find {args} {
 #}
 proc list_cor {reflist list} {
 	set pos 0
+	set result {}
 	foreach item $reflist {
 		lappend grid($item) $pos
 		incr pos
@@ -409,4 +410,51 @@ proc list_change {list changelist} {
 		}
 	}
 	return $result
+}
+
+#doc {convenience get} cmd {
+#get varName ?default?
+#} descr {
+# get returns the value of the variable given by varName if it exists.
+# If the variable does not exists, it returns an empty string, or
+# value given by $default if present
+# 
+#}
+#ps: using uplevel this way instead of teh obvious upvar make strange things 
+# happening with threads go away, and is faster too
+proc get {varName {default {}}} {
+	if {[uplevel [list info exists $varName]]} {
+		return [uplevel [list set $varName]]
+	} else {
+		return $default
+	}
+}
+
+#doc {listcommands inlist} cmd {
+#inlist list value
+#} descr {
+#returns 1 if $value is an element of list $list
+#returns 0 if $value is not an element of list $list
+#}
+proc inlist {list value} {
+	if {[lsearch $list $value]==-1} {
+		return 0
+	} else {
+		return 1
+	}
+}
+
+#doc {listcommands list_concat} cmd {
+#list_concat list ?list? ?list ...?
+#} descr {
+#	This  command  treats each argument as a list and concatenates them into a single list
+#}
+proc list_concat {args} {
+	set list [lindex $args 0]
+	foreach arg [lrange $args 1 end] {
+		foreach el $arg {
+			lappend list $el
+		}
+	}
+	return $list
 }

@@ -519,6 +519,7 @@ proc map_unset {args} {
 #returns the fields present in the map list
 #}
 proc map_fields {list {field {}} args} {
+	set result {}
 	set len [llength $args]
 	if {($len != 0)&&($len != 1)} {
 		return -code error "wrong # args: should be \"map_fields list field ?valueVar?\""

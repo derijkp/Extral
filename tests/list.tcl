@@ -56,34 +56,6 @@ test list_cor {number bug} {
 	list_cor {hobbit.seq orc.seq} {sphinx.seq hobbit.seq orc.seq centaur.seq}
 } {-1 0 1 -1}
 
-test lmath {calc} {
-	lmath_calc {1 2 3.2 4} + {1 2 3.3 4}
-} {2 4 6.5 8}
-
-test lmath {sum} {
-	lmath_sum {1 4 5}
-} {10}
-
-test lmath {min} {
-	lmath_min {5 1 100}
-} {1}
-
-test lmath {max} {
-	lmath_max {5 1 100 50}
-} {100}
-
-test lmath {cumul} {
-	lmath_cumul {5 1 100}
-} {5 6 106}
-
-test lmath {incr} {
-	lmath_incr {8 18 100} 2
-} {10 20 102}
-
-test lmath {between} {
-	lmath_between {-1 4 9 11 8} 0 10
-} {0 4 9 10 8}
-
 test list_remdup {} {
 	list_remdup {a b c a b d}
 } {a b c d}
@@ -406,6 +378,22 @@ test list_select {basic} {
 test list_select {-regexp} {
 	list_select -regexp {a ab aa bc} {^[ab]*$}
 } {a ab aa}
+
+test list_concat {2} {
+	list_concat {a b c} {1 2 3}
+} {a b c 1 2 3}
+
+test list_concat {3} {
+	list_concat {a b c} {d e f} {1 2 3}
+} {a b c d e f 1 2 3}
+
+test inlist {true} {
+	inlist {a b c} b
+} 1
+
+test inlist {false} {
+	inlist {a b c} d
+} 0
 
 # no test yet for
 # list_load <filename>

@@ -2,6 +2,7 @@ proc csv_parse {data {sep ,}} {
 	set result {}
 	set resultline {}
 	set newline 0
+	regsub -all \r\n $data \n data
 	set data [split $data \n]
 	if {[info exists quotedstring]} {unset quotedstring}
 	set quotereplace {{""} {"}}

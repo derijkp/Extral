@@ -60,23 +60,6 @@ proc echo {string} {
 	return $string
 }
 
-#doc {convenience get} cmd {
-#get varName ?default?
-#} descr {
-# get returns the value of the variable given by varName if it exists.
-# If the variable does not exists, it returns an empty string, or
-# value given by $default if present
-# 
-#}
-proc get {varName {default {}}} {
-	upvar $varName var
-	if [info exists var] {
-		return $var
-	} else {
-		return $default
-	}
-}
-
 #doc {convenience rem} cmd {
 #rem args
 #} descr {

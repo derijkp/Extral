@@ -174,3 +174,20 @@ proc string_replace {string first last replacement} {
 	}
 	return [string range $string 0 $first]$replacement[string range $string $last end]
 }
+
+#doc {stringcommands string_foreach} cmd {
+#string_foreach varList string ?varList string ...? command
+#} descr {
+# loop over the characters from a string, follows the same syntax as foreach for lists
+#}
+proc string_foreach {args} {
+	if {![expr {[llength $args]%2}]} {
+		error "wrong # args: should be \"string_foreach varList string ?varList string ...? command\""
+	}
+	set cmd foreach
+	foreach {vars values} [lrange $args 0 end-1] {
+		lappend cmd $vars [split $values {}]
+	}
+	lappend cmd [lindex $args end]
+	uplevel 1 $cmd
+}

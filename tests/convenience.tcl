@@ -50,4 +50,14 @@ test aproc {more} {
 	[aproc {a args} {list $a $args}] 1 2 3
 } {1 {2 3}}
 
+test aproc {get} {
+	set a 1
+	list [get a ?] [get b ?]
+} {1 ?}
+
+test aproc {get variable with space} {
+	set "a a" 1
+	list [get "a a" ?] [get "b b" ?]
+} {1 ?}
+
 testsummarize

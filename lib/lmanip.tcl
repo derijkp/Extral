@@ -155,52 +155,6 @@ proc list_lengths {args} {
 	return $result
 }
 
-#doc {listcommands list_fill} cmd {
-#list_fill ?size? ?start? ??incr??
-#} descr {
-#	fills a list of ?size? elements with ?start?; if ?incr? is given and ?size? is an integer, each element in the list will be the former incremented with ?incr?
-#} example {
-#	% list_fill 4 "Hello world"
-#	{Hello world} {Hello world} {Hello world} {Hello world}
-#	% list_fill 5 2 2
-#	2 4 6 8 10
-#	% list_fill 5 10 -2
-#	10 8 6 4 2
-#}
-proc list_fill {args} {
-	if {([llength $args]!=2)&&([llength $args]!=3)} {
-		error "wrong # args: should be \"list_fill size start ?incr?\""
-	}
-	set result ""
-	set size [lindex $args 0]
-	set item [lindex $args 1]
-	if {[llength $args]==3} {
-		set incr [lindex $args 2]
-	}
-	for {set i 0} {$i<$size} {incr i} {
-		lappend result $item
-		if [info exists incr] {incr item $incr}
-	}
-	return $result
-}
-
-proc list_ffill {args} {
-	if {([llength $args]!=2)&&([llength $args]!=3)} {
-		error "wrong # args: should be \"list_ffill size start ?incr?\n - fills a list with the floating value in start, can be incremented by ?incr?\""
-	}
-	set result ""
-	set size [lindex $args 0]
-	set item [lindex $args 1]
-	if {[llength $args]==3} {
-		set incr [lindex $args 2]
-	}
-	for {set i 0} {$i<$size} {incr i} {
-		lappend result $item
-		if [info exists incr] {set item [expr $item+$incr]}
-	}
-	return $result
-}
-
 #doc {listcommands list_select} cmd {
 #list_subindex ?list? ?pos?
 #} descr {

@@ -189,7 +189,7 @@ proc cmd_load {filename} {
 #		-test {any "test value"}
 #		-b {switch "true or false"}
 #		-o {{oneof a b c} "a, b or c"}
-#	} {?a? b} {-b -test try -o b 1 2}
+#	} {?nrruns? file} {-b -test try -o b 1 testfile}
 #}
 proc cmd_args {cmd options vars arg} {
 	# Handle options

@@ -62,7 +62,7 @@ SWISS-PROT; P46753; RT02_ACACA.
 SWISS-PROT; P46754; RT03_ACACA.
 }
 string_change $value "\; {} \n {}"
-} 1
+} {changelist does not have an even number of elements} 1
 
 test string_reverse {basic} {
 	string_reverse {abc def}
@@ -123,5 +123,33 @@ test string_equal {basic} {
 test string_equal {basic} {
 	string_equal 2.1 2.10
 } 0
+
+test string_foreach {basic} {
+	set temp {}
+	string_foreach a 12345 {lappend temp $a}
+	set temp
+} {1 2 3 4 5}
+
+test string_foreach {two vars} {
+	set temp {}
+	string_foreach {a b} 12345 {lappend temp [list $a $b]}
+	set temp
+} {{1 2} {3 4} {5 {}}}
+
+test string_foreach {two strings, one two vars} {
+	set temp {}
+	string_foreach {a b} 12345 c abcde {lappend temp [list $c $a $b]}
+	set temp
+} {{a 1 2} {b 3 4} {c 5 {}} {d {} {}} {e {} {}}}
+
+test string_foreach {mix} {
+	set temp {}
+	string_foreach a ab {
+		string_foreach b 12 {
+			lappend temp [list $a $b]
+		}
+	}
+	set temp
+} {{a 1} {a 2} {b 1} {b 2}}
 
 testsummarize

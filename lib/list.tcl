@@ -106,25 +106,9 @@ proc list_arrayset {array varlist valuelist} {
 #	returns the common elements of the lists
 #}
 proc list_common {args} {
-	set start [lsort [list_pop args]]
-	foreach item $start {set keep($item) 1}
+	set result [list_shift args]
 	foreach list $args {
-		foreach item $list {
-			if [info exists keep($item)] {
-				set keep($item) 2
-			}
-		}
-		foreach item [array names keep] {
-			if {$keep($item) == 2} {
-				set keep($item) 1
-			} else {
-				unset keep($item)
-			}
-		}
-	}
-	set result [list]
-	foreach item $start {
-		if [info exists keep($item)] {lappend result $item}
+		set result [list_lremove $result [list_lremove $result $list]]
 	}
 	return $result
 }
@@ -204,17 +188,20 @@ proc list_write {filename list} {
 	close $f
 }
 
-#doc {listcommands list_concat} cmd {
-#list_concat list ?list? ?list ...?
+#doc {listcommands list_append} cmd {
+#list_append list ?list1? ...
 #} descr {
-#	This  command  treats each argument as a list and concatenates them into a single list
+#	appends elements in list1 (and following) to list
+#} example {
+#   % set list {1 2 3}
+#   1 2 3
+#	% list_append list {3 4} {5 6}
+#	% set list
+#   1 2 3 4 5 6
 #}
-proc list_concat {args} {
-	set list [lindex $args 0]
-	foreach arg [lrange $args 1 end] {
-		foreach el $arg {
-			lappend list $el
-		}
+proc list_append {listName args} {
+	upvar $listName list
+	foreach alist $args {
+		eval lappend list $alist
 	}
-	return $list
 }

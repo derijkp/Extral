@@ -13,7 +13,7 @@
 #include "tcl.h"
 #include "general.h"
 #define UCHAR(c) ((unsigned char) (c))
- 
+
 /*
  *----------------------------------------------------------------------
  *

@@ -12,17 +12,17 @@ foreach {old new} {
 
 foreach option {
 	regsub find sub cor merge unmerge pop shift load write push unshift
-	set arrayset common union eor remove lremove addnew
+	arrayset common union eor remove lremove addnew
 } {
 	catch {interp alias {} l$option {} list_$new}
 }
 
 foreach option {set get unset fields} {
-	catch {interp alias {} structl$option {} map_$new}
+	catch {interp alias {} structl$option {} map_$option}
 }
 
 foreach option {read write} {
-	catch {interp alias {} ${option}file {} file_$new}
+	catch {interp alias {} ${option}file {} file_$option}
 }
 
 catch {
