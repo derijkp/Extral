@@ -23,9 +23,9 @@ LIBS = -L/home/peter/tcl/tcl8.0a2/unix -ltcl8.0 -ldl  -lm -lc
 # modify any of this stuff by hand.
 #----------------------------------------------------------------
 
-CC = cc
+CC = gcc
 SHLIB_CFLAGS =		-fPIC
-SHLIB_LD =		cc -shared
+SHLIB_LD =		gcc -shared
 SHLIB_SUFFIX =		.so
 SHLIB_VERSION =		
 SRC_DIR =		.
@@ -37,7 +37,7 @@ OBJECTS = extralInit.o extral.o lpop.o nonl.o supersort.o lfile.o general.o
 all: extral${SHLIB_SUFFIX}
 
 extral$(SHLIB_SUFFIX): $(OBJECTS)
-	$(SHLIB_LD) $(SHLIB_CFLAGS) -o ../extral$(SHLIB_SUFFIX) $(OBJECTS) 
+	$(SHLIB_LD) $(SHLIB_CFLAGS) -o ../extral$(SHLIB_SUFFIX) $(OBJECTS) ${LIBS}
 
 extratcl: tclAppInit.o $(OBJECTS)
 	$(CC) $(CC_SWITCHES) -o extratcl tclAppInit.o $(OBJECTS) ${TCL_LIB_SPEC} ${LIBS}

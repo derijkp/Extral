@@ -108,3 +108,43 @@ puts $try
 
 replace Adjust-Motion-Action {Action- B1- -Action -1 Adjust- B2- -Adjust -2}
 time {replace Adjust-Motion-Action {Action- B1- -Action -1 Adjust- B2- -Adjust -2}} 100
+
+set trydata {
+menu
+	menu file "File" Alt-f
+	menu find "Find"
+	action Trytop "Test" {%W insert insert "Test: %W"} Alt-t
+	check SearchReopen "Search Reopen" {-variable [test %W] -onvalue yes -offvalue no} Control-Alt-t
+menu file
+	action Load "Open file" {%W insert insert "Open: %W"}
+	action LoadNext "Open next" {%W insert insert "Open next: %W"}
+	action Try "Test" {%W insert insert "Test: %W"}
+	menu file.try "Trying"
+	action Save Save {%W save}
+# The find menu
+menu find
+	action Goto "Goto line" {Peos__InputBox %W.goto -label "Goto line" -title Goto -buttontext Goto -command {%W gotoline [%W.goto get]}}
+	action Find "Find" {Peos__Editor__finddialog %W}
+	separator
+	action ReplaceFindNext "Replace & Find next" {%W replace-find -forwards}
+	check SearchReopen "Search Reopen" {-variable test%W -onvalue yes -offvalue no}
+	action FindFunction "Find Tcl function" {%W findfunction}
+menu file.try
+	action Try "Trying" {puts try}
+}
+	set data [split $trydata "\n"]
+	set data [lremove $data {}]
+	set lines [lsub $data -exclude [lfind -regexp $data {^#}]]
+	foreach line $lines {
+		if [regexp {^menu} $line] {
+			set men [lindex $line 1]
+			if {"$men"==""} {set curmenu $menu} else {set curmenu $menu.$men}
+			menu $curmenu
+			set num 1
+		} else {
+			set type [lshift line]
+			set key [lshift line]
+			set text [lshift line]
+		}
+	}
+

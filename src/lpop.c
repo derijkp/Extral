@@ -80,13 +80,13 @@ ExtraL_LpopObjCmd(dummy, interp, objc, objv)
 		if (first < 0)  {
 			first = 0;
 		}
-		if (first >= listLen) {
-			Tcl_ResetObjResult(interp);
-			resultPtr = iPtr->objResult;
-			Tcl_StringObjAppend(resultPtr, "list doesn't contain element ", -1);
-			Tcl_StringObjAppendObj(resultPtr, objv[2]);
-			return TCL_ERROR;
-		}
+	}
+	if (first >= listLen) {
+		Tcl_ResetObjResult(interp);
+		resultPtr = iPtr->objResult;
+		Tcl_StringObjAppend(resultPtr, "list doesn't contain element ", -1);
+		Tcl_StringObjAppendObj(resultPtr, objv[2]);
+		return TCL_ERROR;
 	}
 
 	result = Tcl_ListObjIndex(interp,listObjPtr,first,&popPtr);
@@ -132,7 +132,7 @@ ExtraL_LshiftObjCmd(notUsed, interp, objc, objv)
 	Tcl_Obj *resultPtr = iPtr->objResult;
 	register Tcl_Obj *listObjPtr;
 	Tcl_Obj *popPtr;
-	int result;
+	int result,len;
 
 	if (objc != 2) {
 		Tcl_StringObjAppend(resultPtr, "wrong # args: should be \"", -1);
@@ -148,7 +148,13 @@ ExtraL_LshiftObjCmd(notUsed, interp, objc, objv)
 		return TCL_ERROR;
 	}
 	
-
+	result=Tcl_ListObjLength(interp,listObjPtr,&len);
+	if (result==TCL_ERROR) {
+		return TCL_ERROR;
+	}
+	if (len==0) {
+		return TCL_OK;
+	}
 	result = Tcl_ListObjIndex(interp,listObjPtr,0,&popPtr);
 	if (result != TCL_OK) {
 		return result;

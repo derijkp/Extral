@@ -5,12 +5,12 @@
  *	procedure for Tcl applications (without Tk).
  *
  * Copyright (c) 1993 The Regents of the University of California.
- * Copyright (c) 1994-1995 Sun Microsystems, Inc.
+ * Copyright (c) 1994-1997 Sun Microsystems, Inc.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * SCCS: @(#) tclAppInit.c 1.17 96/03/26 12:45:29
+ * SCCS: @(#) tclAppInit.c 1.19 97/01/21 18:14:20
  */
 
 #include "tcl.h"
@@ -20,12 +20,23 @@
  * Sun shared libraries to be used for Tcl.
  */
 
-extern int matherr();
-int *tclDummyMathPtr = (int *) matherr;
+#ifdef	__cplusplus
+extern "C" {
+#endif
+  
+extern int matherr _ANSI_ARGS_((void));
+int (*tclDummyMathPtr) _ANSI_ARGS_((void)) = matherr;
+
+#ifdef	__cplusplus
+}
+#endif
 
 #ifdef TCL_TEST
-EXTERN int		Tcltest_Init _ANSI_ARGS_((Tcl_Interp *interp));
+extern int		Tcltest_Init _ANSI_ARGS_((Tcl_Interp *interp));
+extern int		Tclptest_Init _ANSI_ARGS_((Tcl_Interp *interp));
+extern int		Tclobjtest_Init _ANSI_ARGS_((Tcl_Interp *interp));
 #endif /* TCL_TEST */
+
 
 /*
  *----------------------------------------------------------------------
@@ -45,9 +56,14 @@ EXTERN int		Tcltest_Init _ANSI_ARGS_((Tcl_Interp *interp));
  */
 
 int
+#ifdef _USING_PROTOTYPES_
+main (int    argc,		/* Number of command-line arguments. */
+     char **argv)		/* Values of command-line arguments. */
+#else
 main(argc, argv)
     int argc;			/* Number of command-line arguments. */
     char **argv;		/* Values of command-line arguments. */
+#endif
 {
     Tcl_Main(argc, argv, Tcl_AppInit);
     return 0;			/* Needed only to prevent compiler warning. */
@@ -73,8 +89,12 @@ main(argc, argv)
  */
 
 int
+#ifdef _USING_PROTOTYPES_
+Tcl_AppInit (Tcl_Interp *interp)/* Interpreter for application. */
+#else
 Tcl_AppInit(interp)
     Tcl_Interp *interp;		/* Interpreter for application. */
+#endif
 {
     if (Tcl_Init(interp) == TCL_ERROR) {
 	return TCL_ERROR;
@@ -85,6 +105,16 @@ Tcl_AppInit(interp)
 	return TCL_ERROR;
     }
     Tcl_StaticPackage(interp, "Tcltest", Tcltest_Init,
+            (Tcl_PackageInitProc *) NULL);
+    if (Tclobjtest_Init(interp) == TCL_ERROR) {
+	return TCL_ERROR;
+    }
+    Tcl_StaticPackage(interp, "Tclobjtest", Tclobjtest_Init,
+            (Tcl_PackageInitProc *) NULL);
+    if (Tclptest_Init(interp) == TCL_ERROR) {
+	return TCL_ERROR;
+    }
+    Tcl_StaticPackage(interp, "Tclptest", Tclptest_Init,
             (Tcl_PackageInitProc *) NULL);
 #endif /* TCL_TEST */
 
@@ -99,9 +129,9 @@ Tcl_AppInit(interp)
      * where "Mod" is the name of the module.
      */
 
-    if (Extral_Init(interp) == TCL_ERROR) {
-	return TCL_ERROR;
-    }
+	if (Extral_Init(interp) == TCL_ERROR) {
+		return TCL_ERROR;
+	}
 
     /*
      * Call Tcl_CreateCommand for application-specific commands, if
