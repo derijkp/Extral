@@ -1,34 +1,39 @@
 <HEAD>
 <TITLE>
-General astring manipulation commands
+General string manipulation commands
 </TITLE>
 </HEAD>
 <BODY>
 <h1>
-General astring manipulation commands
+General string manipulation commands
 </h1>
 
 <dl><b><dt>
-replace string replacelist
+string::change string changelist
 </b><dd>
- replace some parts of a string<br>
- replacelist gives alternating a substring to be replaced, and what it should be replaced by.
+ change some parts of a string<br>
+ changelist gives alternating a substring to be changed, and what it should be changed into.
  The command returns a string that is the given string where each occurence of the
- substrings in the replacelist have been replaced.
+ substrings in the changelist have been changed.
 
 <b><dt>
-lreverse list
+string::reverse list
 </b><dd>
  returns the reverse of list.
 
 <b><dt>
-sfind mode list pattern
+string::find mode list pattern
 </b><dd>
 	returns a list of all indices which match a pattern.
 	mode can be -exact, -glob, or -regexp
 	The default mode is -exact
 <br>eg.:<pre>
-	% lfind -regexp {Ape Ball Field {Antwerp city} Egg} {^A}
+	% string::find -regexp {Ape Ball Field {Antwerp city} Egg} {^A}
 	0 3
 </pre>
+<b><dt>
+string::replace string first last replacement
+</b><dd>
+ replace a part of a string
+
 </body>

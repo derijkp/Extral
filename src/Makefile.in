@@ -33,7 +33,7 @@ SHLIB_SUFFIX =		@SHLIB_SUFFIX@
 SHLIB_VERSION =		@SHLIB_VERSION@
 SRC_DIR =		@srcdir@
 
-CFLAGS = -g -Wall
+CFLAGS = -O -Wall
 CC_SWITCHES = $(CFLAGS) -I${TCL_GENERIC_DIR} ${SHLIB_CFLAGS}
 
 OBJECTS = extralInit.o extral.o lpop.o nonl.o supersort.o general.o \

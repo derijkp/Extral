@@ -53,16 +53,14 @@ be created.
 
 compiled packages for most Unix platform should be created using the following 
 steps:
-cd Extral/src
-./configure clean
-./configure distclean
+cd Extral-src-x.x.x/src
 ./configure --with-tcl=<path of tcl distribution>
 make
 cd ..
 ./makedist.tcl
 
 If you want to make gdbm and bsd-db support, you will have to create a 
-libgdbm.a and libdb.a (should position independend code) and put these
+libgdbm.a and libdb.a (should be position independend code) and put these
 in the extern directory together with their header files. (gdbm.h and 
 db_185.h) and do in the src directory:
 make gdbm.so

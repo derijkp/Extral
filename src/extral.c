@@ -310,7 +310,7 @@ ExtraL_LremdupObjCmd(dummy, interp, objc, objv)
 	Tcl_Obj *resultObj;
 	int listLen, result;
 	char *string,*checkstring;
-	int i,len,checklen,sort,var;
+	int i,len,checklen,sort,var = 0;
 
 	sort = 0;
 	if (objc>2) {

@@ -43,7 +43,7 @@ ExtraL_FfindCmd(notUsed, interp, argc, argv)
 	char **argv;						/* Argument strings. */
 {
 
-	Tcl_RegExp regexp;
+	Tcl_RegExp regexp = NULL;
 	char *start, *end;
 	Tcl_Channel file;
 	char **argPtr;
@@ -321,7 +321,7 @@ array set try {a 1 b 2 c 3 d 4 e 5 f 6}
 amanip get try {a d g f}
 amanip get try {a d g f} null
 */
-		char *defval, *result;
+		char *defval = NULL, *result;
 		if ((argc != 4)&&(argc != 5)) {
 			Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
 				" get arrayName list ?alldefault?\"", (char *) NULL);
@@ -407,7 +407,7 @@ ExtraL_AmanipObjCmd(notUsed, interp, objc, objv)
 			amanip get try {a d g f}
 			amanip get try {a d g f} null
 		*/
-		Tcl_Obj *defval, *result, *element;
+		Tcl_Obj *defval = NULL, *result, *element;
 		if ((objc != 4)&&(objc != 5)) {
 			Tcl_WrongNumArgs(interp, 2, objv, "arrayName list ?alldefault?");
 			return TCL_ERROR;

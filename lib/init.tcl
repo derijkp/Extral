@@ -10,7 +10,7 @@
 # $Format: "set ::Extral::version 1.$ProjectMajorVersion$"$
 set ::Extral::version 1.1
 # $Format: "set ::Extral::patchlevel $ProjectMinorVersion$"$
-set ::Extral::patchlevel 3
+set ::Extral::patchlevel 4
 package provide Extral $::Extral::version
 
 #

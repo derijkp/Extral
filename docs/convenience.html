@@ -49,9 +49,12 @@ arraytrans varName list ?default?
  If $default is given, it will be returned for indices not in the array.
 
 <b><dt>
-? expr truevalue falsevalue
+get varName ?default?
 </b><dd>
- ? expr truevalue falsevalue
+ get returns the value of the variable given by varName if it exists.
+ If the variable does not exists, it returns an empty string, or
+ value given by $default if present
+ 
 
 <b><dt>
 rem args
@@ -80,9 +83,10 @@ true expression
 	same as the set command, but then for global variables
 
 <b><dt>
-random min max
+inlist list value
 </b><dd>
-returns a random number between min and max
+returns 1 if $value is an element of list $list
+returns 0 if $value is not an element of list $list
 
 <b><dt>
 putsvars varname ?varname ...?
