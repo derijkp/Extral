@@ -22,7 +22,7 @@ LIBS = -L/home/peter/tcl/tcl8.0/unix -ltcl8.0 -ldl  -lm -lc
 #----------------------------------------------------------------
 
 CC = gcc
-SHLIB_CFLAGS =		-fPIC -g
+SHLIB_CFLAGS =		-fPIC
 SHLIB_LD =		gcc -shared
 SHLIB_SUFFIX =		.so
 SHLIB_VERSION =		
@@ -30,7 +30,7 @@ SRC_DIR =		.
 CFLAGS = -g
 CC_SWITCHES = $(CFLAGS) $(SHLIB_CFLAGS) -I${TCL_GENERIC_DIR} -I$(TCL_UNIX_DIR) -I${TK_GENERIC_DIR} ${SHLIB_CFLAGS}
 
-OBJECTS = extralInit.o extral.o lpop.o nonl.o supersort.o general.o tagl.o
+OBJECTS = extralInit.o extral.o lpop.o nonl.o supersort.o general.o tagl.o date.o
 
 all: extral${SHLIB_SUFFIX}
 

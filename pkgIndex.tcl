@@ -8,7 +8,7 @@
 # full path name of this file's directory.
 
 # $Format: "set version $ProjectVersion$"$
-set version 1a.16
+set version 1a.17
 regsub -all {[ab]} $Extral__version {} Extral__version
 set Extral__temp {
 	if [file exists [file join $dir extral[info sharedlibextension]]] {
@@ -20,6 +20,7 @@ set Extral__temp {
 	set Extral__version $Extral__version
 	set Extral__dir $dir
 	package provide Extral $Extral__version
+	namespace eval ::Extral {set version $Extral__version}
 }
 regsub -all {\$Extral__version} $Extral__temp [list $Extral__version] Extral__temp
 regsub -all {\$dir} $Extral__temp [list $dir] Extral__temp
