@@ -1,0 +1,45 @@
+# File containing the Tcl part of the Extral extension
+#
+# Copyright (c) 1996 Peter De Rijk
+#
+# See the file "README.txt" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# =============================================================
+
+#doc stringcommands title {
+#General string manipulation commands
+#}
+
+#doc {stringcommands string::split} cmd {
+#string::split string splitstring
+#} descr {
+# split string on exact occurence off splitstring<br>
+#}
+proc string::split {string splitstring} {
+	set result ""
+	set len [string length $splitstring]
+	while 1 {
+		set pos [string first $splitstring $string]
+		if {$pos == -1} {
+			lappend result $string
+			break
+		}
+		lappend result [string range $string 0 [expr {$pos-1}]]
+		set string [string range $string [expr {$pos+$len}] end]
+	}
+	return $result
+}
+
+#doc {stringcommands string_equal} cmd {
+#string_equal s1 s2
+#} descr {
+# returns 1 if the strings are equal, 0 if the are not
+#}
+proc string_equal {s1 s2} {
+	if {"$s1" == "$s2"} {
+		return 1
+	} else {
+		return 0
+	}
+}
