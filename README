@@ -9,6 +9,7 @@ Extral is a generally useful library which extends Tcl with a.o.:
 	- extral list manipulation commands
 	- extra string manipulation commands
 	- array manipulation
+	- map
 	- atexit
 	- tempfile
 	- filing commands

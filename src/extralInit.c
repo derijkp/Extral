@@ -4,7 +4,7 @@
 #include <time.h>
 #include <math.h>
 
-int Extral_StructlInit _ANSI_ARGS_((Tcl_Interp *interp));
+int ExtraL_MapInit _ANSI_ARGS_((Tcl_Interp *interp));
 
 
 extern int ExtraL_List_popObjCmd _ANSI_ARGS_((ClientData clientData,
@@ -124,6 +124,6 @@ Extral_Init(interp)
 	Tcl_CreateObjCommand(interp,"time_scan",(Tcl_ObjCmdProc *)ExtraL_ScanTimeObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"time_format",(Tcl_ObjCmdProc *)ExtraL_FormatTimeObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"ssort",(Tcl_ObjCmdProc *)ExtraL_SSortObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Extral_StructlInit(interp);
+	ExtraL_MapInit(interp);
 	return TCL_OK;
 }

@@ -56,10 +56,19 @@ proc file_write {filename list} {
 #}
 proc file_fullpath {filename} {
 	if [string_equal [file pathtype $filename] absolute] {
-		return $filename
+		set resultlist {}
 	} else {
-		return [file join [pwd] $filename]
+		set resultlist [file split [pwd]]
 	}
+	foreach el [file split $filename] {
+		if {[string_equal $el .]} continue
+		if {[string_equal $el ..]} {
+			list_pop resultlist
+		} else {
+			lappend resultlist $el
+		}
+	}
+	return [eval file join $resultlist]
 }
 
 # Using the Unix tools

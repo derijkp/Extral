@@ -40,6 +40,9 @@ proc string_split {string splitstring} {
 # returns 1 if the strings are equal, 0 if the are not
 #}
 proc string_equal {s1 s2} {
+	if {[string length $s1] != [string length $s2]} {
+		return 0
+	}
 	if {"$s1" == "$s2"} {
 		return 1
 	} else {

@@ -1,5 +1,5 @@
 /*	
- *	 File:	structl.c
+ *	 File:	map.c
  *	 Purpose: extraL extension to Tcl
  *	 Author:  Copyright (c) 1995 Peter De Rijk
  *
@@ -11,31 +11,31 @@
 #include "extral.h"
 #include <string.h>
 
-extern ExtraL_StructlTypeSetProc ExtraL_StructlSetDouble;
-extern ExtraL_StructlTypeSetProc ExtraL_StructlSetInt;
-extern ExtraL_StructlTypeSetProc ExtraL_StructlSetBool;
-extern ExtraL_StructlTypeSetProc ExtraL_StructlSetRegexp;
-extern ExtraL_StructlTypeSetProc ExtraL_StructlSetBetween;
-extern ExtraL_StructlTypeSetProc ExtraL_StructlSetDBetween;
-extern ExtraL_StructlTypeSetProc ExtraL_StructlSetDate;
-extern ExtraL_StructlTypeGetProc ExtraL_StructlGetDate;
-extern ExtraL_StructlTypeSetProc ExtraL_StructlSetTime;
-extern ExtraL_StructlTypeGetProc ExtraL_StructlGetTime;
-extern ExtraL_StructlTypeSetProc ExtraL_StructlSetList;
-extern ExtraL_StructlTypeGetProc ExtraL_StructlGetList;
-extern ExtraL_StructlTypeSetProc ExtraL_StructlSetNamed;
-extern ExtraL_StructlTypeGetProc ExtraL_StructlGetNamed;
-extern ExtraL_StructlTypeUnsetProc ExtraL_StructlUnsetList;
-extern ExtraL_StructlTypeUnsetProc ExtraL_StructlUnsetNamed;
+extern ExtraL_MapTypeSetProc ExtraL_MapSetDouble;
+extern ExtraL_MapTypeSetProc ExtraL_MapSetInt;
+extern ExtraL_MapTypeSetProc ExtraL_MapSetBool;
+extern ExtraL_MapTypeSetProc ExtraL_MapSetRegexp;
+extern ExtraL_MapTypeSetProc ExtraL_MapSetBetween;
+extern ExtraL_MapTypeSetProc ExtraL_MapSetDBetween;
+extern ExtraL_MapTypeSetProc ExtraL_MapSetDate;
+extern ExtraL_MapTypeGetProc ExtraL_MapGetDate;
+extern ExtraL_MapTypeSetProc ExtraL_MapSetTime;
+extern ExtraL_MapTypeGetProc ExtraL_MapGetTime;
+extern ExtraL_MapTypeSetProc ExtraL_MapSetList;
+extern ExtraL_MapTypeGetProc ExtraL_MapGetList;
+extern ExtraL_MapTypeSetProc ExtraL_MapSetNamed;
+extern ExtraL_MapTypeGetProc ExtraL_MapGetNamed;
+extern ExtraL_MapTypeUnsetProc ExtraL_MapUnsetList;
+extern ExtraL_MapTypeUnsetProc ExtraL_MapUnsetNamed;
 
 #ifdef unix
 #define extern
 #endif
 
 struct Type {
-	ExtraL_StructlTypeSetProc *setproc;
-	ExtraL_StructlTypeGetProc *getproc;
-	ExtraL_StructlTypeUnsetProc *unsetproc;
+	ExtraL_MapTypeSetProc *setproc;
+	ExtraL_MapTypeGetProc *getproc;
+	ExtraL_MapTypeUnsetProc *unsetproc;
 };
 
 static Tcl_HashTable typesTable;
@@ -64,12 +64,12 @@ int ExtraL_CopyObj(Tcl_Obj *objPtr,Tcl_Obj *dupPtr) {
 */
 /*}*/
 
-extern int ExtraL_StructlCreateType(interp,key,setproc,getproc,unsetproc)
+extern int ExtraL_MapCreateType(interp,key,setproc,getproc,unsetproc)
 	Tcl_Interp *interp;
 	char *key;
-	ExtraL_StructlTypeSetProc *setproc;
-	ExtraL_StructlTypeGetProc *getproc;
-	ExtraL_StructlTypeUnsetProc *unsetproc;
+	ExtraL_MapTypeSetProc *setproc;
+	ExtraL_MapTypeGetProc *getproc;
+	ExtraL_MapTypeUnsetProc *unsetproc;
 {
 	Tcl_HashEntry *entry;
 	struct Type *type;
@@ -88,9 +88,9 @@ extern int ExtraL_StructlCreateType(interp,key,setproc,getproc,unsetproc)
 	return TCL_OK;
 }
 
-int ExtraL_StructlsetValidate(interp,substructure,data,ctag,clen,oldvalue,tagsc,tagsv,value,resultPtr) 
+int ExtraL_MapsetValidate(interp,submap,data,ctag,clen,oldvalue,tagsc,tagsv,value,resultPtr) 
 	Tcl_Interp *interp;
-	Tcl_Obj *substructure;
+	Tcl_Obj *submap;
 	Tcl_Obj *data;
 	char *ctag;
 	int clen;
@@ -102,7 +102,7 @@ int ExtraL_StructlsetValidate(interp,substructure,data,ctag,clen,oldvalue,tagsc,
 {
 	Tcl_HashEntry *entry;
 	struct Type *type;
-	ExtraL_StructlTypeSetProc *cmd;
+	ExtraL_MapTypeSetProc *cmd;
 	int error;
 	
 	entry = Tcl_FindHashEntry(&typesTable, ctag);
@@ -111,7 +111,7 @@ int ExtraL_StructlsetValidate(interp,substructure,data,ctag,clen,oldvalue,tagsc,
 		*resultPtr = value;
 		cmd = type->setproc;
 		if (cmd!=NULL) {
-			error = (*cmd)(interp,substructure,data,oldvalue,tagsc,tagsv,resultPtr);
+			error = (*cmd)(interp,submap,data,oldvalue,tagsc,tagsv,resultPtr);
 			if (error != TCL_OK) {return error;}
 		}
 		return TCL_OK;
@@ -120,12 +120,12 @@ int ExtraL_StructlsetValidate(interp,substructure,data,ctag,clen,oldvalue,tagsc,
 		Tcl_Obj **listv;
 		int listc;
 
-		error = Tcl_ListObjGetElements(interp, substructure, &listc, &listv);
+		error = Tcl_ListObjGetElements(interp, submap, &listc, &listv);
 		if (error != TCL_OK) {return error;}
 		cmdObj = Tcl_NewStringObj("::Extral::set",13);
 		Tcl_IncrRefCount(cmdObj);
 		Tcl_AppendToObj(cmdObj,ctag+1,clen-1);
-		error = Tcl_ListObjAppendElement(interp,cmdObj,substructure);
+		error = Tcl_ListObjAppendElement(interp,cmdObj,submap);
 		if (error != TCL_OK) {Tcl_DecrRefCount(cmdObj);return error;}
 		if (data != NULL) {
 			error = Tcl_ListObjAppendElement(interp,cmdObj,data);
@@ -156,9 +156,9 @@ int ExtraL_StructlsetValidate(interp,substructure,data,ctag,clen,oldvalue,tagsc,
 	}
 }
 
-int ExtraL_StructlunsetValidate(interp,substructure,data,ctag,clen,oldvalue,tagsc,tagsv,resultPtr)
+int ExtraL_MapunsetValidate(interp,submap,data,ctag,clen,oldvalue,tagsc,tagsv,resultPtr)
 	Tcl_Interp *interp;
-	Tcl_Obj *substructure;
+	Tcl_Obj *submap;
 	Tcl_Obj *data;
 	char *ctag;
 	int clen;
@@ -169,7 +169,7 @@ int ExtraL_StructlunsetValidate(interp,substructure,data,ctag,clen,oldvalue,tags
 {
 	Tcl_HashEntry *entry;
 	struct Type *type;
-	ExtraL_StructlTypeSetProc *cmd;
+	ExtraL_MapTypeSetProc *cmd;
 	int error;
 	
 	entry = Tcl_FindHashEntry(&typesTable, ctag);
@@ -177,7 +177,7 @@ int ExtraL_StructlunsetValidate(interp,substructure,data,ctag,clen,oldvalue,tags
 		type = (struct Type *)Tcl_GetHashValue(entry);
 		cmd = type->unsetproc;
 		if (cmd!=NULL) {
-			error = (*cmd)(interp,substructure,data,oldvalue,tagsc,tagsv,resultPtr);
+			error = (*cmd)(interp,submap,data,oldvalue,tagsc,tagsv,resultPtr);
 			if (error != TCL_OK) {return error;}
 			return TCL_OK;
 		} else {
@@ -190,12 +190,12 @@ int ExtraL_StructlunsetValidate(interp,substructure,data,ctag,clen,oldvalue,tags
 		Tcl_Obj **listv;
 		int listc;
 
-		error = Tcl_ListObjGetElements(interp, substructure, &listc, &listv);
+		error = Tcl_ListObjGetElements(interp, submap, &listc, &listv);
 		if (error != TCL_OK) {return error;}
 		cmdObj = Tcl_NewStringObj("::Extral::unset",13);
 		Tcl_IncrRefCount(cmdObj);
 		Tcl_AppendToObj(cmdObj,ctag+1,clen-1);
-		error = Tcl_ListObjAppendElement(interp,cmdObj,substructure);
+		error = Tcl_ListObjAppendElement(interp,cmdObj,submap);
 		if (error != TCL_OK) {Tcl_DecrRefCount(cmdObj);return error;}
 		if (data != NULL) {
 			error = Tcl_ListObjAppendElement(interp,cmdObj,data);
@@ -225,9 +225,9 @@ int ExtraL_StructlunsetValidate(interp,substructure,data,ctag,clen,oldvalue,tags
 	}
 }
 
-int ExtraL_StructlgetValidate(interp,substructure,data,ctag,clen,tagsc,tagsv,resultPtr) 
+int ExtraL_MapgetValidate(interp,submap,data,ctag,clen,tagsc,tagsv,resultPtr) 
 	Tcl_Interp *interp;
-	Tcl_Obj *substructure;
+	Tcl_Obj *submap;
 	Tcl_Obj *data;
 	char *ctag;
 	int clen;
@@ -237,7 +237,7 @@ int ExtraL_StructlgetValidate(interp,substructure,data,ctag,clen,tagsc,tagsv,res
 {
 	Tcl_HashEntry *entry;
 	struct Type *type;
-	ExtraL_StructlTypeGetProc *cmd;
+	ExtraL_MapTypeGetProc *cmd;
 	int error,i;
 	
 	entry = Tcl_FindHashEntry(&typesTable, ctag);
@@ -245,15 +245,15 @@ int ExtraL_StructlgetValidate(interp,substructure,data,ctag,clen,tagsc,tagsv,res
 		type = (struct Type *)Tcl_GetHashValue(entry);
 		cmd = type->getproc;
 		if (cmd!=NULL) {
-			error = (*cmd)(interp,substructure,data,tagsc,tagsv,resultPtr);
+			error = (*cmd)(interp,submap,data,tagsc,tagsv,resultPtr);
 			if (error != TCL_OK) {return error;}
 		} else {
 			int listlen;
 			if (*resultPtr != NULL) {Tcl_GetStringFromObj(*resultPtr, &listlen);} else {listlen = 0;}
 			if (listlen == 0) {
-				error = Tcl_ListObjLength(interp, substructure, &i);
+				error = Tcl_ListObjLength(interp, submap, &i);
 				if (error != TCL_OK) {return error;}
-				error = Tcl_ListObjIndex(interp, substructure, i-1, resultPtr);
+				error = Tcl_ListObjIndex(interp, submap, i-1, resultPtr);
 				if (error != TCL_OK) {return error;}
 			}
 			return TCL_OK;
@@ -266,13 +266,13 @@ int ExtraL_StructlgetValidate(interp,substructure,data,ctag,clen,tagsc,tagsv,res
 		Tcl_Obj **listv;
 		int listc;
 
-		error = Tcl_ListObjGetElements(interp, substructure, &listc, &listv);
+		error = Tcl_ListObjGetElements(interp, submap, &listc, &listv);
 		if (error != TCL_OK) {return error;}
 	
 		cmdObj = Tcl_NewStringObj("::Extral::get",13);
 		Tcl_IncrRefCount(cmdObj);
 		Tcl_AppendToObj(cmdObj,ctag+1,clen-1);
-		error = Tcl_ListObjAppendElement(interp,cmdObj,substructure);
+		error = Tcl_ListObjAppendElement(interp,cmdObj,submap);
 		if (error != TCL_OK) {Tcl_DecrRefCount(cmdObj);return error;}
 		if (data != NULL) {
 			error = Tcl_ListObjAppendElement(interp,cmdObj,data);
@@ -312,7 +312,7 @@ int ExtraL_ObjEqual(obj1, obj2)
 	}
 }
 
-int ExtraL_StructlFindTag(interp, list, tag, taglen, resultPtr, posPtr)
+int ExtraL_MapFindTag(interp, list, tag, taglen, resultPtr, posPtr)
 	Tcl_Interp *interp;
 	Tcl_Obj *list;
 	char *tag;
@@ -389,15 +389,15 @@ int ExtraL_StructlFindTag(interp, list, tag, taglen, resultPtr, posPtr)
 /*
  *----------------------------------------------------------------------
  *
- *		C backend for structlset with struct
+ *		C backend for map_set with struct
  *	 list gets changed directly, so should not be shared
  *
  *----------------------------------------------------------------------
  */
 
-extern int ExtraL_StructlsetStruct(interp, structure, data, list, tagsc, tagsv, value, resultPtr)
+extern int ExtraL_MapsetStruct(interp, map, data, list, tagsc, tagsv, value, resultPtr)
 	Tcl_Interp *interp;
-	Tcl_Obj *structure;
+	Tcl_Obj *map;
 	Tcl_Obj *data;
 	Tcl_Obj *list;
 	int tagsc;
@@ -407,14 +407,14 @@ extern int ExtraL_StructlsetStruct(interp, structure, data, list, tagsc, tagsv, 
 {
 	Tcl_Obj *temp, *tagObj,*result,*res;
 	char *ctag = NULL,*tag;
-	Tcl_Obj *substructure, *sublist, *structtag, *subtag;
+	Tcl_Obj *submap, *sublist, *structtag, *subtag;
 	int sublistpos, structpos;
 	int clen,len;
 	int error;
 	int pos;
 
 	result = NULL;
-	error = Tcl_ListObjIndex(interp, structure, 0, &temp);
+	error = Tcl_ListObjIndex(interp, map, 0, &temp);
 	if (error != TCL_OK) {return error;}
 	if (temp != NULL) {
 		ctag = Tcl_GetStringFromObj(temp,&clen);
@@ -423,13 +423,13 @@ extern int ExtraL_StructlsetStruct(interp, structure, data, list, tagsc, tagsv, 
 	}
 	if ((clen>1)&&(ctag[0]=='*')&&(ctag[1]!=' ')) {
 		/* endnode */
-		error = ExtraL_StructlsetValidate(interp,structure,data,ctag,clen,list,tagsc,tagsv,value,&res);
+		error = ExtraL_MapsetValidate(interp,map,data,ctag,clen,list,tagsc,tagsv,value,&res);
 		if (error != TCL_OK) {return error;}
 		*resultPtr = res;
 		return TCL_OK;
 	} else if (tagsc == 0) {
 		/*
-		# Go further down structure by value
+		# Go further down map by value
 		# ----------------------------------
 		*/
 		int tempc;
@@ -439,7 +439,7 @@ extern int ExtraL_StructlsetStruct(interp, structure, data, list, tagsc, tagsv, 
 		}
 		if (tempc & 1) {
 			Tcl_ResetResult(interp);
-			Tcl_AppendResult(interp,"error: incorrect value trying to assign \"", Tcl_GetStringFromObj(value,&len),"\" to struct \"", Tcl_GetStringFromObj(structure,&len),"\"",(char *)NULL);
+			Tcl_AppendResult(interp,"error: incorrect value trying to assign \"", Tcl_GetStringFromObj(value,&len),"\" to map \"", Tcl_GetStringFromObj(map,&len),"\"",(char *)NULL);
 			return TCL_ERROR;
 		} else if (tempc!=0) {
 			if (list == NULL) {
@@ -450,18 +450,18 @@ extern int ExtraL_StructlsetStruct(interp, structure, data, list, tagsc, tagsv, 
 			for(pos=0;pos<tempc;pos+=2) {
 				tagObj = tempv[pos];
 				tag = Tcl_GetStringFromObj(tagObj,&len);
-				/* check structure if needed */
-				error = ExtraL_StructlFindTag(interp, structure, tag, len, &substructure, &structpos);
+				/* check map if needed */
+				error = ExtraL_MapFindTag(interp, map, tag, len, &submap, &structpos);
 				if (error != TCL_OK) {Tcl_DecrRefCount(result);return TCL_ERROR;}
 				if (structpos == -1) {
 					Tcl_ResetResult(interp);
-					Tcl_AppendResult(interp,"error: tag \"", tag, "\" not present in structure \"", Tcl_GetStringFromObj(structure,&len),"\"",(char *)NULL);
+					Tcl_AppendResult(interp,"error: tag \"", tag, "\" not present in map \"", Tcl_GetStringFromObj(map,&len),"\"",(char *)NULL);
 					Tcl_DecrRefCount(result);
 					return TCL_ERROR;	
 				}
 			
 				/* try to find the next tag */
-				error = Tcl_ListObjIndex(interp, structure, structpos-1, &structtag);
+				error = Tcl_ListObjIndex(interp, map, structpos-1, &structtag);
 				if (error != TCL_OK) {Tcl_DecrRefCount(result);return error;}
 				error = Tcl_ListObjIndex(interp, structtag, 0, &subtag);
 				if (error != TCL_OK) {Tcl_DecrRefCount(result);return error;}
@@ -472,10 +472,10 @@ extern int ExtraL_StructlsetStruct(interp, structure, data, list, tagsc, tagsv, 
 					if (tagObj == NULL) {tagObj = Tcl_NewObj();}
 					tag = Tcl_GetStringFromObj(tagObj,&len);
 				}
-				error = ExtraL_StructlFindTag(interp, result, tag, len, &sublist, &sublistpos);
+				error = ExtraL_MapFindTag(interp, result, tag, len, &sublist, &sublistpos);
 				if (error != TCL_OK) {Tcl_DecrRefCount(result);return TCL_ERROR;}
 		
-				error = ExtraL_StructlsetStruct(interp, substructure, data, sublist, 0, NULL, tempv[pos+1], &res);
+				error = ExtraL_MapsetStruct(interp, submap, data, sublist, 0, NULL, tempv[pos+1], &res);
 				if (error == TCL_ERROR) {
 					Tcl_AppendResult(interp," at field \"",tag ,"\"",(char *) NULL);
 					Tcl_DecrRefCount(result);return error;
@@ -506,24 +506,24 @@ extern int ExtraL_StructlsetStruct(interp, structure, data, list, tagsc, tagsv, 
 		}
 	} else {
 		/*
-		# Go further down structure by tags
+		# Go further down map by tags
 		# ---------------------------------
 		*/
 		tagObj = tagsv[0];
 		tag = Tcl_GetStringFromObj(tagsv[0],&len);
 		tagsc--;
 		tagsv++;
-		/* check structure if needed */
-		error = ExtraL_StructlFindTag(interp, structure, tag, len, &substructure, &structpos);
+		/* check map if needed */
+		error = ExtraL_MapFindTag(interp, map, tag, len, &submap, &structpos);
 		if (error != TCL_OK) {return TCL_ERROR;}
 		if (structpos == -1) {
 			Tcl_ResetResult(interp);
-			Tcl_AppendResult(interp,"error: tag \"", tag, "\" not present in structure \"", Tcl_GetStringFromObj(structure,&len),"\"",(char *)NULL);
+			Tcl_AppendResult(interp,"error: tag \"", tag, "\" not present in map \"", Tcl_GetStringFromObj(map,&len),"\"",(char *)NULL);
 			return TCL_ERROR;	
 		}
 	
 		/* try to find the next tag */
-		error = Tcl_ListObjIndex(interp, structure, structpos-1, &structtag);
+		error = Tcl_ListObjIndex(interp, map, structpos-1, &structtag);
 		if (error != TCL_OK) {return error;}
 		error = Tcl_ListObjIndex(interp, structtag, 0, &subtag);
 		if (error != TCL_OK) {return error;}
@@ -534,10 +534,10 @@ extern int ExtraL_StructlsetStruct(interp, structure, data, list, tagsc, tagsv, 
 			if (tagObj == NULL) {tagObj = Tcl_NewObj();}
 			tag = Tcl_GetStringFromObj(tagObj,&len);
 		}
-		error = ExtraL_StructlFindTag(interp, list, tag, len, &sublist, &sublistpos);
+		error = ExtraL_MapFindTag(interp, list, tag, len, &sublist, &sublistpos);
 		if (error != TCL_OK) {return TCL_ERROR;}
 
-		error = ExtraL_StructlsetStruct(interp, substructure, data, sublist, tagsc, tagsv, value, &res);
+		error = ExtraL_MapsetStruct(interp, submap, data, sublist, tagsc, tagsv, value, &res);
 		if (error == TCL_ERROR) {
 			Tcl_AppendResult(interp," at field \"",tag ,"\"",(char *) NULL);
 			return error;
@@ -591,13 +591,13 @@ extern int ExtraL_StructlsetStruct(interp, structure, data, list, tagsc, tagsv, 
 /*
  *----------------------------------------------------------------------
  *
- *		C backend for structlset
+ *		C backend for map_set
  *	 list gets changed directly, so should not be shared
  *
  *----------------------------------------------------------------------
  */
 
-extern int ExtraL_Structlset(interp, list, tagsc, tagsv, value, resultPtr)
+extern int ExtraL_Mapset(interp, list, tagsc, tagsv, value, resultPtr)
 	Tcl_Interp *interp;
 	Tcl_Obj *list;
 	int tagsc;
@@ -615,7 +615,7 @@ extern int ExtraL_Structlset(interp, list, tagsc, tagsv, value, resultPtr)
 	tag = Tcl_GetStringFromObj(tagsv[0],&len);
 
 	/* try to find the next tag */
-	error = ExtraL_StructlFindTag(interp, list, tag, len, &sublist, &sublistpos);
+	error = ExtraL_MapFindTag(interp, list, tag, len, &sublist, &sublistpos);
 	if (error != TCL_OK) {return TCL_ERROR;}
 
 	*resultPtr = NULL;
@@ -623,7 +623,7 @@ extern int ExtraL_Structlset(interp, list, tagsc, tagsv, value, resultPtr)
 	/* change or ad the element */
 	if (sublistpos != -1) {
 		if (tagsc != 1) {
-			error = ExtraL_Structlset(interp, sublist, tagsc-1, tagsv+1, value, &res);
+			error = ExtraL_Mapset(interp, sublist, tagsc-1, tagsv+1, value, &res);
 			if (error != TCL_OK) {Tcl_DecrRefCount(result);return error;}
 			error = Tcl_ListObjReplace(interp,result,sublistpos,1,1,&res);
 			if (error != TCL_OK) {Tcl_DecrRefCount(result);Tcl_DecrRefCount(res);return error;}
@@ -665,15 +665,15 @@ extern int ExtraL_Structlset(interp, list, tagsc, tagsv, value, resultPtr)
 /*
  *----------------------------------------------------------------------
  *
- *		C backend for structlunset with struct
+ *		C backend for map_unset with struct
  *	 list gets changed directly, so should not be shared
  *
  *----------------------------------------------------------------------
  */
 
-extern int ExtraL_StructlunsetStruct(interp, structure, data, list, tagsc, tagsv, resultPtr)
+extern int ExtraL_MapunsetStruct(interp, map, data, list, tagsc, tagsv, resultPtr)
 	Tcl_Interp *interp;
-	Tcl_Obj *structure;
+	Tcl_Obj *map;
 	Tcl_Obj *data;
 	Tcl_Obj *list;
 	int tagsc;
@@ -682,13 +682,13 @@ extern int ExtraL_StructlunsetStruct(interp, structure, data, list, tagsc, tagsv
 {
 	Tcl_Obj *temp, *tagObj,*result,*res;
 	char *ctag = NULL,*tag;
-	Tcl_Obj *substructure, *sublist, *structtag, *subtag;
+	Tcl_Obj *submap, *sublist, *structtag, *subtag;
 	int sublistpos, structpos;
 	int clen,len;
 	int error;
 
 	result = NULL;
-	error = Tcl_ListObjIndex(interp, structure, 0, &temp);
+	error = Tcl_ListObjIndex(interp, map, 0, &temp);
 	if (error != TCL_OK) {return error;}
 	if (temp != NULL) {
 		ctag = Tcl_GetStringFromObj(temp,&clen);
@@ -697,7 +697,7 @@ extern int ExtraL_StructlunsetStruct(interp, structure, data, list, tagsc, tagsv
 	}
 	if ((clen>1)&&(ctag[0]=='*')&&(ctag[1]!=' ')) {
 		/* endnode */
-		error = ExtraL_StructlunsetValidate(interp,structure,data,ctag,clen,list,tagsc,tagsv,&res);
+		error = ExtraL_MapunsetValidate(interp,map,data,ctag,clen,list,tagsc,tagsv,&res);
 		if (error != TCL_OK) {return error;}
 		*resultPtr = res;
 		return TCL_OK;
@@ -706,24 +706,24 @@ extern int ExtraL_StructlunsetStruct(interp, structure, data, list, tagsc, tagsv
 		return 5;
 	} else {
 		/*
-		# Go further down structure by tags
+		# Go further down map by tags
 		# ---------------------------------
 		*/
 		tagObj = tagsv[0];
 		tag = Tcl_GetStringFromObj(tagsv[0],&len);
 		tagsc--;
 		tagsv++;
-		/* check structure if needed */
-		error = ExtraL_StructlFindTag(interp, structure, tag, len, &substructure, &structpos);
+		/* check map if needed */
+		error = ExtraL_MapFindTag(interp, map, tag, len, &submap, &structpos);
 		if (error != TCL_OK) {return TCL_ERROR;}
 		if (structpos == -1) {
 			Tcl_ResetResult(interp);
-			Tcl_AppendResult(interp,"error: tag \"", tag, "\" not present in structure \"", Tcl_GetStringFromObj(structure,&len),"\"",(char *)NULL);
+			Tcl_AppendResult(interp,"error: tag \"", tag, "\" not present in map \"", Tcl_GetStringFromObj(map,&len),"\"",(char *)NULL);
 			return TCL_ERROR;	
 		}
 	
 		/* try to find the next tag */
-		error = Tcl_ListObjIndex(interp, structure, structpos-1, &structtag);
+		error = Tcl_ListObjIndex(interp, map, structpos-1, &structtag);
 		if (error != TCL_OK) {return error;}
 		error = Tcl_ListObjIndex(interp, structtag, 0, &subtag);
 		if (error != TCL_OK) {return error;}
@@ -734,13 +734,13 @@ extern int ExtraL_StructlunsetStruct(interp, structure, data, list, tagsc, tagsv
 			if (tagObj == NULL) {tagObj = Tcl_NewObj();}
 			tag = Tcl_GetStringFromObj(tagObj,&len);
 		}
-		error = ExtraL_StructlFindTag(interp, list, tag, len, &sublist, &sublistpos);
+		error = ExtraL_MapFindTag(interp, list, tag, len, &sublist, &sublistpos);
 		if (error != TCL_OK) {return TCL_ERROR;}
 		if (sublistpos == -1) {
 			sublist = NULL;
 		}
 
-		error = ExtraL_StructlunsetStruct(interp, substructure, data, sublist, tagsc, tagsv, &res);
+		error = ExtraL_MapunsetStruct(interp, submap, data, sublist, tagsc, tagsv, &res);
 		if (error == TCL_ERROR) {
 			Tcl_AppendResult(interp," at field \"",tag ,"\"",(char *) NULL);
 			return error;
@@ -794,13 +794,13 @@ extern int ExtraL_StructlunsetStruct(interp, structure, data, list, tagsc, tagsv
 /*
  *----------------------------------------------------------------------
  *
- *		C backend for structlunset without struct
+ *		C backend for map_unset without struct
  *	 list gets changed directly, so should not be shared
  *
  *----------------------------------------------------------------------
  */
 
-extern int ExtraL_Structlunsetnostruct(interp, list, tagsc, tagsv)
+extern int ExtraL_Mapunsetnostruct(interp, list, tagsc, tagsv)
 	Tcl_Interp *interp;
 	Tcl_Obj *list;
 	int tagsc;
@@ -836,7 +836,7 @@ extern int ExtraL_Structlunsetnostruct(interp, list, tagsc, tagsv)
 				} else {
 					pos++;
 					temp = Tcl_DuplicateObj(workv[pos]);
-					result = ExtraL_Structlunsetnostruct(interp, temp, tagsc-1, tagsv+1);
+					result = ExtraL_Mapunsetnostruct(interp, temp, tagsc-1, tagsv+1);
 					if (result != TCL_OK) {
 						Tcl_DecrRefCount(temp);return result;
 					}
@@ -855,34 +855,34 @@ extern int ExtraL_Structlunsetnostruct(interp, list, tagsc, tagsv)
 /*
  *----------------------------------------------------------------------
  *
- *		C backend for structlget with struct
+ *		C backend for map_get with struct
  *
  *----------------------------------------------------------------------
  */
 
-extern int ExtraL_StructlgetStruct(interp, structure, data, list, tagsc, tagsv, resultPtr)
+extern int ExtraL_MapgetStruct(interp, map, data, list, tagsc, tagsv, resultPtr)
 	Tcl_Interp *interp;
-	Tcl_Obj *structure;
+	Tcl_Obj *map;
 	Tcl_Obj *data;
 	Tcl_Obj *list;
 	int tagsc;
 	Tcl_Obj **tagsv;
 	Tcl_Obj **resultPtr;
 {
-	Tcl_Obj *temp, *substructure, *sublist, *res;
+	Tcl_Obj *temp, *submap, *sublist, *res;
 	char *ctag,*tag;
 	int clen,len;
 	int error;
 	int pos;
 
 /*
-printf("struct: %s\n",Tcl_GetStringFromObj(structure,&error));
+printf("struct: %s\n",Tcl_GetStringFromObj(map,&error));
 if (list != NULL) {printf("list: %s\n",Tcl_GetStringFromObj(list,&error));}
 if (tagsc != 0) {printf("tags: %d\ntag: %s\n",tagsc,Tcl_GetStringFromObj(tagsv[0],&error));}
 printf("\n");
 fflush(stdout);
 */
-	Tcl_ListObjIndex(interp, structure, 0, &temp);
+	Tcl_ListObjIndex(interp, map, 0, &temp);
 	if (temp == NULL) {
 		ctag="";
 	} else {
@@ -894,12 +894,12 @@ fflush(stdout);
 	*/
 	if ((clen>1)&&(ctag[0]=='*')&&(ctag[1]!=' ')) {
 		if (tagsc>0) {
-			error = ExtraL_StructlgetValidate(interp,structure,data,ctag,clen,tagsc,tagsv,&list);
+			error = ExtraL_MapgetValidate(interp,map,data,ctag,clen,tagsc,tagsv,&list);
 			if (error != TCL_OK) {return TCL_ERROR;}
 			*resultPtr = list;
 			return TCL_OK;
 		} else {
-			error = ExtraL_StructlgetValidate(interp,structure,data,ctag,clen,0,NULL,&list);
+			error = ExtraL_MapgetValidate(interp,map,data,ctag,clen,0,NULL,&list);
 			if (error != TCL_OK) {return TCL_ERROR;}
 			*resultPtr = list;
 			return TCL_OK;
@@ -916,11 +916,11 @@ fflush(stdout);
 		Tcl_Obj *result, *subtag;
 		int i;
 
-		error = Tcl_ListObjGetElements(interp, structure, &tempc, &tempv);
+		error = Tcl_ListObjGetElements(interp, map, &tempc, &tempv);
 		if (error != TCL_OK) {return error;}
 		if (tempc & 1) {
 			Tcl_ResetResult(interp);
-			Tcl_AppendResult(interp,"error: structure \"", Tcl_GetStringFromObj(structure,&len),"\" does not have an even number of elements",(char *)NULL);
+			Tcl_AppendResult(interp,"error: map \"", Tcl_GetStringFromObj(map,&len),"\" does not have an even number of elements",(char *)NULL);
 			return TCL_ERROR;
 		} else if (tempc != 0) {
 			result = Tcl_NewObj();
@@ -942,9 +942,9 @@ fflush(stdout);
 					} else {
 						ctag = Tcl_GetStringFromObj(subtag,&clen);
 					}
-					error = ExtraL_StructlFindTag(interp,list,ctag,clen,&sublist,&i);
+					error = ExtraL_MapFindTag(interp,list,ctag,clen,&sublist,&i);
 					if (error != TCL_OK) {Tcl_DecrRefCount(result);return error;}
-					error = ExtraL_StructlgetStruct(interp, tempv[pos+1], data, sublist, 0, NULL, &res);
+					error = ExtraL_MapgetStruct(interp, tempv[pos+1], data, sublist, 0, NULL, &res);
 					if (error != TCL_OK) {Tcl_DecrRefCount(result);return error;}
 					error = Tcl_ListObjAppendElement(interp,result,res);
 					if (error != TCL_OK) {Tcl_DecrRefCount(result);return error;}
@@ -952,9 +952,9 @@ fflush(stdout);
 					ctag = Tcl_GetStringFromObj(tempv[pos],&clen);
 					error = Tcl_ListObjAppendElement(interp,result,tempv[pos]);
 					if (error != TCL_OK) {Tcl_DecrRefCount(result);return error;}
-					error = ExtraL_StructlFindTag(interp,list,ctag,clen,&sublist,&i);
+					error = ExtraL_MapFindTag(interp,list,ctag,clen,&sublist,&i);
 					if (error != TCL_OK) {Tcl_DecrRefCount(result);return error;}
-					error = ExtraL_StructlgetStruct(interp, tempv[pos+1], data, sublist, 0, NULL, &res);
+					error = ExtraL_MapgetStruct(interp, tempv[pos+1], data, sublist, 0, NULL, &res);
 					if (error != TCL_OK) {Tcl_DecrRefCount(result);return error;}
 					error = Tcl_ListObjAppendElement(interp,result,res);
 					if (error != TCL_OK) {Tcl_DecrRefCount(result);return error;}
@@ -969,19 +969,19 @@ fflush(stdout);
 	} else {
 		Tcl_Obj *structtag, *subtag;
 		/* 
-		# find substructure corresponding to tag 
+		# find submap corresponding to tag 
 		# --------------------------------------
 		*/
 
 		tag = Tcl_GetStringFromObj(tagsv[0],&len);
-		error = ExtraL_StructlFindTag(interp,structure,tag,len,&substructure,&pos);
+		error = ExtraL_MapFindTag(interp,map,tag,len,&submap,&pos);
 		if (error != TCL_OK) {return error;}
 		if (pos == -1) {
 			Tcl_ResetResult(interp);
-			Tcl_AppendResult(interp,"error: tag \"", tag, "\" not present in structure \"", Tcl_GetStringFromObj(structure,&len),"\"",(char *)NULL);
+			Tcl_AppendResult(interp,"error: tag \"", tag, "\" not present in map \"", Tcl_GetStringFromObj(map,&len),"\"",(char *)NULL);
 			return TCL_ERROR;	
 		}
-		error = Tcl_ListObjIndex(interp, structure, pos-1, &structtag);
+		error = Tcl_ListObjIndex(interp, map, pos-1, &structtag);
 		if (error != TCL_OK) {return error;}
 		error = Tcl_ListObjIndex(interp, structtag, 0, &subtag);
 		if (error != TCL_OK) {return error;}
@@ -997,11 +997,11 @@ fflush(stdout);
 			find the tag
 			------------
 		*/
-		error = ExtraL_StructlFindTag(interp,list,tag,len,&sublist,&pos);
+		error = ExtraL_MapFindTag(interp,list,tag,len,&sublist,&pos);
 		if (error != TCL_OK) {return error;}
 	
 		/* set the result */
-		error = ExtraL_StructlgetStruct(interp, substructure, data, sublist, tagsc-1, tagsv+1, &res);
+		error = ExtraL_MapgetStruct(interp, submap, data, sublist, tagsc-1, tagsv+1, &res);
 		if (error != TCL_OK) {return error;}
 		*resultPtr = res;
 		return TCL_OK;
@@ -1010,12 +1010,12 @@ fflush(stdout);
 /*
  *----------------------------------------------------------------------
  *
- *		C backend for structlget
+ *		C backend for map_get
  *
  *----------------------------------------------------------------------
  */
 
-extern int ExtraL_Structlget(interp, list, tags, resultPtr)
+extern int ExtraL_Mapget(interp, list, tags, resultPtr)
 	Tcl_Interp *interp;
 	Tcl_Obj *list;
 	Tcl_Obj *tags;
@@ -1065,9 +1065,9 @@ extern int ExtraL_Structlget(interp, list, tags, resultPtr)
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_StructlsetObjCmd --
+ * ExtraL_MapsetObjCmd --
  *
- *		This procedure is invoked to process the "structlset" command.
+ *		This procedure is invoked to process the "map_set" command.
  *
  * Results:
  *		A standard Tcl result.
@@ -1076,7 +1076,7 @@ extern int ExtraL_Structlget(interp, list, tags, resultPtr)
  *----------------------------------------------------------------------
  */
 
-int ExtraL_StructlsetObjCmd(notUsed, interp, objc, objv)
+int ExtraL_MapsetObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;				 /* Not used. */
 	Tcl_Interp *interp;					/* Current interpreter. */
 	int objc;						/* Number of arguments. */
@@ -1085,21 +1085,21 @@ int ExtraL_StructlsetObjCmd(notUsed, interp, objc, objv)
 	Tcl_Obj *current, *res;
 	Tcl_Obj **tagsv;
 	int tagsc;
-	Tcl_Obj *structure, *data;
+	Tcl_Obj *map, *data;
 	char *string;
 	int pos, error, i;
 
 	if (objc < 3) {
-		Tcl_WrongNumArgs(interp, 1, objv, "?-struct schema? ?-data clientdata? list field value ?field value ...?");
+		Tcl_WrongNumArgs(interp, 1, objv, "?-map schema? ?-data clientdata? list field value ?field value ...?");
 		return TCL_ERROR;
 	}
-	structure = NULL;
+	map = NULL;
 	data = NULL;
 	pos = 1;
 	while(pos < objc) {
 		string = Tcl_GetStringFromObj(objv[pos], &i);
-		if ((i==7)&&(strncmp(string,"-struct",7) == 0)) {
-			structure = objv[pos+1];
+		if ((i==4)&&(strncmp(string,"-map",4) == 0)) {
+			map = objv[pos+1];
 			pos += 2;
 		} else if ((i==5)&&(strncmp(string,"-data",5) == 0)) {
 			data = objv[pos+1];
@@ -1110,7 +1110,7 @@ int ExtraL_StructlsetObjCmd(notUsed, interp, objc, objv)
 	}
 
 	if ((objc < (pos+3))||(objc & 1)) {
-		Tcl_WrongNumArgs(interp, 1, objv, "?-struct schema? ?-data clientdata? list field value ?field value ...?");
+		Tcl_WrongNumArgs(interp, 1, objv, "?-map schema? ?-data clientdata? list field value ?field value ...?");
 		return TCL_ERROR;
 	}
 
@@ -1119,19 +1119,19 @@ int ExtraL_StructlsetObjCmd(notUsed, interp, objc, objv)
 	for(i = pos+1 ; i < objc ; i+=2) {
 		error = Tcl_ListObjGetElements(interp, objv[i], &tagsc, &tagsv);
 		if (error != TCL_OK)	{Tcl_DecrRefCount(current);return error;}
-		if (structure == NULL) {
+		if (map == NULL) {
 			if (tagsc == 0) {
 				Tcl_DecrRefCount(current);
 				current = objv[i+1];
 				Tcl_IncrRefCount(current);
 			} else {
-				error = ExtraL_Structlset(interp, current, tagsc, tagsv, objv[i+1],&res);
+				error = ExtraL_Mapset(interp, current, tagsc, tagsv, objv[i+1],&res);
 				Tcl_DecrRefCount(current);
 				if (error != TCL_OK)	{return error;}
 				current = res;
 			}
 		} else {
-			error = ExtraL_StructlsetStruct(interp, structure, data, current, tagsc, tagsv, objv[i+1],&res);
+			error = ExtraL_MapsetStruct(interp, map, data, current, tagsc, tagsv, objv[i+1],&res);
 			Tcl_DecrRefCount(current);
 			if (error == TCL_ERROR)	{
 				return error;
@@ -1149,9 +1149,9 @@ int ExtraL_StructlsetObjCmd(notUsed, interp, objc, objv)
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_StructlunsetCmd --
+ * ExtraL_MapunsetCmd --
  *
- *		This procedure is invoked to process the "structlunset" command.
+ *		This procedure is invoked to process the "map_unset" command.
  *
  * Results:
  *		A standard Tcl result.
@@ -1160,7 +1160,7 @@ int ExtraL_StructlsetObjCmd(notUsed, interp, objc, objv)
  *----------------------------------------------------------------------
  */
 
-int ExtraL_StructlunsetObjCmd(notUsed, interp, objc, objv)
+int ExtraL_MapunsetObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;				 /* Not used. */
 	Tcl_Interp *interp;					/* Current interpreter. */
 	int objc;						/* Number of arguments. */
@@ -1169,21 +1169,21 @@ int ExtraL_StructlunsetObjCmd(notUsed, interp, objc, objv)
 	Tcl_Obj *current,*res;
 	Tcl_Obj **tagsv;
 	int tagsc;
-	Tcl_Obj *structure, *data;
+	Tcl_Obj *map, *data;
 	char *string;
 	int pos, error, i;
 
 	if (objc < 2) {
-		Tcl_WrongNumArgs(interp, 1, objv, "?-struct schema? ?-data clientdata? list field ?field ...?");
+		Tcl_WrongNumArgs(interp, 1, objv, "?-map schema? ?-data clientdata? list field ?field ...?");
 		return TCL_ERROR;
 	}
-	structure = NULL;
+	map = NULL;
 	data = NULL;
 	pos = 1;
 	while(pos < objc) {
 		string = Tcl_GetStringFromObj(objv[pos], &i);
-		if ((i==7)&&(strncmp(string,"-struct",7) == 0)) {
-			structure = objv[pos+1];
+		if ((i==4)&&(strncmp(string,"-map",4) == 0)) {
+			map = objv[pos+1];
 			pos += 2;
 		} else if ((i==5)&&(strncmp(string,"-data",5) == 0)) {
 			data = objv[pos+1];
@@ -1194,10 +1194,10 @@ int ExtraL_StructlunsetObjCmd(notUsed, interp, objc, objv)
 	}
 
 	if ((objc-pos) < 2) {
-		Tcl_WrongNumArgs(interp, 1, objv, "?-struct schema? ?-data clientdata? list field ?field ...?");
+		Tcl_WrongNumArgs(interp, 1, objv, "?-map schema? ?-data clientdata? list field ?field ...?");
 		return TCL_ERROR;
 	}
-	if (structure == NULL) {
+	if (map == NULL) {
 		current = Tcl_DuplicateObj(objv[pos]);
 		for(i = pos+1 ; i < objc ; i++) {
 			error = Tcl_ListObjGetElements(interp, objv[i], &tagsc, &tagsv);
@@ -1205,7 +1205,7 @@ int ExtraL_StructlunsetObjCmd(notUsed, interp, objc, objv)
 			if (tagsc == 0) {
 				Tcl_SetListObj(current,1,objv+i+1);
 			} else {
-				error = ExtraL_Structlunsetnostruct(interp, current, tagsc, tagsv);
+				error = ExtraL_Mapunsetnostruct(interp, current, tagsc, tagsv);
 				if (error != TCL_OK)	{Tcl_DecrRefCount(current);return error;}
 			}
 		}
@@ -1215,7 +1215,7 @@ int ExtraL_StructlunsetObjCmd(notUsed, interp, objc, objv)
 		for(i = pos+1 ; i < objc ; i++) {
 			error = Tcl_ListObjGetElements(interp, objv[i], &tagsc, &tagsv);
 			if (error != TCL_OK)	{return error;}
-			error = ExtraL_StructlunsetStruct(interp, structure, data, current, tagsc, tagsv, &res);
+			error = ExtraL_MapunsetStruct(interp, map, data, current, tagsc, tagsv, &res);
 			Tcl_DecrRefCount(current);
 			if (error == TCL_ERROR)	{
 				return error;
@@ -1233,9 +1233,9 @@ int ExtraL_StructlunsetObjCmd(notUsed, interp, objc, objv)
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_StructlgetCmd --
+ * ExtraL_MapgetCmd --
  *
- *		This procedure is invoked to process the "structlget" command.
+ *		This procedure is invoked to process the "map_get" command.
  *
  * Results:
  *		A standard Tcl result.
@@ -1244,7 +1244,7 @@ int ExtraL_StructlunsetObjCmd(notUsed, interp, objc, objv)
  *----------------------------------------------------------------------
  */
 
-int ExtraL_StructlgetObjCmd(notUsed, interp, objc, objv)
+int ExtraL_MapgetObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;
 	Tcl_Interp *interp;
 	int objc;
@@ -1253,22 +1253,22 @@ int ExtraL_StructlgetObjCmd(notUsed, interp, objc, objv)
 	Tcl_Obj **tagsv;
 	int tagsc;
 	Tcl_Obj *result;
-	Tcl_Obj *structure, *data;
+	Tcl_Obj *map, *data;
 	char *string;
 	int i, error;
 
 	if (objc < 2) {
-		Tcl_WrongNumArgs(interp, 1, objv, "?-struct schema? ?-data clientdata? list field ?field ...?");
+		Tcl_WrongNumArgs(interp, 1, objv, "?-map schema? ?-data clientdata? list field ?field ...?");
 		return TCL_ERROR;
 	}
-	structure = NULL;
+	map = NULL;
 	data = NULL;
 	objc -= 1;
 	objv += 1;
 	while(objc > 0) {
 		string = Tcl_GetStringFromObj(objv[0], &i);
-		if ((i==7)&&(strncmp(string,"-struct",7) == 0)) {
-			structure = objv[1];
+		if ((i==4)&&(strncmp(string,"-map",4) == 0)) {
+			map = objv[1];
 			objc -= 2;
 			objv += 2;
 		} else if ((i==5)&&(strncmp(string,"-data",5) == 0)) {
@@ -1280,33 +1280,33 @@ int ExtraL_StructlgetObjCmd(notUsed, interp, objc, objv)
 		}
 	}
 	if (objc < 2) {
-		Tcl_WrongNumArgs(interp, 1, objv, "?-struct schema? ?-data clientdata? list field ?field ...?");
+		Tcl_WrongNumArgs(interp, 1, objv, "?-map schema? ?-data clientdata? list field ?field ...?");
 		return TCL_ERROR;
 	}
 	if (objc == 2) {
-		if (structure != NULL) {
+		if (map != NULL) {
 			error = Tcl_ListObjGetElements(interp, objv[1], &tagsc, &tagsv);
 			if (error != TCL_OK) {return TCL_ERROR;}
-			error = ExtraL_StructlgetStruct(interp, structure, data, objv[0], tagsc, tagsv, &result);
+			error = ExtraL_MapgetStruct(interp, map, data, objv[0], tagsc, tagsv, &result);
 		} else {
-			error = ExtraL_Structlget(interp, objv[0], objv[1], &result);
+			error = ExtraL_Mapget(interp, objv[0], objv[1], &result);
 		}
 		if (error != TCL_OK) {return TCL_ERROR;}
 	} else {
 		Tcl_Obj *res;
 		result = Tcl_NewObj();
-		if (structure != NULL) {
+		if (map != NULL) {
 			for(i=1;i<objc;i++) {
 				error = Tcl_ListObjGetElements(interp, objv[i], &tagsc, &tagsv);
 				if (error != TCL_OK) {Tcl_DecrRefCount(result);return TCL_ERROR;}
-				error = ExtraL_StructlgetStruct(interp, structure, data, objv[0], tagsc, tagsv, &res);
+				error = ExtraL_MapgetStruct(interp, map, data, objv[0], tagsc, tagsv, &res);
 				if (error != TCL_OK) {Tcl_DecrRefCount(result);return TCL_ERROR;}
 				error = Tcl_ListObjAppendElement(interp, result, res);
 				if (error != TCL_OK) {Tcl_DecrRefCount(result);return TCL_ERROR;}
 			}
 		} else {
 			for(i=1;i<objc;i++) {
-				error = ExtraL_Structlget(interp, objv[0], objv[i], &res);
+				error = ExtraL_Mapget(interp, objv[0], objv[i], &res);
 				if (error != TCL_OK) {Tcl_DecrRefCount(result);return TCL_ERROR;}
 				error = Tcl_ListObjAppendElement(interp, result, res);
 				if (error != TCL_OK) {Tcl_DecrRefCount(result);return TCL_ERROR;}
@@ -1320,9 +1320,9 @@ int ExtraL_StructlgetObjCmd(notUsed, interp, objc, objv)
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_StructlfieldsObjCmd --
+ * ExtraL_MapfieldsObjCmd --
  *
- *		This procedure is invoked to process the "structlfields" command.
+ *		This procedure is invoked to process the "map_fields" command.
  *
  * Results:
  *		A standard Tcl result.
@@ -1331,7 +1331,7 @@ int ExtraL_StructlgetObjCmd(notUsed, interp, objc, objv)
  *----------------------------------------------------------------------
  */
 
-int ExtraL_StructlfieldsObjCmd(notUsed, interp, objc, objv)
+int ExtraL_MapfieldsObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;				 /* Not used. */
 	Tcl_Interp *interp;					/* Current interpreter. */
 	int objc;						/* Number of arguments. */
@@ -1349,11 +1349,11 @@ int ExtraL_StructlfieldsObjCmd(notUsed, interp, objc, objv)
 	list = objv[1];
 	if (objc==2) {
 		tags = Tcl_NewObj();
-		error = ExtraL_Structlget(interp, list, tags, &list);
+		error = ExtraL_Mapget(interp, list, tags, &list);
 		Tcl_DecrRefCount(tags);
 	} else {
 		tags = objv[2];
-		error = ExtraL_Structlget(interp, list, tags, &list);
+		error = ExtraL_Mapget(interp, list, tags, &list);
 	}
 
 	if (error != TCL_OK) {return error;}
@@ -1404,9 +1404,9 @@ int ExtraL_StructlfieldsObjCmd(notUsed, interp, objc, objv)
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_StructlfindCmd --
+ * ExtraL_MapfindCmd --
  *
- *		This procedure is invoked to process the "structlfind" command.
+ *		This procedure is invoked to process the "map_find" command.
  *
  * Results:
  *		A standard Tcl result.
@@ -1415,7 +1415,7 @@ int ExtraL_StructlfieldsObjCmd(notUsed, interp, objc, objv)
  *----------------------------------------------------------------------
  */
 
-int ExtraL_StructlfindObjCmd(notUsed, interp, objc, objv)
+int ExtraL_MapfindObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;				 /* Not used. */
 	Tcl_Interp *interp;					/* Current interpreter. */
 	int objc;						/* Number of arguments. */
@@ -1462,28 +1462,28 @@ int ExtraL_StructlfindObjCmd(notUsed, interp, objc, objv)
 	return TCL_OK;
 }
 
-int Extral_StructlInit(interp)
+int ExtraL_MapInit(interp)
 	Tcl_Interp *interp;
 {
 	Tcl_InitHashTable(&typesTable,TCL_STRING_KEYS);
-	Tcl_CreateObjCommand(interp,"structlist_set",(Tcl_ObjCmdProc *)ExtraL_StructlsetObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"structlist_unset",(Tcl_ObjCmdProc *)ExtraL_StructlunsetObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"structlist_get",(Tcl_ObjCmdProc *)ExtraL_StructlgetObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"structlist_fields",(Tcl_ObjCmdProc *)ExtraL_StructlfieldsObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"structlist_find",(Tcl_ObjCmdProc *)ExtraL_StructlfindObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	ExtraL_StructlCreateType(interp,"*string",(ExtraL_StructlTypeSetProc *)NULL,(ExtraL_StructlTypeGetProc *)NULL,(ExtraL_StructlTypeUnsetProc *)NULL);
-	ExtraL_StructlCreateType(interp,"*text",(ExtraL_StructlTypeSetProc *)NULL,(ExtraL_StructlTypeGetProc *)NULL,(ExtraL_StructlTypeUnsetProc *)NULL);
-	ExtraL_StructlCreateType(interp,"*any",(ExtraL_StructlTypeSetProc *)NULL,(ExtraL_StructlTypeGetProc *)NULL,(ExtraL_StructlTypeUnsetProc *)NULL);
-	ExtraL_StructlCreateType(interp,"*int",(ExtraL_StructlTypeSetProc *)ExtraL_StructlSetInt,(ExtraL_StructlTypeGetProc *)NULL,(ExtraL_StructlTypeUnsetProc *)NULL);
-	ExtraL_StructlCreateType(interp,"*double",(ExtraL_StructlTypeSetProc *)ExtraL_StructlSetDouble,(ExtraL_StructlTypeGetProc *)NULL,(ExtraL_StructlTypeUnsetProc *)NULL);
-	ExtraL_StructlCreateType(interp,"*bool",(ExtraL_StructlTypeSetProc *)ExtraL_StructlSetBool,(ExtraL_StructlTypeGetProc *)NULL,(ExtraL_StructlTypeUnsetProc *)NULL);
-	ExtraL_StructlCreateType(interp,"*regexp",(ExtraL_StructlTypeSetProc *)ExtraL_StructlSetRegexp,(ExtraL_StructlTypeGetProc *)NULL,(ExtraL_StructlTypeUnsetProc *)NULL);
-	ExtraL_StructlCreateType(interp,"*between",(ExtraL_StructlTypeSetProc *)ExtraL_StructlSetBetween,(ExtraL_StructlTypeGetProc *)NULL,(ExtraL_StructlTypeUnsetProc *)NULL);
-	ExtraL_StructlCreateType(interp,"*dbetween",(ExtraL_StructlTypeSetProc *)ExtraL_StructlSetDBetween,(ExtraL_StructlTypeGetProc *)NULL,(ExtraL_StructlTypeUnsetProc *)NULL);
-	ExtraL_StructlCreateType(interp,"*date",(ExtraL_StructlTypeSetProc *)ExtraL_StructlSetDate,(ExtraL_StructlTypeGetProc *)ExtraL_StructlGetDate,(ExtraL_StructlTypeUnsetProc *)NULL);
-	ExtraL_StructlCreateType(interp,"*time",(ExtraL_StructlTypeSetProc *)ExtraL_StructlSetTime,(ExtraL_StructlTypeGetProc *)ExtraL_StructlGetTime,(ExtraL_StructlTypeUnsetProc *)NULL);
-	ExtraL_StructlCreateType(interp,"*list",(ExtraL_StructlTypeSetProc *)ExtraL_StructlSetList,(ExtraL_StructlTypeGetProc *)ExtraL_StructlGetList,(ExtraL_StructlTypeUnsetProc *)ExtraL_StructlUnsetList);
-	ExtraL_StructlCreateType(interp,"*named",(ExtraL_StructlTypeSetProc *)ExtraL_StructlSetNamed,(ExtraL_StructlTypeGetProc *)ExtraL_StructlGetNamed,(ExtraL_StructlTypeUnsetProc *)ExtraL_StructlUnsetNamed);
+	Tcl_CreateObjCommand(interp,"map_set",(Tcl_ObjCmdProc *)ExtraL_MapsetObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"map_unset",(Tcl_ObjCmdProc *)ExtraL_MapunsetObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"map_get",(Tcl_ObjCmdProc *)ExtraL_MapgetObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"map_fields",(Tcl_ObjCmdProc *)ExtraL_MapfieldsObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"map_find",(Tcl_ObjCmdProc *)ExtraL_MapfindObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	ExtraL_MapCreateType(interp,"*string",(ExtraL_MapTypeSetProc *)NULL,(ExtraL_MapTypeGetProc *)NULL,(ExtraL_MapTypeUnsetProc *)NULL);
+	ExtraL_MapCreateType(interp,"*text",(ExtraL_MapTypeSetProc *)NULL,(ExtraL_MapTypeGetProc *)NULL,(ExtraL_MapTypeUnsetProc *)NULL);
+	ExtraL_MapCreateType(interp,"*any",(ExtraL_MapTypeSetProc *)NULL,(ExtraL_MapTypeGetProc *)NULL,(ExtraL_MapTypeUnsetProc *)NULL);
+	ExtraL_MapCreateType(interp,"*int",(ExtraL_MapTypeSetProc *)ExtraL_MapSetInt,(ExtraL_MapTypeGetProc *)NULL,(ExtraL_MapTypeUnsetProc *)NULL);
+	ExtraL_MapCreateType(interp,"*double",(ExtraL_MapTypeSetProc *)ExtraL_MapSetDouble,(ExtraL_MapTypeGetProc *)NULL,(ExtraL_MapTypeUnsetProc *)NULL);
+	ExtraL_MapCreateType(interp,"*bool",(ExtraL_MapTypeSetProc *)ExtraL_MapSetBool,(ExtraL_MapTypeGetProc *)NULL,(ExtraL_MapTypeUnsetProc *)NULL);
+	ExtraL_MapCreateType(interp,"*regexp",(ExtraL_MapTypeSetProc *)ExtraL_MapSetRegexp,(ExtraL_MapTypeGetProc *)NULL,(ExtraL_MapTypeUnsetProc *)NULL);
+	ExtraL_MapCreateType(interp,"*between",(ExtraL_MapTypeSetProc *)ExtraL_MapSetBetween,(ExtraL_MapTypeGetProc *)NULL,(ExtraL_MapTypeUnsetProc *)NULL);
+	ExtraL_MapCreateType(interp,"*dbetween",(ExtraL_MapTypeSetProc *)ExtraL_MapSetDBetween,(ExtraL_MapTypeGetProc *)NULL,(ExtraL_MapTypeUnsetProc *)NULL);
+	ExtraL_MapCreateType(interp,"*date",(ExtraL_MapTypeSetProc *)ExtraL_MapSetDate,(ExtraL_MapTypeGetProc *)ExtraL_MapGetDate,(ExtraL_MapTypeUnsetProc *)NULL);
+	ExtraL_MapCreateType(interp,"*time",(ExtraL_MapTypeSetProc *)ExtraL_MapSetTime,(ExtraL_MapTypeGetProc *)ExtraL_MapGetTime,(ExtraL_MapTypeUnsetProc *)NULL);
+	ExtraL_MapCreateType(interp,"*list",(ExtraL_MapTypeSetProc *)ExtraL_MapSetList,(ExtraL_MapTypeGetProc *)ExtraL_MapGetList,(ExtraL_MapTypeUnsetProc *)ExtraL_MapUnsetList);
+	ExtraL_MapCreateType(interp,"*named",(ExtraL_MapTypeSetProc *)ExtraL_MapSetNamed,(ExtraL_MapTypeGetProc *)ExtraL_MapGetNamed,(ExtraL_MapTypeUnsetProc *)ExtraL_MapUnsetNamed);
 	return TCL_OK;
 }
 

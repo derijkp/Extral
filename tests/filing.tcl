@@ -39,8 +39,20 @@ test file_fullpath {basic} {
 	file_fullpath /tmp/try.txt
 } /tmp/try.txt
 
-test file_fullpath {basic} {
+test file_fullpath {relative} {
 	file_fullpath try.txt
+} [file join [pwd] try.txt]
+
+test file_fullpath {.} {
+	file_fullpath ./try.txt
+} [file join [pwd] try.txt]
+
+test file_fullpath {..} {
+	file_fullpath try/../try.txt
+} [file join [pwd] try.txt]
+
+test file_fullpath {..} {
+	file_fullpath try/it/../../try.txt
 } [file join [pwd] try.txt]
 
 testsummarize

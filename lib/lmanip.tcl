@@ -200,3 +200,29 @@ proc list_ffill {args} {
 	}
 	return $result
 }
+
+#doc {listcommands list_select} cmd {
+#list_subindex ?list? ?pos?
+#} descr {
+#	selects all elements of a list that match a certain pattern. Default mode is -glob
+#} example {
+#	% list_select {a b ab bc} a*
+#	a ab
+#	% list_select -regexp {a ab aa bc} {^[ab]*$}
+#	a ab aa
+#}
+proc list_select {args} {
+	if {[llength $args]==2} {
+		set list [lindex $args 0]
+		set pattern [lindex $args 1]
+		set mode -glob
+	} elseif {[llength $args]==3} {
+		set mode [lindex $args 0]
+		set list [lindex $args 1]
+		set pattern [lindex $args 2]
+	} else {
+		error "Format is \"list_select ?mode? list pattern\""
+	}
+	return [list_sub $list [list_find $mode $list $pattern]]
+}
+

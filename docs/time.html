@@ -5,16 +5,19 @@
 <h1>Date and time</h1>
 
 The time_scan transforms a string containing date and/or time into a 
-double value (number of seconds since 0). These values can
-be sorted, compared or stored, and transformed back into a human readable
-date and time string using the time_format command. The clock scan and
+a list of two integers (number of days since 0, and number of miliseconds in that day). 
+These values can be sorted (-dictionary), compared or stored, and transformed back 
+into a human readable date and time string using the time_format command. The clock scan and
 format commands in Tcl give up before somewhere before 1901 and after
 2037, which is a bit of a bummer (eg. for genealogy). The transformation
-takes into account leap-years properly (I hope). However, it extrapolated
+takes into account leap-years properly. However, it extrapolated
 the current rule to the past (so eg. 0004 BC is a leap year), and doesn't
 take into account the meddling that has happened to time over 
-time (missing days, ...). I don't know enough about that to do this
-correctly.
+time (missing days, ...) because this is nearly impossible to do
+correctly (I am not an historian).
+The format of the internal time has been changed since a previous version to using a 
+list of two integers instead of one double value because the accuracy was not good 
+enough to store miliseconds
 
 <dl><b><dt>
 time_scan time ?date/time/both?
@@ -22,7 +25,7 @@ time_scan time ?date/time/both?
 	!! the year should be specified fully (>=4 numbers)
 <br>eg.:<pre>
 	% time_scan {9 May 1997 12:30}
-	62998777800.0
+	729152 45000000
 </pre>
 <b><dt>
 time_format time ?formatstring?
@@ -40,12 +43,12 @@ time_format time ?formatstring?
 	%H : hour
 	%M : minute
 	%S : second
-	%s : hundreds of a second
+	%s : miliseconds
 </pre>
 <br>eg.:<pre>
-	% time_format 62998777800.0
-	1997 May 09 12:30:00
-	% time_format 62998777800.0 "%B %e %Y"
+	% time_format {729152 45000000}
+	1997-05-09 12:30:00
+	% time_format {729152 45000000} "%B %e %Y"
 	May 9 1997
 </pre>
 </body>

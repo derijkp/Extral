@@ -25,27 +25,27 @@ EXTERN int ExtraL_ScanTime _ANSI_ARGS_((Tcl_Interp *interp,
 	int musthavedate,
 	int musthavetime,
 	Tcl_Obj *dateObj,
-	double *resultPtr));
+	Tcl_Obj **result));
 
 EXTERN int ExtraL_FormatTime _ANSI_ARGS_((Tcl_Interp *interp,
-	double time,
+	Tcl_Obj *time,
 	char *format,
 	char **result));
 
 /*
- * structl functions and definitions
+ * map functions and definitions
  */
 
-typedef int ExtraL_StructlTypeSetProc _ANSI_ARGS_((Tcl_Interp *interp,
+typedef int ExtraL_MapTypeSetProc _ANSI_ARGS_((Tcl_Interp *interp,
 	Tcl_Obj *structure,Tcl_Obj *data,Tcl_Obj *oldvalue,int tagsc,Tcl_Obj **tagsv,
 	Tcl_Obj **value));
-typedef int ExtraL_StructlTypeGetProc _ANSI_ARGS_((Tcl_Interp *interp,
+typedef int ExtraL_MapTypeGetProc _ANSI_ARGS_((Tcl_Interp *interp,
 	Tcl_Obj *structure,Tcl_Obj *data,int tagsc,Tcl_Obj **tagsv,
 	Tcl_Obj **value));
-typedef int ExtraL_StructlTypeUnsetProc _ANSI_ARGS_((Tcl_Interp *interp,
+typedef int ExtraL_MapTypeUnsetProc _ANSI_ARGS_((Tcl_Interp *interp,
 	Tcl_Obj *structure,Tcl_Obj *data,Tcl_Obj *oldvalue,int tagsc,Tcl_Obj **tagsv,
 	Tcl_Obj **value));
-EXTERN int ExtraL_StructlsetStruct _ANSI_ARGS_((Tcl_Interp *interp,
+EXTERN int ExtraL_MapsetStruct _ANSI_ARGS_((Tcl_Interp *interp,
 	Tcl_Obj *structure,
 	Tcl_Obj *data,
 	Tcl_Obj *list,
@@ -54,7 +54,7 @@ EXTERN int ExtraL_StructlsetStruct _ANSI_ARGS_((Tcl_Interp *interp,
 	Tcl_Obj *value,
 	Tcl_Obj **resultPtr));
 
-EXTERN int ExtraL_StructlunsetStruct _ANSI_ARGS_((Tcl_Interp *interp,
+EXTERN int ExtraL_MapunsetStruct _ANSI_ARGS_((Tcl_Interp *interp,
 	Tcl_Obj *structure,
 	Tcl_Obj *data,
 	Tcl_Obj *list,
@@ -62,7 +62,7 @@ EXTERN int ExtraL_StructlunsetStruct _ANSI_ARGS_((Tcl_Interp *interp,
 	Tcl_Obj **tagsv,
 	Tcl_Obj **resultPtr));
 
-EXTERN int ExtraL_StructlgetStruct _ANSI_ARGS_((Tcl_Interp *interp,
+EXTERN int ExtraL_MapgetStruct _ANSI_ARGS_((Tcl_Interp *interp,
 	Tcl_Obj *structure,
 	Tcl_Obj *data,
 	Tcl_Obj *list,
@@ -71,13 +71,13 @@ EXTERN int ExtraL_StructlgetStruct _ANSI_ARGS_((Tcl_Interp *interp,
 	Tcl_Obj **resultPtr));
 
 
-EXTERN int ExtraL_StructlCreateType _ANSI_ARGS_((Tcl_Interp *interp,
+EXTERN int ExtraL_MapCreateType _ANSI_ARGS_((Tcl_Interp *interp,
 	char *key,
-	ExtraL_StructlTypeSetProc *setproc,
-	ExtraL_StructlTypeGetProc *getproc,
-	ExtraL_StructlTypeUnsetProc *unsetproc));
+	ExtraL_MapTypeSetProc *setproc,
+	ExtraL_MapTypeGetProc *getproc,
+	ExtraL_MapTypeUnsetProc *unsetproc));
 
-EXTERN int ExtraL_StructlFindTag _ANSI_ARGS_((Tcl_Interp *interp,
+EXTERN int ExtraL_MapFindTag _ANSI_ARGS_((Tcl_Interp *interp,
 	Tcl_Obj *list,
 	char *tag,
 	int taglen,

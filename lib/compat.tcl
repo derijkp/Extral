@@ -18,7 +18,7 @@ foreach option {
 }
 
 foreach option {set get unset fields} {
-	catch {interp alias {} structl$option {} structlist_$new}
+	catch {interp alias {} structl$option {} map_$new}
 }
 
 foreach option {read write} {

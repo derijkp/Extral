@@ -1,3 +1,7 @@
+source tools.tcl
+time_format {0 10000}
+
+if 0 {
 namespace eval ::Extral {}
 set ::Extral::dir /home/peter/dev/Extral
 source /home/peter/dev/Extral/lib/init.tcl
@@ -49,10 +53,10 @@ uncompress $try
 package require Extral 1
 
 set try {a 1 b 2 c {a 1 b 2 c {a 1 b 2}}}
-structlist_unset $try {c c a}
-structlist_unset $try {c a}
-structlist_unset $try c
-structlist_unset $try {c d}
+map_unset $try {c c a}
+map_unset $try {c a}
+map_unset $try c
+map_unset $try {c d}
 
 set try
 
@@ -64,7 +68,7 @@ wm withdraw .
 catch {unset try}
 set try {a 1 b 2 c 3 d 4 e 5 f 6 g 7 h 8 i 9 j 10}
 time {
-structlist_get try g
+map_get try g
 } 100
 
 catch {unset try}
@@ -72,17 +76,17 @@ for {set i 0} {$i<100} {incr i} {
 lappend try tryingit$i tryingit$i
 }
 time {
-structlist_get try tryingit98
+map_get try tryingit98
 } 100
 
 
 # 210
 time {
-structlist_set $try g try
+map_set $try g try
 }
 # 501 422
 time {
-structlist_unset $try g
+map_unset $try g
 }
 
 set file temp
@@ -282,3 +286,4 @@ menu file.try
 		}
 	}
 
+}

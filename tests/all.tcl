@@ -25,12 +25,12 @@ alltest lmanip.tcl
 alltest string.tcl
 alltest convenience.tcl
 alltest array.tcl
-alltest date.tcl
+alltest time.tcl
 alltest filing.tcl
 alltest cmd.tcl
 alltest tempfile.tcl
 alltest struct.tcl
-alltest structlist.tcl
-alltest structlstruct.tcl
-alltest structltypes.tcl
+alltest map.tcl
+alltest map-map.tcl
+alltest maptypes.tcl
 alltest ssort.tcl

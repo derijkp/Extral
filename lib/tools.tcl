@@ -154,8 +154,11 @@ proc random {min max} {
 #}
 proc putsvars {args} {
 	foreach var $args {
-		set value [uplevel set $var]
-		puts [list set $var $value]
+		if {[catch {uplevel set $var} value]} {
+			puts [list unset $var]
+		} else {
+			puts [list set $var $value]
+		}
 	}
 }
 
@@ -169,6 +172,15 @@ proc error_preserve {} {
 	upvar ::Classy::error_preserve keep
 	set keep(Info) $::errorInfo
 	set keep(Code) $::errorCode
+}
+
+#doc {convenience today} cmd {
+# today
+#} descr {
+# returns current time in astronomical format: "%Y-%m-%d %H:%M:%S"
+#}
+proc today {} {
+	return [clock format [clock seconds] -format "%Y-%m-%d %H:%M:%S"]
 }
 
 proc error_restore {} {

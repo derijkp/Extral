@@ -243,4 +243,14 @@ list_fill ?size? ?start? ??incr??
 	% list_fill 5 10 -2
 	10 8 6 4 2
 </pre>
+<b><dt>
+list_subindex ?list? ?pos?
+</b><dd>
+	selects all elements of a list that match a certain pattern. Default mode is -glob
+<br>eg.:<pre>
+	% list_select {a b ab bc} a*
+	a ab
+	% list_select -regexp {a ab aa bc} {^[ab]*$}
+	a ab aa
+</pre>
 </body>

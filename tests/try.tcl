@@ -4,10 +4,13 @@ if 0 {
 }
 source tools.tcl
 
-test structlist_get-list {list test type, 1 to end} {
-	set struct {a {*list {*int ?}}}
-	set try {a {1 2 3 4}}
-	structlist_get -struct $struct $try {a {0 end {lmath_sum}}}
-} {10}
+set value {
+SPTREMBL; Q37382; Q37382.
+SWISS-PROT; P46753; RT02_ACACA.
+SWISS-PROT; P46754; RT03_ACACA.
+}
 
+string_change $value [list \; {} \n {}]
+
+string_change $value "\; {} \n {}"
 

@@ -357,6 +357,7 @@ proc list_unmerge {args} {
 	} else {
 		set spacing 1
 	}
+	if ![isint $spacing] {error "spacing \"$spacing\" is not an integer"}
 	if {$spacing==1} {
 		foreach {e1 e2} [lindex $args 0] {
 			lappend result $e1

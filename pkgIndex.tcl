@@ -7,8 +7,8 @@
 # script is sourced, the variable $dir must contain the
 # full path name of this file's directory.
 
-# $Format: "package ifneeded Extral 1.$ProjectMajorVersion: 1 $ \"$
-package ifneeded Extral 1.1 \
+# $Format: "package ifneeded Extral 2.$ProjectMajorVersion: 0 $ \"$
+package ifneeded Extral 2.0 \
 	"[list namespace eval ::Extral {}] ; [list set ::Extral::execdir $dir] ; \
 	if \[[list file exists [file join $dir lib init.tcl]]\] \
 		\{[list source [file join $dir lib init.tcl]]\} \

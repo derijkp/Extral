@@ -55,6 +55,15 @@ test string_change {in index, but not in list} {
 string_change {tkEntryButton1 %W %x} {{[::Classy::rebind %W]} %W %W %O}
 } {tkEntryButton1 %O %x}
 
+test string_change {bugfix} {
+set value {
+SPTREMBL; Q37382; Q37382.
+SWISS-PROT; P46753; RT02_ACACA.
+SWISS-PROT; P46754; RT03_ACACA.
+}
+string_change $value "\; {} \n {}"
+} 1
+
 test string_reverse {basic} {
 	string_reverse {abc def}
 } {fed cba}
@@ -102,5 +111,17 @@ test string_replace {insert} {
 test string_fill {basic} {
 	string_fill ab 5
 } ababababab
+
+test string_equal {basic} {
+	string_equal ab ab
+} 1
+
+test string_equal {basic} {
+	string_equal ab ac
+} 0
+
+test string_equal {basic} {
+	string_equal 2.1 2.10
+} 0
 
 testsummarize

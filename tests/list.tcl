@@ -399,6 +399,14 @@ test list_change {basic} {
 	list_change {a b aa c aa g} {aa x g y}
 } {a b x c x y}
 
+test list_select {basic} {
+	list_select {a b ab bc} a*
+} {a ab}
+
+test list_select {-regexp} {
+	list_select -regexp {a ab aa bc} {^[ab]*$}
+} {a ab aa}
+
 # no test yet for
 # list_load <filename>
 # list_write ?file? ?list?

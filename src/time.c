@@ -21,25 +21,24 @@
  *----------------------------------------------------------------------
  */
 
-int ExtraL_ScanTime(interp,musthavedate,musthavetime,dateObj,resultPtr)
+int ExtraL_ScanTime(interp,musthavedate,musthavetime,dateObj,resultObj)
 	Tcl_Interp *interp;
 	int musthavedate;
 	int musthavetime;
 	Tcl_Obj *dateObj;
-	double *resultPtr;
+	Tcl_Obj **resultObj;
 {
+	Tcl_Obj *el;
 	char *date;
-	char temp[6];
+	char temp[8];
 	char *ctemp = NULL;
 	char ch;
 	int year=-1,month=-1,day=-1,bc=0,hour=-1,min=-1,sec=-1,ms=-1;
 	int first=-1,second=-1,days=-1,schrikkel = 0;
 	int busyhour=0;
-	int i,j,len,temppos;
+	int i,j,len,temppos,prevnum=0;
 	int error,result;
-
 	date = Tcl_GetStringFromObj(dateObj,&len);
-
 	temppos = 0;
 	i=0;
 	while(i<=len) {
@@ -48,35 +47,56 @@ int ExtraL_ScanTime(interp,musthavedate,musthavetime,dateObj,resultPtr)
 		} else {
 			ch = ' ';
 		}
-		if ((ch == ':')||((ch == ' ')&&(busyhour == 1))) {
+		if ((ch == ':')||(ch == '.')||((ch == ' ')&&(busyhour == 1))) {
+			int pos;
 			if (temppos == 0) {
 				i++;
 				continue;
 			}
-			if (ch == ':') {
+			if ((ch == ':')||(ch == '.')) {
 				busyhour = 1;
 			} else {
 				busyhour = 0;
 			}
 			temp[temppos] = '\0';
-			if ((temp[0] == '0')&&(temppos > 1)) {
-				int i;
-				for(i=1;i<=temppos;i++) {
-					temp[i-1] = temp[i];
-				}
-			}
+			pos = 0;
 			if (hour == -1) {
-				error = Tcl_GetInt(interp, temp, &hour);
+				while (pos < (temppos-1)) {
+					if (temp[pos] != '0') break;
+					pos++;
+				}
+				error = Tcl_GetInt(interp, temp+pos, &hour);
 				if (error != TCL_OK) {return error;}
 			} else if (min == -1) {
-				error = Tcl_GetInt(interp, temp, &min);
+				while (pos < (temppos-1)) {
+					if (temp[pos] != '0') break;
+					pos++;
+				}
+				error = Tcl_GetInt(interp, temp+pos, &min);
 				if (error != TCL_OK) {return error;}
 			} else if (sec == -1) {
-				error = Tcl_GetInt(interp, temp, &sec);
+				while (pos < (temppos-1)) {
+					if (temp[pos] != '0') break;
+					pos++;
+				}
+				error = Tcl_GetInt(interp, temp+pos, &sec);
 				if (error != TCL_OK) {return error;}
 			} else if (ms == -1) {
-				error = Tcl_GetInt(interp, temp, &ms);
-				if (error != TCL_OK) {return error;}
+				int len,p,t,i;
+				p = 100;
+				ms = 0;
+				i = 0;
+				while(1) {
+					if (temp[i] == '\0') break;
+					t = temp[i]-48;
+					if ((t < 0)||(t > 9)) {
+						Tcl_AppendResult(interp,"Error in formatting of miliseconds",(char *)NULL);
+						return TCL_ERROR;
+					}
+					ms += p*t;
+					p /= 10;
+					i++;
+				}
 			}
 			temppos = 0;
 		} else if ((ispunct(ch)!=0)||(ch==' ')) {
@@ -93,6 +113,17 @@ int ExtraL_ScanTime(interp,musthavedate,musthavetime,dateObj,resultPtr)
 				if (*start == '\0') {
 					year = 0;
 				} else {
+					int i=0;
+					while (i<temppos) {
+						if (!isdigit(temp[i])) break;
+						i++;
+					}
+					if (i != temppos) {
+						if (((i+1)<temppos)&&((temp[i]=='B')||(temp[i]=='b'))&&((temp[i+1]=='C')||(temp[i+1]=='c'))) {
+							bc = 1;
+						}
+						temp[i] = '\0';
+					}
 					error = Tcl_GetInt(interp, start, &year);
 					if (error != TCL_OK) {return error;}
 				}
@@ -130,7 +161,7 @@ int ExtraL_ScanTime(interp,musthavedate,musthavetime,dateObj,resultPtr)
 			temppos = 0;
 		} else {
 			temp[temppos++] = tolower(ch);
-			if (temppos == 6) {
+			if (temppos == 8) {
 				temp[5]='\0';
 				temppos = 0;
 				Tcl_ResetResult(interp);
@@ -140,7 +171,6 @@ int ExtraL_ScanTime(interp,musthavedate,musthavetime,dateObj,resultPtr)
 		}
 		i++;
 	}
-
 	if (month == -1) {
 		month = first;
 		day = second;
@@ -176,7 +206,6 @@ int ExtraL_ScanTime(interp,musthavedate,musthavetime,dateObj,resultPtr)
 		Tcl_AppendResult(interp,"error while parsing date in \"",date, "\": invalid month", (char *)NULL);
 		return TCL_ERROR;
 	}
-
 	/* check and calculate days */
 	if (year==0) {
 		ctemp = "(unfortunately) there is no year 0";
@@ -291,7 +320,7 @@ int ExtraL_ScanTime(interp,musthavedate,musthavetime,dateObj,resultPtr)
 		ctemp = "invalid seconds";
 	}
 	if (ms == -1) {ms = 0;}
-	if ((ms<0)||(ms>99)) {
+	if ((ms<0)||(ms>999)) {
 		ctemp = "invalid miliseconds";
 	}
 	if (ctemp != NULL) {
@@ -299,7 +328,13 @@ int ExtraL_ScanTime(interp,musthavedate,musthavetime,dateObj,resultPtr)
 		Tcl_AppendResult(interp,"error while parsing time in \"",date, "\": ", ctemp, (char *)NULL);
 		return TCL_ERROR;
 	}
-	*resultPtr = result*86400.0 + hour*3600.0 + min*60.0 + sec + ms/100.0;
+	*resultObj = Tcl_NewListObj(0,NULL);
+	el = Tcl_NewIntObj(result);
+	error = Tcl_ListObjAppendElement(interp, *resultObj, el);
+	if (error) {Tcl_DecrRefCount(*resultObj);*resultObj = NULL;Tcl_DecrRefCount(el);return TCL_ERROR;}
+	el = Tcl_NewIntObj(hour*3600000 + min*60000 + sec*1000 + ms);
+	error = Tcl_ListObjAppendElement(interp, *resultObj, el);
+	if (error) {Tcl_DecrRefCount(*resultObj);*resultObj = NULL;Tcl_DecrRefCount(el);return TCL_ERROR;}
 	return TCL_OK;
 }
 
@@ -324,10 +359,10 @@ ExtraL_ScanTimeObjCmd(notUsed, interp, objc, objv)
 	int objc;						/* Number of arguments. */
 	Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
+	Tcl_Obj *result,*el;
 	char *temp;
-	double result;
 	int musthavedate,musthavetime;
-	int error;
+	int error,days,ms;
 
 	if ((objc != 2)&&(objc != 3)) {
 		Tcl_WrongNumArgs(interp, 1, objv, "time ?date/time/both?");
@@ -352,7 +387,7 @@ ExtraL_ScanTimeObjCmd(notUsed, interp, objc, objv)
 	}
 	error = ExtraL_ScanTime(interp,musthavedate,musthavetime,objv[1],&result);
 	if (error != TCL_OK) {return error;}
-	Tcl_SetObjResult(interp,Tcl_NewDoubleObj(result));
+	Tcl_SetObjResult(interp,result);
 	return TCL_OK;
 }
 
@@ -364,8 +399,205 @@ ExtraL_ScanTimeObjCmd(notUsed, interp, objc, objv)
  *----------------------------------------------------------------------
  */
 
+
 int
-ExtraL_FormatTime(Tcl_Interp *interp, double time, char *format, char **result)
+ExtraL_FormatTime(Tcl_Interp *interp, Tcl_Obj *timeObj, char *format, char **result)
+{
+	Tcl_Obj **listv;
+	int listc;
+	char *buffer, *fpos, *temp, *smonth;
+	char b[2];
+	int buffersize=1;
+	int i,error;
+	int year=-1,month=-1,day=-1,bc=0,hour=-1,min=-1,sec=-1,ms=-1;
+	int date,time,days, schrikkel=0;
+	int seconds;
+
+	error = Tcl_ListObjGetElements(interp, timeObj, &listc, &listv);
+	if (listc != 2) {
+		Tcl_AppendResult(interp,"time should be a list of two integers (or a double for the old format)", (char *)NULL);
+		return TCL_ERROR;
+	}
+	error = Tcl_GetIntFromObj(interp,listv[0], &date);
+	if (error) {return TCL_ERROR;}
+	error = Tcl_GetIntFromObj(interp,listv[1], &time);
+	if (error) {return TCL_ERROR;}
+	/* get date */
+	if (date<0) {
+		bc = 1;
+		date = -date;
+	}
+	days = date;
+	/* Start from something likely, try to add 1 year untill we get more days than given */
+	year = (int)floor((double)days/365.25);
+	while(1) {
+		i = year+1;
+		i = i*365 + i/4 - i/100 + i/400;
+		if (bc == 1) {
+			if (i>=days) break;
+		} else if (i>days) break;
+		year++;
+	}
+	/* How many days left after substracting all the days in the years accounted for */
+	days = days - (year*365 + year/4 - year/100 + year/400);
+	year++;
+	if (year%4 == 0) {
+		if ((year%100 != 0)||(year%400 == 0)) {
+			schrikkel = 1;
+		}
+	}
+	if (bc == 1) {
+		days = 365 + schrikkel - days + 1;
+	} else {
+		days++;
+	}
+	if (days>(334+schrikkel)) {
+		day = days-(334+schrikkel);
+		smonth = "December";
+		month = 12;
+	} else if (days>(304+schrikkel)) {
+		day = days-(304+schrikkel);
+		smonth = "November";
+		month = 11;
+	} else if (days>(273+schrikkel)) {
+		day = days-(273+schrikkel);
+		smonth = "October";
+		month = 10;
+	} else if (days>(243+schrikkel)) {
+		day = days-(243+schrikkel);
+		smonth = "September";
+		month = 9;
+	} else if (days>(212+schrikkel)) {
+		day = days-(212+schrikkel);
+		smonth = "August";
+		month = 8;
+	} else if (days>(181+schrikkel)) {
+		day = days-(181+schrikkel);
+		smonth = "July";
+		month = 7;
+	} else if (days>(151+schrikkel)) {
+		day = days-(151+schrikkel);
+		smonth = "June";
+		month = 6;
+	} else if (days>(120+schrikkel)) {
+		day = days-(120+schrikkel);
+		smonth = "May";
+		month = 5;
+	} else if (days>(90+schrikkel)) {
+		day = days-(90+schrikkel);
+		smonth = "April";
+		month = 4;
+	} else if (days>(59+schrikkel)) {
+		day = days-(59+schrikkel);
+		smonth = "March";
+		month = 3;
+	} else if (days>31) {
+		day = days-31;
+		smonth = "February";
+		month = 2;
+	} else {
+		day = days;
+		smonth = "January";
+		month = 1;
+	}
+
+	/* get time */
+	seconds = (int)((double)time/1000.0);
+	ms = time - (seconds*1000);
+	hour = (int)floor((double)seconds/3600.0);
+	seconds = seconds - (hour*3600.0);
+	min = (int)floor(seconds/60.0);
+	seconds = seconds - (min*60.0);
+	sec = (int)(seconds);
+	seconds = seconds - sec;
+
+	temp = format;
+	while(*temp != '\0') {
+		if (*temp != '%') {
+			buffersize +=1;
+		} else if (temp[1] == 'Y') {
+			buffersize +=7;
+		} else if (temp[1] == 'B') {
+			buffersize += strlen(smonth);
+		} else {
+			buffersize +=3;
+		}
+		temp++;
+	}
+	buffer = Tcl_Alloc(buffersize*sizeof(char));
+	if (buffer == NULL) {return TCL_ERROR;}
+	fpos = format;
+	i = 0;
+	while(*fpos != '\0') {
+		if (*fpos == '%') {
+			fpos++;
+			if (*fpos == '\0') break;
+			switch(*fpos) {
+				case '%' :
+					buffer[i++] = '%';
+					break;
+				case 'Y' :
+					i += sprintf(buffer+i,"%4.4d",year);
+					if (bc == 1) {
+						i += sprintf(buffer+i,"BC");
+					}
+					break;
+				case 'd' :
+					i += sprintf(buffer+i,"%2.2d",day);
+					break;
+				case 'e' :
+					i += sprintf(buffer+i,"%d",day);
+					break;
+				case 'j' :
+					i += sprintf(buffer+i,"%3.3d",days);
+					break;
+				case 'm' :
+					i += sprintf(buffer+i,"%2.2d",month);
+					break;
+				case 'b' :
+					i += sprintf(buffer+i,"%3.3s",smonth);
+					break;
+				case 'B' :
+					i += sprintf(buffer+i,"%s",smonth);
+					break;
+				case 'H' :
+					i += sprintf(buffer+i,"%2.2d",hour);
+					break;
+				case 'M' :
+					i += sprintf(buffer+i,"%2.2d",min);
+					break;
+				case 'S' :
+					i += sprintf(buffer+i,"%2.2d",sec);
+					break;
+				case 's' :
+					i += sprintf(buffer+i,"%3.3d",ms);
+					break;
+				default :
+					Tcl_ResetResult(interp);
+					b[0]=*fpos;
+					b[1]='\0';
+					Tcl_AppendResult(interp,"format option ", b, " not supported", (char *)NULL);
+					return TCL_ERROR;
+			}
+		} else {
+			buffer[i++] = *fpos;
+		}
+		fpos++;
+	}
+	*result = buffer;
+	return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * old FormatTime C API
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+ExtraL_FormatTime_old(Tcl_Interp *interp, double time, char *format, char **result)
 {
 	char *buffer, *fpos, *temp, *smonth;
 	char b[2];
@@ -495,7 +727,7 @@ ExtraL_FormatTime(Tcl_Interp *interp, double time, char *format, char **result)
 				case 'Y' :
 					i += sprintf(buffer+i,"%4.4d",year);
 					if (bc == 1) {
-						i += sprintf(buffer+i," BC");
+						i += sprintf(buffer+i,"BC");
 					}
 					break;
 				case 'd' :
@@ -567,29 +799,35 @@ ExtraL_FormatTimeObjCmd(notUsed, interp, objc, objv)
 {
 	char *format, *result;
 	double time;
-	int len;
+	int len,days,ms;
 	int error;
 
 	if ((objc != 2)&&(objc != 3)) {
 		Tcl_WrongNumArgs(interp, 1, objv, "time ?formatstring?");
 		return TCL_ERROR;
 	}
-
-	error = Tcl_GetDoubleFromObj(interp,objv[1], &time);
-	if (error != TCL_OK) {
-		Tcl_ResetResult(interp);
-		Tcl_AppendResult(interp,"time should be a double", (char *)NULL);
-		return TCL_ERROR;
-	}
 	if (objc == 3) {
 		format = Tcl_GetStringFromObj(objv[2],&len);
 	} else {
-		format = "%Y %b %d %H:%M:%S";
+		format = "%Y-%m-%d %H:%M:%S";
 		len = 23;
 	}
-	error = ExtraL_FormatTime(interp, time, format, &result);
+	error = Tcl_ListObjLength(interp, objv[1], &len);
+	if (len == 2) {
+		error = ExtraL_FormatTime(interp, objv[1], format, &result);
+		if (error) {return error;}
+	} else {
+		error = Tcl_GetDoubleFromObj(interp,objv[1], &time);
+		if (error) {goto error;}
+		error = ExtraL_FormatTime_old(interp, time, format, &result);
+		if (error) {return error;}
+	}
 	Tcl_SetResult(interp,result,TCL_VOLATILE);
 	Tcl_Free(result);
 	return TCL_OK;
+	error:
+		Tcl_ResetResult(interp);
+		Tcl_AppendResult(interp,"time should be a list of two integers (or a double for the old format)", (char *)NULL);
+		return TCL_ERROR;
 }
 

@@ -1,0 +1,116 @@
+<HEAD>
+<TITLE>Maps</TITLE>
+</HEAD>
+<BODY>
+<h1>Maps</h1>
+
+In a map names (or fields) alternate with the value attached to this name,
+eg.: {name1 {value of name1} name2 {value of name2} ...}
+Using the map commands, you can use a list as a sort of array.
+However, maps have some advantages to arrays:
+<ul>
+<li>They can be passed to functions easily
+<li>maps can be nested: an element of a map can
+   contain another map, etc.
+<li>although finding a value in an array should be faster,
+   creating the array can take more time.
+<li>maps can be handled according to a certain schema using the -map option.
+</ul>
+ Using maps, data can be stored in a treelike structure (see examples further down).
+ Using the map_get and map_set functions, data in any of the branches or leaves can be
+ easily obtained or set, using a field (a list of names of successive branches).
+ <p>
+ Using the -map option a schema can be specified that puts constraints on which branches are 
+ allowed, and what values are allowed in the branches.
+ A schema is also organised as a map. when the first element in a value starts with 
+ an asterisk, it is an endnode. Otherwise it is the schema of the submap starting
+ at the name of that value.
+ An endnode consists of a type indicator (the first element starting with an asterisk) and 
+ type parameters. A number of types 
+ are available by default (*any, *int, *regexp, *date, *named *list, ...). 
+ New types can be added using either Tcl or C code.
+ <p>
+ If a schema contains names consisting of a list where element 0 is a questionmark these are treated specially: 
+ The list must have 2 further elements: element 1 is the long name for the value, and element
+ 2 the short name. Both long and short name can be used to set or get values from the map.
+ However, map_set will always return a struct with the short name (efficient storage), while
+ map_get will return the long form.
+
+<dl><b><dt>
+map_set ?-map schema? ?-data clientdata? list field value ?field value ...?
+</b><dd>
+ set the value of a field in the map. The -data option can be used to
+ pass data to self defined data types.
+<br>eg.:<pre>
+	set the value for tag
+		% set list {a 1 b 4}
+		a 1 b 4
+		% set list [map_set $list c 3]
+		a 1 b 4 c 3
+		% map_set {a 1 b 4 c 3} b 2
+		a 1 b 2 c 3
+	example of nesting:
+		% map_set {a 1 b {a 1 b 4} c 3} {b b} 2
+		a 1 b {a 1 b 2} c 3
+	example of map:
+		% set struct {
+			reg {*regexp {^a[0-9]} ?}
+			sub {
+				a {*any ?}
+				b {*between 0 10 ?}
+			}
+			ints {
+				*named {*int ?}
+			}
+		}
+		% set data {}
+		% set data [map_set -map $struct $data {sub b} 9]
+		sub {b 9}
+		% set data [map_set -map $struct $data {sub b} 11]
+		error: 11 is not between 0 and 10 at field "b" at field "sub"
+		% set data [map_set -map $struct $data ints {a 9}]
+		sub {b 9} ints {a 9}
+		% set data [map_set -map $struct $data {sub b} ?]
+		ints {a 9}
+</pre>
+<b><dt>
+map_get ?-map schema? list field ?field ...?
+</b><dd>
+get the value of a field in the map
+<br>eg.:<pre>
+	% set struct {
+		reg {*regexp {^a[0-9]} ?}
+		sub {
+			a {*any ?}
+			b {*between 0 10 ?}
+		}
+		ints {
+			*named {*int ?}
+		}
+	}
+	% map_get -map $struct {ints {a 9}} {sub b}
+	?
+	% map_get -map $struct {ints {a 9}} {ints}
+	a 9
+</pre>
+<b><dt>
+map_unset ?-map schema? ?-data clientdata? list field ?field ...?
+</b><dd>
+unset the value of a field in the map
+<br>eg.:<pre>
+	% map_unset {a 1 b 2} b
+	a 1
+</pre>
+<b><dt>
+map_fields list field ?valueVar?
+</b><dd>
+returns the fields present in the map list
+
+<b><dt>
+map_xml xml
+</b><dd>
+ puts the information in xml into a map
+ data (not in tags) will be placed in the map with the tag "_"
+<br>eg.:<pre>
+</pre>
+</body>

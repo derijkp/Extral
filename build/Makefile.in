@@ -11,7 +11,7 @@
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
-# RCS: @(#) $Id: Makefile.in 1.2 Tue, 08 Aug 2000 10:07:19 +0200 peter $
+# RCS: @(#) $Id: Makefile.in 1.1 Thu, 12 Apr 2001 15:47:01 +0200 peter $
 
 #========================================================================
 # Edit the following few lines when writing a new extension
@@ -35,7 +35,7 @@ SOURCE_DIR=$(srcdir)/../src
 
 Extral_SOURCES = $(SOURCE_DIR)/extral.c $(SOURCE_DIR)/extralInit.c \
 	$(SOURCE_DIR)/general.c $(SOURCE_DIR)/array.c $(SOURCE_DIR)/supersort.c \
-	$(SOURCE_DIR)/date.c $(SOURCE_DIR)/structl.c $(SOURCE_DIR)/structltypes.c \
+	$(SOURCE_DIR)/time.c $(SOURCE_DIR)/map.c $(SOURCE_DIR)/maptypes.c \
 	$(SOURCE_DIR)/string.c $(SOURCE_DIR)/list_pop.c
 SOURCES = $(Extral_SOURCES)
 
@@ -48,8 +48,8 @@ SOURCES = $(Extral_SOURCES)
 #========================================================================
 
 Extral_OBJECTS = extral.$(OBJEXT) extralInit.$(OBJEXT) general.$(OBJEXT) \
-	array.$(OBJEXT) supersort.$(OBJEXT) date.$(OBJEXT) structl.$(OBJEXT) \
-	structltypes.$(OBJEXT) string.$(OBJEXT) list_pop.$(OBJEXT)
+	array.$(OBJEXT) supersort.$(OBJEXT) time.$(OBJEXT) map.$(OBJEXT) \
+	maptypes.$(OBJEXT) string.$(OBJEXT) list_pop.$(OBJEXT)
 OBJECTS = $(Extral_OBJECTS)
 
 #========================================================================
@@ -308,7 +308,7 @@ $(Extral_LIB_FILE): $(Extral_OBJECTS)
 	$(RANLIB) $(Extral_LIB_FILE)
 
 extratcl: tclAppInit.$(OBJEXT) $(Extral_OBJECTS)
-	$(CC) $(CC_SWITCHES) -o extratcl tclAppInit.$(OBJEXT) $(Extral_OBJECTS) ${TCL_LIB_SPEC} ${TCL_LIBS}
+	$(CC) $(CC_SWITCHES) -o extratcl tclAppInit.$(OBJEXT) $(Extral_OBJECTS) ${SHLIB_LDFLAGS} ${SHLIB_LD_LIBS} -lm
 
 #========================================================================
 # We need to enumerate the list of .c to .o lines here.
@@ -339,14 +339,14 @@ array.$(OBJEXT): $(SOURCE_DIR)/array.c
 supersort.$(OBJEXT): $(SOURCE_DIR)/supersort.c
 	$(COMPILE) -c `@CYGPATH@ $(SOURCE_DIR)/supersort.c` -o $@
 
-date.$(OBJEXT): $(SOURCE_DIR)/date.c
-	$(COMPILE) -c `@CYGPATH@ $(SOURCE_DIR)/date.c` -o $@
+time.$(OBJEXT): $(SOURCE_DIR)/time.c
+	$(COMPILE) -c `@CYGPATH@ $(SOURCE_DIR)/time.c` -o $@
 
-structl.$(OBJEXT): $(SOURCE_DIR)/structl.c
-	$(COMPILE) -c `@CYGPATH@ $(SOURCE_DIR)/structl.c` -o $@
+map.$(OBJEXT): $(SOURCE_DIR)/map.c
+	$(COMPILE) -c `@CYGPATH@ $(SOURCE_DIR)/map.c` -o $@
 
-structltypes.$(OBJEXT): $(SOURCE_DIR)/structltypes.c
-	$(COMPILE) -c `@CYGPATH@ $(SOURCE_DIR)/structltypes.c` -o $@
+maptypes.$(OBJEXT): $(SOURCE_DIR)/maptypes.c
+	$(COMPILE) -c `@CYGPATH@ $(SOURCE_DIR)/maptypes.c` -o $@
 
 string.$(OBJEXT): $(SOURCE_DIR)/string.c
 	$(COMPILE) -c `@CYGPATH@ $(SOURCE_DIR)/string.c` -o $@

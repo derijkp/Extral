@@ -11,10 +11,10 @@ if {[llength $argv] == 0} {
 	set targetdir [lindex $argv 0]
 }
 
-# $Format: "set version 1.$ProjectMajorVersion$"$
-set version 1.1
+# $Format: "set version 2.$ProjectMajorVersion$"$
+set version 2.0
 # $Format: "set minorversion $ProjectMinorVersion$"$
-set minorversion 21
+set minorversion 1
 
 set targetdir [file join $targetdir Extral-$tcl_platform(os)-$version.$minorversion]
 puts "Building binary distribution in $targetdir"
