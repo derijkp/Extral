@@ -79,7 +79,13 @@ proc lmath_min {args} {
 	}
 	set list [lindex $args 0]
 	set result [lindex $list 0]
+	if {![isdouble $result]} {
+		error "expected floating-point number but got \"$result\""
+	}
 	foreach e1 $list  {
+		if {![isdouble $e1]} {
+			error "expected floating-point number but got \"$e1\""
+		}
 		if {$e1<$result} {
 			set result $e1
 		}
@@ -98,8 +104,14 @@ proc lmath_max {args} {
 	}
 	set list [lindex $args 0]
 	set result [lindex $list 0]
+	if {![isdouble $result]} {
+		error "expected floating-point number but got \"$result\""
+	}
 	foreach e1 $list  {
-		if {$e1>$result} {
+		if {![isdouble $e1]} {
+			error "expected floating-point number but got \"$e1\""
+		}
+		if {$e1 > $result} {
 			set result $e1
 		}
 	}

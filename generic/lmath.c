@@ -78,6 +78,7 @@ ExtraL_Lmath_maxObjCmd(notUsed, interp, objc, objv)
 	}
 	if (listobjc == 0) {return TCL_OK;}
 	error  = Tcl_GetDoubleFromObj(interp,listobjv[0],&el);
+	if (error) {return error;}
 	result = el;
 	resultpos = 0;
 	for (i = 1 ; i<listobjc ; i++) {
@@ -120,6 +121,7 @@ ExtraL_Lmath_minObjCmd(notUsed, interp, objc, objv)
 	}
 	if (listobjc == 0) {return TCL_OK;}
 	error  = Tcl_GetDoubleFromObj(interp,listobjv[0],&el);
+	if (error) {return error;}
 	result = el;
 	resultpos = 0;
 	for (i = 1 ; i < listobjc ; i++) {

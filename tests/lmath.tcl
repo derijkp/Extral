@@ -32,9 +32,17 @@ test lmath {min} {
 	lmath_min {5 1 100}
 } {1}
 
+test lmath {min bugfix} {
+	lmath_min {{} 5 100 50}
+} {expected floating-point number but got ""} 1
+
 test lmath {max} {
 	lmath_max {5 1 100 50}
 } {100}
+
+test lmath {max bugfix} {
+	lmath_max {{} 5 100 50}
+} {expected floating-point number but got ""} 1
 
 test lmath {cumul} {
 	lmath_cumul {5 1 100}
