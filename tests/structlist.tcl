@@ -130,6 +130,10 @@ test structlist_unset {not present} {
 	structlist_unset {a 1 bb 2 ccc 3} d
 } {a 1 bb 2 ccc 3}
 
+test structlist_unset {unset 2} {
+	structlist_unset {a 1 bb 2 ccc 3} bb ccc
+} {a 1}
+
 test structlist_unset {check uneven} {
 	structlist_unset {a 1 bb 2 ccc} bb
 } {error: list "a 1 bb 2 ccc" does not have an even number of elements} 1

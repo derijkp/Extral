@@ -4,6 +4,13 @@ exec tclsh8.0 "$0" "$@"
 
 source tools.tcl
 
+set changelist {%% % %W $w}
+set string "abc%Wefg"
+set pos 3
+time {
+	string_change "abc%Wefg" {%% % %W $w}
+}
+
 test string_change {basic} {
 	string_change "abc%Wefg" {%% % %W $w}
 } {abc$wefg}
@@ -39,6 +46,14 @@ test string_change {close, order!} {
 test string_change {close} {
 	string_change cga {a t u a t a g c c g}
 } {gct}
+
+test string_change {zero length} {
+	string_change {} {a t u a t a g c c g}
+} {}
+
+test string_change {in index, but not in list} {
+string_change {tkEntryButton1 %W %x} {{[::Classy::rebind %W]} %W %W %O}
+} {tkEntryButton1 %O %x}
 
 test string_reverse {basic} {
 	string_reverse {abc def}

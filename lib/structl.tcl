@@ -505,7 +505,11 @@ proc structlist_unset {args} {
 		}
 		return $list
 	} else {
-		return [Extral::structlist_unsetnostruct [lindex $args 0] [lindex $args 1]]
+		set result [lindex $args 0]
+		foreach el [lrange $args 1 end] {
+			set result [Extral::structlist_unsetnostruct $result $el]
+		}
+		return $result
 	}
 }
 

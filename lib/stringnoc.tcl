@@ -7,33 +7,89 @@
 # substrings in the changelist have been changed.
 #}
 proc string_change {string changelist} {
-	array set a $changelist
-	set rem $string
-	set string ""
-	while 1 {
-		set names [array names a]
-		if {"$names" == ""} break
-		set fpos [string length $rem]
-		foreach name $names {
-			set pos [string first $name $rem]
-			if {$pos == -1} {
-				unset a($name)
-			} elseif {$pos < $fpos} {
-				set found $name
-				set fpos $pos
-			}
+	array set translate $changelist
+	foreach {from to} $changelist {
+		if [string_equal $from {}] {
+			error "changelist for string_change cannot contain empty keys"
 		}
-		if ![info exists found] {
-			append string $rem
-			break
-		}
-		append string [string range $rem 0 [expr {$fpos-1}]]
-		append string $a($found)
-		set rem [string range $rem [expr {$fpos+[string length $found]}] end]
-		if {"$rem" == ""} break
-		unset found
+		lappend index([string index $from 0]) $from
+		set length($from) [string length $from]
 	}
-	return $string
+	set len [string length $string]	
+	set prevpos 0
+	set pos 0
+	set result ""
+	while {$pos < $len} {
+		set first [string index $string $pos]
+		if [info exists index($first)] {
+			foreach name $index($first) {
+				set temppos $pos
+				for {set i 0} {$i < $length($name)} {incr i} {
+					if {"[string index $string $temppos]" != "[string index $name $i]"} {
+						break
+					}
+					incr temppos
+				}
+				if {$i == $length($name)} {
+					if {$pos != $prevpos} {
+						append result [string range $string $prevpos [expr {$pos-1}]]
+					}
+					append result $translate($name)
+					incr pos $i
+					set prevpos $pos
+					break
+				}
+			}
+		} else {
+			incr pos
+		}
+	}
+	if {$pos != $prevpos} {
+		append result [string range $string $prevpos [expr {$pos-1}]]
+	}
+	return $result
+}
+
+proc string_change {string changelist} {
+	array set translate $changelist
+	foreach {from to} $changelist {
+		if [string_equal $from {}] {
+			error "changelist for string_change cannot contain empty keys"
+		}
+		lappend index([string index $from 0]) $from
+		set length($from) [expr {[string length $from]-1}]
+	}
+	set len [string length $string]	
+	set prevpos 0
+	set pos 0
+	set result ""
+	while {$pos < $len} {
+		set first [string index $string $pos]
+		if [info exists index($first)] {
+			set found 0
+			foreach name $index($first) {
+				set nlen $length($name)
+				if {($nlen == 0)||[string_equal [string range $string $pos [expr {$pos+$nlen}]] $name]} {
+					if {$pos != $prevpos} {
+						append result [string range $string $prevpos [expr {$pos-1}]]
+					}
+					append result $translate($name)
+					incr pos $nlen
+					incr pos
+					set prevpos $pos
+					set found 1
+					break
+				}
+			}
+			if !$found {incr pos}
+		} else {
+			incr pos
+		}
+	}
+	if {$pos != $prevpos} {
+		append result [string range $string $prevpos [expr {$pos-1}]]
+	}
+	return $result
 }
 
 #doc {stringcommands string_reverse} cmd {
