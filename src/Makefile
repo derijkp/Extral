@@ -5,8 +5,8 @@
 # The directory containing the Tcl sources and headers appropriate
 # for this version of Tk ("srcdir" will be replaced or has already
 # been replaced by the configure script):
-TCL_GENERIC_DIR =	/home/peter/tcl/tcl7.6b1/generic
-TCL_UNIX_DIR =	/home/peter/tcl/tcl7.6b1/unix
+TCL_GENERIC_DIR =	/home/peter/tcl/tcl7.6/generic
+TCL_UNIX_DIR =	/home/peter/tcl/tcl7.6/unix
 TK_GENERIC_DIR =	@TK_SRC_DIR@/../tk4.1/generic
 
 # The directory containing the Tcl library archive file appropriate
@@ -15,7 +15,7 @@ TCL_BIN_DIR = @TCL_BIN_DIR@
 TK_BIN_DIR = @TCL_BIN_DIR@/../tk4.1
 
 # Libraries to use when linking:
-LIBS = -L/home/peter/tcl/tcl7.6b1/unix -ltcl7.6 -ldl  -lieee -lm -lc
+LIBS = -L/home/peter/tcl/tcl7.6/unix -ltcl7.6 -ldl  -lm -lc
 
 #----------------------------------------------------------------
 # The information below is modified by the configure script when
@@ -32,7 +32,7 @@ SRC_DIR =		.
 CFLAGS = -g
 CC_SWITCHES = $(CFLAGS) $(SHLIB_CFLAGS) -I${TCL_GENERIC_DIR} -I$(TCL_UNIX_DIR) -I${TK_GENERIC_DIR} ${SHLIB_CFLAGS}
 
-OBJECTS = extralInit.o extral.o lpop.o nonl.o supersort.o general.o
+OBJECTS = extralInit.o extral.o lpop.o nonl.o supersort.o lfile.o general.o
 
 all: extral${SHLIB_SUFFIX}
 

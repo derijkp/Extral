@@ -17,7 +17,6 @@
 #define GLOB		1
 #define REGEXP		2
 
-extern Tcl_RegExp Tcl_RegExpCompile(Tcl_Interp *interp,char *string);
 /*
  *----------------------------------------------------------------------
  *
@@ -390,7 +389,7 @@ ExtraL_LmanipCmd(notUsed, interp, argc, argv)
 		int spacing=1;
 		int i,k;
 	
-		if ((argc < 3)&&(argc > 5)) {
+		if ((argc < 3)||(argc > 5)) {
 			Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
 				" unmangle list ?spacing? ?var?\"", (char *) NULL);
 			return TCL_ERROR;
@@ -404,6 +403,11 @@ ExtraL_LmanipCmd(notUsed, interp, argc, argv)
 				return TCL_ERROR;
 			}
 		}
+		if (argv[2][0]=='\0') {
+			Tcl_AppendResult(interp, "", (char *) NULL);
+			if (argc==5) {Tcl_SetVar(interp, argv[4], "", 0);}
+			return TCL_OK;
+			}
 		if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
 			return TCL_ERROR;
 		}

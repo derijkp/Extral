@@ -20,10 +20,12 @@ Installation
 You should be able to obtain the latest version of ExtraL via anonymous ftp
 on rrna.uia.ac.be. in the directory /pub/tcl
 
-This package can be build as a loadable object to Tcl7.5 by adjusting
-the appropriate Makefile and running make. (In doubt, it's a good bet
-to copy most options used to compile the Tcl files.) It should be
-initialised by calling the function Extral_Init
+This package can be build as a loadable object to Tcl7.5. Go to the
+src directory and type
+./configure --with-tcl=<path of tcl distribution>
+Then run make. This should produce the loadable module. The build.tcl and
+buildwin.tcl files are a tool to make a nice package in a different
+directory.
 
 How to contact me
 -----------------

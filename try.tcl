@@ -1,6 +1,10 @@
 set auto_path {/home/peter/dev/Extral0.94 /home/peter/bin/Peos0.84 /usr/local/lib/tcl7.6 /usr/local/lib/tk4.2}
 package require Extral
 
+ffind -regexp -matches -allmatches [glob ../test/*] "\norg:(\[^\n\]*)\n"
+ffind -regexp -matches -allfiles [glob ../test/*] "\norg:(\[^\n\]*)\n" null
+ffind -regexp [glob ../test/*] "\norg:(\[^\n\]*)\n"
+
 load extral.so
 ssort -reflist {a a b a b c b a} {1 2 3 4 5 6 7 8}
 

@@ -12,10 +12,10 @@ ac_help=
 ac_default_prefix=/usr/local
 # Any additions from configure.in:
 ac_help="$ac_help
-  --with-tcl=DIR          Use Tcl 7.5 source tree from
+  --with-tcl=DIR          Use Tcl source tree from
 DIR"
 ac_help="$ac_help
-  --with-tk=DIR          use Tk 4.1 source tree from DIR"
+  --with-tk=DIR          use Tk source tree from DIR"
 
 # Initialize some variables set by options.
 # The variables have the same names as the options, with
@@ -529,7 +529,7 @@ if test "${with_tcl+set}" = set; then
   withval="$with_tcl"
   TCL_SRC_DIR=$withval
 else
-  TCL_SRC_DIR=`cd ../../tcl7.6b1/unix; pwd`
+  TCL_SRC_DIR=`cd ../../tcl7.6/unix; pwd`
 fi
 
 if test ! -d $TCL_SRC_DIR; then
@@ -541,7 +541,7 @@ if test "${with_tk+set}" = set; then
   withval="$with_tk"
   TK_SRC_DIR=$withval
 else
-  TK_SRC_DIR=`cd $TCL_SRC_DIR/../tk4.2b1; pwd`
+  TK_SRC_DIR=`cd $TCL_SRC_DIR/../tk4.2; pwd`
 fi
 
 if test ! -d $TK_SRC_DIR; then

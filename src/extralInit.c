@@ -42,6 +42,9 @@ extern int ExtraL_ReplaceCmd _ANSI_ARGS_((ClientData clientData,
 extern int ExtraL_SSortCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
 
+extern int ExtraL_LfileCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int argc, char *argv[]));
+
 extern int ExtraL_AtexitCmd _ANSI_ARGS_((ClientData clientData));
 
 #ifdef windows
@@ -82,6 +85,7 @@ Extral_Init(interp)
 	dld_AddTclCommand(interp, "amanip", ExtraL_AmanipCmd);
 	dld_AddTclCommand(interp, "replace", ExtraL_ReplaceCmd);
 	dld_AddTclCommand(interp, "ssort", ExtraL_SSortCmd);
+	dld_AddTclCommand(interp, "lfile", ExtraL_LfileCmd);
 	dld_AddTclCommand(interp, "random", ExtraL_RandomCmd);
 #ifdef windows
 /*

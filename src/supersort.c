@@ -173,10 +173,15 @@ ExtraL_SSortCmd(notUsed, interp, argc, argv)
 		sortInfo.resultCode = TCL_ERROR;
 		goto done;
 	}
+	if (listArgc<=1) {
+		Tcl_AppendResult(interp,argv[argc-1],(char *)NULL);
+		goto done;
+	}
 
 	if (reflist!=NULL) {
 		if (Tcl_SplitList(interp, reflist, &reflistArgc, &reflistArgv) != TCL_OK) {
 			sortInfo.resultCode = TCL_ERROR;
+			ckfree((char *) listArgv);
 			goto done;
 		}
 	}
