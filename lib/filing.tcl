@@ -9,43 +9,8 @@
 #
 # =============================================================
 
-proc mkdir {args} {
-	eval file mkdir $args
-}
-
-proc cp {args} {
-	eval file copy -force $args
-}
-
-proc mv {args} {
-	eval file rename $args
-}
-
-proc rm {args} {
-	eval file delete $args
-}
-
 # Using the Unix tools
 # --------------------
-proc ls {args} {
-	global env tcl_interactive
-	if {$tcl_interactive&&[info exists env(LS_OPTIONS)]} {
-		set cl $env(LS_OPTIONS)
-	} else {
-		set cl ""
-	}
-	while {[string match \-* [lindex $args 0]]} {
-		lappend cl [lshift args]
-	}
-	if {"$args"==""} {set args *}
-
-	eval lappend cl [eval glob -nocomplain $args]
-	if {$tcl_interactive&&([info level]==1)} {
-		eval exec ls $cl >&@stdout
-	} else {
-		eval exec ls $cl
-	}
-}
 
 proc chmod {args} {
 	set cl ""
@@ -61,7 +26,7 @@ proc chmod {args} {
 
 if {"$tcl_platform(platform)"=="windows"} {
 #
-# Same for Windows ?
+# ls and chmod for Windows ?
 # This is just a very quick hack to get the most important things working.
 # Don't expect to much of it ;-)
 # ------------------------------------------------------------------------
@@ -92,6 +57,22 @@ proc ls {args} {
 		}
 	}
 	return [join $result "\n"]
+}
+
+proc mkdir {args} {
+	eval file mkdir $args
+}
+
+proc cp {args} {
+	eval file copy -force $args
+}
+
+proc mv {args} {
+	eval file rename $args
+}
+
+proc rm {args} {
+	eval file delete $args
 }
 
 proc chmod {args} {

@@ -140,6 +140,10 @@ set data {
 {set try {a b};laddnew try c}
 {a b c}
 
+{set list {a b c};set l $list;lpop list;set l}
+{a b c}
+{set list {a b c};set l $list;lshift list;set l}
+{a b c}
 }
 
 # Run tests
