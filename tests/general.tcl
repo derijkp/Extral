@@ -385,6 +385,10 @@ test taglset {check uneven} {
 	taglset {a 1 bb 2 ccc} dddd 4
 } {tagged list must have an even number of elements} 1
 
+test taglset {empty list} {
+	taglset {} a 1
+} {a 1}
+
 test taglset {check for object errors in C code} {
 	set try {a 1 bb 2 ccc 3}
 	taglset $try bb try

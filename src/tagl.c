@@ -46,7 +46,7 @@ ExtraL_TaglsetObjCmd(notUsed, interp, objc, objv)
 	if (Tcl_ListObjLength(interp,objv[1],&len) != TCL_OK) {
 		return TCL_ERROR;
 	}
-	if (len & 1) {
+	if ((len != 0)&&(len & 1)) {
 		Tcl_ResetResult(interp);
 		Tcl_AppendResult(interp,"tagged list must have an even number of elements",(char *)NULL);
 		return TCL_ERROR;
@@ -120,7 +120,7 @@ ExtraL_TaglunsetObjCmd(notUsed, interp, objc, objv)
 	if (Tcl_ListObjGetElements(interp, objv[1], &listArgc, &listArgv) != TCL_OK) {
 		return TCL_ERROR;
 	}
-	if (listArgc & 1) {
+	if ((listArgc != 0)&&(listArgc & 1)) {
 		Tcl_ResetResult(interp);
 		Tcl_AppendResult(interp,"tagged list must have an even number of elements",(char *)NULL);
 		return TCL_ERROR;
@@ -185,7 +185,7 @@ ExtraL_TaglgetObjCmd(notUsed, interp, objc, objv)
 	if (Tcl_ListObjGetElements(interp, objv[1], &listArgc, &listArgv) != TCL_OK) {
 		return TCL_ERROR;
 	}
-	if (listArgc & 1) {
+	if ((listArgc != 0)&&(listArgc & 1)) {
 		Tcl_ResetResult(interp);
 		Tcl_AppendResult(interp,"tagged list must have an even number of elements",(char *)NULL);
 		return TCL_ERROR;
@@ -251,7 +251,7 @@ ExtraL_TaglfieldsObjCmd(notUsed, interp, objc, objv)
 	if (Tcl_ListObjGetElements(interp, objv[1], &listArgc, &listArgv) != TCL_OK) {
 		return TCL_ERROR;
 	}
-	if (listArgc & 1) {
+	if ((listArgc != 0)&&(listArgc & 1)) {
 		Tcl_ResetResult(interp);
 		Tcl_AppendResult(interp,"tagged list must have an even number of elements",(char *)NULL);
 		return TCL_ERROR;
