@@ -216,4 +216,3 @@ proc Extral::scriptdir {} {
 		return [file dir $script]
 	}
 }
-

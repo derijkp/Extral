@@ -1,3 +1,4 @@
+# Generated automatically from Makefile.in by configure.
 # Makefile.in --
 #
 #	This file is a Makefile for Sample TEA Extension.  If it has the name
@@ -27,7 +28,7 @@
 # unix subdirectory.
 #========================================================================
 
-Extral_SOURCES	= extral.c extralInit.c general.c  array.c supersort.c   time.c map.c maptypes.c   string.c list_pop.c unix.c lmath.c @EXTRA_SOURCES@
+Extral_SOURCES	= extral.c extralInit.c general.c  array.c supersort.c   time.c map.c maptypes.c   string.c list_pop.c unix.c lmath.c $(UNIX_SOURCES)
 
 WIN_SOURCES	= 
 UNIX_SOURCES	= 
@@ -44,8 +45,8 @@ UNIX_SOURCES	=
 # configuration options) composed of the named objects.
 #========================================================================
 
-Extral_OBJECTS	= $(Extral_SOURCES:.c=.@OBJEXT@)
-Extral_LIB_FILE	= @Extral_LIB_FILE@
+Extral_OBJECTS	= $(Extral_SOURCES:.c=.o)
+Extral_LIB_FILE	= libExtral2.0.3.so
 
 #========================================================================
 # RUNTIME_SOURCES identifies Tcl runtime files that are associated with
@@ -81,17 +82,17 @@ GENERIC_HDRS	=
 lib_BINARIES	= $($(PACKAGE)_LIB_FILE)
 BINARIES	= $(lib_BINARIES)
 
-SHELL		= @SHELL@
+SHELL		= /bin/sh
 
-srcdir		= @srcdir@
-prefix		= @prefix@
-exec_prefix	= @exec_prefix@
+srcdir		= ..
+prefix		= /usr
+exec_prefix	= /usr
 
-bindir		= @bindir@
-libdir		= @libdir@
-datadir		= @datadir@
-mandir		= @mandir@
-includedir	= @includedir@
+bindir		= ${exec_prefix}/bin
+libdir		= ${exec_prefix}/lib
+datadir		= ${prefix}/share
+mandir		= ${prefix}/man
+includedir	= ${prefix}/include
 
 DESTDIR		=
 
@@ -102,39 +103,39 @@ pkgincludedir	= $(includedir)/$(PKG_DIR)
 
 top_builddir	= .
 
-INSTALL		= @INSTALL@
-INSTALL_PROGRAM	= @INSTALL_PROGRAM@
-INSTALL_DATA	= @INSTALL_DATA@
-INSTALL_SCRIPT	= @INSTALL_SCRIPT@
+INSTALL		= /usr/bin/install -c
+INSTALL_PROGRAM	= ${INSTALL}
+INSTALL_DATA	= ${INSTALL} -m 644
+INSTALL_SCRIPT	= ${INSTALL_PROGRAM}
 
-PACKAGE		= @PACKAGE@
-VERSION		= @VERSION@
-CC		= @CC@
-CFLAGS_DEBUG	= @CFLAGS_DEBUG@
-CFLAGS_DEFAULT	= @CFLAGS_DEFAULT@
-CFLAGS_OPTIMIZE	= @CFLAGS_OPTIMIZE@
-CLEANFILES	= @CLEANFILES@
-EXEEXT		= @EXEEXT@
-LDFLAGS_DEBUG	= @LDFLAGS_DEBUG@
-LDFLAGS_DEFAULT	= @LDFLAGS_DEFAULT@
-LDFLAGS_OPTIMIZE = @LDFLAGS_OPTIMIZE@
-MAKE_LIB	= @MAKE_LIB@
-MAKE_SHARED_LIB	= @MAKE_SHARED_LIB@
-MAKE_STATIC_LIB	= @MAKE_STATIC_LIB@
-OBJEXT		= @OBJEXT@
-RANLIB		= @RANLIB@
-SHLIB_CFLAGS	= @SHLIB_CFLAGS@
-SHLIB_LD	= @SHLIB_LD@
-SHLIB_LDFLAGS	= @SHLIB_LDFLAGS@
-SHLIB_LD_LIBS	= @SHLIB_LD_LIBS@
-STLIB_LD	= @STLIB_LD@
-TCL_DEFS	= @TCL_DEFS@
-TCL_BIN_DIR	= @TCL_BIN_DIR@
-TCL_SRC_DIR	= @TCL_SRC_DIR@
+PACKAGE		= Extral
+VERSION		= 2.0.3
+CC		= gcc -pipe
+CFLAGS_DEBUG	= -g
+CFLAGS_DEFAULT	= $(CFLAGS_OPTIMIZE)
+CFLAGS_OPTIMIZE	= -O -D__NO_STRING_INLINES -D__NO_MATH_INLINES
+CLEANFILES	= pkgIndex.tcl
+EXEEXT		= 
+LDFLAGS_DEBUG	= 
+LDFLAGS_DEFAULT	= $(LDFLAGS_OPTIMIZE)
+LDFLAGS_OPTIMIZE = 
+MAKE_LIB	= ${SHLIB_LD} -o $@ $($(PACKAGE)_OBJECTS) ${SHLIB_LDFLAGS} ${SHLIB_LD_LIBS} 
+MAKE_SHARED_LIB	= ${SHLIB_LD} -o $@ $($(PACKAGE)_OBJECTS) ${SHLIB_LDFLAGS} ${SHLIB_LD_LIBS}
+MAKE_STATIC_LIB	= ${STLIB_LD} $@ $($(PACKAGE)_OBJECTS)
+OBJEXT		= o
+RANLIB		= :
+SHLIB_CFLAGS	= -fPIC
+SHLIB_LD	= gcc -pipe -shared
+SHLIB_LDFLAGS	= $(LDFLAGS_DEFAULT)
+SHLIB_LD_LIBS	= ${LIBS} -L/usr/lib -ltclstub8.4
+STLIB_LD	= ${AR} cr
+TCL_DEFS	=  -DHAVE_UNISTD_H=1 -DHAVE_LIMITS_H=1 -D_LARGEFILE64_SOURCE=1 -DTCL_WIDE_INT_TYPE=long\ long -DHAVE_STRUCT_STAT64=1 -DHAVE_TYPE_OFF64_T=1 -DHAVE_GETCWD=1 -DHAVE_OPENDIR=1 -DHAVE_STRSTR=1 -DHAVE_STRTOL=1 -DHAVE_STRTOLL=1 -DHAVE_STRTOULL=1 -DHAVE_TMPNAM=1 -DHAVE_WAITPID=1 -DHAVE_UNISTD_H=1 -DHAVE_SYS_PARAM_H=1 -DUSE_TERMIOS=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 -DHAVE_TM_ZONE=1 -DHAVE_GMTIME_R=1 -DHAVE_LOCALTIME_R=1 -DHAVE_TM_GMTOFF=1 -DHAVE_TIMEZONE_VAR=1 -DHAVE_ST_BLKSIZE=1 -DSTDC_HEADERS=1 -DHAVE_SIGNED_CHAR=1 -DHAVE_LANGINFO=1 -DPEEK_XCLOSEIM=1 -DHAVE_SYS_IOCTL_H=1 
+TCL_BIN_DIR	= /usr/lib
+TCL_SRC_DIR	= /usr/include/tcl8.4.5
 # This is necessary for packages that use private Tcl headers
 #TCL_TOP_DIR_NATIVE	= @TCL_TOP_DIR_NATIVE@
 # Not used, but retained for reference of what libs Tcl required
-TCL_LIBS	= @TCL_LIBS@
+TCL_LIBS	= -ldl  -lieee -lm
 
 TK_SRC_DIR	= @TK_SRC_DIR@
 TK_BIN_DIR	= @TK_BIN_DIR@
@@ -148,32 +149,32 @@ TK_LIBS		= @TK_LIBS@
 #========================================================================
 
 EXTRA_PATH	= $(top_builddir):$(TCL_BIN_DIR):$(TK_BIN_DIR)
-TCLSH_ENV	= TCL_LIBRARY=`@CYGPATH@ $(TCL_SRC_DIR)/library` \
-		  TK_LIBRARY=`@CYGPATH@ $(TK_SRC_DIR)/library` \
+TCLSH_ENV	= TCL_LIBRARY=`echo $(TCL_SRC_DIR)/library` \
+		  TK_LIBRARY=`echo $(TK_SRC_DIR)/library` \
 		  LD_LIBRARY_PATH="$(EXTRA_PATH):$(LD_LIBRARY_PATH)" \
 		  LIBPATH="$(EXTRA_PATH):${LIBPATH}" \
 		  SHLIB_PATH="$(EXTRA_PATH):${SHLIB_PATH}" \
 		  PATH="$(EXTRA_PATH):$(PATH)" \
 		  TCLLIBPATH="$(top_builddir)"
-TCLSH_PROG	= @TCLSH_PROG@
+TCLSH_PROG	= /usr/lib/../bin/tclsh8.4
 WISH_PROG	= @WISH_PROG@
 TCLSH		= $(TCLSH_ENV) $(TCLSH_PROG)
-SHARED_BUILD	= @SHARED_BUILD@
+SHARED_BUILD	= 1
 
-INCLUDES	= @TCL_INCLUDES@
+INCLUDES	= -I"/usr/include"
 # when using tk
-#INCLUDES	= @TCL_INCLUDES@ @TK_INCLUDES@ @TK_XINCLUDES@
+#INCLUDES	= -I"/usr/include" @TK_INCLUDES@ @TK_XINCLUDES@
 
-EXTRA_CFLAGS	= $(MEM_DEBUG_FLAGS) @EXTRA_CFLAGS@
+EXTRA_CFLAGS	= $(MEM_DEBUG_FLAGS) 
 
-DEFS		= $(TCL_DEFS) @DEFS@ $(EXTRA_CFLAGS)
+DEFS		= $(TCL_DEFS)  -DVERSION=\"2.0.3\" -D_LARGEFILE64_SOURCE=1 -DTCL_WIDE_INT_TYPE=long\ long -DHAVE_STRUCT_STAT64=1 -DHAVE_TYPE_OFF64_T=1 -DHAVE_UNISTD_H=1 -DHAVE_SYS_PARAM_H=1 -DUSE_TCL_STUBS=1  $(EXTRA_CFLAGS)
 
 CONFIG_CLEAN_FILES = Makefile
 
-CPPFLAGS	= @CPPFLAGS@
-LIBS		= @LIBS@
+CPPFLAGS	= 
+LIBS		= 
 AR		= ar
-CFLAGS		= @CFLAGS@
+CFLAGS		=  ${CFLAGS_DEFAULT} ${CFLAGS_WARNING} ${SHLIB_CFLAGS}
 COMPILE		= $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 
 #========================================================================
@@ -202,17 +203,17 @@ binaries: $(BINARIES) pkgIndex.tcl
 libraries:
 
 version:
-	$(TCLSH_PROG) $(srcdir)/build/version.tcl srcdir $(srcdir) version @VERSION@
+	$(TCLSH_PROG) $(srcdir)/build/version.tcl srcdir $(srcdir) version 2.0.3
 
 doc:
 	$(TCLSH_PROG) $(srcdir)/build/makedoc.tcl srcdir \$(srcdir)
 	
 
 uninstall:
-	$(TCLSH_PROG) $(srcdir)/build/uninstall.tcl srcdir $(srcdir) pkglibdir "$(DESTDIR)$(pkglibdir)" pkgtcllibdir "$(DESTDIR)$(pkgtcllibdir)" pkgdatadir "$(DESTDIR)$(pkgdatadir)" pkgincludedir "$(DESTDIR)$(pkgincludedir)" bindir "$(DESTDIR)$(bindir)" mandir "$(DESTDIR)$(mandir)" package @PACKAGE@ version @VERSION@
+	$(TCLSH_PROG) $(srcdir)/build/uninstall.tcl srcdir $(srcdir) pkglibdir "$(DESTDIR)$(pkglibdir)" pkgtcllibdir "$(DESTDIR)$(pkgtcllibdir)" pkgdatadir "$(DESTDIR)$(pkgdatadir)" pkgincludedir "$(DESTDIR)$(pkgincludedir)" bindir "$(DESTDIR)$(bindir)" mandir "$(DESTDIR)$(mandir)" package Extral version 2.0.3
 
 install: all
-	$(TCLSH_PROG) $(srcdir)/build/install.tcl srcdir $(srcdir) pkglibdir "$(DESTDIR)$(pkglibdir)" pkgtcllibdir "$(DESTDIR)$(pkgtcllibdir)" pkgdatadir "$(DESTDIR)$(pkgdatadir)" pkgincludedir "$(DESTDIR)$(pkgincludedir)" bindir "$(DESTDIR)$(bindir)" mandir "$(DESTDIR)$(mandir)" package @PACKAGE@ version @VERSION@
+	$(TCLSH_PROG) $(srcdir)/build/install.tcl srcdir $(srcdir) pkglibdir "$(DESTDIR)$(pkglibdir)" pkgtcllibdir "$(DESTDIR)$(pkgtcllibdir)" pkgdatadir "$(DESTDIR)$(pkgdatadir)" pkgincludedir "$(DESTDIR)$(pkgincludedir)" bindir "$(DESTDIR)$(bindir)" mandir "$(DESTDIR)$(mandir)" package Extral version 2.0.3
 
 install-binaries: binaries install-lib-binaries install-bin-binaries
 	if test "x$(SHARED_BUILD)" = "x1"; then \
@@ -246,7 +247,7 @@ install-doc: doc
 	done
 
 test: binaries libraries
-	$(TCLSH) `@CYGPATH@ $(srcdir)/tests/all.tcl` $(TESTFLAGS)
+	$(TCLSH) `echo $(srcdir)/tests/all.tcl` $(TESTFLAGS)
 
 shell: binaries libraries
 	@$(TCLSH) $(SCRIPT)
@@ -279,7 +280,7 @@ $($(PACKAGE)_LIB_FILE): $($(PACKAGE)_OBJECTS)
 # you will have to modify the paths to reflect this:
 #
 # sample.$(OBJEXT): $(srcdir)/generic/sample.c
-# 	$(COMPILE) -c `@CYGPATH@ $(srcdir)/generic/sample.c` -o $@
+# 	$(COMPILE) -c `echo $(srcdir)/generic/sample.c` -o $@
 #
 # Setting the VPATH variable to a list of paths will cause the makefile
 # to look into these paths when resolving .c to .obj dependencies.
@@ -289,7 +290,7 @@ $($(PACKAGE)_LIB_FILE): $($(PACKAGE)_OBJECTS)
 VPATH = $(srcdir)/generic:$(srcdir)/unix:$(srcdir)/win
 
 .c.$(OBJEXT):
-	$(COMPILE) -c `@CYGPATH@ $<` -o $@
+	$(COMPILE) -c `echo $<` -o $@
 
 #========================================================================
 # Create the pkgIndex.tcl file.

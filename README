@@ -69,10 +69,6 @@ make install
 The configure command has several options that can be examined using
 /configure --help
 
-The Tcl script makedist.tcl creates a package distribution
-If no compiled version (.so, .dll) is available, a Tcl-only version will 
-be created.
-
 How to contact me
 -----------------
 I will do my best to reply as fast as I can to any problems, etc.

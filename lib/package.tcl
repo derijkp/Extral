@@ -9,7 +9,7 @@ proc package::architecture {} {
 	}
 }
 
-proc ::package::init {dir name {testcmd {}} {noc_lib {}}} {
+proc package::init {dir name {testcmd {}} {noc_lib {}}} {
 	global tcl_platform noc
 	#
 	# Try to find the compiled library in several places

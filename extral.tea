@@ -13,7 +13,7 @@ config minor 0
 
 # The patchlevel of your package. This component usually gets omitted from
 # library and directory names, and may even be left blank.
-config patchlevel
+config patchlevel 3
 
 # The name of a file in your distribution that configure should find to
 # discover whether it is where it thinks it ought to be. This should
@@ -110,3 +110,6 @@ config installscript build/install.tcl
 # The script will be called with a key value list containing data about installation locations.
 # The filename must be relative to the configure dir
 config uninstallscript build/uninstall.tcl
+
+# Name of a tcl script that will be used to do update version numbers (in place)
+config versionscript build/version.tcl

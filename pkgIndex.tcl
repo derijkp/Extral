@@ -7,10 +7,24 @@
 # script is sourced, the variable $dir must contain the
 # full path name of this file's directory.
 
-# $Format: "package ifneeded Extral 2.$ProjectMajorVersion: 0 $ \"$
+# $Format: "package ifneeded Extral 2.0$ProjectMajorVersion: 0 $ \"$
 package ifneeded Extral 2.0 \
 [subst -nocommands {
 	namespace eval ::Extral {}
 	set ::Extral::dir [list $dir]
 	source [file join [list $dir] lib init.tcl]
 }]
+
+
+
+
+
+
+
+
+
+
+
+
+
+

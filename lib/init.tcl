@@ -9,7 +9,7 @@
 
 namespace eval Extral {}
 
-# $Format: "set ::Extral::version 2.$ProjectMajorVersion$"$
+# $Format: "set ::Extral::version 2.0$ProjectMajorVersion$"$
 set ::Extral::version 2.0
 # $Format: "set ::Extral::patchlevel $ProjectMinorVersion$"$
 set ::Extral::patchlevel 3
@@ -31,3 +31,10 @@ source [file join ${Extral::dir} lib atexit.tcl]
 source [file join ${Extral::dir} lib always.tcl]
 # gives problems with 8.4
 # Extral::compat
+
+
+
+
+
+
+
