@@ -82,89 +82,89 @@ test structlist_set {with space} {
 	structlist_set "" {Fonts {Basic Fonts} {other font}} *Font
 } {Fonts {{Basic Fonts} {{other font} *Font}}}
 
-test structlget {} {
-	structlget {a 1 bb 2 ccc 3} bb
+test structlist_get {} {
+	structlist_get {a 1 bb 2 ccc 3} bb
 } {2}
 
-test structlget {with structure} {
-	structlget {a 1 bb {a bb1 b bb2} ccc 3} {bb b}
+test structlist_get {with structure} {
+	structlist_get {a 1 bb {a bb1 b bb2} ccc 3} {bb b}
 } {bb2}
 
-test structlget {with larger structure} {
-	structlget {a 1 b {a {a baa b bab} b try}} {b a b}
+test structlist_get {with larger structure} {
+	structlist_get {a 1 b {a {a baa b bab} b try}} {b a b}
 } {bab}
 
-test structlget {tag not present} {
-	structlget {a 1 bb 2 ccc 3} e
+test structlist_get {tag not present} {
+	structlist_get {a 1 bb 2 ccc 3} e
 } {tag "e" not found} 1
 
-test structlget {field larger than structure} {
-	structlget {a 1 bb 2 ccc 3} {a b}
+test structlist_get {field larger than structure} {
+	structlist_get {a 1 bb 2 ccc 3} {a b}
 } {error: list "1" does not have an even number of elements} 1
 
-test structlget {field in struct not present} {
-	structlget {a {a 1 b 2} bb 2 ccc 3} {a c}
+test structlist_get {field in struct not present} {
+	structlist_get {a {a 1 b 2} bb 2 ccc 3} {a c}
 } {tag "c" not found} 1
 
-test structlget {get partial} {
-	structlget {a {a 1 b 2} bb 2 ccc 3} a
+test structlist_get {get partial} {
+	structlist_get {a {a 1 b 2} bb 2 ccc 3} a
 } {a 1 b 2}
 
-test structlget {check uneven} {
-	structlget {a 1 bb 2 ccc} bb
+test structlist_get {check uneven} {
+	structlist_get {a 1 bb 2 ccc} bb
 } {error: list "a 1 bb 2 ccc" does not have an even number of elements} 1
 
-test structlget {def} {
-	structlget {a 1 b 2} b a
+test structlist_get {def} {
+	structlist_get {a 1 b 2} b a
 } {2 1}
 
-test structlget {not found} {
-	structlget {a 1} b
+test structlist_get {not found} {
+	structlist_get {a 1} b
 } {tag "b" not found} 1
 
-test structlunset {} {
-	structlunset {a 1 bb 2 ccc 3} bb
+test structlist_unset {} {
+	structlist_unset {a 1 bb 2 ccc 3} bb
 } {a 1 ccc 3}
 
-test structlunset {not present} {
-	structlunset {a 1 bb 2 ccc 3} d
+test structlist_unset {not present} {
+	structlist_unset {a 1 bb 2 ccc 3} d
 } {a 1 bb 2 ccc 3}
 
-test structlunset {check uneven} {
-	structlunset {a 1 bb 2 ccc} bb
+test structlist_unset {check uneven} {
+	structlist_unset {a 1 bb 2 ccc} bb
 } {error: list "a 1 bb 2 ccc" does not have an even number of elements} 1
 
-test structlunset {present, 2 tags} {
-	structlunset {a 1 b 2 c {a 1 b 2}} {c a}
+test structlist_unset {present, 2 tags} {
+	structlist_unset {a 1 b 2 c {a 1 b 2}} {c a}
 } {a 1 b 2 c {b 2}}
 
-test structlunset {not present, 2 tags} {
-	structlunset {a 1 b 2 c {a 1 b 2}} {c c}
+test structlist_unset {not present, 2 tags} {
+	structlist_unset {a 1 b 2 c {a 1 b 2}} {c c}
 } {a 1 b 2 c {a 1 b 2}}
 
-test structlunset {unset, 3 tags} {
-	structlunset {a 1 b 2 c {a 1 b 2 c {a 1 b 2}}} {c c a}
+test structlist_unset {unset, 3 tags} {
+	structlist_unset {a 1 b 2 c {a 1 b 2 c {a 1 b 2}}} {c c a}
 } {a 1 b 2 c {a 1 b 2 c {b 2}}}
 
-test structlunset {check bug} {
-	structlunset {a 1 b 2} a 1
+test structlist_unset {check bug} {
+	structlist_unset {a 1 b 2} a 1
 } {b 2}
 
-test structlfields {} {
-	structlfields {a 1 bb 2 ccc 3}
+test structlist_fields {} {
+	structlist_fields {a 1 bb 2 ccc 3}
 } {a bb ccc}
 
-test structlfields {see values} {
-	structlfields {a 1 bb 2 ccc 3} {} values
+test structlist_fields {see values} {
+	structlist_fields {a 1 bb 2 ccc 3} {} values
 	set values
 } {1 2 3}
 
-test structlfields {see values} {
-	structlfields {a {a 1 b 2 c 3}} a
+test structlist_fields {see values} {
+	structlist_fields {a {a 1 b 2 c 3}} a
 } {a b c}
 
-test structlfields {check uneven} {
-	structlfields {a 1 bb 2 ccc}
+test structlist_fields {check uneven} {
+	structlist_fields {a 1 bb 2 ccc}
 } {error: list "a 1 bb 2 ccc" does not have an even number of elements} 1
 
 test structlist_find {present} {

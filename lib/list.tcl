@@ -106,9 +106,25 @@ proc list_arrayset {array varlist valuelist} {
 #	returns the common elements of the lists
 #}
 proc list_common {args} {
-	set result [lsort [list_pop args]]
+	set start [lsort [list_pop args]]
+	foreach item $start {set keep($item) 1}
 	foreach list $args {
-		list_lremove -sorted $result [lsort $list] result
+		foreach item $list {
+			if [info exists keep($item)] {
+				set keep($item) 2
+			}
+		}
+		foreach item [array names keep] {
+			if {$keep($item) == 2} {
+				set keep($item) 1
+			} else {
+				unset keep($item)
+			}
+		}
+	}
+	set result [list]
+	foreach item $start {
+		if [info exists keep($item)] {lappend result $item}
 	}
 	return $result
 }

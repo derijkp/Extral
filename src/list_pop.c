@@ -16,7 +16,7 @@
  *
  * ExtraL_List_popCmd --
  *
- *		This procedure is invoked to process the "lpop" command.
+ *		This procedure is invoked to process the "list_pop" command.
  *		It pops an item out of a list
  *
  * Results:

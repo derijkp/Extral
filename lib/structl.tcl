@@ -42,7 +42,7 @@
 # The list must have 2 further elements: element 1 is the long name for the value, and element
 # 2 the short name. Both long and short name can be used to set or get values from the structured list.
 # However, structlist_set will always return a struct with the short name (efficient storage), while
-# structlget will return the long form.
+# structlist_get will return the long form.
 #}
 
 proc Extral::structlist_setstruct {structure data list taglen taglist value} {
@@ -248,7 +248,7 @@ proc structlist_set {args} {
 	return $list
 }
 
-proc Extral::structlgetstruct {structure data list taglen taglist} {
+proc Extral::structlist_getstruct {structure data list taglen taglist} {
 #putsvars structure data list taglen taglist
 	# Is this an endnode
 	# ------------------
@@ -267,10 +267,10 @@ proc Extral::structlgetstruct {structure data list taglen taglist} {
 			foreach {tag str} $structure {
 				if {"[lindex $tag 0]" == "?"} {
 					set sublist [structlist_find $list [lindex $tag 2] value]
-					lappend result [lindex $tag 1] [Extral::structlgetstruct $str $data $sublist 0 ""]
+					lappend result [lindex $tag 1] [Extral::structlist_getstruct $str $data $sublist 0 ""]
 				} else {
 					set sublist [structlist_find $list $tag value]
-					lappend result $tag [Extral::structlgetstruct $str $data $sublist 0 ""]
+					lappend result $tag [Extral::structlist_getstruct $str $data $sublist 0 ""]
 				}
 			}
 			return $result
@@ -295,11 +295,11 @@ proc Extral::structlgetstruct {structure data list taglen taglist} {
 		# find the tag
 		# ------------
 		set sublist [structlist_find $list $tag value]
-		return [Extral::structlgetstruct $substructure $data $sublist $taglen $taglist]
+		return [Extral::structlist_getstruct $substructure $data $sublist $taglen $taglist]
 	}
 }
 
-proc Extral::structlgetnostruct {list taglen taglist} {
+proc Extral::structlist_getnostruct {list taglen taglist} {
 	foreach tag $taglist {
 		set len [llength $list]
 		if {[expr $len%2] != 0} {
@@ -320,8 +320,8 @@ proc Extral::structlgetnostruct {list taglen taglist} {
 	return $list
 }
 
-#doc {structl structlget} cmd {
-#structlget ?-struct schema? list field ?field ...?
+#doc {structl structlist_get} cmd {
+#structlist_get ?-struct schema? list field ?field ...?
 #} descr {
 #get the value of a field in the structured list
 #} example {
@@ -335,12 +335,12 @@ proc Extral::structlgetnostruct {list taglen taglist} {
 #			*named {*int ?}
 #		}
 #	}
-#	% structlget -struct $struct {ints {a 9}} {sub b}
+#	% structlist_get -struct $struct {ints {a 9}} {sub b}
 #	?
-#	% structlget -struct $struct {ints {a 9}} {ints}
+#	% structlist_get -struct $struct {ints {a 9}} {ints}
 #	a 9
 #}
-proc structlget {args} {
+proc structlist_get {args} {
 	set usestr 0
 	set data {}
 	set alen [llength $args]
@@ -358,32 +358,32 @@ proc structlget {args} {
 		} else break
 	}
 	if {$alen < 2} {
-		return -code error "wrong # args: should be \"structlget ?-struct schema? list field ?field ...?\""
+		return -code error "wrong # args: should be \"structlist_get ?-struct schema? list field ?field ...?\""
 	}
 	set list [list_shift args]
 	if {$alen == 2} {
 		set taglist [lindex $args 0]
 		set len [llength $taglist]
 		if {$usestr == 1} {
-			return [Extral::structlgetstruct $struct $data $list $len $taglist]
+			return [Extral::structlist_getstruct $struct $data $list $len $taglist]
 		} else {
-			return [Extral::structlgetnostruct $list $len $taglist]
+			return [Extral::structlist_getnostruct $list $len $taglist]
 		}
 	} else {
 		set result ""
 		foreach taglist $args {
 			set len [llength $taglist]
 			if {$usestr == 1} {
-				lappend result [Extral::structlgetstruct $struct $data $list $len $taglist]
+				lappend result [Extral::structlist_getstruct $struct $data $list $len $taglist]
 			} else {
-				lappend result [Extral::structlgetnostruct $list $len $taglist]
+				lappend result [Extral::structlist_getnostruct $list $len $taglist]
 			}
 		}
 		return $result
 	}
 }
 
-proc Extral::structlunsetstruct {structure data list taglen taglist} {
+proc Extral::structlist_unsetstruct {structure data list taglen taglist} {
 #putsvars structure list taglen taglist
 	set ctag [lindex $structure 0]
 	if [regexp {^\*[^ ]} $ctag] {
@@ -418,7 +418,7 @@ proc Extral::structlunsetstruct {structure data list taglen taglist} {
 		} else {
 			set sublist [lindex $list $sublistpos]
 		}
-		set code [catch {Extral::structlunsetstruct $substructure $data $sublist $taglen $taglist} sublist]
+		set code [catch {Extral::structlist_unsetstruct $substructure $data $sublist $taglen $taglist} sublist]
 		if {$code == 1} {
 			error "$sublist at field \"$tag\""
 		} elseif {$code == 5} {
@@ -440,7 +440,7 @@ proc Extral::structlunsetstruct {structure data list taglen taglist} {
 	}
 }
 
-proc Extral::structlunsetnostruct {list taglist} {
+proc Extral::structlist_unsetnostruct {list taglist} {
 	set len [llength $list]
 	if {[expr $len%2] != 0} {
 		return -code error "error: list \"$list\" does not have an even number of elements"
@@ -453,7 +453,7 @@ proc Extral::structlunsetnostruct {list taglist} {
 			if {$taglen == 0} {
 				return [lreplace $list [expr $pos-1] $pos]
 			} else {
-				set temp [structlunset [lindex $list $pos] $taglist]
+				set temp [structlist_unset [lindex $list $pos] $taglist]
 				return [lreplace $list $pos $pos $temp]
 			}
 		}
@@ -462,15 +462,15 @@ proc Extral::structlunsetnostruct {list taglist} {
 	return $list
 }
 
-#doc {structl structlunset} cmd {
-#structlunset ?-struct schema? ?-data clientdata? list field ?field ...?
+#doc {structl structlist_unset} cmd {
+#structlist_unset ?-struct schema? ?-data clientdata? list field ?field ...?
 #} descr {
 #unset the value of a field in the structured list
 #} example {
-#	% structlunset {a 1 b 2} b
+#	% structlist_unset {a 1 b 2} b
 #	a 1
 #}
-proc structlunset {args} {
+proc structlist_unset {args} {
 	set usestr 0
 	set data {}
 	set len [llength $args]
@@ -488,13 +488,13 @@ proc structlunset {args} {
 		} else break
 	}
 	if {$len < 2} {
-		return -code error "wrong # args: should be \"structlunset ?-struct schema? ?-data clientdata? list field ?field ... ?\""
+		return -code error "wrong # args: should be \"structlist_unset ?-struct schema? ?-data clientdata? list field ?field ... ?\""
 	}
 	if {$usestr == 1} {
 		set list [list_shift args]
 		foreach taglist $args {
 			set taglen [llength $taglist]
-			set code [catch {Extral::structlunsetstruct $struct $data $list $taglen $taglist} result]
+			set code [catch {Extral::structlist_unsetstruct $struct $data $list $taglen $taglist} result]
 			if {"$code" == 1} {
 				error $result
 			} elseif {"$code" == 5} {
@@ -505,21 +505,21 @@ proc structlunset {args} {
 		}
 		return $list
 	} else {
-		return [Extral::structlunsetnostruct [lindex $args 0] [lindex $args 1]]
+		return [Extral::structlist_unsetnostruct [lindex $args 0] [lindex $args 1]]
 	}
 }
 
-#doc {structl structlfields} cmd {
-#structlfields list field ?valueVar?
+#doc {structl structlist_fields} cmd {
+#structlist_fields list field ?valueVar?
 #} descr {
 #returns the fields present in the structure list
 #}
-proc structlfields {list {field {}} args} {
+proc structlist_fields {list {field {}} args} {
 	set len [llength $args]
 	if {($len != 0)&&($len != 1)} {
-		return -code error "wrong # args: should be \"structlfields list field ?valueVar?\""
+		return -code error "wrong # args: should be \"structlist_fields list field ?valueVar?\""
 	}
-	set list [structlget $list $field]
+	set list [structlist_get $list $field]
 	set len [llength $list]
 	if {[expr $len%2] != 0} {
 		return -code error "error: list \"$list\" does not have an even number of elements"

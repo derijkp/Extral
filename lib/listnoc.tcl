@@ -398,9 +398,8 @@ proc list_reverse {list} {
 #} descr {
 # change matching elements in a list to other values
 #}
-proc list_change {list change to args} {
-	set trans($change) $to
-	array set trans $args
+proc list_change {list changelist} {
+	array set trans $changelist
 	foreach element $list {
 		if [info exists trans($element)] {
 			lappend result $trans($element)

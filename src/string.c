@@ -20,7 +20,7 @@
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_StringChangeObjCmd --
+ * ExtraL_String_ChangeObjCmd --
  *
  *
  * Results:
@@ -30,7 +30,7 @@
  *----------------------------------------------------------------------
  */
 int
-ExtraL_StringChangeObjCmd(notUsed, interp, objc, objv)
+ExtraL_String_ChangeObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;				 /* Not used. */
 	Tcl_Interp *interp;					/* Current interpreter. */
 	int objc;						/* Number of arguments. */
@@ -86,7 +86,7 @@ ExtraL_StringChangeObjCmd(notUsed, interp, objc, objv)
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_StringReplaceObjCmd --
+ * ExtraL_String_ReplaceObjCmd --
  *
  *
  * Results:
@@ -96,7 +96,7 @@ ExtraL_StringChangeObjCmd(notUsed, interp, objc, objv)
  *----------------------------------------------------------------------
  */
 int
-ExtraL_StringReplaceObjCmd(notUsed, interp, objc, objv)
+ExtraL_String_ReplaceObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;				 /* Not used. */
 	Tcl_Interp *interp;					/* Current interpreter. */
 	int objc;						/* Number of arguments. */
@@ -140,7 +140,7 @@ ExtraL_StringReplaceObjCmd(notUsed, interp, objc, objv)
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_SreverseObjCmd --
+ * ExtraL_String_reverseObjCmd --
  *
  *		This procedure is invoked to process the "sreverse" command.
  *
@@ -152,7 +152,7 @@ ExtraL_StringReplaceObjCmd(notUsed, interp, objc, objv)
  */
 
 int
-ExtraL_SreverseObjCmd(notUsed, interp, objc, objv)
+ExtraL_String_reverseObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;				 /* Not used. */
 	Tcl_Interp *interp;					/* Current interpreter. */
 	int objc;						/* Number of arguments. */
@@ -178,7 +178,7 @@ ExtraL_SreverseObjCmd(notUsed, interp, objc, objv)
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_SfindCmd --
+ * ExtraL_String_FindObjCmd --
  *
  *		This procedure is invoked to process the "sfind" command.
  *		It finds all occurences of a pattern in a list, and returns
@@ -192,7 +192,7 @@ ExtraL_SreverseObjCmd(notUsed, interp, objc, objv)
  */
 
 int
-ExtraL_SFindObjCmd(clientData, interp, objc, objv)
+ExtraL_String_FindObjCmd(clientData, interp, objc, objv)
 	ClientData clientData;	/* Not used. */
 	Tcl_Interp *interp;		/* Current interpreter. */
 	int objc;			/* Number of arguments. */

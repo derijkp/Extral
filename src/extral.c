@@ -745,13 +745,16 @@ ExtraL_List_changeObjCmd(dummy, interp, objc, objv)
 	Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
 	Tcl_Obj *listPtr;
-	Tcl_Obj **elemPtrs;
+	Tcl_Obj **elemPtrs, **changeObjv;
 	Tcl_Obj *resultObj;
-	int listLen, result;
+	int listLen, changeObjc, result;
 	char *string,*cstring;
 	int i,y,len,clen;
-	if ((objc < 4)&&( (objc&1) != 0)) {
-		Tcl_WrongNumArgs(interp, 1, objv, "list change by ?change by ...?");
+	if (objc != 3) {
+		Tcl_WrongNumArgs(interp, 1, objv, "list changelist");
+		return TCL_ERROR;
+	}
+	if (Tcl_ListObjGetElements(interp, objv[2], &changeObjc, &changeObjv) != TCL_OK) {
 		return TCL_ERROR;
 	}
 	/*
@@ -767,16 +770,16 @@ ExtraL_List_changeObjCmd(dummy, interp, objc, objv)
 		Tcl_SetObjResult(interp, listPtr);
 		return TCL_OK;
 	}
-	for(i = 0 ; i < objc ; i++) {
+	for(i = 0 ; i < listLen ; i++) {
 		string = Tcl_GetStringFromObj(elemPtrs[i], &len);
-		for(y = 2 ; y < objc ; y += 2) {	
-			cstring = Tcl_GetStringFromObj(objv[y], &clen);
+		for(y = 0 ; y < changeObjc ; y += 2) {	
+			cstring = Tcl_GetStringFromObj(changeObjv[y], &clen);
 			if ((len == clen) && (strncmp(string,cstring,len) == 0)) {
 				break;
 			}
 		}
-		if (y < objc) {
-			result = Tcl_ListObjAppendElement(interp,resultObj,objv[y+1]);
+		if (y < changeObjc) {
+			result = Tcl_ListObjAppendElement(interp,resultObj,changeObjv[y+1]);
 		} else {
 			result = Tcl_ListObjAppendElement(interp,resultObj,elemPtrs[i]);
 		}

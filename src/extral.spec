@@ -1,13 +1,14 @@
 Summary:	extra commands for Tcl
 Name:		extral
-Version:	1.1.5
+Version:	1.1.10
 Release:	1
 Copyright:	BSD
 Group:	Development/Languages/Tcl
-Source:	Extral-1.1.5.src.tar.gz
+Source:	Extral-1.1.10.src.tar.gz
 URL: http://rrna.uia.ac.be/extral
 Packager: Peter De Rijk <derijkp@uia.ua.ac.be>
 Requires: tcl >= 8.0.4
+Prefix: /usr/lib
 %description
  Extral is a generally useful library which extends Tcl with a.o.:
         - extral list manipulation commands
@@ -34,4 +35,4 @@ ln -s /usr/lib/Extral-Linux-$RPM_PACKAGE_VERSION/docs /usr/doc/extral-$RPM_PACKA
 
 %files
 %doc README
-/usr/lib/Extral-Linux-$RPM_PACKAGE_VERSION
+/usr/lib/Extral-Linux-1.1.10

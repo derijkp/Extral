@@ -202,10 +202,10 @@ test structlist_set-types {proc set: use oldvalue} {
 	structlist_set -struct $struct $try a 9
 } {a {8 -> 9}}
 
-test structlget-types {get int default} {
+test structlist_get-types {get int default} {
 	set struct {a {*int ?}}
 	set try {}
-	structlget -struct $struct $try a
+	structlist_get -struct $struct $try a
 } {?}
 
 test structlist_set-types {set int default} {
@@ -220,37 +220,37 @@ test structlist_set-types {set date default} {
 	structlist_set -struct $struct $try a ?
 } {}
 
-test structlget-types {get any default} {
+test structlist_get-types {get any default} {
 	set struct {a {*any ?}}
 	set try {}
-	structlget -struct $struct $try a
+	structlist_get -struct $struct $try a
 } {?}
 
-test structlget-types {get date default} {
+test structlist_get-types {get date default} {
 	set struct {*date ?}
 	set try {}
-	structlget -struct $struct $try {}
+	structlist_get -struct $struct $try {}
 } {?}
 
-test structlget-types {get date default sub} {
+test structlist_get-types {get date default sub} {
 	set struct {a {*date ?}}
 	set try {}
-	structlget -struct $struct $try a
+	structlist_get -struct $struct $try a
 } {?}
 
-test structlget-types {get time default sub} {
+test structlist_get-types {get time default sub} {
 	set struct {a {*time ?}}
 	set try {}
-	structlget -struct $struct $try a
+	structlist_get -struct $struct $try a
 } {?}
 
-test structlget-types {get int} {
+test structlist_get-types {get int} {
 	set struct {a {*int ?}}
 	set try {a 10}
-	structlget -struct $struct $try a
+	structlist_get -struct $struct $try a
 } {10}
 
-test structlget-types {proc get} {
+test structlist_get-types {proc get} {
 	namespace eval ::Extral {
 		proc getproc {structure data field value} {
 			return "try:$value"
@@ -258,10 +258,10 @@ test structlget-types {proc get} {
 	}
 	set struct {a {*proc ?}}
 	set try {a 10}
-	structlget -struct $struct $try a
+	structlist_get -struct $struct $try a
 } {try:10}
 
-test structlget-types {proc get with argument} {
+test structlist_get-types {proc get with argument} {
 	namespace eval ::Extral {
 		proc getproc {structure data field value} {
 			return "[lindex $structure 1]:$value"
@@ -269,7 +269,7 @@ test structlget-types {proc get with argument} {
 	}
 	set struct {a {*proc t ?}}
 	set try {a 10}
-	structlget -struct $struct $try a
+	structlist_get -struct $struct $try a
 } {t:10}
 
 test structlist_set-types {set date} {
@@ -284,16 +284,16 @@ test structlist_set-types {set date 2} {
 	structlist_set -struct $struct $try a {05/09/1997}
 } {a 62998732800.0}
 
-test structlget-types {get date} {
+test structlist_get-types {get date} {
 	set struct {a {*date t ?}}
 	set try {a 62998732800.0}
-	structlget -struct $struct $try a
+	structlist_get -struct $struct $try a
 } {9 May 1997}
 
-test structlget-types {get date} {
+test structlist_get-types {get date} {
 	set struct {a {*date ?}}
 	set try {a 62998732800.0}
-	structlget -struct $struct $try {a val}
+	structlist_get -struct $struct $try {a val}
 } {62998732800.0}
 
 test structlist_set-types {set time} {
@@ -308,52 +308,52 @@ test structlist_set-types {set time 2} {
 	structlist_set -struct $struct $try a {05/09/1997 12:30:24}
 } {a 62998777824.0}
 
-test structlget-types {get time} {
+test structlist_get-types {get time} {
 	set struct {a {*time ?}}
 	set try {a 62998777824.0}
-	structlget -struct $struct $try a
+	structlist_get -struct $struct $try a
 } {9 May 1997 12:30:24}
 
-test structlget-types {get time: check empty} {
+test structlist_get-types {get time: check empty} {
 	set struct {a {*time ?}}
-	structlget -struct $struct {} a
+	structlist_get -struct $struct {} a
 } {?}
 
-test structlget-types {get time: check empty with val} {
+test structlist_get-types {get time: check empty with val} {
 	set struct {a {*time ?}}
-	structlget -struct $struct {} {a val}
+	structlist_get -struct $struct {} {a val}
 } {?}
 
-test structlget-types {get time: check empty with param} {
+test structlist_get-types {get time: check empty with param} {
 	set struct {a {*time ?}}
-	structlget -struct $struct {} {a "%t"}
+	structlist_get -struct $struct {} {a "%t"}
 } {?}
 
-test structlget-types {get date: check empty with val} {
+test structlist_get-types {get date: check empty with val} {
 	set struct {a {*date ?}}
-	structlget -struct $struct {} {a val}
+	structlist_get -struct $struct {} {a val}
 } {?}
 
-test structlget-types {get date: check empty with param} {
+test structlist_get-types {get date: check empty with param} {
 	set struct {a {*date ?}}
-	structlget -struct $struct {} {a "%t"}
+	structlist_get -struct $struct {} {a "%t"}
 } {?}
 
-test structlget-types {set time: check empty} {
+test structlist_get-types {set time: check empty} {
 	set struct {a {*time ?}}
 	structlist_set -struct {a {*time ?}} {} a ?
 } {}
 
-test structlget-types {get time with format} {
+test structlist_get-types {get time with format} {
 	set struct {a {*time ?}}
 	set try {a 62998777824.0}
-	structlget -struct $struct $try {a "%H:%M:%S %e %b %Y"}
+	structlist_get -struct $struct $try {a "%H:%M:%S %e %b %Y"}
 } {12:30:24 9 May 1997}
 
-test structlget-types {get time with format} {
+test structlist_get-types {get time with format} {
 	set struct {a {*time ?}}
 	set try {a 62998777824.0}
-	structlget -struct $struct $try {a val}
+	structlist_get -struct $struct $try {a val}
 } {62998777824.0}
 
 test structlist_set-types {proc get with field} {
@@ -364,7 +364,7 @@ test structlist_set-types {proc get with field} {
 	}
 	set struct {a {*proc ?}}
 	set try {a 11}
-	structlget -struct $struct $try {a b}
+	structlist_get -struct $struct $try {a b}
 } {b 11}
 
 test structlist_set-types {proc set: check data} {
@@ -378,7 +378,7 @@ test structlist_set-types {proc set: check data} {
 	structlist_set -data d -struct $struct $try a 9
 } {a {d 8 9}}
 
-test structlget-types {proc get: test data} {
+test structlist_get-types {proc get: test data} {
 	namespace eval ::Extral {
 		proc getproc {structure data field value} {
 			return [list $data $value]
@@ -386,13 +386,13 @@ test structlget-types {proc get: test data} {
 	}
 	set struct {a {*proc ?}}
 	set try {a 10}
-	structlget -data d -struct $struct $try a
+	structlist_get -data d -struct $struct $try a
 } {d 10}
 
-test structlget-types {quotes in any} {
+test structlist_get-types {quotes in any} {
 	set dbstruct {t {*any {}}}
 	set db {t { "try}}
-	structlget -struct $dbstruct $db t
+	structlist_get -struct $dbstruct $db t
 } { "try}
 
 #
@@ -496,31 +496,31 @@ test structlist_set-list {struct in list error} {
 
 #	list unset
 #
-test structlunset-list {list set} {
+test structlist_unset-list {list set} {
 	set struct {a {*list {*int ?}}}
 	set try {a {1 2 3}}
-	structlunset -struct $struct $try a
+	structlist_unset -struct $struct $try a
 } {}
 
-test structlunset-list {list parameter num} {
+test structlist_unset-list {list parameter num} {
 	set struct {a {*list {*int ?}}}
 	set try {a {1 2 3}}
-	structlunset -struct $struct $try {a 1}
+	structlist_unset -struct $struct $try {a 1}
 } {a {1 3}}
 
-test structlunset-list {list parameter: non existing num} {
+test structlist_unset-list {list parameter: non existing num} {
 	set struct {a {*list {*int ?}}}
 	set try {}
-	structlunset -struct $struct $try {a 2}
+	structlist_unset -struct $struct $try {a 2}
 } {}
 
-test structlunset-list {list parameter end} {
+test structlist_unset-list {list parameter end} {
 	set struct {a {*list {*int ?}}}
 	set try {a {1 2 3}}
-	structlunset -struct $struct $try {a end}
+	structlist_unset -struct $struct $try {a end}
 } {a {1 2}}
 
-test structlunset-list {struct in list: simple} {
+test structlist_unset-list {struct in list: simple} {
 	set struct {
 		a {*list {
 			a {*int ?}
@@ -528,51 +528,51 @@ test structlunset-list {struct in list: simple} {
 		}}
 	}
 	set try {a {{a 1}}}
-	structlunset -struct $struct $try {a end a}
+	structlist_unset -struct $struct $try {a end a}
 } {a {{}}}
 
-test structlunset-list {struct in list} {
+test structlist_unset-list {struct in list} {
 	set struct {a {*list {
 		a {*int ?}
 		b {*int ?}
 	}}}
 	set try {a {{a 1 b 1} {b 2} {b 3}}}
-	structlunset -struct $struct $try {a "" b}
+	structlist_unset -struct $struct $try {a "" b}
 } {a {{a 1} {} {}}}
 
-test structlunset-list {struct in list with parameter} {
+test structlist_unset-list {struct in list with parameter} {
 	set struct {a {*list {
 		a {*int ?}
 		b {*int ?}
 	}}}
 	set try {a {{a 1} {a 2 b 2}}}
-	structlunset -struct $struct $try {a 1 b}
+	structlist_unset -struct $struct $try {a 1 b}
 } {a {{a 1} {a 2}}}
 
-test structlunset-list {struct in list with parameters; gets empty} {
+test structlist_unset-list {struct in list with parameters; gets empty} {
 	set struct {a {*list {
 		a {*int ?}
 		b {*int ?}
 	}}}
 	set try {a {{a 1 b 1} {b 2} {b 3}}}
-	structlunset -struct $struct $try {a 1 b}
+	structlist_unset -struct $struct $try {a 1 b}
 } {a {{a 1 b 1} {} {b 3}}}
 
-test structlunset-list {struct in list with parameter 0} {
+test structlist_unset-list {struct in list with parameter 0} {
 	set struct {a {*list {
 		a {*int ?}
 		b {*int ?}
 	}}}
 	set try {a {{a 1 b 2} {a 2}}}
-	structlunset -struct $struct $try {a 0 b}
+	structlist_unset -struct $struct $try {a 0 b}
 } {a {{a 1} {a 2}}}
 
 #	list get
 #
-test structlget-list {list test type, end index} {
+test structlist_get-list {list test type, end index} {
 	set struct {a {*list {*date ?}}}
 	set try [structlist_set -struct $struct {} a {{1 Jan 1998} {2 Jan 1998}}]
-	structlget -struct $struct $try {a end}
+	structlist_get -struct $struct $try {a end}
 } {2 Jan 1998}
 
 test structlist_set-list {set ints in list from empty} {
@@ -585,65 +585,65 @@ test structlist_set-list {set dates in list from empty} {
 	structlist_set -struct $struct {} a {{1 Jan 1998} {2 Jan 1998}}
 } {a {63019209600.0 63019296000.0}}
 
-test structlget-list {list test type, 0 index} {
+test structlist_get-list {list test type, 0 index} {
 	set struct {a {*list {*date ?}}}
 	set try [structlist_set -struct $struct {} a {{1 Jan 1998} {2 Jan 1998}}]
-	structlget -struct $struct $try {a 0}
+	structlist_get -struct $struct $try {a 0}
 } {1 Jan 1998}
 
-test structlget-list {list test type, 1 to end} {
+test structlist_get-list {list test type, 1 to end} {
 	set struct {a {*list {*date ?}}}
 	set try {a {1 2 3}}
 	set try [structlist_set -struct $struct $try a {{1 Jan 1998} {2 Jan 1998} {3 Jan 1998}}]
-	structlget -struct $struct $try {a {1 end}}
+	structlist_get -struct $struct $try {a {1 end}}
 } {{2 Jan 1998} {3 Jan 1998}}
 
-test structlget-list {list test type, 1 to end} {
+test structlist_get-list {list test type, 1 to end} {
 	set struct {a {*list {*int ?}}}
 	set try {a {1 2 3 4}}
-	structlget -struct $struct $try {a {0 end {lmath_sum}}}
+	structlist_get -struct $struct $try {a {0 end {lmath_sum}}}
 } {10}
 
-test structlget-list {list test type, 1 to end} {
+test structlist_get-list {list test type, 1 to end} {
 	set struct {a {*list {*int ?}}}
 	set try {a {1 2 3 4}}
-	structlget -struct $struct $try {a {0 end {lmath_average}}}
+	structlist_get -struct $struct $try {a {0 end {lmath_average}}}
 } {2.5}
 
-test structlget-list {list index out of range} {
+test structlist_get-list {list index out of range} {
 	set struct {a {*list {*date ?}}}
 	set try [structlist_set -struct $struct {} a {{1 Jan 1998}}]
-	structlget -struct $struct $try {a 2}
+	structlist_get -struct $struct $try {a 2}
 } {}
 
-test structlget-list {list index error: invalid command} {
+test structlist_get-list {list index error: invalid command} {
 	set struct {a {*list {*int ?}}}
 	set try [structlist_set -struct $struct {} a {1 2 4}]
-	structlget -struct $struct $try {a {1 2 3}}
+	structlist_get -struct $struct $try {a {1 2 3}}
 } {invalid command name "3"} 1
 
-test structlget-list {list index out of range} {
+test structlist_get-list {list index out of range} {
 	set struct {a {*list {*date ?}}}
 	set try [structlist_set -struct $struct {} a {{1 Jan 1998}}]
-	structlget -struct $struct $try {a {2 4}}
+	structlist_get -struct $struct $try {a {2 4}}
 } {}
 
-test structlget-list {list 2 indices out of range} {
+test structlist_get-list {list 2 indices out of range} {
 	set struct {a {*list {*date ?}}}
 	set try [structlist_set -struct $struct {} a {{1 Jan 1998}}]
-	structlget -struct $struct $try {a {0 4}}
+	structlist_get -struct $struct $try {a {0 4}}
 } {{1 Jan 1998}}
 
-test structlget-list {list 2 indices} {
+test structlist_get-list {list 2 indices} {
 	set struct {a {*list {*date ?}}}
 	set try [structlist_set -struct $struct {} a {{1 Jan 1998} {2 Jan 1998}}]
-	structlget -struct $struct $try {a {0 end}}
+	structlist_get -struct $struct $try {a {0 end}}
 } {{1 Jan 1998} {2 Jan 1998}}
 
-test structlget-list {list 2 indices} {
+test structlist_get-list {list 2 indices} {
 	set struct {a {*list {*date ?}}}
 	set try [structlist_set -struct $struct {} a {{1 Jan 1998} {2 Jan 1998}}]
-	structlget -struct $struct $try {a {0 1}}
+	structlist_get -struct $struct $try {a {0 1}}
 } {{1 Jan 1998} {2 Jan 1998}}
 
 test structlist_set-list {list regexp} {
@@ -668,9 +668,9 @@ test structlist_set-list {set empty list sub element} {
 	set db [structlist_set -struct $dbstruct {} {art next} {}]
 } {art {{}}}
 
-test structlget-list {non empty default} {
+test structlist_get-list {non empty default} {
 	set struct {*list {*any {}}} 
-	structlget -struct $struct {} {}
+	structlist_get -struct $struct {} {}
 } {}
 
 test structlist_set-list {non empty default} {
@@ -715,10 +715,10 @@ test structlist_set-named {named set to default 2} {
 
 test structlist_set-named {check empty list with named} {
 	set struct {auth {*list {*named {*any {}}}}}
-	structlget -struct $struct {} {auth end name}
+	structlist_get -struct $struct {} {auth end name}
 } {}
 
-test structlget-named {check for non existing error} {
+test structlist_get-named {check for non existing error} {
 	proc ::Extral::getproc {structure data field value} {
 		return [list $field $value]
 	}
@@ -729,25 +729,25 @@ test structlget-named {check for non existing error} {
 		jou {*link Jou {}}
 	}
 	set data {auth {1 auth1.Auth}}
-	structlget -struct $struct $data {auth 2 name}
+	structlist_get -struct $struct $data {auth 2 name}
 } {name {}}
 
-test structlget-named {get all from empty} {
+test structlist_get-named {get all from empty} {
 	set schema {nums {*named {*any ?}}}
-	structlget -struct $schema {} {}
+	structlist_get -struct $schema {} {}
 } {nums {}}
 
-test structlget-named {get all from empty tag before named} {
+test structlist_get-named {get all from empty tag before named} {
 	set schema {nums {*named {*any ?}}}
-	structlget -struct $schema {} nums
+	structlist_get -struct $schema {} nums
 } {}
 
-test structlget-named {get all from empty tag in named} {
+test structlist_get-named {get all from empty tag in named} {
 	set schema {nums {*named {*any ?}}}
-	structlget -struct $schema {} {nums a}
+	structlist_get -struct $schema {} {nums a}
 } ?
 
-test structlget-named {with bool} {
+test structlist_get-named {with bool} {
 	set schema {{? bool b} {*named {*bool 0}}}
 	structlist_set -struct $schema {} {bool gvf} 1
 } {b {gvf 1}}

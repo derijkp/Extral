@@ -10,7 +10,7 @@
 # $Format: "set ::Extral::version 1.$ProjectMajorVersion$"$
 set ::Extral::version 1.1
 # $Format: "set ::Extral::patchlevel $ProjectMinorVersion$"$
-set ::Extral::patchlevel 10
+set ::Extral::patchlevel 11
 package provide Extral $::Extral::version
 
 #
@@ -21,7 +21,7 @@ package provide Extral $::Extral::version
 namespace eval Extral {}
 
 if [file exists [file join ${Extral::dir} extral[info sharedlibextension]]] {
-	if {"[info commands Extral::lpop]" == ""} {
+	if {"[info commands Extral::list_pop]" == ""} {
 		load [file join ${Extral::dir} extral[info sharedlibextension]]
 	}
 } else {

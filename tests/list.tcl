@@ -269,6 +269,13 @@ test list_common {} {
 	list_common $files $selfiles
 } {Bipsp.EAN Sibfio.EAN}
 
+test list_common {large} {
+	set list1 [list_fill 200 1 1]
+	set list2 [list_fill 200 100 1]
+	set list [list_common $list1 $list2]
+	llength $list
+} {101}
+
 test list_union {} {
 	list_union {a b c} {c d e}
 } {a b c d e}
@@ -389,7 +396,7 @@ test list_reverse {basic} {
 } {{d e} c {a b}}
 
 test list_change {basic} {
-	list_change {a b aa c aa g} aa x g y
+	list_change {a b aa c aa g} {aa x g y}
 } {a b x c x y}
 
 # no test yet for

@@ -261,7 +261,7 @@ proc ::Extral::unsetnamed {structure data oldvalue field} {
 		set tag [list_shift field]
 		set pos [structlist_find $oldvalue $tag]
 		if {$pos == -1} {
-			set code [catch {::Extral::structlunsetstruct $struct $data "" [llength $field] $field} res]
+			set code [catch {::Extral::structlist_unsetstruct $struct $data "" [llength $field] $field} res]
 			if {$code == 1} {
 				error "$res in named \"$tag\""
 			} elseif {$code == 5} {
@@ -272,7 +272,7 @@ proc ::Extral::unsetnamed {structure data oldvalue field} {
 				set result $oldvalue
 			}
 		} else {
-			set code [catch {::Extral::structlunsetstruct $struct $data [lindex $oldvalue $pos] [llength $field] $field} res]
+			set code [catch {::Extral::structlist_unsetstruct $struct $data [lindex $oldvalue $pos] [llength $field] $field} res]
 			if {$code == 1} {
 				error "$res in named \"$tag\""
 			} elseif {$code == 5} {
@@ -295,16 +295,16 @@ proc ::Extral::getnamed {structure data field value} {
 	if {"$field" == ""} {
 		set result ""
 		foreach {name val} $value {
-			lappend result $name [structlgetstruct $struc $data $val 0 ""]
+			lappend result $name [structlist_getstruct $struc $data $val 0 ""]
 		}
 		return $result
 	} else {
 		set tag [list_shift field]
 		set pos [structlist_find $value $tag]
 		if {$pos != -1} {
-			return [structlgetstruct $struc $data [lindex $value $pos] [llength $field] $field]
+			return [structlist_getstruct $struc $data [lindex $value $pos] [llength $field] $field]
 		} else {
-			return [structlgetstruct $struc $data {} [llength $field] $field]
+			return [structlist_getstruct $struc $data {} [llength $field] $field]
 		}
 	}
 }
@@ -366,7 +366,7 @@ proc ::Extral::unsetlist {structure data oldvalue field} {
 		set result ""
 		if {"$tag" == ""} {
 			foreach element $oldvalue {
-				set code [catch {::Extral::structlunsetstruct $struct $data $element $fieldlen $field} res]
+				set code [catch {::Extral::structlist_unsetstruct $struct $data $element $fieldlen $field} res]
 				if {$code == 1} {
 					error $res
 				} elseif {$code == 5} {
@@ -379,7 +379,7 @@ proc ::Extral::unsetlist {structure data oldvalue field} {
 			if {("$tag"!="end")&&($tag>$len)} {
 				return $oldvalue
 			}
-			set code [catch {::Extral::structlunsetstruct $struct $data [lindex $oldvalue $tag] $fieldlen $field} res]
+			set code [catch {::Extral::structlist_unsetstruct $struct $data [lindex $oldvalue $tag] $fieldlen $field} res]
 			if {$code == 1} {
 				error $res
 			} else {
@@ -415,7 +415,7 @@ proc ::Extral::getlist {structure data field value} {
 	if {$taglen == 0} {
 		set result ""
 		foreach val $value {
-			set code [catch {::Extral::structlgetstruct $struct $data $val [llength $field] $field} res]
+			set code [catch {::Extral::structlist_getstruct $struct $data $val [llength $field] $field} res]
 			if {$code == 1} {
 				error $res
 			} else {
@@ -432,7 +432,7 @@ proc ::Extral::getlist {structure data field value} {
 		if {("$tag" != "end")&&($tag > $len)} {
 			return ""
 		}
-		set code [catch {::Extral::structlgetstruct $struct $data [lindex $value $tag] [llength $field] $field} res]
+		set code [catch {::Extral::structlist_getstruct $struct $data [lindex $value $tag] [llength $field] $field} res]
 		if {$code == 1} {
 			error $res
 		} else {
@@ -454,7 +454,7 @@ proc ::Extral::getlist {structure data field value} {
 		}
 		set result ""
 		foreach val [lrange $value $start $end] {
-			set code [catch {::Extral::structlgetstruct $struct $data $val [llength $field] $field} res]
+			set code [catch {::Extral::structlist_getstruct $struct $data $val [llength $field] $field} res]
 			if {$code == 1} {
 				error $res
 			} else {

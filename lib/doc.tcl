@@ -57,19 +57,19 @@ proc Extral::makedoc {files dstdir {indextitle ""} {order ""}} {
 			set docdata($section) {}
 		}
 		set list $docdata($section)
-		if [catch {set title [structlget $list title]}] {
+		if [catch {set title [structlist_get $list title]}] {
 			set title $section
 		}
-		if [catch {set descr [structlget $list descr]}] {
+		if [catch {set descr [structlist_get $list descr]}] {
 			set descr ""
 		}
-		if [catch {set ind [structlget $list index]}] {
+		if [catch {set ind [structlist_get $list index]}] {
 			set ind ""
 		}
 		if {"$ind" != "none"} {
 			regsub -all \n $title {} title
 			append index($ind) "\n<li><a href=\"$section.html\">$title</a>"
-			if ![catch {set shortdescr [structlget $list shortdescr]}] {
+			if ![catch {set shortdescr [structlist_get $list shortdescr]}] {
 				regsub -all \n $shortdescr {} shortdescr
 				append index($ind) ": $shortdescr"
 			}
@@ -116,7 +116,7 @@ proc Extral::outputdoc {section} {
 	if ![info exists docdata($section)] return
 	set list $docdata($section)
 	set result ""
-	if [catch {set type [structlget $list type]}] {
+	if [catch {set type [structlist_get $list type]}] {
 		set type [lindex $list 0]
 	}
 	switch -regexp $type {
@@ -125,14 +125,14 @@ proc Extral::outputdoc {section} {
 				append result "<dl>"
 				set prevcmd 1
 			}
-			if [catch {set cmd [structlget $list cmd]}] {
+			if [catch {set cmd [structlist_get $list cmd]}] {
 				set cmd [lindex $section end]
 			}
 			append result "<b><dt>$cmd</b>"
-			if ![catch {set descr [structlget $list descr]}] {
+			if ![catch {set descr [structlist_get $list descr]}] {
 				append result "<dd>$descr"
 			}
-			if ![catch {set example [structlget $list example]}] {
+			if ![catch {set example [structlist_get $list example]}] {
 				append result "<br>eg.:<pre>$example</pre>"
 			}
 		}
@@ -141,16 +141,16 @@ proc Extral::outputdoc {section} {
 				append result "<dl>"
 				set prevcmd 1
 			}
-			if [catch {set option [structlget $list option]}] {
+			if [catch {set option [structlist_get $list option]}] {
 				set option [lindex $section end]
 			}
 			append result "<b><dt>Command-Line Name: [lindex $option 0]</b>"
 			append result "<b><dt>Database Name: [lindex $option 1]</b>"
 			append result "<b><dt>Database Class: [lindex $option 2]</b>"
-			if ![catch {set descr [structlget $list descr]}] {
+			if ![catch {set descr [structlist_get $list descr]}] {
 				append result "<dd>$descr"
 			}
-			if ![catch {set example [structlget $list example]}] {
+			if ![catch {set example [structlist_get $list example]}] {
 				append result "<br>eg.:<pre>$example</pre>"
 			}
 		}
@@ -159,11 +159,11 @@ proc Extral::outputdoc {section} {
 				append result "</dl>"
 				set prevcmd 0
 			}
-			if [catch {set title [structlget $list $type]}] {
+			if [catch {set title [structlist_get $list $type]}] {
 				set title [lindex $section end]
 			}
 			append result "<$type>$title</$type>"
-			if ![catch {set descr [structlget $list descr]}] {
+			if ![catch {set descr [structlist_get $list descr]}] {
 				append result $descr
 			}
 			if [info exists sections($section)] {

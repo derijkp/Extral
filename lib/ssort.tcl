@@ -35,7 +35,12 @@ proc ssort {args} {
 	set list [list_pop args]
 	set pos [lsearch $args -reflist]
 	if {$pos==-1} {
-		return [eval lsort $args {$list}]
+		if [catch {eval lsort $args {$list}} result] {
+			regsub -- {-integer, or -real} $result {-integer, -real, or -reflist} result
+			return -code error $result
+		} else {
+			return $result
+		}
 	} else {
 		list_pop args $pos
 		set temp [list_mangle $list [list_pop args $pos]]

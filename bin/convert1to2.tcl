@@ -4,64 +4,69 @@ exec tclsh8.0 "$0" "$@"
 
 package require Extral 1.1
 set Extral::changes {
-	string::split string_split
-	string::change string_change
-	string::reverse string_reverse
-	string::find string_find
-	string::replace string_replace
-	list::change list_change
-	lpop list_pop
-	lshift list_shift
-	lsub list_sub
-	lfind list_find
-	lcor list_cor
-	lremdup list_remdup
-	llremove list_lremove
-	lremove list_remove
-	lmerge list_merge
-	lunmerge list_unmerge
-	lreverse list_reverse
-	lpush list_push
-	lunshift list_unshift
-	lset list_set
-	larrayset list_arrayset
-	lcommon list_common
-	lunion list_union
-	leor list_eor
-	laddnew list_addnew
-	oneof inlist
-	lload list_load
-	lwrite list_write
-	lregsub list_regsub
-	literate list_iterate
-	lnext list_next
-	readfile file_read
-	writefile file_write
-	"lmath calc" lmath_calc
-	"lmath sum" lmath_sum
-	"lmath min" lmath_min
-	"lmath max" lmath_max
-	"lmath cumul" lmath_cumul
-	"lmath incr" lmath_incr
-	"lmath between" lmath_between
-	"lmath average" lmath_average
-	"lmanip subindex" list_subindex
-	"lmanip mangle" list_mangle
-	"lmanip extract" list_extract
-	"lmanip split" list_split
-	"lmanip join" list_join
-	"lmanip lengths" list_lengths
-	"lmanip fill" list_fill
-	"lmanip ffill" list_ffill
-	"amanip lappend" array_lappend
-	"amanip get" array_lget
-	arraytrans array_trans
-	scantime time_scan
-	formattime time_format
-	getcomplete cmd_get
-	splitcomplete cmd_split
-	parsecommand cmd_parse
-	cload cmd_load
+	string_split string_split
+	string_change string_change
+	string_reverse string_reverse
+	string_find string_find
+	string_replace string_replace
+	list_change list_change
+	list_pop list_pop
+	list_shift list_shift
+	list_sub list_sub
+	list_find list_find
+	list_cor list_cor
+	list_remdup list_remdup
+	list_lremove list_list_remove
+	list_remove list_remove
+	list_merge list_merge
+	list_unmerge list_unmerge
+	list_reverse list_reverse
+	list_push list_push
+	list_unshift list_unshift
+	list_set list_set
+	list_arrayset list_arrayset
+	list_common list_common
+	list_union list_union
+	list_eor list_eor
+	list_addnew list_addnew
+	inlist inlist
+	list_load list_load
+	list_write list_write
+	list_regsub list_regsub
+	list_iterate list_iterate
+	list_next list_next
+	file_read file_read
+	file_write file_write
+	"lmath_calc" lmath_calc
+	"lmath_sum" lmath_sum
+	"lmath_min" lmath_min
+	"lmath_max" lmath_max
+	"lmath_cumul" lmath_cumul
+	"lmath_incr" lmath_incr
+	"lmath_between" lmath_between
+	"lmath_average" lmath_average
+	"list_subindex" list_subindex
+	"list_mangle" list_mangle
+	"list_extract" list_extract
+	"list_split" list_split
+	"list_join" list_join
+	"list_lengths" list_lengths
+	"list_fill" list_fill
+	"list_ffill" list_ffill
+	"array_lappend" array_lappend
+	"array_lget" array_lget
+	array_trans array_trans
+	time_scan time_scan
+	time_format time_format
+	cmd_get cmd_get
+	cmd_split cmd_split
+	cmd_parse cmd_parse
+	cmd_load cmd_load
+	structlist_set structlist_set
+	structlist_get structlist_get
+	structlist_unset structlist_unset
+	structlist_fields structlist_fields
+	structlist_find structlist_find
 }
 
 proc convert {files} {
