@@ -43,8 +43,8 @@ extratcl: tclAppInit.o $(OBJECTS)
 
 clean:
 	rm -f *.o *${SHLIB_SUFFIX} config.cache config.log lib.exp
-	rm -f core ../core
-	rm -f ../extral$(SHLIB_SUFFIX) ../extral.dll ../win/*.obj ../win/*.csm
+	rm -f core ../core extratcl
+	rm -f ../extral$(SHLIB_SUFFIX) ../extral.dll ../win/tmp/*.obj ../win/*.csm
 
 Makefile: Makefile.in
 	./config.status

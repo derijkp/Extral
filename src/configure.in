@@ -11,13 +11,13 @@ AC_INIT(extral.c)
 
 AC_ARG_WITH(tcl, [  --with-tcl=DIR          Use Tcl source tree from
 DIR],
-        TCL_SRC_DIR=$withval, TCL_SRC_DIR=`cd ../../tcl7.6/unix; pwd`)
+        TCL_SRC_DIR=$withval, TCL_SRC_DIR=`cd ../../tcl8.0a2/unix; pwd`)
 if test ! -d $TCL_SRC_DIR; then
     AC_MSG_ERROR(Tcl directory $TCL_SRC_DIR doesn't exist)
 fi
 
 AC_ARG_WITH(tk, [  --with-tk=DIR          use Tk source tree from DIR],
-        TK_SRC_DIR=$withval, TK_SRC_DIR=`cd $TCL_SRC_DIR/../tk4.2; pwd`)
+        TK_SRC_DIR=$withval, TK_SRC_DIR=`cd $TCL_SRC_DIR/../tk8.0a2; pwd`)
 if test ! -d $TK_SRC_DIR; then
     AC_MSG_ERROR(Tcl directory $TK_SRC_DIR doesn't exist)
 fi

@@ -1,5 +1,5 @@
 /*	
- *	 File:    extral.c
+ *	 File:	extral.c
  *	 Purpose: extraL extension to Tcl
  *	 Author:  Copyright (c) 1995 Peter De Rijk
  *
@@ -26,99 +26,84 @@
  *
  *----------------------------------------------------------------------
  */
-
-		/* ARGSUSED */
 int
-ExtraL_LpopCmd(notUsed, interp, argc, argv)
-	ClientData notUsed;				 /* Not used. */
-	Tcl_Interp *interp;					/* Current interpreter. */
-	int argc;						/* Number of arguments. */
-	char **argv;					    /* Argument strings. */
+ExtraL_LpopObjCmd(dummy, interp, objc, objv)
+	ClientData dummy;		/* Not used. */
+	Tcl_Interp *interp;		/* Current interpreter. */
+	int objc;			/* Number of arguments. */
+	Tcl_Obj **objv;		/* Argument objects. */
 {
-	int listArgc;
-	char **listArgv;
-	int start,end,pos;
-    char *p, *element, savedChar, *next, *string;
-    int index, size, parenthesized, result, returnLast;
+	Interp *iPtr = (Interp *) interp;
+	Tcl_Obj *resultPtr = iPtr->objResult;
+	register Tcl_Obj *listObjPtr;
+	Tcl_Obj *popPtr;
+	char *firstStr;
+	int listLen;
+	long first;
+	int result;
 
-	if ((argc < 2)||(argc > 3)) {
-		Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-				 " list ?pos?\"", (char *) NULL);
+	if ((objc != 2)&&(objc != 3)) {
+		Tcl_StringObjAppend(resultPtr, "wrong # args: should be \"", -1);
+		Tcl_StringObjAppendObj(resultPtr, objv[0]);
+		Tcl_StringObjAppend(resultPtr,
+	 	 	   " listName pos\"", -1);
+	return TCL_ERROR;
+	}
+
+	listObjPtr = Tcl_ObjGetVar2(interp, objv[1], (Tcl_Obj *) NULL,
+		(TCL_LEAVE_ERR_MSG | TCL_PART1_NOT_PARSED));
+	if (listObjPtr == NULL) {
 		return TCL_ERROR;
 	}
 	
-	string=Tcl_GetVar(interp,argv[1],TCL_LEAVE_ERR_MSG);
-	if (string == NULL) {
-	    return TCL_ERROR;
-	}
-    if ((argc<3)||((*argv[2] == 'e') && (strncmp(argv[2], "end", strlen(argv[2])) == 0))) {
-		returnLast = 1;
-		index = INT_MAX;
-    } else {
-		returnLast = 0;
-		if (Tcl_GetInt(interp, argv[2], &index) != TCL_OK) {
-		    Tcl_ResetResult(interp);
-		    Tcl_AppendResult(interp, "bad index \"", argv[2],
-			    "\": must be integer or \"end\"", (char *) NULL);
-		    return TCL_ERROR;
-		}
-		if (index==0) {
-			return(ExtraL_LshiftCmd(notUsed, interp, argc-1, argv));
-		}
-    }
-    if (index < 0) {
-		index = 0;
-    }
 
-    size = 0;
-    element = string;
-    for (p = string; index >= 0; index--) {
-		result = TclFindElement(interp, p, &element, &next, &size, &parenthesized);
-		if (result != TCL_OK) {return result;}
-		if ((*next == 0) && returnLast) {break;}
-		p = next;
-    }
-    if ((returnLast==0)&&(*next == 0)&&(index != -1)) {
-		Tcl_AppendResult(interp, "list doesn't contain element ",argv[2], (char *) NULL);
-		return TCL_ERROR;
-    }
-
-    if (size >= TCL_RESULT_SIZE) {
-		interp->result = (char *) ckalloc((unsigned) size+1);
-		interp->freeProc = TCL_DYNAMIC;
-    }
-    if (parenthesized) {
-		memcpy((VOID *) interp->result, (VOID *) element, (size_t) size);
-		interp->result[size] = 0;
-		element--;
-    } else {
-		TclCopyAndCollapse(size, element, interp->result);
-    }
-
-	if (element[-1]=='"') element--;
-	while ((element != argv[1]) && (isspace(UCHAR(element[-1])))) {
-		element--;
-	}
 	/*
-	 * Add the first part to the list.
+	 * THIS FAILS IF THE OBJECT'S STRING REP CONTAINS NULLS.
 	 */
-
-	*element = 0;
-	if (Tcl_SetVar(interp, argv[1], string,TCL_LEAVE_ERR_MSG)==NULL) {
+	
+	result=Tcl_ListObjLength(interp,listObjPtr,&listLen);
+	if (result==TCL_ERROR) {
 		return TCL_ERROR;
+	}
+	if (objc==2) {
+		first = (listLen - 1);
+	} else {
+		firstStr = Tcl_GetStringFromObj(objv[2], (int *)NULL);
+		if ((*firstStr == 'e') && (strcmp(firstStr, "end") == 0)) {
+			first = (listLen - 1);
+		} else {
+			result=Tcl_GetIntFromObj(interp,objv[2],&first);
+			if (result==TCL_ERROR) {
+				return TCL_ERROR;
+			}
+		}
+		if (first < 0)  {
+			first = 0;
+		}
+		if (first >= listLen) {
+			Tcl_ResetObjResult(interp);
+			resultPtr = iPtr->objResult;
+			Tcl_StringObjAppend(resultPtr, "list doesn't contain element ", -1);
+			Tcl_StringObjAppendObj(resultPtr, objv[2]);
+			return TCL_ERROR;
+		}
+	}
+
+	result = Tcl_ListObjIndex(interp,listObjPtr,first,&popPtr);
+	if (result != TCL_OK) {
+		return result;
+	}
+	Tcl_SetObjResult(interp,popPtr);
+	result = Tcl_ListObjReplace(interp, listObjPtr, first, 1, 0, NULL);
+	if (result != TCL_OK) {
+		return result;
 	}
 
 	/*
-	 * Append the remainder of the original list.
+	 * Set the interpreter's object result. 
 	 */
 
-	if (*next != 0) {
-		if (*string	!= '\0') {
-			Tcl_SetVar(interp, argv[1], " ",TCL_APPEND_VALUE);
-		}
-		Tcl_SetVar(interp, argv[1], next,TCL_APPEND_VALUE);
-	}
-    return TCL_OK;
+	return TCL_OK;
 }
 
 /*
@@ -136,53 +121,47 @@ ExtraL_LpopCmd(notUsed, interp, argc, argv)
  *----------------------------------------------------------------------
  */
 
-		/* ARGSUSED */
 int
-ExtraL_LshiftCmd(notUsed, interp, argc, argv)
+ExtraL_LshiftObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;				 /* Not used. */
 	Tcl_Interp *interp;					/* Current interpreter. */
-	int argc;						/* Number of arguments. */
-	char **argv;					    /* Argument strings. */
+	int objc;			/* Number of arguments. */
+	Tcl_Obj **objv;		/* Argument objects. */
 {
-	int listArgc;
-	char **listArgv;
-	int start,end,pos;
-    char *element, savedChar, *next, *string;
-    int size, parenthesized, result, returnLast;
+	Interp *iPtr = (Interp *) interp;
+	Tcl_Obj *resultPtr = iPtr->objResult;
+	register Tcl_Obj *listObjPtr;
+	Tcl_Obj *popPtr;
+	int result;
 
-	if (argc != 2) {
-		Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-				 " list\"", (char *) NULL);
+	if (objc != 2) {
+		Tcl_StringObjAppend(resultPtr, "wrong # args: should be \"", -1);
+		Tcl_StringObjAppendObj(resultPtr, objv[0]);
+		Tcl_StringObjAppend(resultPtr,
+	 	 	   " listName\"", -1);
+	return TCL_ERROR;
+	}
+
+	listObjPtr = Tcl_ObjGetVar2(interp, objv[1], (Tcl_Obj *) NULL,
+		(TCL_LEAVE_ERR_MSG | TCL_PART1_NOT_PARSED));
+	if (listObjPtr == NULL) {
 		return TCL_ERROR;
 	}
 	
-	string=Tcl_GetVar(interp,argv[1],TCL_LEAVE_ERR_MSG);
-	if (string == NULL) {
-	    return TCL_ERROR;
-	}
 
-	size = 0;
-	element = string;
-	result = TclFindElement(interp, string, &element, &next, &size, &parenthesized);
-	if (result != TCL_OK) {return result;}
-	if (size >= TCL_RESULT_SIZE) {
-		interp->result = (char *) ckalloc((unsigned) size+1);
-		interp->freeProc = TCL_DYNAMIC;
+	result = Tcl_ListObjIndex(interp,listObjPtr,0,&popPtr);
+	if (result != TCL_OK) {
+		return result;
 	}
-	if (parenthesized) {
-		memcpy((VOID *) interp->result, (VOID *) element, (size_t) size);
-		interp->result[size] = 0;
-		element--;
-	} else {
-		TclCopyAndCollapse(size, element, interp->result);
+	Tcl_SetObjResult(interp,popPtr);
+	result = Tcl_ListObjReplace(interp, listObjPtr, 0, 1, 0, NULL);
+	if (result != TCL_OK) {
+		return result;
 	}
 
 	/*
-	 * Append the remainder of the original list.
+	 * Set the interpreter's object result. 
 	 */
 
-	if (Tcl_SetVar(interp, argv[1], next,TCL_LEAVE_ERR_MSG)==NULL) {
-		return TCL_ERROR;
-	}
-    return TCL_OK;
+	return TCL_OK;
 }
