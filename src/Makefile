@@ -12,14 +12,10 @@ PROJECT = extral
 # The directory containing the Tcl sources and headers appropriate
 # for this version of Tk ("srcdir" will be replaced or has already
 # been replaced by the configure script):
-TCL_GENERIC_DIR =	/home/peter/tcl/tcl8.0.4/generic
-
-# The directory containing the Tcl library archive file appropriate
-# for this version of Tk:
-TCL_BIN_DIR = @TCL_BIN_DIR@
+TCL_GENERIC_DIR =	/usr/src/bs/BUILD/tcltk-8.0.4/tcl8.0.4/generic
 
 # Libraries to use when linking:
-LIBS = -L/home/peter/tcl/tcl8.0.4/unix -ltcl8.0${TCL_DBGX} -ldl  -lm -lc
+LIBS = -L/usr/lib -ltcl8.0${TCL_DBGX} -ldl  -lm -lc
 
 #----------------------------------------------------------------
 # The information below is modified by the configure script when
@@ -35,10 +31,10 @@ SHLIB_VERSION =
 SRC_DIR =		.
 
 CFLAGS = -O -Wall
-CC_SWITCHES = $(CFLAGS) -I${TCL_GENERIC_DIR} ${SHLIB_CFLAGS}
+CC_SWITCHES = $(CFLAGS) ${SHLIB_CFLAGS}
 
 OBJECTS = extralInit.o extral.o list_pop.o string.o array.o supersort.o general.o \
-			structl.o structltypes.o date.o leval.o
+			structl.o structltypes.o date.o
 
 all: $(PROJECT)${SHLIB_SUFFIX}
 
@@ -46,12 +42,16 @@ $(PROJECT)${SHLIB_SUFFIX}: $(OBJECTS)
 	${SHLIB_LD} $(OBJECTS) -o ../$(PROJECT)${SHLIB_SUFFIX} 
 
 extratcl: tclAppInit.o $(OBJECTS)
-	$(CC) $(CFLAGS) -o extratcl tclAppInit.o $(OBJECTS) ${TCL_LIB_SPEC} ${LIBS}
+	$(CC) $(CFLAGS) -o extratcl tclAppInit.o $(OBJECTS) ${LIBS}
 
 clean:
 	rm -f *.o *${SHLIB_SUFFIX} config.cache config.log lib.exp
 	rm -f core ../core extratcl
 	rm -f ../*.so ../*.dll ./*.so ./*.dll ../win/tmp/*.obj ../win/*.csm
+
+install: 
+	../makedoc.tcl
+	../makedist.tcl /usr/lib
 
 Makefile: Makefile.in
 	./config.status

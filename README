@@ -12,7 +12,6 @@ Extral is a generally useful library which extends Tcl with a.o.:
 	- atexit
 	- tempfile
 	- filing commands
-	- light eval (Viktor Dukhovni)
 	
 The name comes from the fact that ExtraL originally only contained
 extra list processing commands to overcome some of the performance 
@@ -34,7 +33,7 @@ Changes
 This release contains many changes with regards to previous releases. Many
 commands have been renamed in order to get a more clear and consistent
 naming scheme. There is a small compatibility layer for old releases, but
-it is adviced to use the new command names.
+it is adviced to use the new command names. leval has been removed.
 The dbm support will be moved to a seperate package.
 
 Installation

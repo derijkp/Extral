@@ -3,6 +3,8 @@
 exec tclsh8.0 "$0" ${1+"$@"}
 #
 
+cd [file dir [info script]]
+
 if {[llength $argv] == 0} {
 	set targetdir [file dir [pwd]]
 } else {
@@ -12,7 +14,7 @@ if {[llength $argv] == 0} {
 # $Format: "set version 1.$ProjectMajorVersion$"$
 set version 1.1
 # $Format: "set minorversion $ProjectMinorVersion$"$
-set minorversion 9
+set minorversion 10
 
 set targetdir [file join $targetdir Extral-$tcl_platform(os)-$version.$minorversion]
 puts "Building binary distribution in $targetdir"
@@ -39,6 +41,7 @@ proc clean {filemode dirmode dir} {
 	if [file exists $targetdir] {
 		error "Target build directory $targetdir exists"
 	}
+	auto_mkindex lib
 	file mkdir $targetdir
 	file copy docs lib $targetdir
 	file copy README pkgIndex.tcl $targetdir
@@ -46,6 +49,7 @@ proc clean {filemode dirmode dir} {
 		puts stderr "Warning, no compiled version available"
 	}
 	clean 0644 0755 $targetdir
+	auto_mkindex [file join $targetdir lib]
 exit
 
 

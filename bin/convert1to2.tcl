@@ -1,6 +1,6 @@
 #!/bin/sh
 # the next line restarts using tclsh \
-exec tclsh "$0" "$@"
+exec tclsh8.0 "$0" "$@"
 
 package require Extral 1.1
 set Extral::changes {
