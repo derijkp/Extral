@@ -1,13 +1,7 @@
 set auto_path {/home/peter/dev/Extral0.94 /home/peter/bin/Peos0.84 /usr/local/lib/tcl7.6 /usr/local/lib/tk4.2}
 package require Extral
 
-set list1 {a {b sdf} c {d dsfg}}
-set list2 {c {d dsfg} {e sd} f}
-
-set try $list
-time {eval lremove try $args}
-
-ffind -regexp -matches -allfiles [glob test/*] "\norg:(\[^\n\]*)\n" ::NULL::
+ffind -regexp -matches -allfiles [glob test/*] "\norg:(\[^\n\]*)\n" ::NULL:: org
 
 ffind -regexp -matches -allfiles [glob test/*] "\norg:(\[^\n\]*)\n" ::NULL:: org "\nsrc:(\[^\n\]*)\n" none src
 ffind -regexp -allmatches -matches [glob test/*] "\norg:(\[^\n\]*)\n" org "\n(s..):" try
