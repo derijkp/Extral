@@ -23,13 +23,19 @@ test structlset-types {int error: give string} {
 	set struct {a {*int ?}}
 	set try {}
 	structlset -struct $struct $try a try
-} {expected integer but got "try"} 1
+} {expected integer but got "try" at field "a"} 1
+
+test structlset-types {int error in subfield} {
+	set struct {a {a {*int ?}}}
+	set try {}
+	structlset -struct $struct $try a {a try}
+} {expected integer but got "try" at field "a" at field "a"} 1
 
 test structlset-types {int error: give double} {
 	set struct {a {*int ?}}
 	set try {}
 	structlset -struct $struct $try a 10.2
-} {expected integer but got "10.2"} 1
+} {expected integer but got "10.2" at field "a"} 1
 
 test structlset-types {double} {
 	set struct {a {*double ?}}
@@ -47,7 +53,7 @@ test structlset-types {double error: give string} {
 	set struct {a {*double ?}}
 	set try {}
 	structlset -struct $struct $try a try
-} {expected floating-point number but got "try"} 1
+} {expected floating-point number but got "try" at field "a"} 1
 
 test structlset-types {bool} {
 	set struct {a {*bool ?}}
@@ -65,7 +71,7 @@ test structlset-types {bool error} {
 	set struct {a {*bool ?}}
 	set try {}
 	structlset -struct $struct $try a try
-} {expected boolean value but got "try"} 1
+} {expected boolean value but got "try" at field "a"} 1
 
 test structlset-types {regexp} {
 	set struct {a {*regexp ^a "does not start with an a" ?}}
@@ -77,7 +83,7 @@ test structlset-types {regexp error} {
 	set struct {a {*regexp ^a "does not start with an a" ?}}
 	set try {}
 	structlset -struct $struct $try a b10
-} {error: "b10" does not start with an a} 1
+} {error: "b10" does not start with an a at field "a"} 1
 
 test structlset-types {regexp: one of} {
 	set struct {a {*regexp ^try|any|yes|no$ "is not one of try, any, yes or no" ?}}
@@ -89,13 +95,13 @@ test structlset-types {regexp: one of error} {
 	set struct {a {*regexp ^try|any|yes|no$ "is not one of try, any, yes or no" ?}}
 	set try {}
 	structlset -struct $struct $try a test
-} {error: "test" is not one of try, any, yes or no} 1
+} {error: "test" is not one of try, any, yes or no at field "a"} 1
 
 test structlset-types {regexp: not enough arguments} {
 	set struct {a {*regexp}}
 	set try {}
 	structlset -struct $struct $try a try
-} {error: wrong number of arguments in structure "*regexp"} 1
+} {error: wrong number of arguments in structure "*regexp" at field "a"} 1
 
 test structlset-types {between: ok} {
 	set struct {a {*between 0 10 ?}}
@@ -119,13 +125,13 @@ test structlset-types {between: too low} {
 	set struct {a {*between 0 10 ?}}
 	set try {}
 	structlset -struct $struct $try a -1
-} {error: -1 is not between 0 and 10} 1
+} {error: -1 is not between 0 and 10 at field "a"} 1
 
 test structlset-types {between: too high} {
 	set struct {a {*between 0 10 ?}}
 	set try {}
 	structlset -struct $struct $try a 11
-} {error: 11 is not between 0 and 10} 1
+} {error: 11 is not between 0 and 10 at field "a"} 1
 
 test structlset-types {dbetween: ok} {
 	set struct {a {*dbetween 0.5 1.8 ?}}
@@ -149,17 +155,17 @@ test structlset-types {dbetween: too low} {
 	set struct {a {*dbetween 0.5 1.8 ?}}
 	set try {}
 	structlset -struct $struct $try a 0
-} {error: 0 is not between 0.5 and 1.8} 1
+} {error: 0 is not between 0.5 and 1.8 at field "a"} 1
 
 test structlset-types {dbetween: too high} {
 	set struct {a {*dbetween 0.5 1.8 ?}}
 	set try {}
 	structlset -struct $struct $try a 11
-} {error: 11 is not between 0.5 and 1.8} 1
+} {error: 11 is not between 0.5 and 1.8 at field "a"} 1
 
 test structlset-types {proc} {
 	namespace eval ::Extral {
-		proc setproc {stucture oldvalue field value} {
+		proc setproc {structure data oldvalue field value} {
 			return "try:$value"
 		}
 	}
@@ -170,7 +176,7 @@ test structlset-types {proc} {
 
 test structlset-types {proc with argument: set} {
 	namespace eval ::Extral {
-		proc setproc {structure oldvalue field value} {
+		proc setproc {structure data oldvalue field value} {
 			return "[lindex $structure 1]:$value"
 		}
 	}
@@ -181,7 +187,7 @@ test structlset-types {proc with argument: set} {
 
 test structlset-types {proc set: use oldvalue} {
 	namespace eval ::Extral {
-		proc setproc {structure oldvalue field value} {
+		proc setproc {structure data oldvalue field value} {
 			return "$oldvalue -> $value"
 		}
 	}
@@ -204,7 +210,7 @@ test structlget-types {get int} {
 
 test structlget-types {proc get} {
 	namespace eval ::Extral {
-		proc getproc {structure field value} {
+		proc getproc {structure data field value} {
 			return "try:$value"
 		}
 	}
@@ -215,7 +221,7 @@ test structlget-types {proc get} {
 
 test structlget-types {proc get with argument} {
 	namespace eval ::Extral {
-		proc getproc {structure field value} {
+		proc getproc {structure data field value} {
 			return "[lindex $structure 1]:$value"
 		}
 	}
@@ -242,27 +248,75 @@ test structlget-types {get date} {
 	structlget -struct $struct $try a
 } {9 May 1997}
 
+test structlget-types {get date} {
+	set struct {a {*date ?}}
+	set try {a 62998732800.0}
+	structlget -struct $struct $try {a val}
+} {62998732800.0}
+
 test structlset-types {set time} {
-	set struct {a {*time t ?}}
+	set struct {a {*time ?}}
 	set try {}
 	structlset -struct $struct $try a {9 May 1997 12:30:24}
 } {a 62998777824.0}
 
 test structlset-types {set time 2} {
-	set struct {a {*time t ?}}
+	set struct {a {*time ?}}
 	set try {}
 	structlset -struct $struct $try a {05/09/1997 12:30:24}
 } {a 62998777824.0}
 
 test structlget-types {get time} {
-	set struct {a {*time t ?}}
+	set struct {a {*time ?}}
 	set try {a 62998777824.0}
 	structlget -struct $struct $try a
 } {9 May 1997 12:30:24}
 
+test structlget-types {get time: check empty} {
+	set struct {a {*time ?}}
+	structlget -struct $struct {} a
+} {?}
+
+test structlget-types {get time: check empty with val} {
+	set struct {a {*time ?}}
+	Extral::structlget -struct $struct {} {a val}
+} {?}
+
+test structlget-types {get time: check empty with param} {
+	set struct {a {*time ?}}
+	structlget -struct $struct {} {a "%t"}
+} {?}
+
+test structlget-types {get date: check empty with val} {
+	set struct {a {*date ?}}
+	Extral::structlget -struct $struct {} {a val}
+} {?}
+
+test structlget-types {get date: check empty with param} {
+	set struct {a {*date ?}}
+	structlget -struct $struct {} {a "%t"}
+} {?}
+
+test structlget-types {set time: check empty} {
+	set struct {a {*time ?}}
+	structlset -struct $struct {} a ?
+} {}
+
+test structlget-types {get time with format} {
+	set struct {a {*time ?}}
+	set try {a 62998777824.0}
+	structlget -struct $struct $try {a "%H:%M:%S %e %b %Y"}
+} {12:30:24 9 May 1997}
+
+test structlget-types {get time with format} {
+	set struct {a {*time ?}}
+	set try {a 62998777824.0}
+	structlget -struct $struct $try {a val}
+} {62998777824.0}
+
 test structlset-types {proc get with field} {
 	namespace eval ::Extral {
-		proc getproc {structure field value} {
+		proc getproc {structure data field value} {
 			return [list $field $value]
 		}
 	}
@@ -272,12 +326,12 @@ test structlset-types {proc get with field} {
 } {b 11}
 
 test structlget-types {check for non existing error} {
-	proc ::Extral::getproc {stucture field value} {
+	proc ::Extral::getproc {structure data field value} {
 		return [list $field $value]
 	}
 	set struct {
 		auth {
-			* {*proc Auth {}}
+			*named {*proc Auth {}} {}
 		}
 		jou {*link Jou {}}
 	}
@@ -307,7 +361,7 @@ test structlset-types {list parameter: non existing num} {
 	set struct {a {*list {*int ?} {}}}
 	set try {}
 	Extral::structlset -struct $struct $try {a 2} 4
-} {empty list} 1
+} {empty list at field "a"} 1
 
 test structlset-types {list parameter end} {
 	set struct {a {*list {*int ?} {}}}
@@ -319,7 +373,7 @@ test structlset-types {list error} {
 	set struct {a {*list {*int ?} {}}}
 	set try {}
 	structlset -struct $struct $try a {1 2 c}
-} {expected integer but got "c"} 1
+} {expected integer but got "c" at field "a"} 1
 
 test structlset-types {struct in list: simple} {
 	set struct {
@@ -366,7 +420,7 @@ test structlset-types {struct in list error} {
 	} {}}}
 	set try {}
 	Extral::structlset -struct $struct $try {a "" b} {1 c 3}
-} {expected integer but got "c"} 1
+} {expected integer but got "c" at field "b" at field "a"} 1
 
 test structlget-types {list test type, end index} {
 	set struct {a {*list {*date ?} {}}}
@@ -387,11 +441,11 @@ test structlget-types {list test type, 1 to end} {
 	structlget -struct $struct $try {a {1 end}}
 } {{2 Jan 1998} {3 Jan 1998}}
 
-test structlget-types {list index error} {
+test structlget-types {list index out of range} {
 	set struct {a {*list {*date ?} {}}}
 	set try [structlset -struct $struct {} a {{1 Jan 1998}}]
 	structlget -struct $struct $try {a 2}
-} {list doesn't contain element 2} 1
+} {}
 
 test structlget-types {list index error: invalid argument} {
 	set struct {a {*list {*date ?} {}}}
@@ -399,17 +453,17 @@ test structlget-types {list index error: invalid argument} {
 	structlget -struct $struct $try {a {1 2 3}}
 } {wrong # args to list: "1 2 3"} 1
 
-test structlget-types {list index error} {
+test structlget-types {list index out of range} {
 	set struct {a {*list {*date ?} {}}}
 	set try [structlset -struct $struct {} a {{1 Jan 1998}}]
 	structlget -struct $struct $try {a {2 4}}
-} {list doesn't contain element 2} 1
+} {}
 
-test structlget-types {list 2 indices error} {
+test structlget-types {list 2 indices out of range} {
 	set struct {a {*list {*date ?} {}}}
 	set try [structlset -struct $struct {} a {{1 Jan 1998}}]
 	structlget -struct $struct $try {a {0 4}}
-} {list doesn't contain element 4} 1
+} {{1 Jan 1998}}
 
 test structlget-types {list 2 indices} {
 	set struct {a {*list {*date ?} {}}}
@@ -422,5 +476,32 @@ test structlget-types {list 2 indices} {
 	set try [structlset -struct $struct {} a {{1 Jan 1998} {2 Jan 1998}}]
 	structlget -struct $struct $try {a {0 1}}
 } {{1 Jan 1998} {2 Jan 1998}}
+
+test structlset-struct {check empty list} {
+	set struct {auth {*list {* {*any {}}} {}}}
+	structlget -struct $struct {} {auth end name}
+} {}
+
+test structlset-types {proc set: check data} {
+	namespace eval ::Extral {
+		proc setproc {structure data oldvalue field value} {
+			return [list $data $oldvalue $value]
+		}
+	}
+	set struct {a {*proc t ?}}
+	set try {a 8}
+	structlset -data d -struct $struct $try a 9
+} {a {d 8 9}}
+
+test structlget-types {proc get: test data} {
+	namespace eval ::Extral {
+		proc getproc {structure data field value} {
+			return [list $data $value]
+		}
+	}
+	set struct {a {*proc ?}}
+	set try {a 10}
+	structlget -data d -struct $struct $try a
+} {d 10}
 
 testsummarize

@@ -24,6 +24,9 @@ rename exit ::Extral::exit
 	}
 
 
+if 0 {
+proc Extral::atexit {} {}
+}
 Extral::export {atexit} {
 
 #doc {atexit atexit} cmd {

@@ -5,6 +5,9 @@
 #
 # =============================================================
 
+if 0 {
+proc Extral::varsubst {} {}
+}
 Extral::export {varsubst} {
 
 #doc {convenience varsubst} cmd {

@@ -8,7 +8,18 @@
 # =============================================================
 #doc convenience title {Convenience functions}
 
-Extral::export {rem REM remoff true setglobal random extractoption extractbool} {
+if 0 {
+proc Extral::rem {} {}
+proc Extral::REM {} {}
+proc Extral::remoff {} {}
+proc Extral::true {} {}
+proc Extral::setglobal {} {}
+proc Extral::random {} {}
+proc Extral::extractoption {} {}
+proc Extral::extractbool {} {}
+proc Extral::inlist {} {}
+}
+Extral::export {rem REM remoff true setglobal random extractoption extractbool inlist} {
 
 #doc {convenience rem} cmd {
 #rem args
@@ -76,6 +87,20 @@ proc setglobal {varName args} {
 proc random {min max} {
 	set r [expr $max-$min+1]
 	return [expr int($min+rand()*$r)]
+}
+
+#doc {convenience random} cmd {
+#inlist list value
+#} descr {
+#returns 1 if $value is an element of list $list
+#returns 0 if $value is not an element of list $list
+#}
+proc inlist {list value} {
+        if {[lsearch $list $value]==-1} {
+                return 0
+        } else {
+                return 1
+        }
 }
 
 proc extractoption {listName option default} {

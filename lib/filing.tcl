@@ -10,6 +10,16 @@
 #Filing commands
 #}
 
+if 0 {
+proc Extral::dirglob {} {}
+proc Extral::lload {} {}
+proc Extral::lwrite {} {}
+proc Extral::readfile {} {}
+proc Extral::writefile {} {}
+proc Extral::getcomplete {} {}
+proc Extral::splitcomple {} {}
+proc Extral::cload {} {}
+}
 Extral::export {dirglob lload lwrite readfile writefile getcomplete splitcomplete cload} {
 
 #doc {filing dirglob} cmd {

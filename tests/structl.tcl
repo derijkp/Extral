@@ -107,8 +107,8 @@ test structlget {check uneven} {
 } {error: list "a 1 bb 2 ccc" does not have an even number of elements} 1
 
 test structlget {def} {
-	structlget {a 1} b def
-} {def}
+	structlget {a 1 b 2} b a
+} {2 1}
 
 test structlget {not found} {
 	structlget {a 1} b

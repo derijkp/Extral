@@ -45,6 +45,9 @@
 #	Any value lower than the minimum is changed to the minimum.
 #}
 
+if 0 {
+proc Extral::lmath {} {}
+}
 Extral::export {lmath} {
 
 proc lmath {option args} {

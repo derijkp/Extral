@@ -8,6 +8,9 @@
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
 # ===========================================
+if 0 {
+proc Extral::literate {} {}
+}
 
 Extral::export {literate lnext} {
 

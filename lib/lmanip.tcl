@@ -79,6 +79,9 @@
 #	% lmanip fill 5 10 -2
 #	10 8 6 4 2
 #}
+if 0 {
+proc Extral::lmanip {} {}
+}
 Extral::export lmanip {
 
 proc lmanip {option args} {

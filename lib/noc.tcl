@@ -7,6 +7,19 @@
 #
 # =============================================================
 
+if 0 {
+proc Extral::lpop {} {}
+proc Extral::lshift {} {}
+proc Extral::lsub {} {}
+proc Extral::lfind {} {}
+proc Extral::lcor {} {}
+proc Extral::lremdup {} {}
+proc Extral::llremove {} {}
+proc Extral::lmerge {} {}
+proc Extral::lunmerge {} {}
+proc Extral::replace {} {}
+proc Extral::leval {} {}
+}
 Extral::export {
 	lpop lshift lsub lfind lcor lremdup llremove lmerge lunmerge replace leval
 } {

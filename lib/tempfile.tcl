@@ -74,7 +74,13 @@ namespace eval Extral {
 #} descr {
 #	remove all temporary files, including those of other Extral programs.
 #}
-proc Extral::tempfile {{action {get}}} {
+if 0 {
+proc tempfile {} {}
+}
+
+Extral::export {tempfile} {
+
+proc tempfile {{action {get}}} {
 	variable temp_dir
 	variable templock
 	switch $action {
@@ -103,4 +109,4 @@ proc Extral::tempfile {{action {get}}} {
 	}
 }
 
-Extral::export tempfile {}
+}

@@ -26,72 +26,16 @@
 #</ul>
 #}
 
+if 0 {
+proc Extral::structlset {} {}
+proc Extral::structlget {} {}
+proc Extral::structlunset {} {}
+proc Extral::structlfields {} {}
+proc Extral::structlfind {} {}
+}
 Extral::export {structlset structlget structlunset structlfields structlfind} {
 
-#proc structlsetstruct {structure list taglen taglist value} {
-##putsvars structure list taglen taglist value
-#	set tag [lpop taglist 0]
-#	incr taglen -1
-#	set structpos [structlfind $structure $tag]
-#	if {$structpos == -1} {
-#		return -code error "error: tag \"$tag\" not present in structure \"$structure\""
-#	}
-#	set substructure [lindex $structure $structpos]
-#	set listpos [structlfind $list $tag]
-#	if {$listpos == -1} {
-#		set sublist ""
-#	} else {
-#		set sublist [lindex $list $listpos]
-#	}
-#
-#	# Is the substructure an endnode
-#	# ------------------------------
-#	set ctag [lindex $substructure 0]
-#	set endnode 0
-#	if [regexp {^\*.+} $ctag] {
-#		if {$taglen > 0} {
-#			set endnode 1
-#			set sublist [::Extral::set[string range $ctag 1 end] $substructure $sublist $taglist $value]
-##			return -code error "error: tag \"[lindex $taglist 0]\" not present in structure \"$substructure\""
-#		} elseif {"$value" == "[lindex $substructure end]"} {
-#			if {$listpos != -1} {
-#				set list [lreplace $list [expr $listpos-1] $listpos]
-#			}
-#			return $list
-#		} else	{
-#			set endnode 1
-#			set sublist [::Extral::set[string range $ctag 1 end] $substructure $sublist $taglist $value]
-#		}
-#	} elseif {$taglen == 0} {
-#		# Go further down structure by value
-#		# ----------------------------------
-#		if [expr [llength $value] & 1] {
-#			return -code error "error: incorrect value trying to assign \"$value\" to struct \"$substructure\""
-#		}
-#		foreach {t val} $value {
-#			set sublist [structlsetstruct $substructure $sublist 1 $t $val]
-#		}
-#	} else {
-#		# Go further down structure by tags
-#		# ---------------------------------
-#		set sublist [structlsetstruct $substructure $sublist $taglen $taglist $value]
-#	}
-#
-#	if {$listpos != -1} {
-#		if {($endnode == 1)||("$sublist" != "")} {
-#			set list [lreplace $list $listpos $listpos $sublist]
-#		} else {
-#			set list [lreplace $list [expr $listpos-1] $listpos]
-#		}
-#	} else {
-#		if {($endnode == 1)||("$sublist" != "")} {
-#			lappend list $tag $sublist
-#		}
-#	}
-#	return $list
-#}
-
-proc structlsetstruct {structure list taglen taglist value} {
+proc structlsetstruct {structure data list taglen taglist value} {
 #putsvars structure list taglen taglist value
 	set ctag [lindex $structure 0]
 	if [regexp {^\*.+} $ctag] {
@@ -100,7 +44,7 @@ proc structlsetstruct {structure list taglen taglist value} {
 		if {"$value" == "[lindex $structure end]"} {
 			return -code 5 $value
 		} else {
-			return [::Extral::set[string range $ctag 1 end] $structure $list $taglist $value]
+			return [::Extral::set[string range $ctag 1 end] $structure $data $list $taglist $value]
 		}
 	} elseif {$taglen == 0} {
 		# Go further down structure by value
@@ -121,9 +65,9 @@ proc structlsetstruct {structure list taglen taglist value} {
 			} else {
 				set sublist [lindex $list $sublistpos]
 			}
-			set code [catch {structlsetstruct $substructure $sublist 0 "" $val} sublist]
+			set code [catch {structlsetstruct $substructure $data $sublist 0 "" $val} sublist]
 			if {$code == 1} {
-				error $sublist
+				error "$sublist at field \"$tag\""
 			} elseif {$code == 5} {
 				if {$sublistpos != -1} {
 					set list [lreplace $list [expr $sublistpos-1] $sublistpos]
@@ -152,9 +96,9 @@ proc structlsetstruct {structure list taglen taglist value} {
 		} else {
 			set sublist [lindex $list $sublistpos]
 		}
-		set code [catch {structlsetstruct $substructure $sublist $taglen $taglist $value} sublist]
+		set code [catch {structlsetstruct $substructure $data $sublist $taglen $taglist $value} sublist]
 		if {$code == 1} {
-			error $sublist
+			error "$sublist at field \"$tag\""
 		} elseif {$code == 5} {
 			if {$sublistpos != -1} {
 				set list [lreplace $list [expr $sublistpos-1] $sublistpos]
@@ -205,9 +149,10 @@ proc structlsetnostruct {list taglen taglist value} {
 }
 
 #doc {structl structlset} cmd {
-#structlset ?-struct schema? list taglist value ?taglist value?
+#structlset ?-struct schema? ?-data clientdata? list taglist value ?taglist value?
 #} descr {
-#set the value of a field in the structured list
+# set the value of a field in the structured list. The -data option can be used to
+# pass data to self defined data types.
 #} example {
 #	set the value for tag
 #		% set list {a 1 b 4}
@@ -241,14 +186,22 @@ proc structlsetnostruct {list taglen taglist value} {
 #		ints {a 9}
 #}
 proc structlset {args} {
-	if {"[lindex $args 0]" == "-struct"} {
-		set struct [lindex $args 1]
-		set args [lrange $args 2 end]
-		set usestr 1
-	} else {
-		set usestr 0
-	}
+	set usestr 0
+	set data {}
 	set len [llength $args]
+	set pos 0
+	while {$len >= 0} {
+		if {"[lindex $args 0]" == "-struct"} {
+			set struct [lindex $args 1]
+			set args [lrange $args 2 end]
+			incr len -2
+			set usestr 1
+		} elseif {"[lindex $args 0]" == "-data"} {
+			set data [lindex $args 1]
+			set args [lrange $args 2 end]
+			incr len -2
+		} else break
+	}
 	if {($len == 0)||(![expr $len&1])} {
 		return -code error "wrong # args: should be \"structlset ?-struct schema? list taglist value ?taglist value?\""
 	}
@@ -256,7 +209,7 @@ proc structlset {args} {
 		set list [lshift args]
 		foreach {taglist value} $args {
 			set taglen [llength $taglist]
-			set code [catch {structlsetstruct $struct $list $taglen $taglist $value} result]
+			set code [catch {structlsetstruct $struct $data $list $taglen $taglist $value} result]
 			if {"$code" == 1} {
 				error $result
 			} elseif {"$code" == 5} {
@@ -278,19 +231,19 @@ proc structlset {args} {
 	return $list
 }
 
-proc structlgetstruct {structure list taglen taglist} {
-#putsvars structure list taglen taglist
+proc structlgetstruct {structure data list taglen taglist} {
+#putsvars structure data list taglen taglist
 	# Is this an endnode
 	# ------------------
 	set ctag [lindex $structure 0]
 		# The dot is important to make the distinction between * and *proc
 	if [regexp {^\*.} $ctag] {
 		if {$taglen > 0} {
-			return [::Extral::get[string range $ctag 1 end] $structure $taglist $list]
+			return [::Extral::get[string range $ctag 1 end] $structure $data $taglist $list]
 		} elseif {"$list" == ""} {
 			return [lindex $structure end]
 		} else {	
-			return [::Extral::get[string range $ctag 1 end] $structure $taglist $list]
+			return [::Extral::get[string range $ctag 1 end] $structure $data $taglist $list]
 		}
 	}
 
@@ -303,56 +256,18 @@ proc structlgetstruct {structure list taglen taglist} {
 		} elseif {$structlen != 0} {
 			set result ""
 			foreach {tag str} $structure {
-				if {"$tag" != "*"} {
-					set sublist [structlfind $list $tag value]
-					lappend result $tag [structlgetstruct $str $sublist 0 ""]
-				} else {
-					set wstructure $str
-				}
-			}
-			if [info exists wstructure] {
-				foreach {tag sublist} $list {
-					if {[structlfind $result $tag]== -1} {
-						lappend result $tag [structlgetstruct $wstructure $sublist 0 ""]
-					}
-				}
+				set sublist [structlfind $list [lindex $tag end] value]
+				lappend result [lindex $tag 0] [structlgetstruct $str $data $sublist 0 ""]
 			}
 			return $result
 		} else {
 			return $list
 		}
 	} else {
-	
 		# find substructure corresponding to tag 
 		# --------------------------------------
 		set tag [lpop taglist 0]
 		incr taglen -1
-#		if {"$tag" == "*"} {
-#			set dotags ""
-#			set result ""
-#			foreach {tag val} $structure {
-#				if {"$tag" != "*"} {
-#					lappend dotags $tag
-#				}
-#			}	
-#			foreach {tag val} $list {
-#				if {"$tag" != "*"} {
-#					if {[lsearch $dotags $tag] == -1} {
-#						lappend dotags $tag
-#					}
-#				}
-#			}
-#			foreach tag $dotags {
-#				set pos [structlfind $structure $tag]
-#				set substructure [lindex $structure $pos]
-#			
-#				# find the tag
-#				# ------------
-#				set sublist [structlfind $list $tag value]
-#				lappend result $tag [structlgetstruct $substructure $sublist $taglen $taglist]
-#			}
-#			return $result
-#		}
 		set pos [structlfind $structure $tag]
 		if {$pos == -1} {
 			return -code error "error: tag \"$tag\" not present in structure \"$structure\""
@@ -362,11 +277,11 @@ proc structlgetstruct {structure list taglen taglist} {
 		# find the tag
 		# ------------
 		set sublist [structlfind $list $tag value]
-		return [structlgetstruct $substructure $sublist $taglen $taglist]
+		return [structlgetstruct $substructure $data $sublist $taglen $taglist]
 	}
 }
 
-proc structlgetnostruct {list taglist taglen} {
+proc structlgetnostruct {list taglen taglist} {
 	foreach tag $taglist {
 		set len [llength $list]
 		if {[expr $len%2] != 0} {
@@ -408,45 +323,45 @@ proc structlgetnostruct {list taglist taglen} {
 #	a 9
 #}
 proc structlget {args} {
-	set alen	[llength $args]
-	if {($alen < 2)||($alen > 5)} {
-		return -code error "wrong # args: should be \"structlget ?-struct schema? list taglist ?def?\""
+	set usestr 0
+	set data {}
+	set alen [llength $args]
+	set pos 0
+	while {$alen >= 0} {
+		if {"[lindex $args 0]" == "-struct"} {
+			set struct [lindex $args 1]
+			set args [lrange $args 2 end]
+			incr alen -2
+			set usestr 1
+		} elseif {"[lindex $args 0]" == "-data"} {
+			set data [lindex $args 1]
+			set args [lrange $args 2 end]
+			incr alen -2
+		} else break
 	}
-	if {($alen == 4)||($alen == 5)} {
-		if {"[lindex $args 0]" != "-struct"} {
-			return -code error "wrong option [lindex $args 0]"
-		} else {
-			foreach arg $args var {temp struct list taglist} {
-				set $var $arg
-			}
-		}
+	if {$alen < 2} {
+		return -code error "wrong # args: should be \"structlget ?-struct schema? list taglist ?taglist ...?\""
+	}
+	set list [lshift args]
+	if {$alen == 2} {
+		set taglist [lindex $args 0]
 		set len [llength $taglist]
-		if {$alen == 4} {
-			return [structlgetstruct $struct $list $len $taglist]
+		if {$usestr == 1} {
+			return [structlgetstruct $struct $data $list $len $taglist]
 		} else {
-			if [catch {structlgetstruct $struct $list $len $taglist} result] {
-				return [lindex $args 4]
-			} else {
-				return $result
-			}
+			return [structlgetnostruct $list $len $taglist]
 		}
 	} else {
-		foreach arg $args var {list taglist} {
-			set $var $arg
-		}
-		set len [llength $taglist]
-		if {$len == 0} {
-			return $list
-		}
-		if {$alen == 2} {
-			return [structlgetnostruct $list $taglist $len]
-		} else {
-			if [catch {structlgetnostruct $list $taglist $len} result] {
-				return [lindex $args 2]
+		set result ""
+		foreach taglist $args {
+			set len [llength $taglist]
+			if {$usestr == 1} {
+				lappend result [structlgetstruct $struct $data $list $len $taglist]
 			} else {
-				return $result
+				lappend result [structlgetnostruct $list $len $taglist]
 			}
 		}
+		return $result
 	}
 }
 
@@ -521,13 +436,6 @@ proc structlfind {list tag args} {
 		}
 		incr pos 2
 	}	
-	if {"[lindex $list 0]" == "*"} {
-		if {"$args" == ""} {
-			return 1
-		} else {
-			return [lindex $list 1]
-		}
-	}
 	if {"$args" == ""} {
 		return -1
 	} else {

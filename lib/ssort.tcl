@@ -26,6 +26,9 @@
 #	</dl>
 #}
 
+if 0 {
+proc Extral::ssort {} {}
+}
 Extral::export ssort {
 
 #doc {ssort ssort} cmd {

@@ -10,6 +10,17 @@
 #General list manipulation commands
 #}
 
+if 0 {
+proc Extral::lremove {} {}
+proc Extral::lpush {} {}
+proc Extral::lunshift {} {}
+proc Extral::lset {} {}
+proc Extral::larrayset {} {}
+proc Extral::lcommon {} {}
+proc Extral::lunion {} {}
+proc Extral::leor {} {}
+proc Extral::laddnew {} {}
+}
 Extral::export {
 	lremove lpush lunshift lset larrayset lcommon lunion leor laddnew
 } {

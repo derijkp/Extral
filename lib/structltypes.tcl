@@ -1,14 +1,14 @@
-proc ::Extral::setany {structure oldvalue field value} {
+proc ::Extral::setany {structure data oldvalue field value} {
 	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
 	return $value
 }
 
-proc ::Extral::getany {structure field value} {
+proc ::Extral::getany {structure data field value} {
 	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
 	return $value
 }
 
-proc ::Extral::setint {structure oldvalue field value} {
+proc ::Extral::setint {structure data oldvalue field value} {
 	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
 	if ![regexp {^-?[0-9]+$} $value] {
 		return -code error "expected integer but got \"$value\""
@@ -16,12 +16,12 @@ proc ::Extral::setint {structure oldvalue field value} {
 	return $value
 }
 
-proc ::Extral::getint {structure field value} {
+proc ::Extral::getint {structure data field value} {
 	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
 	return $value
 }
 
-proc ::Extral::setdouble {structure oldvalue field value} {
+proc ::Extral::setdouble {structure data oldvalue field value} {
 	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
 	if [catch {expr $value}] {
 		return -code error "expected floating-point number but got \"$value\""
@@ -29,12 +29,12 @@ proc ::Extral::setdouble {structure oldvalue field value} {
 	return $value
 }
 
-proc ::Extral::getdouble {structure field value} {
+proc ::Extral::getdouble {structure data field value} {
 	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
 	return $value
 }
 
-proc ::Extral::setbool {structure oldvalue field value} {
+proc ::Extral::setbool {structure data oldvalue field value} {
 	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
 	set value [string tolower $value]
 	if [regexp {^1$|^true$|^t$|^yes$|^y$} $value] {
@@ -46,12 +46,12 @@ proc ::Extral::setbool {structure oldvalue field value} {
 	}
 }
 
-proc ::Extral::getbool {structure field value} {
+proc ::Extral::getbool {structure data field value} {
 	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
 	return $value
 }
 
-proc ::Extral::setregexp {structure oldvalue field value} {
+proc ::Extral::setregexp {structure data oldvalue field value} {
 	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
 	if {[llength $structure] != 4} {
 		return -code error "error: wrong number of arguments in structure \"$structure\""
@@ -63,12 +63,12 @@ proc ::Extral::setregexp {structure oldvalue field value} {
 	return $value
 }
 
-proc ::Extral::getregexp {structure field value} {
+proc ::Extral::getregexp {structure data field value} {
 	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
 	return $value
 }
 
-proc ::Extral::setbetween {structure oldvalue field value} {
+proc ::Extral::setbetween {structure data oldvalue field value} {
 	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
 	if {[llength $structure] != 4} {
 		return -code error "error: wrong number of arguments in structure \"$structure\""
@@ -84,12 +84,12 @@ proc ::Extral::setbetween {structure oldvalue field value} {
 	return $value
 }
 
-proc ::Extral::getbetween {structure field value} {
+proc ::Extral::getbetween {structure data field value} {
 	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
 	return $value
 }
 
-proc ::Extral::setdbetween {structure oldvalue field value} {
+proc ::Extral::setdbetween {structure data oldvalue field value} {
 	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
 	if {[llength $structure] != 4} {
 		return -code error "error: wrong number of arguments in structure \"$structure\""
@@ -102,60 +102,118 @@ proc ::Extral::setdbetween {structure oldvalue field value} {
 	return $value
 }
 
-proc ::Extral::getdbetween {structure field value} {
+proc ::Extral::getdbetween {structure data field value} {
 	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
 	return $value
 }
 
-proc ::Extral::setdate {structure oldvalue field value} {
+proc ::Extral::setdate {structure data oldvalue field value} {
 	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
 	return [scantime $value]
 }
 
-proc ::Extral::getdate {structure field value} {
-	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
-	return [formattime $value "%e %b %Y"]
+proc ::Extral::getdate {structure data field value} {
+	if {"$value" == ""} {return [lindex $structure end]}
+	if {"$field" != ""} {
+		if {"$field" == "val"} {
+			return $value
+		} else {
+			return [formattime $value [lindex $field 0]]
+		}
+	} else {
+		return [formattime $value "%e %b %Y"]
+	}
 }
 
-proc ::Extral::settime {structure oldvalue field value} {
+proc ::Extral::settime {structure data oldvalue field value} {
 	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
 	return [scantime $value]
 }
 
-proc ::Extral::gettime {structure field value} {
-	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
-	return [formattime $value "%e %b %Y %H:%M:%S"]
+proc ::Extral::gettime {structure data field value} {
+	if {"$value" == ""} {return [lindex $structure end]}
+	if {"$field" != ""} {
+		if {"$field" == "val"} {
+			return $value
+		} else {
+			return [formattime $value [lindex $field 0]]
+		}
+	} else {
+		return [formattime $value "%e %b %Y %H:%M:%S"]
+	}
 }
 
-#proc ::Extral::setnamed {structure oldvalue field value} {
-#	if {"$field" != ""} {return -code error "error: no name given to named type"}
-#	set tag [lpop field]
-#	set pos [structlfind $value $tag]
-#	if {$pos == -1} {
-#		lappend oldvalue structlsetstruct $structure 
-#	} else {
-#		structlsetstruct $structure 
-#	}
-#}
-#
-#proc ::Extral::getnamed {structure field value} {
-#	if {"$field" == ""} {
-#		return $value
-#	} else {
-#		set tag [lpop field]
-#		set pos [structlfind $value $tag]
-#		return [structlgetstruct [lindex $structure 0] [lindex $value $pos] [llength $field] $field]
-#	}
-#}
+proc ::Extral::setnamed {structure data oldvalue field value} {
+#putsvars structure data oldvalue field value
+	if {"$field" == ""} {
+		set len [llength $value]
+		if {[expr $len%2] != 0} {
+			return -code error "error: \"$value\" does not have an even number of elements"
+		}
+		foreach {name val} $value {
+			set code [catch {::Extral::setnamed $structure $data $oldvalue $name $val} oldvalue]
+			if {$code == 1} {
+				error $oldvalue
+			}
+		}
+		set result $oldvalue
+	} else {
+		set struct [lindex $structure 1]
+		set tag [lshift field]
+		set pos [structlfind $oldvalue $tag]
+		if {$pos == -1} {
+			set code [catch {::Extral::structlsetstruct $struct $data "" [llength $field] $field $value} res]
+			if {$code == 1} {
+				error "$res in named \"$tag\""
+			} elseif {$code == 5} {
+				set result $oldvalue
+			} else {
+				lappend oldvalue $tag
+				lappend oldvalue $res
+				set result $oldvalue
+			}
+		} else {
+			set code [catch {::Extral::structlsetstruct $struct $data [lindex $oldvalue $pos] [llength $field] $field $value} res]
+			if {$code == 1} {
+				error "$res in named \"$tag\""
+			} elseif {$code == 5} {
+				set result [lreplace $oldvalue [expr {$pos-1}] $pos]
+			} else {
+				set result [lreplace $oldvalue $pos $pos $res]
+			}
+		}
+	}
+	if {"$result" == "[lindex $structure end]"} {
+		return -code 5 $result
+	} else {
+		return $result
+	}
+}
 
-proc ::Extral::setlist {structure oldvalue field value} {
+proc ::Extral::getnamed {structure data field value} {
+#putsvars structure data field value
+	set struc [lindex $structure 1]
+	if {"$field" == ""} {
+		set result ""
+		foreach {name val} $value {
+			lappend result $name [structlgetstruct $struc $data $val 0 ""]
+		}
+		return $result
+	} else {
+		set tag [lshift field]
+		set pos [structlfind $value $tag]
+		return [structlgetstruct $struc $data [lindex $value $pos] [llength $field] $field]
+	}
+}
+
+proc ::Extral::setlist {structure data oldvalue field value} {
 #putsvars structure oldvalue field value
 	set tag [lshift field]
 	set struct [lindex $structure 1]
 	if {"$tag" == ""} {
 		set result ""
 		foreach val $value oldval $oldvalue {
-			set code [catch {::Extral::structlsetstruct $struct $oldval [llength $field] $field $val} res]
+			set code [catch {::Extral::structlsetstruct $struct $data $oldval [llength $field] $field $val} res]
 			if {$code == 1} {
 				error $res
 			} else {
@@ -164,7 +222,7 @@ proc ::Extral::setlist {structure oldvalue field value} {
 		}
 		return $result
 	} elseif {"$tag" == "next"} {
-		set code [catch {::Extral::structlsetstruct $struct "" [llength $field] $field $value} res]
+		set code [catch {::Extral::structlsetstruct $struct $data "" [llength $field] $field $value} res]
 		if {$code == 1} {
 			error $res
 		} else {
@@ -180,7 +238,7 @@ proc ::Extral::setlist {structure oldvalue field value} {
 		if {("$tag"!="end")&&($tag>$len)} {
 			return -code error "list doesn't contain element $tag"
 		}
-		set code [catch {::Extral::structlsetstruct $struct [lindex $oldvalue $tag] [llength $field] $field $value} res]
+		set code [catch {::Extral::structlsetstruct $struct $data [lindex $oldvalue $tag] [llength $field] $field $value} res]
 		if {$code == 1} {
 			error $res
 		} else {
@@ -191,14 +249,14 @@ proc ::Extral::setlist {structure oldvalue field value} {
 	}
 }
 
-proc ::Extral::getlist {structure field value} {
+proc ::Extral::getlist {structure data field value} {
 #putsvars structure field value
 	set tag [lshift field]
 	set struct [lindex $structure 1]
 	if {"$tag" == ""} {
 		set result ""
 		foreach val $value {
-			set code [catch {::Extral::structlgetstruct $struct $val [llength $field] $field} res]
+			set code [catch {::Extral::structlgetstruct $struct $data $val [llength $field] $field} res]
 			if {$code == 1} {
 				error $res
 			} else {
@@ -209,13 +267,13 @@ proc ::Extral::getlist {structure field value} {
 	} elseif {[llength $tag] == 1} {
 		set len [llength $value]
 		if {$len == 0} {
-			return -code error "empty list"
+			return ""
 		}
 		incr len -1
 		if {("$tag"!="end")&&($tag>$len)} {
-			return -code error "list doesn't contain element $tag"
+			return ""
 		}
-		set code [catch {::Extral::structlgetstruct $struct [lindex $value $tag] [llength $field] $field} res]
+		set code [catch {::Extral::structlgetstruct $struct $data [lindex $value $tag] [llength $field] $field} res]
 		if {$code == 1} {
 			error $res
 		} else {
@@ -224,20 +282,20 @@ proc ::Extral::getlist {structure field value} {
 	} elseif {[llength $tag] == 2} {
 		set len [llength $value]
 		if {$len == 0} {
-			return -code error "empty list"
+			return ""
 		}
 		incr len -1
 		set start [lindex $tag 0]
 		set end [lindex $tag 1]
 		if {("$start"!="end")&&($start>$len)} {
-			return -code error "list doesn't contain element $start"
+			return ""
 		}
 		if {("$end"!="end")&&($end>$len)} {
-			return -code error "list doesn't contain element $end"
+			set end $len
 		}
 		set result ""
 		foreach val [lrange $value $start $end] {
-			set code [catch {::Extral::structlgetstruct $struct $val [llength $field] $field} res]
+			set code [catch {::Extral::structlgetstruct $struct $data $val [llength $field] $field} res]
 			if {$code == 1} {
 				error $res
 			} else {
@@ -249,3 +307,4 @@ proc ::Extral::getlist {structure field value} {
 		return -code error "wrong # args to list: \"$tag\""
 	}
 }
+

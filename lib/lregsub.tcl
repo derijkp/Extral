@@ -16,6 +16,9 @@ Extral::export {lregsub} {
 #	% lregsub {^([^.]+)\.([^.]+)$} {start.sh help.ps h.sh} {\2 \1}
 #	{sh start} {ps help} {sh h}
 #}
+if 0 {
+proc Extral::lregsub {} {}
+}
 proc lregsub {args} {
 	set len [llength $args]
 	if {$len<3} {

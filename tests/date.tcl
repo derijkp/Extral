@@ -62,6 +62,10 @@ test scantime {scan and format: 1 Feb 0001 BC} {
 	formattime [scantime {1 Feb 0001 BC}]
 } {0001 BC Feb 01 00:00:00}
 
+test scantime {Thu May  4 12:13:09 EDT 1995} {
+	formattime [scantime {Thu May  4 12:10:09 EDT 1995}]
+} {1995 May 04 12:10:09}
+
 test scantime {format: -60*60*24} {
 	formattime [expr -60*60*24]
 } {0001 BC Dec 31 00:00:00}

@@ -59,6 +59,12 @@ int ExtraL_ScanTime(interp,musthavedate,musthavetime,dateObj,resultPtr)
 				busyhour = 0;
 			}
 			temp[temppos] = '\0';
+			if ((temp[0] == '0')&&(temppos > 1)) {
+				int i;
+				for(i=1;i<=temppos;i++) {
+					temp[i-1] = temp[i];
+				}
+			}
 			if (hour == -1) {
 				error = Tcl_GetInt(interp, temp, &hour);
 				if (error != TCL_OK) {return error;}
@@ -80,7 +86,7 @@ int ExtraL_ScanTime(interp,musthavedate,musthavetime,dateObj,resultPtr)
 			}
 			temp[temppos] = '\0';
 			if (temppos>=4) {
-				char  *start=temp;
+				char *start = temp;
 				while ((*start != '\0')&&(*start == '0')) {
 					start++;
 				}

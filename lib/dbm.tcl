@@ -28,6 +28,9 @@
 #The database code can also be used from C using the ExtraL_DbmOpen function.
 #}
 
+if 0 {
+proc Extral::loaddbm {} {}
+}
 Extral::export loaddbm {
 	proc loaddbm {name} {
 		variable dir
@@ -38,7 +41,7 @@ Extral::export loaddbm {
 	}
 }
 
-proc fdbm__create {database arg} {
+proc Extral::fdbm__create {database arg} {
 	if {"$arg" != ""} {
 		return  -code error "fdbm create has no options"
 	}
@@ -48,7 +51,7 @@ proc fdbm__create {database arg} {
 	file mkdir $database
 }
 
-proc fdbm__open {object readonly database arg} {
+proc Extral::fdbm__open {object readonly database arg} {
 	if {"$arg" != ""} {
 		return  -code error "fdbm open has no options"
 	}
@@ -58,11 +61,11 @@ proc fdbm__open {object readonly database arg} {
 	}
 }
 
-proc fdbm__close {object} {
+proc Extral::fdbm__close {object} {
 	unset ::Extral::dbm($object,dir)
 }
 
-proc fdbm__set {object key value} {
+proc Extral::fdbm__set {object key value} {
 	set file [file join [set ::Extral::dbm($object,dir)] $key]
 	if [catch {writefile $file $value}] {
 		return -code error "could not store key \"$key\""
@@ -70,7 +73,7 @@ proc fdbm__set {object key value} {
 	return ""
 }
 
-proc fdbm__get {object key} {
+proc Extral::fdbm__get {object key} {
 	set file [file join [set ::Extral::dbm($object,dir)] $key]
 	if ![file readable $file] {
 		return -code error "error: key \"$key\" not found"
@@ -78,24 +81,130 @@ proc fdbm__get {object key} {
 	return [readfile $file]
 }
 
-proc fdbm__keys {object {pattern *}} {
+proc Extral::fdbm__keys {object {pattern *}} {
 	return [dirglob [set ::Extral::dbm($object,dir)] $pattern]
 }
 
-proc fdbm__unset {object key} {
+proc Extral::fdbm__unset {object key} {
 	set file [file join [set ::Extral::dbm($object,dir)] $key]
 	catch {file delete $file}
 	return ""
 }
 
-proc fdbm__sync {object} {
+proc Extral::fdbm__sync {object} {
 }
 
-proc fdbm__reorganize {object} {
+proc Extral::fdbm__reorganize {object} {
 }
 
 laddnew ::Extral::dbm(types) fdbm
 
+#doc {dbm dbm} h2 "dbm command"
+#doc {dbm dbm types} cmd {
+#dbm types
+#} descr {
+#	list the available type of database systems; fdbm is provided,
+#	gdbm and bsddbm are dynamically loadable
+#}
+#doc {dbm dbm type} cmd {
+#dbm create type database ?options?
+#} descr {
+#	create a database of the given type (fdbm, gdbm, bsddbm) in 
+#	the "file" database. The database is not opened by this command.
+#}
+#doc {dbm dbm open} cmd {
+#dbm open type dbcmd database ?options?
+#} descr {
+#	open a database for reading (read = default) or reading and 
+#	writing (write).
+#	type: the type of the database (fdbm, gdbm, bsddbm).
+#	dbcmd: the command by which the opened database can be queried
+#	database: place of the database in the filing system
+#}
+
+if 0 {
+proc dbm {} {}
+}
+proc Extral::dbm {cmd args} {
+	set len [llength $args]
+	switch $cmd {
+		open {
+			if {$len < 3} {
+				return -code error "wrong # args: should be \"dbm open ?-readonly? type dbcmd database ?options?\""
+			}
+			set readonly [extractbool args -readonly]
+			set type [lindex $args 0]
+			set object [lindex $args 1]
+			set database [lindex $args 2]
+			if {[lsearch -exact [set ::Extral::dbm(types)] $type] == -1} {
+				return -code error "no such type: \"$type\""
+			}
+			${type}__open $object $readonly $database [lrange $args 3 end]
+			set ::Extral::dbm($object,type) $type
+			set ::Extral::dbm($object,readonly) $readonly
+			proc $object {args} "Extral::dbmcmd $object \$args"
+			return $object
+		}
+		create {
+			if {$len < 2} {
+				return -code error "wrong # args: should be \"dbm create type database ?options?\""
+			}
+			set type [lindex $args 0]
+			if {[lsearch -exact [set ::Extral::dbm(types)] $type] == -1} {
+				return -code error "no such type: \"$type\""
+			}
+			${type}__create [lindex $args 1] [lrange $args 2 end]
+		}
+		types {
+			return [set ::Extral::dbm(types)]
+		}
+		default {
+			return -code error "bad option \"$cmd\": must be one of create, open or types"
+		}
+	}
+}
+Extral::export dbm {}
+
+#doc {dbm dbmcmd} h2 {
+#database commands
+#} descr {
+#The dbmcmd created by the "dbm open" above will have the following options:
+#}
+#doc {dbm dbmcmd set} cmd {
+#	dbmcmd set key value
+#} descr {
+#		set key in the database to value.
+#}
+#doc {dbm dbmcmd get} cmd {
+#	dbmcmd get key
+#} descr {
+#		get the value associated with key from the database.
+#}
+#doc {dbm dbmcmd unset} cmd {
+#	dbmcmd unset key
+#} descr {
+#		remove a key from the database.
+#}
+#doc {dbm dbmcmd keys} cmd {
+#	dbmcmd keys ?pattern?
+#} descr {
+#		return the keys in the database.
+#}
+#doc {dbm dbmcmd close} cmd {
+#	dbmcmd close
+#} descr {
+#		close the database. The dbmcmd will be removed
+#}
+#doc {dbm dbmcmd sync} cmd {
+#	dbmcmd sync
+#} descr {
+#		sync the database (for those types that need it).
+#}
+#doc {dbm dbmcmd reorganize} cmd {
+#	dbmcmd reorganize
+#} descr {
+#		reorganize the database (for those types that need it).
+#}
 proc Extral::dbmcmd {object arg} {
 	set len [llength $arg]
 	if {$len < 1} {
@@ -174,95 +283,3 @@ proc Extral::dbmcmd {object arg} {
 	}
 }
 
-#doc {dbm dbm} h2 "dbm command"
-#doc {dbm dbm types} cmd {
-#dbm types
-#} descr {
-#	list the available type of database systems; fdbm is provided,
-#	gdbm and bsddbm are dynamically loadable
-#}
-#doc {dbm dbm type} cmd {
-#dbm create type database ?options?
-#} descr {
-#	create a database of the given type (fdbm, gdbm, bsddbm) in 
-#	the "file" database. The database is not opened by this command.
-#}
-#doc {dbm dbm open} cmd {
-#dbm open type dbcmd database ?options?
-#} descr {
-#	open a database for reading (read = default) or reading and 
-#	writing (write).
-#	type: the type of the database (fdbm, gdbm, bsddbm).
-#	dbcmd: the command by which the opened database can be queried
-#	database: place of the database in the filing system
-#}
-
-proc dbm {cmd args} {
-	set len [llength $args]
-	switch $cmd {
-		open {
-			if {$len < 3} {
-				return -code error "wrong # args: should be \"dbm open ?-readonly? type dbcmd database ?options?\""
-			}
-			set readonly [extractbool args -readonly]
-			set type [lindex $args 0]
-			set object [lindex $args 1]
-			set database [lindex $args 2]
-			if {[lsearch -exact [set ::Extral::dbm(types)] $type] == -1} {
-				return -code error "no such type: \"$type\""
-			}
-			${type}__open $object $readonly $database [lrange $args 3 end]
-			set ::Extral::dbm($object,type) $type
-			set ::Extral::dbm($object,readonly) $readonly
-			proc $object {args} "Extral::dbmcmd $object \$args"
-			return $object
-		}
-		create {
-			if {$len < 2} {
-				return -code error "wrong # args: should be \"dbm create type database ?options?\""
-			}
-			set type [lindex $args 0]
-			if {[lsearch -exact [set ::Extral::dbm(types)] $type] == -1} {
-				return -code error "no such type: \"$type\""
-			}
-			${type}__create [lindex $args 1] [lrange $args 2 end]
-		}
-		types {
-			return [set ::Extral::dbm(types)]
-		}
-		default {
-			return -code error "bad option \"$cmd\": must be one of create, open or types"
-		}
-	}
-}
-
-#doc {dbm dbmcmd} h2 {
-#database commands
-#} descr {
-#The dbmcmd created by the "dbm open" above will have the following options:
-#}
-#doc {dbm dbmcmd set} cmd {
-#	dbmcmd set key value
-#} descr {
-#		set key in the database to value.
-#}
-#doc {dbm dbmcmd get} cmd {
-#	dbmcmd get key
-#} descr {
-#		get the value associated with key from the database.
-#}
-#doc {dbm dbmcmd unset} cmd {
-#	dbmcmd unset key
-#} descr {
-#		remove a key from the database.
-#}
-#doc {dbm dbmcmd sync} cmd {
-#	dbmcmd sync
-#} descr {
-#		sync the database (for those types that need it).
-#}
-#doc {dbm dbmcmd reorganize} cmd {
-#	dbmcmd reorganize
-#} descr {
-#		reorganize the database (for those types that need it).
-#}

@@ -22,8 +22,12 @@
 #time (missing days, ...). I don't know enough about that to do this
 #correctly.
 #}
-Extral::export {scantime formattime} {
 
+if 0 {
+proc Extral::scantime {} {}
+proc Extral::formattime {} {}
+}
+Extral::export {scantime formattime} {
 #doc {time scantime} cmd {
 #scantime time ?date/time/both?
 #} descr {
@@ -53,7 +57,7 @@ proc scantime {time {musthave date}} {
 			}
 			{*:*} {
 				foreach item [split $item ":"] var {hour min sec ms} {
-					set $var $item
+					set $var [string trimleft $item 0]
 				}
 			}
 			{[0-9]*} {

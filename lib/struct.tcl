@@ -82,6 +82,9 @@
 #	3
 #}
 
+if 0 {
+proc Extral::struct {} {}
+}
 Extral::export struct {
 
 namespace eval struct {
