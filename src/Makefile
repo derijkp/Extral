@@ -31,7 +31,7 @@ CC_SWITCHES =	${CFLAGS} -I./ -I${TCL_DIR} -I${TCL_DIR2}
 all: extral.so
 
 extral.so: extral.o extralInit.o
-	$(LD) -o extral.so -shared extral.o extralInit.o
+	$(LD) -o ../inst/extral.so -shared extral.o extralInit.o
 
 extratcl: tclAppInit.o extral.o extralInit.o
 	$(CC) -g -o extratcl tclAppInit.o extral.o extralInit.o ${LIBS}

@@ -4,9 +4,10 @@ ExtraL Commands
 
 ffind <switches> filelist pattern
     returns a list of all files in filelist which match a pattern.
-    <switches> can be -matches -exact, -glob, or -regexp
+    <switches> can be -matches, -all, -allfiles -exact, -glob, or -regexp
     with -matches, the text matching the bracketed pattern will be mangled 
-    into the result.
+    into the result. With -all all matches in the file will be returned. 
+	With -allfiles non matching files will return {}
 
 lregsub ?switches? exp list subSpec
     does a regsub for each element in the list, and returns the resulting list.

@@ -609,69 +609,76 @@ ExtraL_FfindCmd(notUsed, interp, argc, argv)
 	char **argPtr;
 	int listArgc;
 	char **listArgv;
+	char *allfiles;
 	int matches, all, multiple, number;
 	int i, j, match, mode, index;
 
 	if (argc < 4) {
-	wrongNumArgs:
-	Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-		" ?switches? ?filelist? ?pattern? [?var? ?pattern2? ?var2? ...]\"", (char *) NULL);
-	return TCL_ERROR;
+		wrongNumArgs:
+		Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
+			" ?switches? ?filelist? ?pattern? [?var? ?pattern2? ?var2? ...]\"", (char *) NULL);
+		return TCL_ERROR;
 	}
 	argPtr = argv+1;
 	argc--;
 	matches = 0;
 	all=0;
+	allfiles=NULL;
 	multiple = 0;
 	mode = EXACT;
 	while ((argc > 0) && (argPtr[0][0] == '-')) {
-	if (strcmp(argPtr[0], "-matches") == 0) {
-		matches = 1;
-	} else if (strcmp(argPtr[0], "-all") == 0) {
-		all = 1;
+		if (strcmp(argPtr[0], "-matches") == 0) {
+			matches = 1;
+		} else if (strcmp(argPtr[0], "-all") == 0) {
+			all = 1;
+		} else if (strcmp(argPtr[0], "-allfiles") == 0) {
+			argPtr++;
+			argc--;
+			if (argc==0) break;
+			allfiles = argPtr[0];
 		} else if (strcmp(argPtr[0], "-exact") == 0) {
 			mode = EXACT;
 		} else if (strcmp(argPtr[0], "-glob") == 0) {
 			mode = GLOB;
 		} else if (strcmp(argPtr[0], "-regexp") == 0) {
 			mode = REGEXP;
-	} else if (strcmp(argPtr[0], "--") == 0) {
+		} else if (strcmp(argPtr[0], "--") == 0) {
+			argPtr++;
+			argc--;
+			break;
+		} else {
+			Tcl_AppendResult(interp, "bad switch \"", argPtr[0],
+				"\": must be -matches, -all, -allfiles, -exact, -glob, -regexp or --", (char *) NULL);
+			return TCL_ERROR;
+		}
 		argPtr++;
 		argc--;
-		break;
-	} else {
-		Tcl_AppendResult(interp, "bad switch \"", argPtr[0],
-			"\": must be, -matches, -exact, -glob, -regexp or --", (char *) NULL);
-		return TCL_ERROR;
-	}
-	argPtr++;
-	argc--;
 	}
 	if ((matches==1)&&(mode!=REGEXP)) {
-	Tcl_AppendResult(interp, "-matches only applicable with -regexp matching", (char *) NULL);
-	return TCL_ERROR;
+		Tcl_AppendResult(interp, "-matches only applicable with -regexp matching", (char *) NULL);
+		return TCL_ERROR;
 	}
-	if ((all==1)&&(matches==0)) {
-	Tcl_AppendResult(interp, "-all only applicable with -matches options", (char *) NULL);
-	return TCL_ERROR;
+	if (((all==1)||(allfiles!=NULL))&&(matches==0)) {
+		Tcl_AppendResult(interp, "-all and -allfiles only applicable with -matches options", (char *) NULL);
+		return TCL_ERROR;
 	}
 	if (argc == 2) {
-	multiple=0;
-	number=1;
-	if (mode == REGEXP) {
-		regexp=Tcl_RegExpCompile(interp, argPtr[1]);
-		if (regexp==NULL) {
-		return TCL_ERROR;
+		multiple=0;
+		number=1;
+		if (mode == REGEXP) {
+			regexp=Tcl_RegExpCompile(interp, argPtr[1]);
+			if (regexp==NULL) {
+			return TCL_ERROR;
+			}
 		}
-	}
 	} else if (argc > 2) {
 		multiple=1;
 		number=argc-1;
 		if ((2*(number/2))!=number) {
-		goto wrongNumArgs;
-	}
+			goto wrongNumArgs;
+		}
 	} else {
-	goto wrongNumArgs;
+		goto wrongNumArgs;
 	}
 	if (Tcl_SplitList(interp, argPtr[0], &listArgc, &listArgv) != TCL_OK) {
 		return TCL_ERROR;
@@ -687,81 +694,87 @@ ExtraL_FfindCmd(notUsed, interp, argc, argv)
 	}
 	for (i = 0; i < listArgc; i++) {
 		char *string, *search;
-	file=fopen(listArgv[i],"r");
-	if (file==NULL) {
-		fclose(file);
-		free(file);
-		Tcl_AppendResult(interp, "Couldn't open file ", listArgv[i], (char *) NULL);
-		return TCL_ERROR;
-	}
-	string=read_file(file);
-	if (string==NULL) {
-		fclose(file);
-		free(file);
-		continue;
-	}
-	search=string;
-	for(j=0;j<number;j+=2) {
-		if (multiple) {
-		regexp=Tcl_RegExpCompile(interp, argPtr[j]);
-		if (regexp==NULL) {
-			free(string);
+		file=fopen(listArgv[i],"r");
+		if (file==NULL) {
+			fclose(file);
+			free(file);
+			Tcl_AppendResult(interp, "Couldn't open file ", listArgv[i], (char *) NULL);
 			return TCL_ERROR;
 		}
+		string=read_file(file);
+		if (string==NULL) {
+			fclose(file);
+			free(file);
+			continue;
 		}
-		while(1) {
-			match = 0;
-		switch (mode) {
-			case EXACT:
-			match = (strstr(search, argPtr[j]) != NULL);
-			break;
-			case GLOB:
-			match = Tcl_StringMatch(search, argPtr[j]);
-			break;
-			case REGEXP:
-			match = Tcl_RegExpExec(interp, regexp, search, string);
-			if (match < 0) {
-				ckfree((char *) listArgv);
-				return TCL_ERROR;
-			}
-			break;
-		}
-		if (match==0) break;
-		if (multiple==0) {
-			Tcl_AppendElement(interp, listArgv[i]);
-			if (matches == 1) {
-				Tcl_RegExpRange(regexp, 1, &start, &end);
-				if (start==NULL) {Tcl_AppendElement(interp, "");}
-				else {
-					char savedChar;
-					savedChar = *end;
-					*end = 0;
-					Tcl_AppendElement(interp, start);
-					*end = savedChar;
+		search=string;
+		for(j=0;j<number;j+=2) {
+			if (multiple) {
+				regexp=Tcl_RegExpCompile(interp, argPtr[j]);
+				if (regexp==NULL) {
+					free(string);
+					return TCL_ERROR;
 				}
 			}
-		} else {
-			Tcl_SetVar(interp, argPtr[j+1], listArgv[i], TCL_APPEND_VALUE|TCL_LIST_ELEMENT);
-			if (matches == 1) {
-				Tcl_RegExpRange(regexp, 1, &start, &end);
-				if (start==NULL) {
-					Tcl_SetVar(interp, argPtr[j+1], "", TCL_APPEND_VALUE|TCL_LIST_ELEMENT);
+			while(1) {
+				match = 0;
+				switch (mode) {
+					case EXACT:
+						match = (strstr(search, argPtr[j]) != NULL);
+						break;
+					case GLOB:
+						match = Tcl_StringMatch(search, argPtr[j]);
+						break;
+					case REGEXP:
+						match = Tcl_RegExpExec(interp, regexp, search, string);
+						if (match < 0) {
+							ckfree((char *) listArgv);
+							return TCL_ERROR;
+						}
+						break;
 				}
-				else {
-					char savedChar;
-					savedChar = *end;
-					*end = 0;
-					Tcl_SetVar(interp, argPtr[j+1], start, TCL_APPEND_VALUE|TCL_LIST_ELEMENT);
-					*end = savedChar;
+				if (match==0) {
+					if (allfiles!=NULL) {
+						Tcl_AppendElement(interp, listArgv[i]);
+						Tcl_AppendElement(interp, allfiles);
+					}
+					break;
 				}
-			}
+				if (multiple==0) {
+					Tcl_AppendElement(interp, listArgv[i]);
+					if (matches == 1) {
+						Tcl_RegExpRange(regexp, 1, &start, &end);
+						if (start==NULL) {Tcl_AppendElement(interp, "");}
+						else {
+							char savedChar;
+							savedChar = *end;
+							*end = 0;
+							Tcl_AppendElement(interp, start);
+							*end = savedChar;
+						}
+					}
+				} else {
+					Tcl_SetVar(interp, argPtr[j+1], listArgv[i], TCL_APPEND_VALUE|TCL_LIST_ELEMENT);
+					if (matches == 1) {
+						Tcl_RegExpRange(regexp, 1, &start, &end);
+						if (start==NULL) {
+							Tcl_SetVar(interp, argPtr[j+1], "", TCL_APPEND_VALUE|TCL_LIST_ELEMENT);
+						}
+						else {
+							char savedChar;
+							savedChar = *end;
+							*end = 0;
+							Tcl_SetVar(interp, argPtr[j+1], start, TCL_APPEND_VALUE|TCL_LIST_ELEMENT);
+							*end = savedChar;
+						}
+					}
+				}
+				if (all==0) break;
+				search = end;
+			} /* while */
 		}
-		if (all==0) break;
-		search = end;
-		} /* while */
-	}
 		free(string);
-	fclose(file);
+		fclose(file);
 	}
 	ckfree((char *) listArgv);
 	return TCL_OK;
