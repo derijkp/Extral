@@ -24,7 +24,7 @@
 #include "tclRegexp.h"
   typedef enum {false,true,other} PBOOL;
 
-extern Tcl_RegExp Tcl_RegExpCompile(Tcl_Interp *interp,char *string);
+extern regexp *TclCompileRegexp(Tcl_Interp *interp,char *string);
 extern char *		tclRegexpError;
 
 typedef struct {
@@ -392,7 +392,7 @@ int Dcse_LfileCmd(ClientData clientData, Tcl_Interp *interp, int argc, char *arg
   if (regpattern==NULL) {
       L_pos->regexpPtr=NULL;
   } else {
-      L_pos->regexpPtr = (regexp *)Tcl_RegExpCompile(interp, regpattern);
+      L_pos->regexpPtr = TclCompileRegexp(interp, regpattern);
       if (L_pos->regexpPtr == NULL) {
 	  Tcl_AppendResult(interp, "error in regexp specifier", (char *) NULL);
 	  return(false);
@@ -943,7 +943,7 @@ Dcse_LmanipCmd(notUsed, interp, argc, argv)
 		    " extract ?list? ?expression?\"", (char *) NULL);
 	    return TCL_ERROR;
 	}
-	regexpPtr = (regexp *)Tcl_RegExpCompile(interp, argv[3]);
+	regexpPtr = TclCompileRegexp(interp, argv[3]);
 	if (regexpPtr==NULL) {
 	    Tcl_AppendResult(interp, "error in regexp expression", (char *) NULL);
 	    return TCL_ERROR;

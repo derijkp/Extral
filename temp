@@ -21,7 +21,7 @@
 #include <string.h>
 #include <math.h>
 #include <limits.h>
-#include "tclRegexp.h"
+#include "tcl.h"
   typedef enum {false,true,other} PBOOL;
 
 extern Tcl_RegExp Tcl_RegExpCompile(Tcl_Interp *interp,char *string);
@@ -42,7 +42,7 @@ typedef struct {
 typedef struct {
 	int line;
 	int begin,end;
-        regexp *regexpPtr;
+        Tcl_RegExp regexp;
 } Lposition;
 
   PBOOL Compile_L_pos(Tcl_Interp *interp,Lposition *L_pos, char *positions);
@@ -390,10 +390,10 @@ int Dcse_LfileCmd(ClientData clientData, Tcl_Interp *interp, int argc, char *arg
   }
   
   if (regpattern==NULL) {
-      L_pos->regexpPtr=NULL;
+      L_pos->regexp=NULL;
   } else {
-      L_pos->regexpPtr = (regexp *)Tcl_RegExpCompile(interp, regpattern);
-      if (L_pos->regexpPtr == NULL) {
+      L_pos->regexp = Tcl_RegExpCompile(interp, regpattern);
+      if (L_pos->regexp == NULL) {
 	  Tcl_AppendResult(interp, "error in regexp specifier", (char *) NULL);
 	  return(false);
       }
@@ -405,7 +405,7 @@ int Dcse_LfileCmd(ClientData clientData, Tcl_Interp *interp, int argc, char *arg
   {
   FILE *f_ref=LfilePtr->file;
   INDEX ind_ref=LfilePtr->index;
-  regexp *regexpPtr=L_pos->regexpPtr;
+  Tcl_RegExp regexp=L_pos->regexp;
   char *tline;
   char *result=NULL;
   int match = 0;
@@ -436,11 +436,11 @@ int Dcse_LfileCmd(ClientData clientData, Tcl_Interp *interp, int argc, char *arg
   tline[end]='\0';
   result=tline+begin;
   
-  if (regexpPtr==NULL) {
+  if (regexp==NULL) {
       Tcl_AppendElement(interp, result);
   } else {
       tclRegexpError = NULL;
-      match = TclRegExec(regexpPtr, result, result);
+      match = TclRegExec(regexp, result, result);
       if (tclRegexpError != NULL) {
 	  Tcl_AppendResult(interp, "error while matching pattern: ",
 		    tclRegexpError, (char *) NULL);
@@ -452,11 +452,11 @@ int Dcse_LfileCmd(ClientData clientData, Tcl_Interp *interp, int argc, char *arg
       } else {
           Tcl_DString element;
 	  char savedChar, *first, *last;
-	  if (regexpPtr->startp[1]==NULL) {
+	  if (regexp.startp[1]==NULL) {
 	      Tcl_AppendElement(interp,result);
-          } else if (regexpPtr->startp[2]==NULL) {
-	      first = regexpPtr->startp[1];
-	      last = regexpPtr->endp[1];
+          } else if (regexp.startp[2]==NULL) {
+	      first = regexp.startp[1];
+	      last = regexp.endp[1];
 	      savedChar = *last;
 	      *last = '\0';
 	      Tcl_AppendElement(interp, first);
@@ -464,9 +464,9 @@ int Dcse_LfileCmd(ClientData clientData, Tcl_Interp *interp, int argc, char *arg
 	  } else {
 	      Tcl_DStringInit(&element);
 	      i=1;
-	      while (regexpPtr->startp[i]!=NULL) {
-		  first = regexpPtr->startp[i];
-		  last = regexpPtr->endp[i];
+	      while (regexp.startp[i]!=NULL) {
+		  first = regexp.startp[i];
+		  last = regexp.endp[i];
 		  savedChar = *last;
 		  *last = '\0';
 		  Tcl_DStringAppendElement(&element, first);
@@ -931,7 +931,7 @@ Dcse_LmanipCmd(notUsed, interp, argc, argv)
 	ckfree((char *) listArgv);
 	ckfree((char *) listArgv2);
     } else if ((c == 'e')&&(strncmp(argv[1], "extract",len) == 0)) {
-        regexp *regexpPtr;
+        Tcl_RegExp regexp;
         Tcl_DString element;
 	char savedChar, *first, *last;
         int match = 0;
@@ -943,8 +943,8 @@ Dcse_LmanipCmd(notUsed, interp, argc, argv)
 		    " extract ?list? ?expression?\"", (char *) NULL);
 	    return TCL_ERROR;
 	}
-	regexpPtr = (regexp *)Tcl_RegExpCompile(interp, argv[3]);
-	if (regexpPtr==NULL) {
+	regexp = Tcl_RegExpCompile(interp, argv[3]);
+	if (regexp==NULL) {
 	    Tcl_AppendResult(interp, "error in regexp expression", (char *) NULL);
 	    return TCL_ERROR;
 	}
@@ -956,7 +956,7 @@ Dcse_LmanipCmd(notUsed, interp, argc, argv)
 	while(nr<listArgc) {
 	    line=listArgv[nr];
 	    tclRegexpError = NULL;
-	    match = TclRegExec(regexpPtr, line, line);
+	    match = TclRegExec(regexp, line, line);
 	    if (tclRegexpError != NULL) {
 	        Tcl_AppendResult(interp, "error while matching pattern: ",
 	  		tclRegexpError, (char *) NULL);
@@ -965,11 +965,11 @@ Dcse_LmanipCmd(notUsed, interp, argc, argv)
 	    if (!match) {
 	        Tcl_AppendElement(interp, "");
 	    } else {
-		if (regexpPtr->startp[1]==NULL) {
+		if (regexp.startp[1]==NULL) {
 		    Tcl_AppendElement(interp,line);
-		} else if (regexpPtr->startp[2]==NULL) {
-		    first = regexpPtr->startp[1];
-		    last = regexpPtr->endp[1];
+		} else if (regexp.startp[2]==NULL) {
+		    first = regexp.startp[1];
+		    last = regexp.endp[1];
 		    savedChar = *last;
 		    *last = '\0';
 		    Tcl_AppendElement(interp, first);
@@ -977,9 +977,9 @@ Dcse_LmanipCmd(notUsed, interp, argc, argv)
 		} else {
 		    Tcl_DStringInit(&element);
 		    i=1;
-		    while (regexpPtr->startp[i]!=NULL) {
-			first = regexpPtr->startp[i];
-			last = regexpPtr->endp[i];
+		    while (regexp.startp[i]!=NULL) {
+			first = regexp.startp[i];
+			last = regexp.endp[i];
 			savedChar = *last;
 			*last = '\0';
 			Tcl_DStringAppendElement(&element, first);

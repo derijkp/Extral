@@ -15,6 +15,9 @@ extern int Dcse_LcorCmd _ANSI_ARGS_((ClientData clientData,
 extern int Dcse_LloadCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
 
+extern int Dcse_LwriteCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int argc, char *argv[]));
+
 extern int Dcse_LfileCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
 
@@ -38,6 +41,7 @@ ExtraL_Init(interp)
     dld_AddTclCommand(interp, "lsub", Dcse_LsubCmd);
     dld_AddTclCommand(interp, "lcor", Dcse_LcorCmd);
     dld_AddTclCommand(interp, "lload", Dcse_LloadCmd);
+    dld_AddTclCommand(interp, "lwrite", Dcse_LwriteCmd);
     dld_AddTclCommand(interp, "lfile", Dcse_LfileCmd);
     dld_AddTclCommand(interp, "lmanip", Dcse_LmanipCmd);
     dld_AddTclCommand(interp, "lmath", Dcse_LmathCmd);
