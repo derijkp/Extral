@@ -29,7 +29,7 @@ SRC_DIR =		@srcdir@
 CFLAGS = -g
 CC_SWITCHES = $(CFLAGS) $(SHLIB_CFLAGS) -I${TCL_GENERIC_DIR} -I$(TCL_UNIX_DIR) -I${TK_GENERIC_DIR} ${SHLIB_CFLAGS}
 
-OBJECTS = extralInit.o extral.o lpop.o nonl.o supersort.o general.o
+OBJECTS = extralInit.o extral.o lpop.o nonl.o supersort.o general.o tagl.o
 
 all: extral${SHLIB_SUFFIX}
 

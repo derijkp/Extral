@@ -169,6 +169,33 @@ ssort ?-ascii? ?-integer? ?-real? ?-increasing? ?-decreasing? ?-dictionary? ?-co
 			to the comparisons of the corresponding elements in the 
 			reflist.
 
+Tagged lists
+------------
+In a tagged list tags alternate with the value attached to this tag, 
+eg.: {tag1 {value of tag1} tag2 {value of tag2} ...}
+Using the tagged list commands, you can use a list as a sort of array.
+However, tagged lists have some advantages to arrays:
+ - They can be passed to functions easily
+ - an element of a tagged list can contain another tagged list, etc.
+ - although finding a value in an array should be faster,
+   creating the array can take more time.
+
+taglset list tag value
+	set the value for tag
+	eg.:
+		% set list {a 1 b 4}
+		a 1 b 4
+		% set list [taglset $list c 3]
+		a 1 b 4 c 3
+		% taglset {a 1 b 4 c 3} b 2
+		a 1 b 2 c 3
+
+
+taglget list tag ?default?
+taglunset list tag
+taglfields list ?valueVar?
+
+
 Commands in extral.tcl
 ----------------------
 There are also some extra listprocessing commands written in tcl in the 

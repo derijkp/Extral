@@ -8,7 +8,7 @@
 # full path name of this file's directory.
 
 # $Format: "set version $ProjectVersion$"$
-set version 1a.12
+set version 1a.13
 regsub -all {[ab]} $Extral__version {} Extral__version
 set Extral__temp {
 	if [file exists [file join $dir extral[info sharedlibextension]]] {

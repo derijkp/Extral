@@ -2,6 +2,57 @@ set auto_path {/home/peter/dev/Extral /home/peter/bin/Peos}
 package require Extral 1
 tk appname test
 wm withdraw .
+
+catch {unset try}
+set try {a 1 b 2 c 3 d 4 e 5 f 6 g 7 h 8 i 9 j 10}
+time {
+taglget $try g
+}
+# 711 349
+time {
+taglset $try g try
+}
+# 501 422
+time {
+taglunset $try g
+}
+
+set try {{a 1} {b 2} {c 3} {d 4} {e 5} {f 6} {g 7} {h 8} {i 9} {j 10}}
+time {
+keylget try j
+}
+time {
+keylset try g try
+} 1000
+#517 145
+
+set file temp
+#set file /data/test/ssu/temp
+time {
+set c [lreadfile $file]
+set try [lindex $c 10]
+set try2 [lindex $c 11]
+}
+
+time {
+lwritefile temp2 $c
+}
+
+proc readfile {file} {
+	set f [open $file]
+	fconfigure $f -buffersize 100000
+	set c [read $f]
+	close $f
+	return $c
+}
+
+time {
+	set c [readfile $file]
+	set try [lindex $c 10]
+	set try2 [lindex $c 11]
+}
+
+
 proc ptime args {
 time {uplevel $args}
 }

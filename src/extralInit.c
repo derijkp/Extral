@@ -27,6 +27,12 @@ extern int ExtraL_LcorObjCmd _ANSI_ARGS_((ClientData clientData,
 extern int ExtraL_LlremoveObjCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int objc, Tcl_Obj *argv[]));
 
+extern int ExtraL_LunmergeObjCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int objc, Tcl_Obj *argv[]));
+
+extern int ExtraL_LmergeObjCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int objc, Tcl_Obj *argv[]));
+
 extern int ExtraL_AmanipCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
 
@@ -37,6 +43,18 @@ extern int ExtraL_SSortCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
 
 extern int ExtraL_AtexitCmd _ANSI_ARGS_((ClientData clientData));
+
+extern int ExtraL_TaglsetObjCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int argc, char *argv[]));
+
+extern int ExtraL_TaglunsetObjCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int argc, char *argv[]));
+
+extern int ExtraL_TaglgetObjCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int argc, char *argv[]));
+
+extern int ExtraL_TaglfieldsObjCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int argc, char *argv[]));
 
 #ifdef windows
 /*
@@ -71,6 +89,12 @@ Extral_Init(interp)
 	Tcl_CreateObjCommand(interp,"lcor",(Tcl_ObjCmdProc *)ExtraL_LcorObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"lremdup",(Tcl_ObjCmdProc *)ExtraL_LremdupObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"llremove",(Tcl_ObjCmdProc *)ExtraL_LlremoveObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"lunmerge",(Tcl_ObjCmdProc *)ExtraL_LunmergeObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"lmerge",(Tcl_ObjCmdProc *)ExtraL_LmergeObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"taglset",(Tcl_ObjCmdProc *)ExtraL_TaglsetObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"taglunset",(Tcl_ObjCmdProc *)ExtraL_TaglunsetObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"taglget",(Tcl_ObjCmdProc *)ExtraL_TaglgetObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"taglfields",(Tcl_ObjCmdProc *)ExtraL_TaglfieldsObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 
 
 /*	dld_AddTclCommand(interp, "ffind", ExtraL_FfindCmd); */

@@ -416,6 +416,7 @@ ExtraL_LlremoveObjCmd(notUsed, interp, objc, objv)
 		if (refArgc==0) {
 			if (len!=0) {
 				result=Tcl_ListObjAppendElement(interp,resultObj,listArgv[pos]);
+				if (result!=TCL_OK) {return result;}
 			}
 		} else {
 			for(i=0;i<refArgc;i++) {
@@ -429,6 +430,164 @@ ExtraL_LlremoveObjCmd(notUsed, interp, objc, objv)
 				if (result!=TCL_OK) {return result;}
 			}
 		}
+	}
+	return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ExtraL_LunmergeCmd --
+ *
+ *		This procedure is invoked to process the "lunmerge" command.
+ *
+ * Results:
+ *		A standard Tcl result.
+ *
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+ExtraL_LunmergeObjCmd(notUsed, interp, objc, objv)
+	ClientData notUsed;				 /* Not used. */
+	Tcl_Interp *interp;					/* Current interpreter. */
+	int objc;						/* Number of arguments. */
+	Tcl_Obj *CONST objv[];	/* Argument objects. */
+{
+	int listArgc;
+	Tcl_Obj **listArgv;
+	Tcl_Obj *resultObj;
+	char *tag;
+	int spacing=1;
+	int pos,result;
+	int i;
+
+	if ((objc < 2)||(objc > 4)) {
+		Tcl_WrongNumArgs(interp, 1, objv, "list ?spacing? ?varName?");
+		return TCL_ERROR;
+	}
+
+	if (Tcl_ListObjGetElements(interp, objv[1], &listArgc, &listArgv) != TCL_OK) {
+		return TCL_ERROR;
+	}
+	if (objc>=3) {
+		result=Tcl_GetIntFromObj(interp, objv[2], &spacing);
+		if (result!=TCL_OK) {return result;}
+	}
+
+	/* Initialise result */
+	Tcl_ResetResult(interp);
+	resultObj = Tcl_GetObjResult(interp);
+
+	i=spacing;
+	for(pos=0;pos<listArgc;pos++) {
+		if (i!=0) {
+			result=Tcl_ListObjAppendElement(interp,resultObj,listArgv[pos]);
+			if (result!=TCL_OK) {return result;}
+			i--;
+		} else {
+			i=spacing;
+		}
+	}
+	spacing++;
+	if (objc==4) {
+		Tcl_Obj *valueObj;
+		valueObj = Tcl_NewObj();
+		for(pos=spacing-1;pos<listArgc;pos+=spacing) {
+			result=Tcl_ListObjAppendElement(interp,valueObj,listArgv[pos]);
+			if (result!=TCL_OK) {return result;}
+		}
+		if (Tcl_ObjSetVar2(interp, objv[3], (Tcl_Obj *) NULL,
+			valueObj, (TCL_LEAVE_ERR_MSG | TCL_PARSE_PART1)) == NULL) {
+				return TCL_ERROR;
+		}
+	}
+	return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ExtraL_LmergeCmd --
+ *
+ *		This procedure is invoked to process the "lmerge" command.
+ *
+ * Results:
+ *		A standard Tcl result.
+ *
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+ExtraL_LmergeObjCmd(notUsed, interp, objc, objv)
+	ClientData notUsed;				 /* Not used. */
+	Tcl_Interp *interp;					/* Current interpreter. */
+	int objc;						/* Number of arguments. */
+	Tcl_Obj *CONST objv[];	/* Argument objects. */
+{
+	int list1Argc;
+	Tcl_Obj **list1Argv;
+	int list2Argc;
+	Tcl_Obj **list2Argv;
+	Tcl_Obj *resultObj;
+	Tcl_Obj *emptyObj;
+	int spacing=1;
+	int pos,pos2,result;
+	int i;
+
+	emptyObj=Tcl_NewStringObj("",0);
+	if ((objc != 3)&&(objc != 4)) {
+		Tcl_WrongNumArgs(interp, 1, objv, "list1 list2 ?spacing?");
+		return TCL_ERROR;
+	}
+
+	if (objc==4) {
+		result=Tcl_GetIntFromObj(interp, objv[3], &spacing);
+		if (result!=TCL_OK) {return result;}
+	}
+
+	if (Tcl_ListObjGetElements(interp, objv[1], &list1Argc, &list1Argv) != TCL_OK) {
+		return TCL_ERROR;
+	}
+
+	if (Tcl_ListObjGetElements(interp, objv[2], &list2Argc, &list2Argv) != TCL_OK) {
+		return TCL_ERROR;
+	}
+
+	/* Initialise result */
+	Tcl_ResetResult(interp);
+	resultObj = Tcl_GetObjResult(interp);
+
+	pos=0;
+	pos2=0;
+	i=spacing;
+	while(pos<list1Argc) {
+		if (i!=0) {
+			result=Tcl_ListObjAppendElement(interp,resultObj,list1Argv[pos]);
+			if (result!=TCL_OK) {return result;}
+			pos++;
+			i--;
+		} else {
+			if (pos2<list2Argc) {
+				result=Tcl_ListObjAppendElement(interp,resultObj,list2Argv[pos2]);
+				if (result!=TCL_OK) {return result;}
+				pos2++;
+			} else {
+				result=Tcl_ListObjAppendElement(interp,resultObj,emptyObj);
+				if (result!=TCL_OK) {return result;}
+			}
+			i=spacing;
+		}
+	}
+	if (pos2<list2Argc) {
+		result=Tcl_ListObjAppendElement(interp,resultObj,list2Argv[pos2]);
+		if (result!=TCL_OK) {return result;}
+		pos2++;
+	} else {
+		result=Tcl_ListObjAppendElement(interp,resultObj,emptyObj);
+		if (result!=TCL_OK) {return result;}
 	}
 	return TCL_OK;
 }

@@ -1036,3 +1036,168 @@ ExtraL_LregsubCmd(dummy, interp, argc, argv)
 	ckfree((char *) listArgv);
 	return code;
 }
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ExtraL_LreadFileCmd --
+ *
+ *		This procedure is invoked to process the "lreadfile" command.
+ *
+ * Results:
+ *		A standard Tcl result.
+ *
+ *
+ *----------------------------------------------------------------------
+ */
+
+#define BUFFERSIZE 512
+
+int
+ExtraL_LreadFileObjCmd(notUsed, interp, objc, objv)
+	ClientData notUsed;				 /* Not used. */
+	Tcl_Interp *interp;					/* Current interpreter. */
+	int objc;						/* Number of arguments. */
+	Tcl_Obj *CONST objv[];	/* Argument objects. */
+{
+	FILE *file;
+	char *fileName, *nativeName, *new;
+	Tcl_DString buffer;
+	Tcl_Obj *lineObj, *listObj;
+	char fbuffer[BUFFERSIZE];
+	int length, pos, ch, err;
+
+	if (objc != 2) {
+		Tcl_WrongNumArgs(interp, 1, objv, "filename");
+		return TCL_ERROR;
+	}
+	fileName = Tcl_GetStringFromObj(objv[1], &length);
+
+	nativeName = Tcl_TranslateFileName(interp, fileName, &buffer);
+	if (nativeName == NULL) {
+		return TCL_ERROR;
+	}
+	file = fopen(nativeName, "r");
+
+    /*
+     * If nativeName is not NULL, the buffer is valid and we must free
+     * the storage.
+     */
+    
+    Tcl_DStringFree(&buffer);
+
+	listObj = Tcl_NewListObj(0,NULL);
+	lineObj = Tcl_NewStringObj("",0);
+	pos=0;
+	while(1) {
+		ch = fgetc(file);
+		if (ch=='\\') {
+			ch = fgetc(file);
+			if (ch=='n') {
+				fbuffer[pos++] = '\n';
+			} else if (ch=='\\') {
+				fbuffer[pos++] = '\\';
+			} else {
+				fbuffer[pos++] = '\\';
+				fbuffer[pos++] = ch;
+			}
+		} else if (ch==EOF) {
+			Tcl_AppendToObj(lineObj,fbuffer,pos);
+			err = Tcl_ListObjAppendElement(interp,listObj,Tcl_DuplicateObj(lineObj));
+			if (err) {Tcl_DecrRefCount(lineObj);return TCL_ERROR;}
+			break;
+		} else if (ch=='\n') {
+			Tcl_AppendToObj(lineObj,fbuffer,pos);
+			err = Tcl_ListObjAppendElement(interp,listObj,Tcl_DuplicateObj(lineObj));
+			if (err) {Tcl_DecrRefCount(lineObj);return TCL_ERROR;}
+			Tcl_SetObjLength(lineObj,0);
+			pos=0;
+		} else {
+			if (pos==BUFFERSIZE) {
+				Tcl_AppendToObj(lineObj,fbuffer,BUFFERSIZE);
+				pos=0;
+			}
+			fbuffer[pos++] = ch;
+		}
+	}
+	Tcl_DecrRefCount(lineObj);
+	Tcl_SetObjResult(interp,listObj);
+	fclose(file);
+	return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ExtraL_LwriteFileCmd --
+ *
+ *		This procedure is invoked to process the "lwritefile" command.
+ *
+ * Results:
+ *		A standard Tcl result.
+ *
+ *
+ *----------------------------------------------------------------------
+ */
+
+#define BUFFERSIZE 512
+
+int
+ExtraL_LwriteFileObjCmd(notUsed, interp, objc, objv)
+	ClientData notUsed;				 /* Not used. */
+	Tcl_Interp *interp;					/* Current interpreter. */
+	int objc;						/* Number of arguments. */
+	Tcl_Obj *CONST objv[];	/* Argument objects. */
+{
+	FILE *file;
+	char *fileName, *nativeName;
+	Tcl_Obj **listArgv;
+	int listArgc;
+	Tcl_DString buffer;
+	char *string;
+	int length, pos, i, err;
+
+	if (objc != 3) {
+		Tcl_WrongNumArgs(interp, 1, objv, "filename list");
+		return TCL_ERROR;
+	}
+	fileName = Tcl_GetStringFromObj(objv[1], &length);
+
+	nativeName = Tcl_TranslateFileName(interp, fileName, &buffer);
+	if (nativeName == NULL) {
+		return TCL_ERROR;
+	}
+
+	file = fopen(nativeName, "w");
+
+    /*
+     * If nativeName is not NULL, the buffer is valid and we must free
+     * the storage.
+     */
+
+    Tcl_DStringFree(&buffer);
+
+	if (Tcl_ListObjGetElements(interp, objv[2], &listArgc, &listArgv) != TCL_OK) {
+		return TCL_ERROR;
+	}
+
+	for(pos=0;pos<listArgc;pos++) {
+		string = Tcl_GetStringFromObj(listArgv[pos],&length);
+		i=0;
+		while(i<length) {
+			if (string[i]=='\\') {
+				fputc('\\',file);
+				fputc('\\',file);
+			} else if (string[i]=='\n') {
+				fputc('\\',file);
+				fputc('n',file);
+			} else {
+				fputc(string[i],file);
+			}
+			i++;
+		}
+		if (pos!=(listArgc-1)) {fputc('\n',file);}
+	}
+	fclose(file);
+	return TCL_OK;
+}

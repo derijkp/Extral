@@ -1,3 +1,4 @@
 package require Peos 1
 wm withdraw .
-eval edit [glob [pwd]/lib/*.tcl] [glob [pwd]/src/*.c] [pwd]/extral.txt [pwd]/src/Makefile
+eval edit [glob lib/*.tcl] [glob src/*.c] extral.txt src/Makefile
+edit try.tcl

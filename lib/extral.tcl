@@ -33,70 +33,6 @@ proc lremove {list args} {
 }
 }
 
-
-proc lmerge {args} {
-	if {([llength $args]!=2)&&([llength $args]!=3)} {
-		error "wrong # args: should be \"lmerge list1 list2 ?spacing?\""
-	}
-	set result ""
-	if {[llength $args]==3} {
-		set spacing [lindex $args 2]
-		set list2 [lindex $args 1]
-		set c $spacing
-		foreach e1 [lindex $args 0] {
-			lappend result $e1
-			incr c -1
-			if !$c {
-				lappend result [lshift list2]
-				set c $spacing
-			}
-		}
-		return $result
-		
-	} else {
-		foreach e1 [lindex $args 0] e2 [lindex $args 1] {
-			lappend result $e1 $e2
-		}
-		return $result
-	}
-}
-
-proc lunmerge {args} {
-	if {([llength $args]<1)&&([llength $args]>3)} {
-		error "wrong # args: should be \"lunmerge list ?spacing? ?var?\""
-	}
-	set result ""
-	if {[llength $args]==3} {
-		upvar [lindex $args 2] var
-		set var ""
-	}
-	if {[llength $args]>1} {
-		set spacing [lindex $args 1]
-	} else {
-		set spacing 1
-	}
-	if {$spacing==1} {
-		foreach {e1 e2} [lindex $args 0] {
-			lappend result $e1
-			if [info exists var] {lappend var $e2}
-		}
-		return $result
-	} else {
-		set c $spacing
-		foreach e1 [lindex $args 0] {
-			if !$c {
-				if [info exists var] {lappend var $e1}
-				set c $spacing
-			} else {
-				lappend result $e1
-				incr c -1
-			}
-		}
-		return $result
-		
-	}
-}
-
 proc lload {filename} {
 	set f [open $filename "r"]
 	set result [split [read $f] "\n"]
@@ -110,9 +46,24 @@ proc lwrite {filename list} {
 	close $f
 }
 
+proc readfile {filename} {
+	set f [open $filename "r"]
+	fconfigure $f -buffersize 100000
+	set result [read $f]
+	close $f
+	return $result
+}
+
+proc writefile {filename list} {
+	set f [open $filename "w"]
+	fconfigure $f -buffersize 100000
+	puts -nonewline $f $list
+	close $f
+}
+
 proc lpush {ulist item {pos {}}} {
 	upvar $ulist list
-	if {("$list"=="")||("$pos"=="")} { 
+	if {![info exists list]||("$list"=="")||("$pos"=="")} { 
 		lappend list $item
 	} else {
 		if {$pos>=[llength $list]} {
