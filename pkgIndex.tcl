@@ -7,8 +7,12 @@
 # script is sourced, the variable $dir must contain the
 # full path name of this file's directory.
 
-package ifneeded Extral 0.94 [subst {
+# $Format: "set version $ProjectVersion$"$
+set version 1a.3
+regsub -all {[ab]} $version {} version
+package ifneeded Extral $version [subst {
 	load [file join $dir extral[info sharedlibextension]]
 	lappend auto_path [file join $dir lib]
-	package provide Extral 0.94
+	set Extral_version $version
+	package provide Extral $version
 }]

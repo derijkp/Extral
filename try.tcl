@@ -1,5 +1,5 @@
-set auto_path {/home/peter/dev/Extral0.94 /home/peter/bin/Peos0.84 /usr/local/lib/tcl7.6 /usr/local/lib/tk4.2}
-package require Extral
+set auto_path {/home/peter/dev/Extral1a /home/peter/bin/Peos1a /usr/local/lib/tcl8.0 /usr/local/lib/tk8.0}
+package require Extral 1.1
 
 ffind -regexp -matches -allmatches [glob ../test/*] "\norg:(\[^\n\]*)\n"
 ffind -regexp -matches -allfiles [glob ../test/*] "\norg:(\[^\n\]*)\n" null
