@@ -27,4 +27,29 @@ test lwrite-lload {basic} {
 	lload try.txt
 } {a {b c} {d e}}
 
+test splitcomplete {basic} {
+set data {
+	proc try {} {
+		puts ok
+	}
+	# test
+	$w configure \
+		-test try
+}
+splitcomplete $data
+} {{} {	proc try {} {
+		puts ok
+	}} {	# test} {	$w configure  -test try} {}}
+
+test parsecommand {basic} {
+	parsecommand {set test [format "%2.2f" 4.3]}
+} {set test {[format "%2.2f" 4.3]}}
+
+test parsecommand {difficult} {
+set line "\t \$window.try configure \t -title \[puts \"\[tk appname\]\"\]
+\\\n-command \"\$window command\\\"\\n\\\"\" -test \{try \nit \"\"\}"
+parsecommand $line
+} {{$window.try} configure -title {[puts "[tk appname]"]} -command {"$window command\"\n\""} -test {{try 
+it ""}}}
+
 testsummarize

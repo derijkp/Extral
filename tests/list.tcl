@@ -256,8 +256,18 @@ test lcommon {} {
 } {a d}
 
 test lcommon {} {
+	lcommon {d} {a b c d e}
+} {d}
+
+test lcommon {} {
 	lcommon {hobbit.seq orc.seq} {sphinx.seq hobbit.seq orc.seq centaur.seq}
 } {hobbit.seq orc.seq}
+
+test lcommon {} {
+	set selfiles {Lepbor.BCY Lepfov.BCY Lepsp.BCY Oscaga.BCY Osccor.BCY Trisp10.BCY Pseaga.BPG Psealc.BPG Pseamy.BPG Pseasp.BPG Pseaur.BPG Psecic.BPG Psecit.BPG Psecor.BPG Psefic.BPG Pseflu.BPG Psemar.BPG Pseole.BPG Pseres.BPG Psetol.BPG Psevir.BPG Xanalb.BPG Xanaxo.BPG Xancam.BPG Xanfra.BPG Xanory.BPG Xanpop.BPG Haesan.EAN Eisfet.EAN Lancon.EAN Nerlim.EAN Eurcal.EAN Artsal.EAN Tenmol.EAN Linlin.EAN Anesul.EAN Ochery.EAN Alcgel.EAN Barben.EAN Pedcer.EAN Lepsqu.EAN Barvir.EAN Galtak.EAN Glysp.EAN Trisp.EAN Scuven.EAN Aplsp.EAN Balbip.EAN Burran.EAN Faslig.EAN Laealt.EAN Limkam.EAN Litlit.EAN Litobt.EAN Monlab.EAN Nassin.EAN Neralb.EAN Onccel.EAN Oxysp.EAN Pisstr.EAN Sipalg.EAN Thacla.EAN Acajap.EAN Lepcor.EAN Antvul.EAN Goraqu.EAN Linsp.EAN Phoarc.EAN Bipsp.EAN Sibfio.EAN Pricau.EAN Brapli.EAN Phagra.EAN Ridpis.EAN Ascapi.EFU Sclscl.EFU Conapo.EFU Conper.EFU Consp.EFU Phadem.EFU Sarcru.EFU Moncas.EFU Sorfim.EFU Canalb.EFU Cantro.EFU Clalus.EFU Debhan.EFU Dekbru.EFU Dipalb.EFU Endfib.EFU Galgeo.EFU Hanuva.EFU Issori.EFU Klupol.EFU Metbic.EFU Picano.EFU Picmem.EFU Saclud.EFU Saccap.EFU Tordel.EFU Wallip.EFU Zygrou.EFU Filneo.EFU Tricut.EFU Bulalb.EFU Leusco.EFU Rhoglu.EFU Sporos.EFU Ustmay.EFU Lotvac.EPR Hypcat.EPR Palpal.EPR}
+	set files {Bipsp.EAN Sibfio.EAN}
+	lcommon $files $selfiles
+} {Bipsp.EAN Sibfio.EAN}
 
 test lunion {} {
 	lunion {a b c} {c d e}

@@ -95,8 +95,6 @@ int
 Extral_Init(interp)
 	Tcl_Interp *interp;		/* Interpreter to add extra commands */
 {
-	/* $Format: "\tTcl_PkgProvide(interp,"Extral","1.$ProjectMajorVersion$.$ProjectMinorVersion$""$ */
-	Tcl_PkgProvide(interp,
 	Tcl_CreateObjCommand(interp,"lpop",(Tcl_ObjCmdProc *)ExtraL_LpopObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"lshift",(Tcl_ObjCmdProc *)ExtraL_LshiftObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"lfind",(Tcl_ObjCmdProc *)ExtraL_LfindObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);

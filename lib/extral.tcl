@@ -15,8 +15,6 @@
 #} descr {
 #removes the items from the list
 #}
-if ![info exists noc] {
-
 proc lremove {list args} {
 	if {"$args"==""} {
 		return $list
@@ -33,14 +31,14 @@ proc lremove {list args} {
 	return $result
 }
 
-} else {
-proc lremove {list args} {
-	if {"$args"==""} {
-		return $list
-	} else {
-		return [llremove $list $args]
+if ![get noc 0] {
+	proc lremove {list args} {
+		if {"$args"==""} {
+			return $list
+		} else {
+			return [llremove $list $args]
+		}
 	}
-}
 }
 
 #doc {listcommands lpush} cmd {

@@ -7,6 +7,12 @@
 #
 # =============================================================
 
+# $Format: "set ::Extral::version 1.$ProjectMajorVersion$"$
+set ::Extral::version 1.1
+# $Format: "set ::Extral::patchlevel $ProjectMinorVersion$"$
+set ::Extral::patchlevel 2
+package provide Extral $::Extral::version
+
 #
 # Load the shared library if present
 # If not, Tcl code will be loaded when necessary

@@ -97,38 +97,126 @@ proc getcomplete {channelId} {
 #	braces, brackets or array element names.
 #}
 proc splitcomplete {data} {
-        set result ""
-        set current ""
-        foreach line [split $data "\n"] {
-			if {"$current" != ""} {
-				append current "\n"
-			}
-			append current $line
+	set result ""
+	set current ""
+	regsub -all "\\\\\n" $data {} data
+	foreach line [split $data "\n"] {
+		if {"$current" != ""} {
+			append current "\n"
+		}
+		append current $line
+		if [info complete $current] {
+			lappend result $current
+			set current ""
+		}
+	}
+	return $result
+}
+
+proc splitesccomplete {data} {
+	set result ""
+	set current ""
+	regsub -all "\\\\\n" $data {} data
+	foreach line [split $data "\n"] {
+		if {"$current" != ""} {
+			append current "\n"
+		}
+		append current $line
+		if ![regexp {\\$} $current] {
 			if [info complete $current] {
 				lappend result $current
 				set current ""
 			}
-        }
-        return $result
+		}
+	}
+	return $result
 }
 
-proc splitesccomplete {data} {
-        set result ""
-        set current ""
-        foreach line [split $data "\n"] {
-			if {"$current" != ""} {
-				append current "\n"
-			}
-			append current $line
-			if ![regexp {\\$} $current] {
-				if [info complete $current] {
-					lappend result $current
-					set current ""
+#doc {filing splitcomplete} cmd {
+#	parsecommand line
+#} descr {
+#	parses a cmdline. it returns a list where each element is the part of the cmdline that
+#	will result in one element when the cmdline would be evaluated.
+#	eg.
+#	% parsecommand {set test [format "%2.2f" 4.3]}
+#	set test {[format "%2.2f" 4.3]}
+#}
+proc parsecommand {line {recurse 0}} {
+	regsub -all "\\\\\n" $line {} line
+	set len [string length $line]
+	set i $recurse
+	while {$i < $len} {
+		if ![regexp "\[ \t\]" [string index $line $i]] break
+		incr i
+	}
+	set prev $i
+	set result ""
+	while {$i < $len} {
+		switch -- [string index $line $i] {
+			" " - "\n" {
+				lappend result [string range $line $prev [expr {$i-1}]]
+				while {$i < $len} {
+					incr i
+					set char [string index $line $i]
+					if {("$char" != " ")&&("$char" != "\t")} {
+						set prev $i
+						incr i -1
+						break
+					}
 				}
 			}
-        }
-        return $result
+			"\\" {
+				incr i
+			}
+			"\{" {
+				set level 1
+				while 1 {
+					incr i
+					if {$i == $len} break
+					switch [string index $line $i] {
+						"\{" {
+							incr level
+						}
+						"\}" {
+							incr level -1
+							if {$level == 0} break
+						}
+					}
+				}
+			}
+			"\"" {
+				while 1 {
+					incr i
+					if {$i == $len} {
+						error "missing \""
+					}
+					switch -- [string index $line $i] {
+						"\\" {incr i}
+						"\"" break
+						"\[" {
+							incr i
+							set i [parsecommand $line $i]
+						}
+					}
+				}
+			}
+			"\[" {
+				incr i
+				set i [parsecommand $line $i]
+			}
+			"\]" {
+				if $recurse {
+					return $i
+				}
+			}
+		}
+		incr i
+	}
+	lappend result [string range $line $prev end]
+	return $result
 }
+#set line "\t \$window.try configure \t -title \[puts \"\[tk appname\]\"\] \\\n-command \"\$window command\\\"\\n\\\"\" -test \{try \nit \"\"\}"
+#parsecommand $line
 
 #doc {filing cload} cmd {
 #	cload filename

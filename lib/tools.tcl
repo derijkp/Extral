@@ -196,11 +196,11 @@ proc random {min max} {
 #returns 0 if $value is not an element of list $list
 #}
 proc inlist {list value} {
-        if {[lsearch $list $value]==-1} {
-                return 0
-        } else {
-                return 1
-        }
+	if {[lsearch $list $value]==-1} {
+		return 0
+	} else {
+		return 1
+	}
 }
 
 #doc {convenience putsvars} cmd {
@@ -239,3 +239,25 @@ proc extractbool {listName option} {
 	}
 }
 
+proc Extral::scriptdir {} {
+	set script [info script]
+	if {"$script"==""} {
+		return [pwd]
+	} else {
+		global tcl_platform
+		if {"$tcl_platform(platform)"=="unix"} {
+			if {"[file pathtype $script]"!="absolute"} {
+		 		set script [file join [pwd] $script]
+			}
+			while 1 {
+		 		if [catch {set link [file readlink $script]}] break
+		 		if {"[file pathtype $link]"=="absolute"} {
+		 	 		set script $link
+		 		} else {
+		 	 		set script [file join [file dirname $script] $l]
+		 		}
+			}
+		}
+		return [file dir $script]
+	}
+}
