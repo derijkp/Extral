@@ -48,6 +48,10 @@ test lmath {max bugfix} {
 	lmath_max {{} 5 100 50}
 } {expected floating-point number but got ""} 1
 
+test lmath {max} {
+	lmath_max {}
+} {}
+
 test lmath {cumul} {
 	lmath_cumul {5 1 100}
 } {5 6 106}
