@@ -1171,13 +1171,13 @@ ExtraL_LmanipCmd(notUsed, interp, argc, argv)
         int spacing=1;
         int i,k;
     
-        if ((argc != 4)&&(argc != 5)) {
+        if ((argc < 3)&&(argc > 5)) {
             Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-        	    " demangle ?list? ?var? ??spacing??\"", (char *) NULL);
+        	    " unmangle ?list? ??spacing?? ??var??\"", (char *) NULL);
             return TCL_ERROR;
         }
-        if (argc==5) {
-            if (Tcl_GetInt(interp, argv[4], &spacing) != TCL_OK) {
+        if (argc>3) {
+            if (Tcl_GetInt(interp, argv[3], &spacing) != TCL_OK) {
                 return TCL_ERROR;
             }
             if (spacing<=0) {
@@ -1189,13 +1189,16 @@ ExtraL_LmanipCmd(notUsed, interp, argc, argv)
             return TCL_ERROR;
         }
 
-	Tcl_SetVar(interp, argv[3], "", 0);
-        i=0;
+	    if (argc==5) {Tcl_SetVar(interp, argv[4], "", 0);}
+        Tcl_AppendElement(interp, listArgv[0]);
+        i=1;
         while(i<listArgc) {
             for(k=0;k<spacing;k++) {
-    	        Tcl_SetVar(interp, argv[3], listArgv[i], TCL_APPEND_VALUE|TCL_LIST_ELEMENT);
-    	        i++;
-    	        if (i==listArgc) break;
+	        if (argc==5) {
+	    	        Tcl_SetVar(interp, argv[4], listArgv[i], TCL_APPEND_VALUE|TCL_LIST_ELEMENT);
+			}
+			i++;
+			if (i==listArgc) break;
     	    }
     	    if (i==listArgc) break;
             Tcl_AppendElement(interp, listArgv[i]);
@@ -2074,6 +2077,7 @@ ExtraL_RandomCmd(notUsed, interp, argc, argv)
     return TCL_OK;
 }
 
+
 
 
 

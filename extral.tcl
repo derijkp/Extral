@@ -33,12 +33,11 @@ proc lpush {ulist item args} {
     if {"$args"==""} { 
         lappend list $item
     } else {
-        set pos [expr $args-1]
-        if {$pos>=[llength $list]} {
+        if {$args>=[llength $list]} {
             return {}
         }
-        set temp [lindex $list $pos]
-        set list [lreplace $list $pos $pos $temp $item]
+        set temp [lindex $list $args]
+        set list [lreplace $list $args $args $item $temp]
     }
 }
 
