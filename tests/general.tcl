@@ -436,6 +436,14 @@ test taglunset {check uneven} {
 	taglfields {a 1 bb 2 ccc}
 } {tagged list must have an even number of elements} 1
 
+test taglfind {present} {
+	taglfind {a try1 bb try2 ccc try3} bb
+} 3
+
+test taglfind {not present} {
+	taglfind {a try1 bb try2 ccc try3} try
+} 0
+
 
 testsummarize
 

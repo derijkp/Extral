@@ -56,6 +56,9 @@ extern int ExtraL_TaglgetObjCmd _ANSI_ARGS_((ClientData clientData,
 extern int ExtraL_TaglfieldsObjCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
 
+extern int ExtraL_TaglfindObjCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int argc, char *argv[]));
+
 #ifdef windows
 /*
 extern int ExtraL_MkdirCmd _ANSI_ARGS_((ClientData clientData,
@@ -95,6 +98,7 @@ Extral_Init(interp)
 	Tcl_CreateObjCommand(interp,"taglunset",(Tcl_ObjCmdProc *)ExtraL_TaglunsetObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"taglget",(Tcl_ObjCmdProc *)ExtraL_TaglgetObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"taglfields",(Tcl_ObjCmdProc *)ExtraL_TaglfieldsObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"taglfind",(Tcl_ObjCmdProc *)ExtraL_TaglfindObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 
 
 /*	dld_AddTclCommand(interp, "ffind", ExtraL_FfindCmd); */

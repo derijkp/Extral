@@ -38,3 +38,5 @@ if [info exists errors] {
 	error $error
 }
 }
+
+if [info exists errors] {unset errors}

@@ -22,7 +22,7 @@ LIBS = -L/home/peter/tcl/tcl8.0/unix -ltcl8.0 -ldl  -lm -lc
 #----------------------------------------------------------------
 
 CC = gcc
-SHLIB_CFLAGS =		-fPIC
+SHLIB_CFLAGS =		-fPIC -g
 SHLIB_LD =		gcc -shared
 SHLIB_SUFFIX =		.so
 SHLIB_VERSION =		

@@ -1,3 +1,40 @@
+set struct {a int b int c int}
+set try {a 1 b 2 c 1}
+taglset -struct $struct $try d 10
+taglset -struct $struct $try b 10
+
+set struct {a int b int c {a int b {* int}}}
+set try {a 1 b 2 c {a 1 b {a 1 b 2}}}
+taglset -struct $struct $try {c b a} 10
+taglset -struct $struct $try {c b d} 10
+taglset -struct $struct $try {c c a} 10
+taglset -struct $struct $try {c a} 10
+taglset -struct $struct $try {c d} 10
+
+set struct {a {*int ?} b {*int ?} c {* {*int ?} a {*int ?} b {* {*int ?}}}}
+set try {a 1 b 2 c {a 1 b {a 1 b 2}}}
+taglset -struct $struct $try {c b} {d 10}
+taglset -struct $struct $try {c b} 10
+taglset -struct $struct $try {c b a} 10
+taglset -struct $struct $try {c d} 10
+taglset -struct $struct $try {c b d} 10
+taglset -struct $struct $try {c d a} 10
+
+package require Extral 1
+set try {a 1 b 2 c {a 1 b 2 c {a 1 b 2}}}
+taglset $try {d a a} 10
+taglset $try b 10
+taglset $try {c c a} 10
+taglset $try {c d} 10
+taglset $try {c c d} 10
+
+taglunset $try {c c a}
+taglunset $try {c a}
+taglunset $try c
+taglunset $try {c d}
+
+set try
+
 set auto_path {/home/peter/dev/Extral /home/peter/bin/Peos}
 package require Extral 1
 tk appname test
@@ -6,9 +43,19 @@ wm withdraw .
 catch {unset try}
 set try {a 1 b 2 c 3 d 4 e 5 f 6 g 7 h 8 i 9 j 10}
 time {
-taglget $try g
+taglget try g
+} 100
+
+catch {unset try}
+for {set i 0} {$i<100} {incr i} {
+lappend try tryingit$i tryingit$i
 }
-# 711 349
+time {
+taglget try tryingit98
+} 100
+
+
+# 210
 time {
 taglset $try g try
 }
@@ -16,15 +63,6 @@ taglset $try g try
 time {
 taglunset $try g
 }
-
-set try {{a 1} {b 2} {c 3} {d 4} {e 5} {f 6} {g 7} {h 8} {i 9} {j 10}}
-time {
-keylget try j
-}
-time {
-keylset try g try
-} 1000
-#517 145
 
 set file temp
 #set file /data/test/ssu/temp
