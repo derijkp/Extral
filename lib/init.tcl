@@ -31,10 +31,3 @@ source [file join ${Extral::dir} lib atexit.tcl]
 source [file join ${Extral::dir} lib always.tcl]
 # gives problems with 8.4
 # Extral::compat
-
-
-
-
-
-
-

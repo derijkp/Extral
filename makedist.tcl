@@ -51,11 +51,3 @@ proc clean {filemode dirmode dir} {
 	clean 0644 0755 $targetdir
 	auto_mkindex [file join $targetdir lib]
 exit
-
-
-
-
-
-
-
-

@@ -8,8 +8,3 @@ namespace eval ::Extral {}
 set ::Extral::dir $dir
 source [file join $dir lib init.tcl]
 extension provide Extral 2.0.3
-
-
-
-
-

@@ -14,17 +14,3 @@ package ifneeded Extral 2.0 \
 	set ::Extral::dir [list $dir]
 	source [file join [list $dir] lib init.tcl]
 }]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
