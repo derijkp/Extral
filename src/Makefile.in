@@ -8,13 +8,24 @@
 
 PROJECT = extral
 
-# The directory containing the Tcl sources and headers appropriate
-# for this version of Tk ("srcdir" will be replaced or has already
-# been replaced by the configure script):
-TCL_GENERIC_DIR =	@TCL_SRC_DIR@/generic
+# Definitions: comment second line instead of first to compile with debugging information
+#CFLAGS = @TCL_CFLAGS_DEBUG@ @TCL_CFLAGS_WARNING@ 
+CFLAGS = @TCL_CFLAGS_OPTIMIZE@ @TCL_CFLAGS_WARNING@
 
-# Libraries to use when linking:
+# Definitions: comment second line instead of first to compile with debugging information
+#LDFLAGS = @TCL_LDFLAGS_DEBUG@
+LDFLAGS = @TCL_LDFLAGS_OPTIMIZE@
+
+# Libraries to use when linking: comment second line instead of first to compile without stubs
 LIBS = @TCL_LIB_SPEC@ @TCL_LIBS@ -lc
+#LIBS = @TCL_STUB_LIB_SPEC@ @TCL_LIBS@ -lc
+
+# Definitions: comment second line instead of first to compile without stubs
+DEFS = @TCL_DEFS@
+#DEFS = @TCL_DEFS@ -DUSE_TCL_STUBS
+
+# Includes
+INCLUDES = -I@TCL_EXEC_PREFIX@/include
 
 #----------------------------------------------------------------
 # The information below is modified by the configure script when
@@ -22,15 +33,14 @@ LIBS = @TCL_LIB_SPEC@ @TCL_LIBS@ -lc
 # modify any of this stuff by hand.
 #----------------------------------------------------------------
 
-CC = @CC@
-SHLIB_CFLAGS =		@SHLIB_CFLAGS@
-SHLIB_LD =		@SHLIB_LD@
-SHLIB_SUFFIX =		@SHLIB_SUFFIX@
+CC = @TCL_CC@
+SHLIB_CFLAGS =		@SHLIB_CFLAGS@ ${DEFS}
+SHLIB_LD =		@TCL_SHLIB_LD@
+SHLIB_SUFFIX =		@TCL_SHLIB_SUFFIX@
 SHLIB_VERSION =		@SHLIB_VERSION@
 SRC_DIR =		@srcdir@
 
-CFLAGS = -O -Wall
-CC_SWITCHES = $(CFLAGS) ${SHLIB_CFLAGS}
+CC_SWITCHES = $(INCLUDES) $(CFLAGS) $(SHLIB_CFLAGS)
 
 OBJECTS = extralInit.o extral.o list_pop.o string.o array.o supersort.o general.o \
 			structl.o structltypes.o date.o
@@ -41,7 +51,7 @@ $(PROJECT)${SHLIB_SUFFIX}: $(OBJECTS)
 	${SHLIB_LD} $(OBJECTS) -o ../$(PROJECT)${SHLIB_SUFFIX} @SHLIB_LD_LIBS@
 
 extratcl: tclAppInit.o $(OBJECTS)
-	$(CC) $(CFLAGS) -o extratcl tclAppInit.o $(OBJECTS) ${LIBS}
+	$(CC) $(CFLAGS) $(TCL_LD_FLAGS) -o extratcl tclAppInit.o $(OBJECTS) ${LIBS} ${TCL_DL_LIBS}
 
 clean:
 	rm -f *.o *${SHLIB_SUFFIX} config.cache config.log lib.exp

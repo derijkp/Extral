@@ -886,6 +886,7 @@ int ExtraL_StructlGetList(interp,structure,data,tagsc,tagsv,value)
 			} else {
 				Tcl_Obj *cmd;
 				cmd = Tcl_DuplicateObj(tagv[2]);
+				Tcl_IncrRefCount(cmd);
 				error = Tcl_ListObjAppendElement(interp,cmd,result);
 				if (error != TCL_OK) {Tcl_DecrRefCount(cmd);return error;}
 				error = Tcl_EvalObj(interp,cmd);

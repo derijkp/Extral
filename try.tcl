@@ -1,3 +1,16 @@
+source tools.tcl
+
+set cmd test
+set options {}
+set vars {?a b? c d}
+set arg {1 2 3}
+
+test cmd_args {optional range with error} {
+	catch {unset a}
+	catch {unset b}
+	cmd_args test {} {?a b? c} {1 2}
+} {wrong # of args: should be "test ?a b? c"} 1
+
 load ./compress.so
 set f [open ~/lsu/total.ali]
 #set f [open /IDE2/peter/ssu/scomp_jan1999.ali]

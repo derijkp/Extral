@@ -51,6 +51,21 @@ test cmd_args {one optional not used} {
 	list [get a ""] $b
 } {{} 1}
 
+test cmd_args {optional range} {
+	catch {unset a}
+	catch {unset b}
+	cmd_args test {} {?a b? c} {1 2 3}
+	list $a $b $c
+} {1 2 3}
+
+test cmd_args {optional range with error} {
+	catch {unset a}
+	catch {unset b}
+	catch {unset c}
+	catch {unset d}
+	cmd_args test {} {?a b? c d} {1 2 3}
+} {wrong # of args: should be "test ?a b? c d"} 1
+
 test cmd_args {multiple optional not used} {
 	catch {unset a}
 	catch {unset b}

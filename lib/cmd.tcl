@@ -236,24 +236,66 @@ proc cmd_args {cmd options vars arg} {
 		set arg [lrange $arg $pos end]
 	}
 	# Handle arguments
-	set len [llength $arg]
-	set vlen [llength $vars]
-	set poss [list_find -regexp $vars {^[^?]}]
-	set numvar [expr {$len - [llength $poss]}]
-	set maxvar [expr {$vlen - [llength $poss]}]
-	set margspos [lsearch $vars ?...?]
-	if {$numvar < 0} {
+	regsub -all {\?[^?]+\?} $vars {} fixedvars
+	set numfixed [llength $fixedvars]
+	set vartodo [expr {[llength $arg] - $numfixed}]
+	set range 0
+	set error 0
+	if {[llength $arg] < $numfixed} {
 		set error 1
-	} elseif {$numvar > $maxvar} {
-		if {$margspos != -1} {
-			set error 0
-		} else {
-			set error 1
-		}
 	} else {
-		set error 0
+		set pos 0
+		foreach var $vars {
+			set value [lindex $arg $pos]
+			if $range {
+				if !$vartodo {
+					set error 1
+					break
+				}
+				if {"[string index $var [expr {[string length $var]-1}]]" == "?"} {
+					lappend dovar [string trimright $var ?]
+					set range 0
+				} else {
+					lappend dovar $var
+				}
+				lappend doval $value
+				incr vartodo -1
+				incr pos			
+			} elseif {"[string index $var 0]" == "?"} {
+				if {"[string index $var [expr {[string length $var]-1}]]" == "?"} {
+					if [string_equal $var ?...?] {
+						if $vartodo {
+							set pos2 [expr {$pos+$vartodo-1}]
+							lappend dovar args
+							lappend doval [lrange $arg $pos $pos2]
+							set vartodo 0
+							set pos [expr {$pos2+1}]
+						}
+					} else {
+						if $vartodo {
+							lappend dovar [string trimleft [string trimright $var ?] ?]
+							lappend doval $value
+							incr vartodo -1
+							incr pos			
+						}
+					}
+				} else {
+					if $vartodo {
+						lappend dovar [string trimleft $var ?]
+						lappend doval $value
+						incr vartodo -1
+						incr pos			
+					}
+					set range 1
+				}
+			} else {
+				lappend dovar $var
+				lappend doval $value
+				incr pos			
+			}
+		}
 	}
-	if $error {
+	if ($error||$vartodo) {
 		if [llength $options] {
 			set format "$cmd ?options? $vars"
 			set opterror "\nPossible options are:"
@@ -274,25 +316,8 @@ proc cmd_args {cmd options vars arg} {
 			return -code error "wrong # of args: should be \"$format\"$opterror"
 		}
 	}
-	if {$vlen == 0} return
-	if {($margspos == -1)||($len < $vlen)} {
-		set pos 0
-		set dovars {}
-		foreach var $vars {
-			if [regexp {^\?(.*)\?$} $var temp var] {
-				if {$numvar <= 0} continue
-				incr numvar -1
-			}
-			lappend dovars $var
-			incr pos
-		}
-	} else {
-		set pos2 [expr {$margspos+$len-$vlen}]
-		uplevel [list set args [lrange $arg $margspos $pos2]]
-		set arg [list_concat [lrange $arg 0 [expr {$margspos-1}]] [lrange $arg [expr {$pos2+1}] end]]
-		list_pop vars $margspos
-		regsub -all {\?} $vars {} dovars
+	if [info exists dovar] {
+		uplevel [list foreach $dovar $doval break]
 	}
-	uplevel [list foreach $dovars $arg {}]
 }
 

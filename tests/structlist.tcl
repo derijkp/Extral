@@ -181,15 +181,15 @@ test structlist_find {not present} {
 
 test structlist_find {bugfix} {
 	structlist_fields {File {{Open file} {} {Open next} {} Test {} Trying {Trying {} Trying2 {}} Save {} {} {{} {{} {}}} {Radio try} {} {Radio try2} {}} Find {{Goto line} {} Find {} separator1 {} {Replace & Find next} {} {Search Reopen} {}} Test {}} File
-} -1
+} {{Open file} {Open next} Test Trying Save {} {Radio try} {Radio try2}}
 
 test structlist_find {bugfix} {
 	structlist_fields {File {Save {} {} {{} {{} {}}}} Find {{Goto line} {}} Test {}} File
-} -1
+} {Save {}}
 
 test structlist_find {bugfix empty ke} {
 	structlist_fields {{} {}} {}
-}
+} {{}}
 
 testsummarize
 

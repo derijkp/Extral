@@ -99,6 +99,11 @@ int
 Extral_Init(interp)
 	Tcl_Interp *interp;		/* Interpreter to add extra commands */
 {
+#ifdef USE_TCL_STUBS
+	if (Tcl_InitStubs(interp, "8.1", 0) == NULL) {
+		return TCL_ERROR;
+	}
+#endif
 	Tcl_CreateObjCommand(interp,"list_pop",(Tcl_ObjCmdProc *)ExtraL_List_popObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"list_shift",(Tcl_ObjCmdProc *)ExtraL_List_shiftObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"list_find",(Tcl_ObjCmdProc *)ExtraL_List_findObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);

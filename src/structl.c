@@ -123,6 +123,7 @@ int ExtraL_StructlsetValidate(interp,substructure,data,ctag,clen,oldvalue,tagsc,
 		error = Tcl_ListObjGetElements(interp, substructure, &listc, &listv);
 		if (error != TCL_OK) {return error;}
 		cmdObj = Tcl_NewStringObj("::Extral::set",13);
+		Tcl_IncrRefCount(cmdObj);
 		Tcl_AppendToObj(cmdObj,ctag+1,clen-1);
 		error = Tcl_ListObjAppendElement(interp,cmdObj,substructure);
 		if (error != TCL_OK) {Tcl_DecrRefCount(cmdObj);return error;}
@@ -192,6 +193,7 @@ int ExtraL_StructlunsetValidate(interp,substructure,data,ctag,clen,oldvalue,tags
 		error = Tcl_ListObjGetElements(interp, substructure, &listc, &listv);
 		if (error != TCL_OK) {return error;}
 		cmdObj = Tcl_NewStringObj("::Extral::unset",13);
+		Tcl_IncrRefCount(cmdObj);
 		Tcl_AppendToObj(cmdObj,ctag+1,clen-1);
 		error = Tcl_ListObjAppendElement(interp,cmdObj,substructure);
 		if (error != TCL_OK) {Tcl_DecrRefCount(cmdObj);return error;}
@@ -210,7 +212,8 @@ int ExtraL_StructlunsetValidate(interp,substructure,data,ctag,clen,oldvalue,tags
 		error = Tcl_ListObjAppendElement(interp,cmdObj,Tcl_NewListObj(tagsc,tagsv));
 		if (error != TCL_OK) {Tcl_DecrRefCount(cmdObj);return error;}
 
-		error = Tcl_EvalObj(interp,cmdObj);		Tcl_DecrRefCount(cmdObj);
+		error = Tcl_EvalObj(interp,cmdObj);
+		Tcl_DecrRefCount(cmdObj);
 		if (error == 5) {
 			return 5;
 		} else if (error != TCL_OK) {
@@ -267,6 +270,7 @@ int ExtraL_StructlgetValidate(interp,substructure,data,ctag,clen,tagsc,tagsv,res
 		if (error != TCL_OK) {return error;}
 	
 		cmdObj = Tcl_NewStringObj("::Extral::get",13);
+		Tcl_IncrRefCount(cmdObj);
 		Tcl_AppendToObj(cmdObj,ctag+1,clen-1);
 		error = Tcl_ListObjAppendElement(interp,cmdObj,substructure);
 		if (error != TCL_OK) {Tcl_DecrRefCount(cmdObj);return error;}
@@ -284,7 +288,6 @@ int ExtraL_StructlgetValidate(interp,substructure,data,ctag,clen,tagsc,tagsv,res
 			error = Tcl_ListObjAppendElement(interp,cmdObj,Tcl_NewObj());
 		}
 		if (error != TCL_OK) {Tcl_DecrRefCount(cmdObj);return error;}
-
 		error = Tcl_EvalObj(interp,cmdObj);
 		Tcl_DecrRefCount(cmdObj);
 		if (error != TCL_OK) {return error;}
