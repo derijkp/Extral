@@ -50,11 +50,6 @@
 #	returns the average of the numbers in the list.
 #}
 
-if 0 {
-proc Extral::lmath {} {}
-}
-Extral::export {lmath} {
-
 proc lmath {option args} {
 	switch $option {
 		calc {
@@ -162,6 +157,4 @@ proc lmath {option args} {
 			error "bad option \"$option\": should be calc, sum, min, max, cumul or incr"
 		}
 	}
-}
-
 }

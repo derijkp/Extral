@@ -23,11 +23,6 @@
 #correctly.
 #}
 
-if 0 {
-proc Extral::scantime {} {}
-proc Extral::formattime {} {}
-}
-Extral::export {scantime formattime} {
 #doc {time scantime} cmd {
 #scantime time ?date/time/both?
 #} descr {
@@ -378,6 +373,4 @@ proc formattime {time {format {%Y %b %d %H:%M:%S}}} {
 		incr pos
 	}
 	return $buffer
-}
-
 }

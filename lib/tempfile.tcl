@@ -74,15 +74,9 @@ namespace eval Extral {
 #} descr {
 #	remove all temporary files, including those of other Extral programs.
 #}
-if 0 {
-proc tempfile {} {}
-}
-
-Extral::export {tempfile} {
-
 proc tempfile {{action {get}}} {
-	variable temp_dir
-	variable templock
+	upvar ::Extral::templock templock
+	upvar ::Extral::temp_dir temp_dir
 	switch $action {
 		get {
 			set i 1
@@ -107,6 +101,4 @@ proc tempfile {{action {get}}} {
 			return -code error "bad option \"$action\": must be get or clean"
 		}
 	}
-}
-
 }

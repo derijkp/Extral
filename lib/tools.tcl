@@ -8,24 +8,6 @@
 # =============================================================
 #doc convenience title {Convenience functions}
 
-if 0 {
-proc Extral::rem {} {}
-proc Extral::REM {} {}
-proc Extral::remoff {} {}
-proc Extral::true {} {}
-proc Extral::setglobal {} {}
-proc Extral::random {} {}
-proc Extral::extractoption {} {}
-proc Extral::extractbool {} {}
-proc Extral::inlist {} {}
-proc Extral::echo {} {}
-proc Extral::get {} {}
-proc Extral::? {} {}
-proc Extral::invoke {} {}
-proc Extral::arraytrans {} {}
-}
-Extral::export {rem REM remoff true setglobal random extractoption extractbool inlist ? echo get invoke arraytrans} {
-
 #doc {convenience invoke} cmd {
 #invoke vars cmd ...
 #} descr {
@@ -217,7 +199,6 @@ proc extractbool {listName option} {
 	} else {
 		return 0
 	}
-}
 }
 
 proc Extral::makedoc {files dstdir {indextitle ""}} {

@@ -357,17 +357,17 @@ test structlset-struct {long format: withnamed} {
 } {a {t 4} b {t 2}}
 
 test structlfields {see values of long format} {
-	Extral::structlfields {a {{? aa a} 1 b 2 c 3}} a
+	structlfields {a {{? aa a} 1 b 2 c 3}} a
 } {aa b c}
 
 test structlfields {error in long format} {
-	Extral::structlfields {a {? 1 b 2 c 3}} a
+	structlfields {a {? 1 b 2 c 3}} a
 } {{} b c}
 
 test structlunset-struct {basic} {
 	set struct {a {*int ?}}
 	set try {a 1}
-	Extral::structlunset -struct $struct $try a
+	structlunset -struct $struct $try a
 } {}
 
 test structlunset-struct {basic 2} {
@@ -433,7 +433,7 @@ test structlunset-struct {basic one of list} {
 test structlunset-struct {basic one in list subfield} {
 	set struct {a {*list {a {*any ?}}} b {*int ?}}
 	set try {a {{a a} {a b}} b 2}
-	Extral::structlunset -struct $struct $try {a 0 a}
+	structlunset -struct $struct $try {a 0 a}
 } {a {{} {a b}} b 2}
 
 test structlset-struct {parameters} {

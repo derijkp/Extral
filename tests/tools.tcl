@@ -1,4 +1,4 @@
-package require Extral
+package require -exact Extral 1.0
 catch {tk appname test}
 
 if ![info exists testleak] {

@@ -5,7 +5,6 @@
 #
 # =============================================================
 
-Extral::export {lregsub} {
 #doc {listcommands lregsub} cmd {
 #lregsub ?switches? exp list subSpec
 #} descr {
@@ -16,9 +15,6 @@ Extral::export {lregsub} {
 #	% lregsub {^([^.]+)\.([^.]+)$} {start.sh help.ps h.sh} {\2 \1}
 #	{sh start} {ps help} {sh h}
 #}
-if 0 {
-proc Extral::lregsub {} {}
-}
 proc lregsub {args} {
 	set len [llength $args]
 	if {$len<3} {
@@ -45,6 +41,4 @@ proc lregsub {args} {
 		}
 	}
 	return $result
-}
-
 }

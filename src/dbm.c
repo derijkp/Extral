@@ -523,7 +523,7 @@ int Extral_DbmInit(interp)
 	dbmtype.sync = NULL;
 	dbmtype.reorganize = NULL;
 	ExtraL_DbmCreateType(interp,"fdbm",dbmtype);
-	Tcl_CreateObjCommand(interp,"Extral::dbm",(Tcl_ObjCmdProc *)ExtraL_DbmObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"dbm",(Tcl_ObjCmdProc *)ExtraL_DbmObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	return TCL_OK;
 }
 

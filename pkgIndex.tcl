@@ -7,23 +7,6 @@
 # script is sourced, the variable $dir must contain the
 # full path name of this file's directory.
 
-namespace eval __temp [list set dir $dir]
-namespace eval __temp {
-	# $Format: "\tset version 1.$ProjectMajorVersion$"$
-	set version 1.0
-	# $Format: "\tset minorversion $ProjectMinorVersion$"$
-	set minorversion 3
-	regsub -all {[ab]} $version {} version
-	set loadcmd {
-		package provide Extral @version@
-		namespace eval Extral {set dir @dir@}
-		source [file join @dir@ lib init.tcl]
-		namespace eval Extral {set version @version@}
-		namespace eval ::Extral {set minorversion @minorversion@}
-	}
-	regsub -all {@version@} $loadcmd [list $version] loadcmd
-	regsub -all {@minorversion@} $loadcmd [list $minorversion] loadcmd
-	regsub -all {@dir@} $loadcmd [list $dir] loadcmd
-	package ifneeded Extral $version $loadcmd
-}
-namespace delete __temp
+# $Format: "package ifneeded Extral 1.$ProjectMajorVersion: 0 $ \"$
+package ifneeded Extral 1.0 \
+	"[list namespace eval ::Extral [list set dir $dir]] ; [list source [file join $dir lib init.tcl]]"

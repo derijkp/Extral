@@ -71,11 +71,6 @@
 #	% lmanip fill 5 10 -2
 #	10 8 6 4 2
 #}
-if 0 {
-proc Extral::lmanip {} {}
-}
-Extral::export lmanip {
-
 proc lmanip {option args} {
 	switch $option {
 		subindex {
@@ -204,6 +199,4 @@ proc lmanip {option args} {
 			error "bad option \"$option\": should be subindex, mangle, extract, split, join, lengths, fill or ffill"
 		}
 	}
-}
-
 }

@@ -19,11 +19,6 @@
 #	% amanip get try {b c} def
 #	b 2 c def
 #}
-if 0 {
-proc Extral::amanip {} {}
-}
-Extral::export {amanip} {
-
 proc amanip {option args} {
 	set len [llength $args]
 	switch $option {
@@ -56,6 +51,4 @@ proc amanip {option args} {
 			error "bad option \"$option\": should be lappend or get"
 		}
 	}
-}
-
 }

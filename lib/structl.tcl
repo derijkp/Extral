@@ -45,15 +45,6 @@
 # structlget will return the long form.
 #}
 
-if 0 {
-proc Extral::structlset {} {}
-proc Extral::structlget {} {}
-proc Extral::structlunset {} {}
-proc Extral::structlfields {} {}
-proc Extral::structlfind {} {}
-}
-Extral::export {structlset structlget structlunset structlfields structlfind} {
-
 proc structlsetstruct {structure data list taglen taglist value} {
 #putsvars structure list taglen taglist value
 	set ctag [lindex $structure 0]
@@ -584,6 +575,4 @@ proc structlfind {list tag args} {
 	} else {
 		return ""
 	}
-}
-
 }

@@ -10,24 +10,16 @@
 #atexit
 #}
 
-auto_load Extral::laddnew
-auto_load Extral::lremove
 rename exit ::Extral::exit
-	proc exit {{returnCode 0}} {
-		global Extral::atexit
-		if [info exists Extral::atexit] {
-			foreach command $Extral::atexit {
-				eval $command
-			}
+proc exit {{returnCode 0}} {
+	global Extral::atexit
+	if [info exists Extral::atexit] {
+		foreach command $Extral::atexit {
+			eval $command
 		}
-		Extral::exit $returnCode
 	}
-
-
-if 0 {
-proc Extral::atexit {} {}
+	Extral::exit $returnCode
 }
-Extral::export {atexit} {
 
 #doc {atexit atexit} cmd {
 #atexit add command
@@ -48,6 +40,4 @@ proc atexit {action command} {
 			lremove atexit $command
 		}
 	}
-}
-
 }

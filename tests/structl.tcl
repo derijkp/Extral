@@ -5,11 +5,11 @@ exec tclsh8.0 "$0" "$@"
 source tools.tcl
 
 test structlset {set} {
-	Extral::structlset {a 1 bb 2 ccc 3} bb try
+	structlset {a 1 bb 2 ccc 3} bb try
 } {a 1 bb try ccc 3}
 
 test structlset {set, list check} {
-	Extral::structlset {a 1 bb 2 ccc 3} bb {try it}
+	structlset {a 1 bb 2 ccc 3} bb {try it}
 } {a 1 bb {try it} ccc 3}
 
 test structlset {set, 2 tags} {
@@ -33,15 +33,15 @@ test structlset {set new, 2 tags} {
 } {a 1 b 2 c {a 1 b 2 c {a 1 b 2} d try}}
 
 test structlset {set, 3 tags} {
-	Extral::structlset {a 1 b 2 c {a 1 b 2 c {a 1 b 2}}} {c c a} try
+	structlset {a 1 b 2 c {a 1 b 2 c {a 1 b 2}}} {c c a} try
 } {a 1 b 2 c {a 1 b 2 c {a try b 2}}}
 
 test structlset {set multi} {
-	Extral::structlset {a 1} b 2 a a
+	structlset {a 1} b 2 a a
 } {a a b 2}
 
 test structlset {set multi multiple levels} {
-	Extral::structlset {a 1} {b a} 2 a a {b b} 3
+	structlset {a 1} {b a} 2 a a {b b} 3
 } {a a b {a 2 b 3}}
 
 test structlset {check uneven} {
@@ -57,7 +57,7 @@ test structlset {empty list} {
 } {a 1}
 
 test structlset {empty field} {
-	Extral::structlset {} {} {a 1}
+	structlset {} {} {a 1}
 } {a 1}
 
 test structlset {empty sublist} {

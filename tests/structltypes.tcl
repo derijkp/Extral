@@ -734,17 +734,17 @@ test structlget-named {check for non existing error} {
 
 test structlget-named {get all from empty} {
 	set schema {nums {*named {*any ?}}}
-	Extral::structlget -struct $schema {} {}
+	structlget -struct $schema {} {}
 } {nums {}}
 
 test structlget-named {get all from empty tag before named} {
 	set schema {nums {*named {*any ?}}}
-	Extral::structlget -struct $schema {} nums
+	structlget -struct $schema {} nums
 } {}
 
 test structlget-named {get all from empty tag in named} {
 	set schema {nums {*named {*any ?}}}
-	Extral::structlget -struct $schema {} {nums a}
+	structlget -struct $schema {} {nums a}
 } ?
 
 test structlget-named {with bool} {

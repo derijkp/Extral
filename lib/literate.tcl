@@ -8,12 +8,6 @@
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
 # ===========================================
-if 0 {
-proc Extral::literate {} {}
-}
-
-Extral::export {literate lnext} {
-
 #doc {convenience literate} cmd {
 #	literate variableName list
 #} descr {
@@ -52,6 +46,4 @@ proc lnext {var} {
 	} else {
 		set ref [lindex $extraL__Priv_iterate($var:list) $extraL__Priv_iterate($var:pos)]
 	}
-}
-
 }

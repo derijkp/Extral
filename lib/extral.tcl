@@ -10,21 +10,6 @@
 #General list manipulation commands
 #}
 
-if 0 {
-proc Extral::lremove {} {}
-proc Extral::lpush {} {}
-proc Extral::lunshift {} {}
-proc Extral::lset {} {}
-proc Extral::larrayset {} {}
-proc Extral::lcommon {} {}
-proc Extral::lunion {} {}
-proc Extral::leor {} {}
-proc Extral::laddnew {} {}
-}
-Extral::export {
-	lremove lpush lunshift lset larrayset lcommon lunion leor laddnew oneof
-} {
-
 #doc {listcommands lremove} cmd {
 #lremove listName ?item? ...
 #} descr {
@@ -123,7 +108,7 @@ proc larrayset {array varlist valuelist} {
 #	returns the common elements of the lists
 #}
 proc lcommon {args} {
-	set result [lsort [::Extral::lpop args]]
+	set result [lsort [lpop args]]
 	foreach list $args {
 		llremove -sorted $result [lsort $list] result
 	}
@@ -179,5 +164,4 @@ proc oneof {item list} {
 	} else {
 		return 1
 	}
-}
 }

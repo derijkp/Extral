@@ -12,6 +12,10 @@ test leval-1.2 {basic tests} {
 	leval list {a b c}
 } {a b c}
 
+if ![catch {info body leval}] {
+	puts "Skipping further leval tests: C code only"
+} else {
+
 test leval-1.3 {basic tests} {
 	leval list {$a} {$b} {$c}
 } {{$a} {$b} {$c}}
@@ -44,6 +48,7 @@ test leval-1.7 {embedded NULL} {
 	list $code $msg
 } {1 {embedded NULL in command name after "abc"}}
 
+}
 
 testsummarize
 

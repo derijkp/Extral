@@ -28,34 +28,6 @@
 #The database code can also be used from C using the ExtraL_DbmOpen function.
 #}
 
-proc Extral::types {} {
-	set list ""
-	foreach item [lunion [array names ::auto_index ::Extral::dbmtype_*] [info commands ::Extral::dbmtype_*]] {
-		if [uplevel #0 $item] {
-			regsub ::Extral::dbmtype_ $item {} item
-			lappend list $item
-		}
-	}
-	return $list
-}
-
-proc Extral::loaddbm {type} {
-	if [info exists ::Extral::dbm_loaded_types($type)] {
-		return
-	}
-	if [catch {uplevel #0 ::Extral::dbminittype_$type} result] {
-		return -code error -errorinfo $::errorInfo "Could not load type \"$type\": $result"
-	}
-	set ::Extral::dbm_loaded_types($type) 1
-}
-
-if {"[info commands Extral::dbm]" != ""} {
-	set Extral::temp [::Extral::dbm implementation]
-} else {
-	set Extral::temp tcl
-}
-if {"$Extral::temp" == "tcl"} {
-
 #doc {dbm dbm} h2 "dbm command"
 #doc {dbm dbm types} cmd {
 #dbm types
@@ -79,10 +51,7 @@ if {"$Extral::temp" == "tcl"} {
 #	database: place of the database in the filing system
 #}
 
-if 0 {
-proc dbm {} {}
-}
-proc Extral::dbm {cmd args} {
+proc dbm {cmd args} {
 	set len [llength $args]
 	switch $cmd {
 		open {
@@ -94,7 +63,7 @@ proc Extral::dbm {cmd args} {
 			set object [lindex $args 1]
 			set database [lindex $args 2]
 			Extral::loaddbm $type
-			${type}__open $object $readonly $database [lrange $args 3 end]
+			Extral::${type}__open $object $readonly $database [lrange $args 3 end]
 			set ::Extral::dbm($object,type) $type
 			set ::Extral::dbm($object,readonly) $readonly
 			proc ::$object {args} "Extral::dbmcmd $object \$args"
@@ -106,7 +75,7 @@ proc Extral::dbm {cmd args} {
 			}
 			set type [lindex $args 0]
 			Extral::loaddbm $type
-			${type}__create [lindex $args 1] [lrange $args 2 end]
+			Extral::${type}__create [lindex $args 1] [lrange $args 2 end]
 		}
 		types {
 			return [::Extral::types]
@@ -119,7 +88,6 @@ proc Extral::dbm {cmd args} {
 		}
 	}
 }
-Extral::export dbm {}
 
 #doc {dbm dbmcmd} h2 {
 #database commands
@@ -237,6 +205,4 @@ proc Extral::dbmcmd {object arg} {
 			return -code error "bad option \"[lindex $arg 0]\": must be one of set, get, unset, keys, sync or reorganize"
 		}
 	}
-}
-
 }

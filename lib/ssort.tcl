@@ -26,11 +26,6 @@
 #	</dl>
 #}
 
-if 0 {
-proc Extral::ssort {} {}
-}
-Extral::export ssort {
-
 #doc {ssort ssort} cmd {
 #ssort ?-ascii? ?-integer? ?-real? ?-increasing? ?-decreasing? ?-dictionary? ?-command string? ?-reflist list? list
 #}
@@ -45,6 +40,4 @@ proc ssort {args} {
 		set temp [eval lsort $args {-index 1 $temp}]
 		return [lmanip subindex $temp 0]
 	}
-}
-
 }

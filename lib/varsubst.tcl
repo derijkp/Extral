@@ -5,11 +5,6 @@
 #
 # =============================================================
 
-if 0 {
-proc Extral::varsubst {} {}
-}
-Extral::export {varsubst} {
-
 #doc {convenience varsubst} cmd {
 #varsubst varlist string
 #} descr {
@@ -39,6 +34,4 @@ proc varsubst {varlist string} {
 	}
 	regsub { $} $string {} string
 	return $string
-}
-
 }

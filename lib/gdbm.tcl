@@ -1,5 +1,5 @@
 proc Extral::dbmtype_gdbm {} {
-	if {"[::Extral::dbm implementation]" != "tcl"} {
+	if {"[dbm implementation]" != "tcl"} {
 		if [file exists [file join $::Extral::dir dbm gdbm[info sharedlibextension]]] {
 			return 1
 		}
