@@ -1362,17 +1362,17 @@ int ExtraL_StructlfieldsObjCmd(notUsed, interp, objc, objv)
 		Tcl_AppendResult(interp,"error: list \"", Tcl_GetStringFromObj(objv[1],&i),"\" does not have an even number of elements",(char *)NULL);
 		return TCL_ERROR;
 	}
-
-
-
 	/* Initialise result */
 	Tcl_ResetResult(interp);
 	resultObj = Tcl_NewObj();
-
 	for(pos=0;pos<listArgc;pos+=2) {
 		error = Tcl_ListObjIndex(interp, listArgv[pos], 0, &subtag);
 		if (error != TCL_OK) {return error;}
-		ctag = Tcl_GetStringFromObj(subtag,&clen);
+		if (subtag != NULL) {
+			ctag = Tcl_GetStringFromObj(subtag,&clen);
+		} else {
+			ctag = "";
+		}
 		if ((clen==1)&&(ctag[0]=='?')) {
 			error = Tcl_ListObjIndex(interp, listArgv[pos], 1, &subtag);
 			if (subtag == NULL) {subtag = Tcl_NewObj();}

@@ -7,7 +7,7 @@
 # a script that loads the command.
 
 set auto_index(isint) [list source [file join $dir is.tcl]]
-set auto_index(isreal) [list source [file join $dir is.tcl]]
+set auto_index(isdouble) [list source [file join $dir is.tcl]]
 set auto_index(exit) [list source [file join $dir atexit.tcl]]
 set auto_index(atexit) [list source [file join $dir atexit.tcl]]
 set auto_index(tempfile) [list source [file join $dir tempfile.tcl]]
@@ -28,6 +28,8 @@ set auto_index(true) [list source [file join $dir tools.tcl]]
 set auto_index(setglobal) [list source [file join $dir tools.tcl]]
 set auto_index(random) [list source [file join $dir tools.tcl]]
 set auto_index(putsvars) [list source [file join $dir tools.tcl]]
+set auto_index(error_preserve) [list source [file join $dir tools.tcl]]
+set auto_index(error_restore) [list source [file join $dir tools.tcl]]
 set auto_index(extractoption) [list source [file join $dir tools.tcl]]
 set auto_index(extractbool) [list source [file join $dir tools.tcl]]
 set auto_index(::Extral::scriptdir) [list source [file join $dir tools.tcl]]

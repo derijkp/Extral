@@ -179,6 +179,18 @@ test structlist_find {not present} {
 	structlist_find {a try1 bb try2 ccc try3} try
 } -1
 
+test structlist_find {bugfix} {
+	structlist_fields {File {{Open file} {} {Open next} {} Test {} Trying {Trying {} Trying2 {}} Save {} {} {{} {{} {}}} {Radio try} {} {Radio try2} {}} Find {{Goto line} {} Find {} separator1 {} {Replace & Find next} {} {Search Reopen} {}} Test {}} File
+} -1
+
+test structlist_find {bugfix} {
+	structlist_fields {File {Save {} {} {{} {{} {}}}} Find {{Goto line} {}} Test {}} File
+} -1
+
+test structlist_find {bugfix empty ke} {
+	structlist_fields {{} {}} {}
+}
+
 testsummarize
 
 # no test yet for

@@ -5,6 +5,12 @@
 <h1>Command manipulation commands</h1>
 
 <dl><b><dt>
+	args_parse format vars args
+</b><dd>
+	parses the arguments given to a command, deals with options and optional arguments
+	
+
+<b><dt>
 	cmd_get channelId
 </b><dd>
 	get one complete Tcl command, in the sense of having no unclosed quotes, 
@@ -31,4 +37,21 @@
 	returns the contents of the given file als a list of complete Tcl commands.
 	
 
+<b><dt>
+	cmd_args cmd options vars args
+</b><dd>
+	parses the arguments given to a command, deals with options and optional arguments.
+	Options are stored in the array opt, values in the variables given.
+	the list of possible options consists of alternatingly the option
+	and a specification, which is a list of type and description
+	variables in the variable list enclosed in questionmarks are optional.
+	?...? will take all possible extra arguments at that position (if present), and store them in the
+	variable args.
+<br>eg.:<pre>
+	cmd_args test {
+		-test {any "test value"}
+		-b {switch "true or false"}
+		-o {{oneof a b c} "a, b or c"}
+	} {?a? b} {-b -test try -o b 1 2}
+</pre>
 </body>

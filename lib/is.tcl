@@ -8,7 +8,7 @@
 #doc validatecommands title {
 # Validation commands
 #} shortdescr {
-#isint, isreal
+#isint, isdouble
 #}
 
 #doc {validatecommands isint} cmd {
@@ -31,19 +31,19 @@ proc isint {value} {
 	}
 }
 
-#doc {validatecommands isreal} cmd {
-#isreal value
+#doc {validatecommands isdouble} cmd {
+#isdouble value
 #} descr {
 #returns 1 if value is a real number, 0 if it is not
 #} example {
-#	% isreal 1.2
+#	% isdouble 1.2
 #	1
-#	% isreal 1
+#	% isdouble 1
 #	1
-#	% isreal a
+#	% isdouble a
 #	0
 #}
-proc isreal {value} {
+proc isdouble {value} {
 	if [catch {expr $value}] {
 		return 0
 	} else {

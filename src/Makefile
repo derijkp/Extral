@@ -12,7 +12,7 @@ PROJECT = extral
 # The directory containing the Tcl sources and headers appropriate
 # for this version of Tk ("srcdir" will be replaced or has already
 # been replaced by the configure script):
-TCL_GENERIC_DIR =	/usr/src/bs/BUILD/tcltk-8.0.4/tcl8.0.4/generic
+TCL_GENERIC_DIR =	/usr/src/bs/BUILD/tcltk-8.0.5/tcl8.0.5/generic
 
 # Libraries to use when linking:
 LIBS = -L/usr/lib -ltcl8.0${TCL_DBGX} -ldl  -lm -lc
@@ -23,14 +23,14 @@ LIBS = -L/usr/lib -ltcl8.0${TCL_DBGX} -ldl  -lm -lc
 # modify any of this stuff by hand.
 #----------------------------------------------------------------
 
-CC = gcc
+CC = gcc -pipe
 SHLIB_CFLAGS =		-fPIC
-SHLIB_LD =		gcc -shared
+SHLIB_LD =		gcc -pipe -shared
 SHLIB_SUFFIX =		.so
 SHLIB_VERSION =		
 SRC_DIR =		.
 
-CFLAGS = -O -Wall
+CFLAGS = -g -Wall
 CC_SWITCHES = $(CFLAGS) ${SHLIB_CFLAGS}
 
 OBJECTS = extralInit.o extral.o list_pop.o string.o array.o supersort.o general.o \
@@ -39,7 +39,7 @@ OBJECTS = extralInit.o extral.o list_pop.o string.o array.o supersort.o general.
 all: $(PROJECT)${SHLIB_SUFFIX}
 
 $(PROJECT)${SHLIB_SUFFIX}: $(OBJECTS)
-	${SHLIB_LD} $(OBJECTS) -o ../$(PROJECT)${SHLIB_SUFFIX} 
+	${SHLIB_LD} $(OBJECTS) -o ../$(PROJECT)${SHLIB_SUFFIX} ${LIBS}
 
 extratcl: tclAppInit.o $(OBJECTS)
 	$(CC) $(CFLAGS) -o extratcl tclAppInit.o $(OBJECTS) ${LIBS}

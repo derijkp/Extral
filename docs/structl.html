@@ -34,7 +34,7 @@ However, structured lists have some advantages to arrays:
  The list must have 2 further elements: element 1 is the long name for the value, and element
  2 the short name. Both long and short name can be used to set or get values from the structured list.
  However, structlist_set will always return a struct with the short name (efficient storage), while
- structlget will return the long form.
+ structlist_get will return the long form.
 
 <dl><b><dt>
 structlist_set ?-struct schema? ?-data clientdata? list field value ?field value ...?
@@ -74,7 +74,7 @@ structlist_set ?-struct schema? ?-data clientdata? list field value ?field value
 		ints {a 9}
 </pre>
 <b><dt>
-structlget ?-struct schema? list field ?field ...?
+structlist_get ?-struct schema? list field ?field ...?
 </b><dd>
 get the value of a field in the structured list
 <br>eg.:<pre>
@@ -88,21 +88,21 @@ get the value of a field in the structured list
 			*named {*int ?}
 		}
 	}
-	% structlget -struct $struct {ints {a 9}} {sub b}
+	% structlist_get -struct $struct {ints {a 9}} {sub b}
 	?
-	% structlget -struct $struct {ints {a 9}} {ints}
+	% structlist_get -struct $struct {ints {a 9}} {ints}
 	a 9
 </pre>
 <b><dt>
-structlunset ?-struct schema? ?-data clientdata? list field ?field ...?
+structlist_unset ?-struct schema? ?-data clientdata? list field ?field ...?
 </b><dd>
 unset the value of a field in the structured list
 <br>eg.:<pre>
-	% structlunset {a 1 b 2} b
+	% structlist_unset {a 1 b 2} b
 	a 1
 </pre>
 <b><dt>
-structlfields list field ?valueVar?
+structlist_fields list field ?valueVar?
 </b><dd>
 returns the fields present in the structure list
 

@@ -175,10 +175,21 @@ proc cmd_load {filename} {
 }
 
 #doc {cmd cmd_args} cmd {
-#	cmd_args cmd vars args
+#	cmd_args cmd options vars args
 #} descr {
-#	parses the arguments given to a command, deals with options and optional arguments
-#	
+#	parses the arguments given to a command, deals with options and optional arguments.
+#	Options are stored in the array opt, values in the variables given.
+#	the list of possible options consists of alternatingly the option
+#	and a specification, which is a list of type and description
+#	variables in the variable list enclosed in questionmarks are optional.
+#	?...? will take all possible extra arguments at that position (if present), and store them in the
+#	variable args.
+#} example {
+#	cmd_args test {
+#		-test {any "test value"}
+#		-b {switch "true or false"}
+#		-o {{oneof a b c} "a, b or c"}
+#	} {?a? b} {-b -test try -o b 1 2}
 #}
 proc cmd_args {cmd options vars arg} {
 	# Handle options
@@ -208,9 +219,9 @@ proc cmd_args {cmd options vars arg} {
 							return -code error "invalid value \"$value\" for option $curopt: should be an integer"
 						}
 					}
-					real {
-						if ![isreal $value] {
-							return -code error "invalid value \"$value\" for option $curopt: should be a real number"
+					double {
+						if ![isdouble $value] {
+							return -code error "invalid value \"$value\" for option $curopt: should be a double number"
 						}
 					}
 					oneof {
@@ -257,10 +268,16 @@ proc cmd_args {cmd options vars arg} {
 			set format "$cmd $vars"
 			set opterror ""
 		}
-		return -code error "wrong # of args: should be \"$format\"$opterror"
+		if [regexp ^- [lindex $arg 0]] {
+			return -code error "bad option \"[lindex $arg 0]\":$opterror"			
+		} else {
+			return -code error "wrong # of args: should be \"$format\"$opterror"
+		}
 	}
+	if {$vlen == 0} return
 	if {($margspos == -1)||($len < $vlen)} {
 		set pos 0
+		set dovars {}
 		foreach var $vars {
 			if [regexp {^\?(.*)\?$} $var temp var] {
 				if {$numvar <= 0} continue

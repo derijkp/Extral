@@ -156,6 +156,24 @@ proc putsvars {args} {
 	}
 }
 
+#doc {convenience error_preserve} cmd {
+# error_preserve
+#} descr {
+# preserves the error information in the variables errorInfo.
+# Preserved information will be restored with the command error_restore
+#}
+proc error_preserve {} {
+	upvar ::Classy::error_preserve keep
+	set keep(Info) $::errorInfo
+	set keep(Code) $::errorCode
+}
+
+proc error_restore {} {
+	upvar ::Classy::error_preserve keep
+	set ::errorInfo $keep(Info)
+	set ::errorCode $keep(Code)
+}
+
 proc extractoption {listName option default} {
 	upvar $listName l
 	set pos [lsearch $l $option]

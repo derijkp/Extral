@@ -120,11 +120,11 @@ test cmd_args {options} {
 		-b {switch "true or false"}
 		-o {{oneof a b c} "a, b or c"}
 	} {?a? b} {-bla bla 1 2}
-} {wrong # of args: should be "test ?options? ?a? b"
+} {bad option "-bla":
 Possible options are:
-        -test any "test value"
-        -b "true or false"
-        -o {oneof a b c} "a, b or c"} 1
+	-test any "test value"
+	-b "true or false"
+	-o {oneof a b c} "a, b or c"} 1
 
 test cmd_args {options: wrong value oneof} {
 	catch {unset opt}
@@ -162,7 +162,15 @@ test cmd_args {test} {
 		-log {channel "channel on which to write logs"}
 		-ftkey {any "value of ftkey in new features (dcse formats)"}
 		-type {any "feature type (dcse formats)"}
-	} {db file ?...? resultfile} {-ftkey rRNA -type LSU -log stdout test.ref test.seqdb}
-}
+	} {db file ?...? resultfile} {-ftkey rRNA -type LSU -log stdout db test.ref test2.ref test.seqdb}
+	set args
+} test2.ref
+
+test cmd_args {empty vars} {
+	cmd_args "test" {
+		-text {any "text displayed on node"}
+	} {} {}
+	set a 1
+} 1
 
 testsummarize
