@@ -59,7 +59,9 @@ proc larrayset {array varlist valuelist} {
 
 proc lcommon {args} {
 	set result [lpop args]
+	set result [lmanip remdup $result]
 	foreach arg $args {
+		set list [lcor $arg $result]]
 		set result [lsub $arg [lcor $arg $result]]
 	}
 	return [lmanip remdup $result]
@@ -78,6 +80,7 @@ proc leor {list1 list2} {
 	eval lappend result [lsub $list2 $exclusive]
 }
 
+if ![info exists Extral__noc] {
 proc lremove {listref args} {
 	upvar $listref list
 	foreach item $args {
@@ -87,6 +90,19 @@ proc lremove {listref args} {
 		}
 	}
 	return $list
+}
+} else {
+proc lremove {listref args} {
+	upvar $listref list
+	foreach item $args {
+		while 1 {
+			set pos [lsearch -exact $list $item]
+			if {$pos==-1} break
+			set list [lreplace $list $pos $pos]
+		}
+	}
+	return $list	
+}
 }
  
 proc laddnew {listref args} {

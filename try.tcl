@@ -1,5 +1,35 @@
-set auto_path {/home/peter/dev/Extral1a /home/peter/bin/Peos1a /usr/local/lib/tcl8.0 /usr/local/lib/tk8.0}
-package require Extral 1.1
+set auto_path {/home/peter/dev/Extral /home/peter/bin/Peos}
+package require Extral 1
+tk appname test
+wm withdraw .
+proc ptime args {
+time {uplevel $args}
+}
+
+for {set i 0} {$i<100} {incr i} {
+	lappend try a b asdf g {fdg shg} "fdg \{sdf" fdg a b fsd
+}
+set big {}
+for {set i 0} {$i<5000} {incr i} {
+	lappend big [random 0 10000]
+}
+
+lmanip subindex {{a 1} {b 2} {c 3}} 1
+
+time {lremdup $try} 100
+time {lremdup $big}
+time {lmanip2 remdup $big}
+set temp $big
+ptime lremove temp 100 1000
+
+set list [lfind $try a]
+lsub {a b c d} {1 3}
+lsub {a b c d} -except {}
+ptime lsub $try $list
+set newtry [lsort $try]
+ptime lcor {a b c d e f g h i j} {f i g a h b c d e j}
+ptime lcor $try $newtry
+ptime lremove temp a
 
 set long [lmanip fill 10000 1 1]
 time {lregsub {c$} $long {!}}

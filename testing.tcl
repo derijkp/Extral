@@ -17,6 +17,15 @@ set data {
 {lsub {Ape Ball Field {Antwerp city} Egg} -exclude {0 3}}
 {Ball Field Egg}
 
+{lsub {Ape Ball Field Egg} -exclude {}}
+{Ape Ball Field Egg}
+
+{lsub {Ape Ball Field} {}}
+{}
+
+{lsub {Ape Ball Field} {1 -1 100}}
+{Ball}
+
 {lcor {a b c d e f} {d b}}
 {3 1}
 
@@ -24,22 +33,23 @@ set data {
 {1 3 -1}
 
 {lmath calc {1 2 3.2 4} + {1 2 3.3 4}}
-{2.0 4.0 6.5 8.0}
+{2 4 6.5 8}
 
 {lmath sum {1 4 5}}
 {10}
 
 {lmath min {5 1 100}}
-{1.0}
+{1}
 
 {lmath max {5 1 100 50}}
-{100.0}
+{100}
 
 {lmath cumul {5 1 100}}
-{5.0 6.0 106.0}
+{5 6 106}
 
 {lmath incr {8 18 100} 2}
-{10.0 20.0 102.0}
+{10 20 102}
+
 {lmanip subindex {{a 1} {b 2} {c 3}} 1}
 {1 2 3}
 
@@ -48,6 +58,9 @@ set data {
 
 {lmanip extract {Results {A: 50%} {B: 25%} {C: 25%}} { ([0-9+]+)\%}}
 {{} 50 25 25}
+
+{lmanip extract {} {}}
+{}
 
 {lmanip remdup {a b c a b d}}
 {a b c d}
@@ -79,10 +92,10 @@ set data {
 
 {lmanip unmangle {a 1 b 2 c 3}}
 {a b c}
-{lmanip unmangle {1 a b 2 c d} 2 var}
-{1 2}
-{set var}
+{lmanip unmangle {a b 1 c d 2} 2 var}
 {a b c d}
+{set var}
+{1 2}
 
 {set try {a b c};lpop try 1}
 {b}
@@ -167,16 +180,27 @@ set data {
 
 # Run tests
 # =========
+set error 0
 foreach {test result} $data {
 	puts "testing:$test"
 	set real [eval $test]
 	if {"$real"!="$result"} {
-		error "error: result is:\n$real\nshould be\n$result"
+		incr error
+		puts "error: result is:\n$real\nshould be\n$result"
+		lappend errors $test "error: result is:\n$real\nshould be\n$result"
 	}
 }
 
+if $error {
+	set error "***********************\nThere were $error errors in the tests"
+	foreach {test err} $errors {
+		append error "\nTest-------------:\n$test"
+		append error "\n$err"
+	}
+	error $error
+}
+
 puts "Done"
-exit
 # no test yet for
 # ffind <switches> filelist pattern ?varName? ?pattern? ?varname?
 # ffind -matches -allfiles <switches> filelist pattern nulvalue ?varName? ?pattern? ?nulvalue? ?varname? ..

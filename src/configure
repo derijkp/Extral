@@ -535,7 +535,7 @@ if test "${with_tcl+set}" = set; then
   withval="$with_tcl"
   TCL_SRC_DIR=$withval
 else
-  TCL_SRC_DIR=`cd ../../tcl8.0b1/unix; pwd`
+  TCL_SRC_DIR=`cd ../../tcl8.0b2/unix; pwd`
 fi
 
 if test ! -d $TCL_SRC_DIR; then
@@ -547,7 +547,7 @@ if test "${with_tk+set}" = set; then
   withval="$with_tk"
   TK_SRC_DIR=$withval
 else
-  TK_SRC_DIR=`cd $TCL_SRC_DIR/../tk8.0b1; pwd`
+  TK_SRC_DIR=`cd $TCL_SRC_DIR/../tk8.0b2; pwd`
 fi
 
 if test ! -d $TK_SRC_DIR; then

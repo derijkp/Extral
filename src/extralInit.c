@@ -4,31 +4,25 @@
 #include <math.h>
 
 extern int ExtraL_LpopObjCmd _ANSI_ARGS_((ClientData clientData,
-	Tcl_Interp *interp, int argc, char *argv[]));
+	Tcl_Interp *interp, int objc, Tcl_Obj *argv[]));
 
 extern int ExtraL_LshiftObjCmd _ANSI_ARGS_((ClientData clientData,
-	Tcl_Interp *interp, int argc, char *argv[]));
+	Tcl_Interp *interp, int objc, Tcl_Obj *argv[]));
 
-extern int ExtraL_LfindCmd _ANSI_ARGS_((ClientData clientData,
-	Tcl_Interp *interp, int argc, char *argv[]));
+extern int ExtraL_LfindObjCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int objc, Tcl_Obj *argv[]));
+
+extern int ExtraL_LsubObjCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int objc, Tcl_Obj *argv[]));
+
+extern int ExtraL_LremdupObjCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int objc, Tcl_Obj *argv[]));
 
 extern int ExtraL_FfindCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
 
-extern int ExtraL_LsubCmd _ANSI_ARGS_((ClientData clientData,
-	Tcl_Interp *interp, int argc, char *argv[]));
-
-extern int ExtraL_LcorCmd _ANSI_ARGS_((ClientData clientData,
-	Tcl_Interp *interp, int argc, char *argv[]));
-
-extern int ExtraL_LmanipCmd _ANSI_ARGS_((ClientData clientData,
-	Tcl_Interp *interp, int argc, char *argv[]));
-
-extern int ExtraL_LmathCmd _ANSI_ARGS_((ClientData clientData,
-	Tcl_Interp *interp, int argc, char *argv[]));
-
-extern int ExtraL_LregsubCmd _ANSI_ARGS_((ClientData clientData,
-	Tcl_Interp *interp, int argc, char *argv[]));
+extern int ExtraL_LcorObjCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int objc, Tcl_Obj *argv[]));
 
 extern int ExtraL_AmanipCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
@@ -37,9 +31,6 @@ extern int ExtraL_ReplaceCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
 
 extern int ExtraL_SSortCmd _ANSI_ARGS_((ClientData clientData,
-	Tcl_Interp *interp, int argc, char *argv[]));
-
-extern int ExtraL_LfileCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
 
 extern int ExtraL_AtexitCmd _ANSI_ARGS_((ClientData clientData));
@@ -72,19 +63,16 @@ Extral_Init(interp)
 	Tcl_PkgProvide(interp, "extral", "0.94");
 	Tcl_CreateObjCommand(interp,"lpop",(Tcl_ObjCmdProc *)ExtraL_LpopObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"lshift",(Tcl_ObjCmdProc *)ExtraL_LshiftObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"lfind",(Tcl_ObjCmdProc *)ExtraL_LfindObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"lsub",(Tcl_ObjCmdProc *)ExtraL_LsubObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"lcor",(Tcl_ObjCmdProc *)ExtraL_LcorObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"lremdup",(Tcl_ObjCmdProc *)ExtraL_LremdupObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 
 
-	dld_AddTclCommand(interp, "lfind", ExtraL_LfindCmd);
 	dld_AddTclCommand(interp, "ffind", ExtraL_FfindCmd);
-	dld_AddTclCommand(interp, "lsub", ExtraL_LsubCmd);
-	dld_AddTclCommand(interp, "lcor", ExtraL_LcorCmd);
-	dld_AddTclCommand(interp, "lmanip", ExtraL_LmanipCmd);
-	dld_AddTclCommand(interp, "lmath", ExtraL_LmathCmd);
-	dld_AddTclCommand(interp, "lregsub", ExtraL_LregsubCmd);
 	dld_AddTclCommand(interp, "amanip", ExtraL_AmanipCmd);
 	dld_AddTclCommand(interp, "replace", ExtraL_ReplaceCmd);
 	dld_AddTclCommand(interp, "ssort", ExtraL_SSortCmd);
-	dld_AddTclCommand(interp, "lfile", ExtraL_LfileCmd);
 #ifdef windows
 /*
 	dld_AddTclCommand(interp, "win_mkdir", ExtraL_MkdirCmd);
