@@ -20,7 +20,7 @@ Installation
 You should be able to obtain the latest version of ExtraL via anonymous ftp
 on rrna.uia.ac.be. in the directory /pub/tcl
 
-This package can be build against both Tcl7.4 as Tcl7.5. by adjusting
+This package can be build as a loadable object to Tcl7.5 by adjusting
 the appropriate Makefile and running make. (In doubt, it's a good bet
 to copy most options used to compile the Tcl files.) It should be
 initialised by calling the function Extral_Init

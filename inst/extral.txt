@@ -135,9 +135,9 @@ lmanip unmangle ?list? ??spacing?? ??var??
     unmangles items from a list to the result; the remaining items are stored
     in the given variable ?var?
 	eg.
-	% lmanip unmangle {a 1 b 2 c 3}
+        % lmanip unmangle {a 1 b 2 c 3}
         a b c
-	% lmanip unmangle {1 a b 2 c d} 2 var
+        % lmanip unmangle {1 a b 2 c d} 2 var
         1 2
         % set var
         a b c d
@@ -245,5 +245,3 @@ REM:
     to the stdout
 true expr
     returns 1 when expr is yes, true or 1
-
-

@@ -8,6 +8,6 @@
 # full path name of this file's directory.
 
 package ifneeded extral 0.92 [subst {
-load $dir/libextral0.92.so
+load $dir/libextral[info sharedlibextension]
 source $dir/extral.tcl
 }]

@@ -6,11 +6,14 @@
  *   of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  */
 
-#include <stdio.h>
-#include "tclInt.h"
-#include "tclPort.h"
+#include <stdlib.h>
+#include <string.h>
+#include <malloc.h>
+#include "tcl.h"
 #include "tclRegexp.h"
-  typedef enum {false,true,other} PBOOL;
+#define UCHAR(c) ((unsigned char) (c))
+ 
+typedef enum {false,true,other} PBOOL;
 
 extern Tcl_RegExp Tcl_RegExpCompile(Tcl_Interp *interp,char *string);
 
@@ -2061,7 +2064,7 @@ ExtraL_RandomCmd(notUsed, interp, argc, argv)
         return TCL_ERROR;
     }
     number=rand();
-    deler=SHRT_MAX/(max-min);
+    deler=RAND_MAX/(max-min);
     result=number/deler;
     if (result<min) {
         Tcl_AppendResult(interp, "Something strange happened: Result too small", (char *) NULL);
@@ -2077,12 +2080,3 @@ ExtraL_RandomCmd(notUsed, interp, argc, argv)
     return TCL_OK;
 }
 
-
-
-
-
-
-
-
-
-

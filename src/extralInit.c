@@ -39,7 +39,7 @@ extern int ExtraL_RandomCmd _ANSI_ARGS_((ClientData clientData,
 
 int
 Extral_Init(interp)
-    Tcl_Interp *interp;		/* Interpreter to add extra commands */
+	Tcl_Interp *interp;		/* Interpreter to add extra commands */
 {
     char *libDir;
 
@@ -70,10 +70,4 @@ dld_AddTclCommand(interp, command, function)
 	(Tcl_CmdDeleteProc *)NULL);
     return TCL_OK;
 }
-
-
-
-
-
-
 
