@@ -20,15 +20,25 @@ proc lmath_calc {args} {
 		error "wrong # args: should be \"lmath_calc list1 action list2\""
 	}
 	set result ""
+	set l1 [lindex $args 0]
+	set len1 [llength $l1]
 	set calc [lindex $args 1]
 	set l2 [lindex $args 2]
-	if {[llength $l2] != 1} {
-		foreach e1 [lindex $args 0] e2 $l2 {
+	set len2 [llength $l2]
+	if {$len1 == 1} {
+		set e1 [lindex $l1 0]
+		foreach e2 $l2 {
+			lappend result [expr $e1 $calc $e2]
+		}
+	} elseif {$len2 == 1} {
+		set e2 [lindex $l2 0]
+		foreach e1 $l1 {
 			lappend result [expr $e1 $calc $e2]
 		}
 	} else {
-		set e2 [lindex $l2 0]
-		foreach e1 [lindex $args 0] {
+		if {$len2 > $len1} {set l2 [lrange $l2 0 [expr {$len1-1}]]}
+		if {$len1 > $len2} {set l1 [lrange $l1 0 [expr {$len2-1}]]}
+		foreach e1 $l1 e2 $l2 {
 			lappend result [expr $e1 $calc $e2]
 		}
 	}

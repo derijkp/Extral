@@ -20,6 +20,10 @@ test lmath {calc different lengths} {
 	lmath_calc {1.0 2.0} + {1.0 2.0 3.0}
 } {2.0 4.0}
 
+test lmath {calc different lengths} {
+	lmath_calc {1.0 2.0 3.0 5.0} - {1.0 1.0}
+} {0.0 1.0}
+
 test lmath {sum} {
 	expr {round([lmath_sum {1 4 5}])}
 } {10}
