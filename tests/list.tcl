@@ -4,398 +4,396 @@ exec tclsh8.0 "$0" "$@"
 
 source tools.tcl
 
-test lregsub {c$} {
-	lregsub {c$} {afdsg asdc sfgh {dfgh shgfc} dfhg} {!}
+test list_regsub {c$} {
+	list_regsub {c$} {afdsg asdc sfgh {dfgh shgfc} dfhg} {!}
 } {afdsg asd! sfgh {dfgh shgf!} dfhg}
 
-test lregsub {^([^.]+)\.([^.]+)$} {
-	lregsub {^([^.]+)\.([^.]+)$} {start.sh help.ps h.sh} {\2 \1}
+test list_regsub {^([^.]+)\.([^.]+)$} {
+	list_regsub {^([^.]+)\.([^.]+)$} {start.sh help.ps h.sh} {\2 \1}
 } {{sh start} {ps help} {sh h}}
 
-test lfind {} {
-	lfind -regexp {Ape Ball Field {Antwerp city} Egg} {^A}
+test list_find {} {
+	list_find -regexp {Ape Ball Field {Antwerp city} Egg} {^A}
 } {0 3}
 
-test lsub {} {
-	lsub {Ape Ball Field {Antwerp city} Egg} {0 3}
+test list_sub {} {
+	list_sub {Ape Ball Field {Antwerp city} Egg} {0 3}
 } {Ape {Antwerp city}}
 
-test lsub {exclude} {
-	lsub {Ape Ball Field {Antwerp city} Egg} -exclude {0 3}
+test list_sub {exclude} {
+	list_sub {Ape Ball Field {Antwerp city} Egg} -exclude {0 3}
 } {Ball Field Egg}
 
-test lsub {exclude {}} {
-	lsub {Ape Ball Field Egg} -exclude {}
+test list_sub {exclude {}} {
+	list_sub {Ape Ball Field Egg} -exclude {}
 } {Ape Ball Field Egg}
 
-test lsub {lsub with {}} {
-	lsub {Ape Ball Field} {}
+test list_sub {list_sub with {}} {
+	list_sub {Ape Ball Field} {}
 } {}
 
-test lsub {negative index} {
-	lsub {Ape Ball Field} {1 -1 100}
+test list_sub {negative index} {
+	list_sub {Ape Ball Field} {1 -1 100}
 } {Ball}
 
-test lsub {problem} {
+test list_sub {problem} {
 	set findex {{Acibri.ACR: Acidianus brierleyi} {Aciinf.ACR: Acidianus infernus} {Desmob.ACR: Desulfurococcus mobilis} {Thecel.AEU: Thermococcus celer}}
 	set pattern "\\.ACR"
-	set poss [lfind -regexp $findex $pattern]
-	set result [lsub $findex $poss]
-	set rest [lsub $findex -exclude $poss]
+	set poss [list_find -regexp $findex $pattern]
+	set result [list_sub $findex $poss]
+	set rest [list_sub $findex -exclude $poss]
 } {{Thecel.AEU: Thermococcus celer}}
 
-test lcor {} {
-	lcor {a b c d e f} {d b}
+test list_cor {} {
+	list_cor {a b c d e f} {d b}
 } {3 1}
 
-test lcor {2 times} {
-	lcor {a b c d e f} {b d d}
+test list_cor {2 times} {
+	list_cor {a b c d e f} {b d d}
 } {1 3 -1}
 
-test lcor {number bug} {
-	lcor {hobbit.seq orc.seq} {sphinx.seq hobbit.seq orc.seq centaur.seq}
+test list_cor {number bug} {
+	list_cor {hobbit.seq orc.seq} {sphinx.seq hobbit.seq orc.seq centaur.seq}
 } {-1 0 1 -1}
 
 test lmath {calc} {
-	lmath calc {1 2 3.2 4} + {1 2 3.3 4}
+	lmath_calc {1 2 3.2 4} + {1 2 3.3 4}
 } {2 4 6.5 8}
 
 test lmath {sum} {
-	lmath sum {1 4 5}
+	lmath_sum {1 4 5}
 } {10}
 
 test lmath {min} {
-	lmath min {5 1 100}
+	lmath_min {5 1 100}
 } {1}
 
 test lmath {max} {
-	lmath max {5 1 100 50}
+	lmath_max {5 1 100 50}
 } {100}
 
 test lmath {cumul} {
-	lmath cumul {5 1 100}
+	lmath_cumul {5 1 100}
 } {5 6 106}
 
 test lmath {incr} {
-	lmath incr {8 18 100} 2
+	lmath_incr {8 18 100} 2
 } {10 20 102}
 
 test lmath {between} {
-	lmath between {-1 4 9 11 8} 0 10
+	lmath_between {-1 4 9 11 8} 0 10
 } {0 4 9 10 8}
 
-test lremdup {} {
-	lremdup {a b c a b d}
+test list_remdup {} {
+	list_remdup {a b c a b d}
 } {a b c d}
 
-test lremdup {sorted} {
-	lremdup -sorted {a a b b c d}
+test list_remdup {sorted} {
+	list_remdup -sorted {a a b b c d}
 } {a b c d}
 
-test lremdup {check removed} {
-	lremdup {a b c a b d b} temp
+test list_remdup {check removed} {
+	list_remdup {a b c a b d b} temp
 	set temp
 } {a b b}
 
-test lremdup {sorted, check removed} {
-	lremdup -sorted {a a b b b c d} temp
+test list_remdup {sorted, check removed} {
+	list_remdup -sorted {a a b b b c d} temp
 	set temp
 } {a b b}
 
-test lremdup {large} {
+test list_remdup {large} {
 	set list {}
 	for {set i 0} {$i < 10000} {incr i} {lappend list "try $i"}
 	lappend list "try 100" "try 200"
-	llength [lremdup $list]
+	llength [list_remdup $list]
 } 10000
 
-test lremdup {small sorted} {
+test list_remdup {small sorted} {
 	set list {}
 	for {set i 0} {$i < 10} {incr i} {lappend list "try $i"}
 	lappend list "try 1" "try 2"
 	set list [lsort $list]
-	llength [lremdup -sorted $list]
+	llength [list_remdup -sorted $list]
 } 10
 
-test lremdup {large sorted} {
+test list_remdup {large sorted} {
 	set list {}
 	for {set i 0} {$i < 10000} {incr i} {lappend list "try $i"}
 	lappend list "try 100" "try 200"
 	set list [lsort $list]
-	llength [lremdup -sorted $list]
+	llength [list_remdup -sorted $list]
 } 10000
 
-test lmerge {} {
-	lmerge {a b c} {1 2 3}
+test list_merge {} {
+	list_merge {a b c} {1 2 3}
 } {a 1 b 2 c 3}
 
-test lmerge {size 2} {
-	lmerge {a b c d} {1 2} 2
+test list_merge {size 2} {
+	list_merge {a b c d} {1 2} 2
 } {a b 1 c d 2}
 
-test lmerge {first too long} {
-	lmerge {a b c d e} {1 2}
+test list_merge {first too long} {
+	list_merge {a b c d e} {1 2}
 } {a 1 b 2 c {} d {} e {}}
 
-test lmerge {second too long} {
-	lmerge {a b} {1 2 3}
+test list_merge {second too long} {
+	list_merge {a b} {1 2 3}
 } {a 1 b 2}
 
-test lmerge {second too long, spacing 2} {
-	lmerge {a b c d} {1 2 3} 2
+test list_merge {second too long, spacing 2} {
+	list_merge {a b c d} {1 2 3} 2
 } {a b 1 c d 2}
 
-test lmerge {first too long, spacing 2} {
-	lmerge {a b c d e f} {1 2} 2
+test list_merge {first too long, spacing 2} {
+	list_merge {a b c d e f} {1 2} 2
 } {a b 1 c d 2 e f {}}
 
-test lunmerge {} {
-	lunmerge {a 1 b 2 c 3}
+test list_unmerge {} {
+	list_unmerge {a 1 b 2 c 3}
 } {a b c}
 
-test lunmerge {size 2} {
-	lunmerge {a b 1 c d 2} 2 var
+test list_unmerge {size 2} {
+	list_unmerge {a b 1 c d 2} 2 var
 } {a b c d}
 
-test lunmerge {size 2, test var} {
-	lunmerge {a b 1 c d 2 e f 3} 2 var
+test list_unmerge {size 2, test var} {
+	list_unmerge {a b 1 c d 2 e f 3} 2 var
 	set var
 } {1 2 3}
 
-test lunmerge {size 2, test strange string} {
-	lunmerge {a b 1 c d 2 e} 2 var
+test list_unmerge {size 2, test strange string} {
+	list_unmerge {a b 1 c d 2 e} 2 var
 } {a b c d e}
 
-test lunmerge {size 2, test var with strange string} {
-	lunmerge {a b 1 c d 2 e} 2 var
+test list_unmerge {size 2, test var with strange string} {
+	list_unmerge {a b 1 c d 2 e} 2 var
 	set var
 } {1 2}
 
-test lpop {} {
+test list_pop {} {
 	set try {a b c}
-	lpop try 1
+	list_pop try 1
 } {b}
 
-test lpop {several times} {
+test list_pop {several times} {
 	set try {a b c}
-	lpop try 1
-	lpop try
-	lpop try
+	list_pop try 1
+	list_pop try
+	list_pop try
 } {a}
 
-test lpop {empty} {
+test list_pop {empty} {
 	set try {a b c}
-	lpop try 1
-	lpop try
-	lpop try
-	lpop try
+	list_pop try 1
+	list_pop try
+	list_pop try
+	list_pop try
 } {}
 
-test lpop {stays empty} {
+test list_pop {stays empty} {
 	set try {a b c}
-	lpop try 1
-	lpop try
-	lpop try
-	lpop try
-	lpop try
+	list_pop try 1
+	list_pop try
+	list_pop try
+	list_pop try
+	list_pop try
 } {}
 
-test lshift {} {
+test list_shift {} {
 	set try {a b}
-	lshift try
+	list_shift try
 } {a}
 
-test lshift {2} {
+test list_shift {2} {
 	set try {a b}
-	lshift try
-	lshift try
+	list_shift try
+	list_shift try
 } {b}
 
-test lshift {empty} {
+test list_shift {empty} {
 	set try {a b}
-	lshift try
-	lshift try
-	lshift try
+	list_shift try
+	list_shift try
+	list_shift try
 } {}
 
-test lshift {stays empty} {
+test list_shift {stays empty} {
 	set try {a b}
-	lshift try
-	lshift try
-	lshift try
-	lshift try
+	list_shift try
+	list_shift try
+	list_shift try
+	list_shift try
 } {}
 
-test lpush {} {
-	lpush try a
+test list_push {} {
+	list_push try a
 } {a}
 
-test lpush {2} {
-	lpush try a
-	lpush try b
+test list_push {2} {
+	list_push try a
+	list_push try b
 } {a b}
 
-test lunshift {} {
-	lpush try a
-	lpush try b
-	lunshift try 1
+test list_unshift {} {
+	list_push try a
+	list_push try b
+	list_unshift try 1
 } {1 a b}
 
-test lset {} {
+test list_set {} {
 	set try {a b c d}
-	lset try test {1 3}
+	list_set try test {1 3}
 } {a test c test}
 
-test larrayset {} {
-	larrayset a {a b c} {1 2 3}
+test list_arrayset {} {
+	list_arrayset a {a b c} {1 2 3}
 	array get a
 } {a 1 b 2 c 3}
 
-test lcommon {} {
-	lcommon {a b c d} {a d e} {a d f h}
+test list_common {} {
+	list_common {a b c d} {a d e} {a d f h}
 } {a d}
 
-test lcommon {} {
-	lcommon {d} {a b c d e}
+test list_common {} {
+	list_common {d} {a b c d e}
 } {d}
 
-test lcommon {} {
-	lcommon {hobbit.seq orc.seq} {sphinx.seq hobbit.seq orc.seq centaur.seq}
+test list_common {} {
+	list_common {hobbit.seq orc.seq} {sphinx.seq hobbit.seq orc.seq centaur.seq}
 } {hobbit.seq orc.seq}
 
-test lcommon {} {
+test list_common {} {
 	set selfiles {Lepbor.BCY Lepfov.BCY Lepsp.BCY Oscaga.BCY Osccor.BCY Trisp10.BCY Pseaga.BPG Psealc.BPG Pseamy.BPG Pseasp.BPG Pseaur.BPG Psecic.BPG Psecit.BPG Psecor.BPG Psefic.BPG Pseflu.BPG Psemar.BPG Pseole.BPG Pseres.BPG Psetol.BPG Psevir.BPG Xanalb.BPG Xanaxo.BPG Xancam.BPG Xanfra.BPG Xanory.BPG Xanpop.BPG Haesan.EAN Eisfet.EAN Lancon.EAN Nerlim.EAN Eurcal.EAN Artsal.EAN Tenmol.EAN Linlin.EAN Anesul.EAN Ochery.EAN Alcgel.EAN Barben.EAN Pedcer.EAN Lepsqu.EAN Barvir.EAN Galtak.EAN Glysp.EAN Trisp.EAN Scuven.EAN Aplsp.EAN Balbip.EAN Burran.EAN Faslig.EAN Laealt.EAN Limkam.EAN Litlit.EAN Litobt.EAN Monlab.EAN Nassin.EAN Neralb.EAN Onccel.EAN Oxysp.EAN Pisstr.EAN Sipalg.EAN Thacla.EAN Acajap.EAN Lepcor.EAN Antvul.EAN Goraqu.EAN Linsp.EAN Phoarc.EAN Bipsp.EAN Sibfio.EAN Pricau.EAN Brapli.EAN Phagra.EAN Ridpis.EAN Ascapi.EFU Sclscl.EFU Conapo.EFU Conper.EFU Consp.EFU Phadem.EFU Sarcru.EFU Moncas.EFU Sorfim.EFU Canalb.EFU Cantro.EFU Clalus.EFU Debhan.EFU Dekbru.EFU Dipalb.EFU Endfib.EFU Galgeo.EFU Hanuva.EFU Issori.EFU Klupol.EFU Metbic.EFU Picano.EFU Picmem.EFU Saclud.EFU Saccap.EFU Tordel.EFU Wallip.EFU Zygrou.EFU Filneo.EFU Tricut.EFU Bulalb.EFU Leusco.EFU Rhoglu.EFU Sporos.EFU Ustmay.EFU Lotvac.EPR Hypcat.EPR Palpal.EPR}
 	set files {Bipsp.EAN Sibfio.EAN}
-	lcommon $files $selfiles
+	list_common $files $selfiles
 } {Bipsp.EAN Sibfio.EAN}
 
-test lunion {} {
-	lunion {a b c} {c d e}
+test list_union {} {
+	list_union {a b c} {c d e}
 } {a b c d e}
 
-test leor {} {
-	leor {a b c} {c d e}
+test list_eor {} {
+	list_eor {a b c} {c d e}
 } {a b d e}
 
-test lremove {} {
+test list_remove {} {
 	set try {a b a c}
-	lremove $try a
+	list_remove $try a
 } {b c}
 
-test lremove {2} {
+test list_remove {2} {
 	set try {a b a c}
-	lremove $try a c
+	list_remove $try a c
 } {b}
 
-test llremove {} {
+test list_lremove {} {
 	set try {a b a c}
-	llremove $try {a c}
+	list_lremove $try {a c}
 } {b}
 
-test llremove {large} {
+test list_lremove {large} {
 	set try {}
 	set try2 {}
 	for {set i 0} {$i < 10000} {incr i} {lappend try "try $i"}
 	for {set i 1} {$i < 10000} {incr i} {lappend try2 "try $i"}
 	set list [lsort $try]
-	llremove $list $try2
+	list_lremove $list $try2
 } {{try 0}}
 
-test llremove {large sorted} {
+test list_lremove {large sorted} {
 	set try {}
 	set try2 {}
 	for {set i 0} {$i < 10000} {incr i} {lappend try "try $i"}
 	for {set i 1} {$i < 10000} {incr i} {lappend try2 "try $i"}
 	set list [lsort $try]
 	set removelist [lsort $try2]
-	llremove -sorted $list $removelist
+	list_lremove -sorted $list $removelist
 } {{try 0}}
 
-test llremove {difficult cases} {
+test list_lremove {difficult cases} {
 	set list {a b bd ab ab ac}
 	set removelist {ab b}
-	llremove $list $removelist
+	list_lremove $list $removelist
 } {a bd ac}
 
-test llremove {difficult cases, sorted} {
+test list_lremove {difficult cases, sorted} {
 	set list {a ab ab ac b bd}
 	set removelist {ab b}
-	llremove -sorted $list $removelist
+	list_lremove -sorted $list $removelist
 } {a ac bd}
 
-test llremove {difficult cases, check removed} {
+test list_lremove {difficult cases, check removed} {
 	set list {a b bd ab ab ac}
 	set removelist {ab b try}
-	llremove $list $removelist temp
+	list_lremove $list $removelist temp
 	set temp
 } {b ab ab}
 
-test llremove {difficult cases, sorted, check removed} {
+test list_lremove {difficult cases, sorted, check removed} {
 	set list {a ab ab ac b bd}
 	set removelist {ab b try}
-	llremove -sorted $list $removelist temp
+	list_lremove -sorted $list $removelist temp
 	set temp
 } {ab ab b}
 
-test llremove {empty} {
-	llremove 1 {}
+test list_lremove {empty} {
+	list_lremove 1 {}
 } {1}
 
-test laddnew {exists} {
+test list_addnew {exists} {
 	set try {a b}
-	laddnew try a
+	list_addnew try a
 } {a b}
 
-test laddnew {new} {
+test list_addnew {new} {
 	set try {a b}
-	laddnew try c
+	list_addnew try c
 } {a b c}
 
-test lpop {test duplicate} {
+test list_pop {test duplicate} {
 	set list {a b c}
 	set l $list
-	lpop list
+	list_pop list
 	set l
 } {a b c}
 
-test lshift {test duplicate} {
+test list_shift {test duplicate} {
 	set list {a b c}
 	set l $list
-	lshift list
+	list_shift list
 	set l
 } {a b c}
 
-test lshift {object tests} {
+test list_shift {object tests} {
 	set data {{fdfg sdfg gh} sdfh {dgh sdh}}
 	set line [lindex $data 0]
-	lshift line
+	list_shift line
 	set line
 } {sdfg gh}
 
-test lshift {with foreach} {
+test list_shift {with foreach} {
 	set try {a b c d e}
 	foreach t $try {
-		lshift t
-		lshift t
+		list_shift t
+		list_shift t
 	}
 	foreach t $try {
-		lshift t
-		lshift t
+		list_shift t
+		list_shift t
 	}
 } {}
 
-test lreverse {basic} {
-	lreverse {{a b} c {d e}}
+test list_reverse {basic} {
+	list_reverse {{a b} c {d e}}
 } {{d e} c {a b}}
 
-test list::change {basic} {
-	list::change {a b aa c aa g} aa x g y
+test list_change {basic} {
+	list_change {a b aa c aa g} aa x g y
 } {a b x c x y}
 
 # no test yet for
-# ffind <switches> filelist pattern ?varName? ?pattern? ?varname?
-# ffind -matches -allfiles <switches> filelist pattern nulvalue ?varName? ?pattern? ?nulvalue? ?varname? ..
-# lload <filename>
-# lwrite ?file? ?list?
+# list_load <filename>
+# list_write ?file? ?list?
 
 testsummarize

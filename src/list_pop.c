@@ -14,7 +14,7 @@
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_LpopCmd --
+ * ExtraL_List_popCmd --
  *
  *		This procedure is invoked to process the "lpop" command.
  *		It pops an item out of a list
@@ -26,7 +26,7 @@
  *----------------------------------------------------------------------
  */
 int
-ExtraL_LpopObjCmd(dummy, interp, objc, objv)
+ExtraL_List_popObjCmd(dummy, interp, objc, objv)
 	ClientData dummy;		/* Not used. */
 	Tcl_Interp *interp;		/* Current interpreter. */
 	int objc;			/* Number of arguments. */
@@ -106,7 +106,7 @@ ExtraL_LpopObjCmd(dummy, interp, objc, objv)
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_LshiftCmd --
+ * ExtraL_List_shiftCmd --
  *
  *		This procedure is invoked to process the "lshift" command.
  *		It pops the first item out of a list
@@ -119,7 +119,7 @@ ExtraL_LpopObjCmd(dummy, interp, objc, objv)
  */
 
 int
-ExtraL_LshiftObjCmd(notUsed, interp, objc, objv)
+ExtraL_List_shiftObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;				 /* Not used. */
 	Tcl_Interp *interp;					/* Current interpreter. */
 	int objc;			/* Number of arguments. */

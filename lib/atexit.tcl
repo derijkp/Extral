@@ -8,6 +8,8 @@
 # =============================================================
 #doc atexit title {
 #atexit
+#} shortdescr {
+#execute commands when Tcl exits
 #}
 
 rename exit ::Extral::exit

@@ -20,7 +20,7 @@
 #}
 proc invoke {vars cmd args} {
 	foreach var $vars {
-		set $var [lshift args]
+		set $var [list_shift args]
 	}
 	eval $cmd
 }

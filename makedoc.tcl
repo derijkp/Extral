@@ -3,4 +3,9 @@
 exec tclsh8.0 "$0" "$@"
 
 package require Extral
-Extral::makedoc [lsort [glob lib/*.tcl]] docs Extral
+Extral::makedoc [lsort [glob lib/*.tcl]] docs Extral {
+	listcommands lmath stringcommands arraycommands cmd validatecommands
+	filing infocommands
+	time atexit tempfile structl struct
+	convenience ssort leval
+}

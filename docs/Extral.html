@@ -9,23 +9,24 @@ by Peter De Rijk (Universiteit Antwerpen)
 
 <h2>What is ExtraL</h2>
 Extral is a generally useful library which extends Tcl with a.o.(<a
-href="index.html">full list</a>):
+href="index.html">index</a>):
 <ul>
-<li><a href="listcommands.html">General list manipulation commands</a>
-<li><a href="stringcommands.html">General string manipulation commands</a>
-<li><a href="structl.html">Structured lists</a>: store structured data in lists
+<li><a href="listcommands.html">Extra list manipulation commands</a>
+<li><a href="lmath.html">Mathematical commands on whole lists</a>
+<li><a href="stringcommands.html">Extra string manipulation commands</a>
+<li><a href="arraycommands.html">Extra array manipulation commands</a>
+<li><a href="cmd.html">Command manipulation commands</a>
+<li><a href="validatecommands.html"> Validation commands</a>: isint, isreal
 <li><a href="filing.html">Filing commands</a>
-<li><a href="atexit.html">atexit</a>: execute commands at exit of program
-<li><a href="convenience.html">Convenience functions</a>
-<li><a href="tempfile.html">tempfile</a>
-<li><a href="amanip.html">amanip</a>: manipulation of arrays
-<li><a href="time.html">Date and time</a>: 
-<li><a href="lmanip.html">lmanip</a>
-<li><a href="lmath.html">lmath</a>
-<li><a href="dbm.html">Dbm</a>: Support for various dbms (simple databses)
-<li><a href="leval.html">eval Light</a>: a faster but more limited eval (Viktor Dukhovni)
-<li><a href="ssort.html">ssort</a>
+<li><a href="infocommands.html">Info commands</a>
+<li><a href="time.html">Date and time</a>:  extra commands for handling dates
+<li><a href="atexit.html">atexit</a>: execute commands when Tcl exits
+<li><a href="tempfile.html">tempfile</a>:  get names for temporary files
+<li><a href="structl.html">Structured lists</a>: store structured data in lists
 <li><a href="struct.html">Structures</a>
+<li><a href="convenience.html">Convenience functions</a>: various useful procs
+<li><a href="ssort.html">ssort</a>: enhanced lsort
+<li><a href="leval.html">eval Light</a>: a faster but more limited eval (Viktor Dukhovni)
 </ul>
 The name comes from the fact that ExtraL originally only contained
 extra list processing commands to overcome some of the performance 
@@ -57,15 +58,6 @@ make
 This should produce the loadable module. The build.tcl and
 buildwin.tcl files are a tool to make a nice package in a different
 directory.
-<p>
-If you want to make gdbm and bsd-db support, you will have to create a 
-libgdbm.a and libdb.a (should position independend code) and put these
-in the extern directory together with their header files. (gdbm.h and 
-db_185.h) and do a 
-<pre>
-make gdbm.so
-make bsddbm.so
-</pre>
 
 <h2>How to contact me</h2>
 I will do my best to reply as fast as I can to any problems, etc.

@@ -5,20 +5,6 @@
 <h1>Convenience functions</h1>
 
 <dl><b><dt>
-	literate variableName list
-</b><dd>
-	debugging tool to interactively iterate a variable over a list. literate
-	is used to initialise and it sets the variable to the first element of 
-	the list. Every 'lnext variableName' will puts the next element into the 
-	variable.
-
-<b><dt>
-	lnext variableName
-</b><dd>
-	complement to literate. sets the variable to the next element of the list 
-	first given by literate.
-
-<b><dt>
 invoke vars cmd ...
 </b><dd>
  invoke simply evals $cmd in a private space. This eg. allows using
@@ -28,6 +14,20 @@ invoke vars cmd ...
  Further arguments (when given) are parameters that will be available in the
  variables given in vars. If more parameters are supplied than vars are given,
  the remaining parameters will be stored in the variable args.
+
+<b><dt>
+	list_iterate variableName list
+</b><dd>
+	debugging tool to interactively iterate a variable over a list. list_iterate
+	is used to initialise and it sets the variable to the first element of 
+	the list. Every 'list_next variableName' will puts the next element into the 
+	variable.
+
+<b><dt>
+	list_next variableName
+</b><dd>
+	complement to list_iterate. sets the variable to the next element of the list 
+	first given by list_iterate.
 
 <b><dt>
 aproc args body
@@ -41,12 +41,17 @@ aproc args body
  .ctable configure -getcommand [aproc {args} {return $args}]
 
 <b><dt>
-arraytrans varName list ?default?
+? expr truevalue falsevalue
 </b><dd>
- returns a list of all the values in the array corresponding to the
- indices in the given list. If the index is not present in the array,
- the index itself will be returned.
- If $default is given, it will be returned for indices not in the array.
+ ? expr truevalue falsevalue
+
+<b><dt>
+echo string
+</b><dd>
+ echo returns its argument as a result
+ This is useful when you want a command that will be evalled or upleveled
+ to return a certain value
+ 
 
 <b><dt>
 get varName ?default?
@@ -83,10 +88,9 @@ true expression
 	same as the set command, but then for global variables
 
 <b><dt>
-inlist list value
+random min max
 </b><dd>
-returns 1 if $value is an element of list $list
-returns 0 if $value is not an element of list $list
+returns a random number between min and max
 
 <b><dt>
 putsvars varname ?varname ...?

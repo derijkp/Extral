@@ -4,20 +4,20 @@
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
 # =============================================================
-#doc {listcommands lregsub} cmd {
-#lregsub ?switches? exp list subSpec
+#doc {listcommands list_regsub} cmd {
+#list_regsub ?switches? exp list subSpec
 #} descr {
 #	does a regsub for each element in the list, and returns the resulting list.
 #} example {
-#	% lregsub {c$} {afdsg asdc sfgh {dfgh shgfc} dfhg} {!}
+#	% list_regsub {c$} {afdsg asdc sfgh {dfgh shgfc} dfhg} {!}
 #	afdsg asd! sfgh {dfgh shgf!} dfhg
-#	% lregsub {^([^.]+)\.([^.]+)$} {start.sh help.ps h.sh} {\2 \1}
+#	% list_regsub {^([^.]+)\.([^.]+)$} {start.sh help.ps h.sh} {\2 \1}
 #	{sh start} {ps help} {sh h}
 #}
-proc lregsub {args} {
+proc list_regsub {args} {
 	set len [llength $args]
 	if {$len<3} {
-		error "wrong # args: should be \"lregsub ?switches? exp list subSpec\""
+		error "wrong # args: should be \"list_regsub ?switches? exp list subSpec\""
 	}
 	set result ""
 	incr len -1

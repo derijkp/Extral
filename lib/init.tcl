@@ -10,7 +10,7 @@
 # $Format: "set ::Extral::version 1.$ProjectMajorVersion$"$
 set ::Extral::version 1.1
 # $Format: "set ::Extral::patchlevel $ProjectMinorVersion$"$
-set ::Extral::patchlevel 8
+set ::Extral::patchlevel 9
 package provide Extral $::Extral::version
 
 #
@@ -19,8 +19,6 @@ package provide Extral $::Extral::version
 #
 
 namespace eval Extral {}
-namespace eval string {}
-namespace eval list {}
 
 if [file exists [file join ${Extral::dir} extral[info sharedlibextension]]] {
 	if {"[info commands Extral::lpop]" == ""} {
@@ -28,7 +26,7 @@ if [file exists [file join ${Extral::dir} extral[info sharedlibextension]]] {
 	}
 } else {
 	set Extral::noc 1
-	source [file join ${Extral::dir} lib noc.tcl]
+	source [file join ${Extral::dir} lib listnoc.tcl]
 }
 
 #
@@ -41,3 +39,4 @@ lappend auto_path [file join ${Extral::dir} lib]
 
 source [file join ${Extral::dir} lib atexit.tcl]
 source [file join ${Extral::dir} lib always.tcl]
+Extral::compat

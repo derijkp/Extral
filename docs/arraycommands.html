@@ -1,0 +1,30 @@
+<HEAD>
+<TITLE>Extra array manipulation commands</TITLE>
+</HEAD>
+<BODY>
+<h1>Extra array manipulation commands</h1>
+
+<dl><b><dt>
+array_lappend arrayName list
+</b><br>eg.:<pre>
+	% array set try {a 1 b 2}
+	% array_lappend try {a a c 3}
+	% array get try
+	a {1 a} b 2 c 3
+</pre>
+<b><dt>
+array_lget arrayName list ?default?
+</b><br>eg.:<pre>
+	% array set try {a 1 b 2}
+	% array_get try {b c} def
+	b 2 c def
+</pre>
+<b><dt>
+array_trans varName list ?default?
+</b><dd>
+ returns a list of all the values in the array corresponding to the
+ indices in the given list. If the index is not present in the array,
+ the index itself will be returned.
+ If $default is given, it will be returned for indices not in the array.
+
+</body>

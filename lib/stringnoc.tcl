@@ -1,12 +1,12 @@
-#doc {stringcommands string::change} cmd {
-#string::change string changelist
+#doc {stringcommands string_change} cmd {
+#string_change string changelist
 #} descr {
 # change some parts of a string<br>
 # changelist gives alternating a substring to be changed, and what it should be changed into.
 # The command returns a string that is the given string where each occurence of the
 # substrings in the changelist have been changed.
 #}
-proc string::change {string changelist} {
+proc string_change {string changelist} {
 	array set a $changelist
 	set rem $string
 	set string ""
@@ -36,12 +36,12 @@ proc string::change {string changelist} {
 	return $string
 }
 
-#doc {stringcommands string::reverse} cmd {
-#string::reverse list
+#doc {stringcommands string_reverse} cmd {
+#string_reverse list
 #} descr {
 # returns the reverse of list.
 #}
-proc string::reverse {string} {
+proc string_reverse {string} {
 	set i [string length $string]
 	set result ""
 	for {incr i -1} {$i >= 0} {incr i -1} {
@@ -50,17 +50,17 @@ proc string::reverse {string} {
 	return $result
 }
 
-#doc {stringcommands string::find} cmd {
-#string::find mode list pattern
+#doc {stringcommands string_find} cmd {
+#string_find mode list pattern
 #} descr {
 #	returns a list of all indices which match a pattern.
 #	mode can be -exact, -glob, or -regexp
 #	The default mode is -exact
 #} example {
-#	% string::find -regexp {Ape Ball Field {Antwerp city} Egg} {^A}
-#	0 3
+#	% string_find -regexp {Ape Ball Field {Antwerp city} Egg} {^A}
+#	0 16
 #}
-proc string::find {args} {
+proc string_find {args} {
 	if {[llength $args]==2} {
 		set string [lindex $args 0]
 		set pattern [lindex $args 1]
@@ -70,7 +70,7 @@ proc string::find {args} {
 		set string [lindex $args 1]
 		set pattern [lindex $args 2]
 	} else {
-		error "Format is \"lfind ?mode? list pattern\""
+		error "Format is \"list_find ?mode? list pattern\""
 	}
 	set result ""
 	set pos 0
@@ -100,12 +100,12 @@ proc string::find {args} {
 	return $result
 }
 
-#doc {stringcommands string::replace} cmd {
-#string::replace string first last replacement
+#doc {stringcommands string_replace} cmd {
+#string_replace string first last replacement
 #} descr {
 # replace a part of a string
 #}
-proc string::replace {string first last replacement} {
+proc string_replace {string first last replacement} {
 	if {$last < $first} {
 		set last $first
 	} else {

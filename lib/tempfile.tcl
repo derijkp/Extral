@@ -54,9 +54,10 @@ namespace eval Extral {
 
 #doc tempfile title {
 #tempfile
-#} shortdescr
+#} shortdescr {
 # get names for temporary files
 #}
+
 #doc {tempfile get} cmd {
 #tempfile ?get?
 #} descr {

@@ -4,82 +4,82 @@ exec tclsh8.0 "$0" "$@"
 
 source tools.tcl
 
-test structlset {set} {
-	structlset {a 1 bb 2 ccc 3} bb try
+test structlist_set {set} {
+	structlist_set {a 1 bb 2 ccc 3} bb try
 } {a 1 bb try ccc 3}
 
-test structlset {set, list check} {
-	structlset {a 1 bb 2 ccc 3} bb {try it}
+test structlist_set {set, list check} {
+	structlist_set {a 1 bb 2 ccc 3} bb {try it}
 } {a 1 bb {try it} ccc 3}
 
-test structlset {set, 2 tags} {
-	structlset {a 1 b 2 c {a 1 b 2 c {a 1 b 2}}} {c a} try
+test structlist_set {set, 2 tags} {
+	structlist_set {a 1 b 2 c {a 1 b 2 c {a 1 b 2}}} {c a} try
 } {a 1 b 2 c {a try b 2 c {a 1 b 2}}}
 
-test structlset {set new} {
-	structlset {a 1 bb 2 ccc 3} dddd 4
+test structlist_set {set new} {
+	structlist_set {a 1 bb 2 ccc 3} dddd 4
 } {a 1 bb 2 ccc 3 dddd 4}
 
-test structlset {set new, list value} {
-	structlset {a 1 bb 2 ccc 3} dddd {try it}
+test structlist_set {set new, list value} {
+	structlist_set {a 1 bb 2 ccc 3} dddd {try it}
 } {a 1 bb 2 ccc 3 dddd {try it}}
 
-test structlset {set new, list tag, list value} {
-	structlset {a 1 bb 2 ccc 3} {{d d}} {try it}
+test structlist_set {set new, list tag, list value} {
+	structlist_set {a 1 bb 2 ccc 3} {{d d}} {try it}
 } {a 1 bb 2 ccc 3 {d d} {try it}}
 
-test structlset {set new, 2 tags} {
-	structlset {a 1 b 2 c {a 1 b 2 c {a 1 b 2}}} {c d} try
+test structlist_set {set new, 2 tags} {
+	structlist_set {a 1 b 2 c {a 1 b 2 c {a 1 b 2}}} {c d} try
 } {a 1 b 2 c {a 1 b 2 c {a 1 b 2} d try}}
 
-test structlset {set, 3 tags} {
-	structlset {a 1 b 2 c {a 1 b 2 c {a 1 b 2}}} {c c a} try
+test structlist_set {set, 3 tags} {
+	structlist_set {a 1 b 2 c {a 1 b 2 c {a 1 b 2}}} {c c a} try
 } {a 1 b 2 c {a 1 b 2 c {a try b 2}}}
 
-test structlset {set multi} {
-	structlset {a 1} b 2 a a
+test structlist_set {set multi} {
+	structlist_set {a 1} b 2 a a
 } {a a b 2}
 
-test structlset {set multi multiple levels} {
-	structlset {a 1} {b a} 2 a a {b b} 3
+test structlist_set {set multi multiple levels} {
+	structlist_set {a 1} {b a} 2 a a {b b} 3
 } {a a b {a 2 b 3}}
 
-test structlset {check uneven} {
-	structlset {a 1 bb 2 ccc} dddd 4
+test structlist_set {check uneven} {
+	structlist_set {a 1 bb 2 ccc} dddd 4
 } {error: "a 1 bb 2 ccc" does not have an even number of elements} 1
 
-test structlset {check uneven, 2 tags} {
-	structlset {a 1 b 2 c {a 1 b}} {c a} 4
+test structlist_set {check uneven, 2 tags} {
+	structlist_set {a 1 b 2 c {a 1 b}} {c a} 4
 } {error: "a 1 b" does not have an even number of elements} 1
 
-test structlset {empty list} {
-	structlset {} a 1
+test structlist_set {empty list} {
+	structlist_set {} a 1
 } {a 1}
 
-test structlset {empty field} {
-	structlset {} {} {a 1}
+test structlist_set {empty field} {
+	structlist_set {} {} {a 1}
 } {a 1}
 
-test structlset {empty sublist} {
-	structlset {a {}} {a b} 1
+test structlist_set {empty sublist} {
+	structlist_set {a {}} {a b} 1
 } {a {b 1}}
 
-test structlset {check for object errors in C code} {
+test structlist_set {check for object errors in C code} {
 	set try {a 1 bb 2 ccc 3}
-	structlset $try bb try
+	structlist_set $try bb try
 	set try 
 } {a 1 bb 2 ccc 3}
 
-test structlset {multiple tags not found} {
-	structlset {a 1 bb 2} {c a b} 1
+test structlist_set {multiple tags not found} {
+	structlist_set {a 1 bb 2} {c a b} 1
 } {a 1 bb 2 c {a {b 1}}}
 
-test structlset {with space} {
-	structlset "" {Fonts {Basic Fonts} BoldItalicFont} *Font
+test structlist_set {with space} {
+	structlist_set "" {Fonts {Basic Fonts} BoldItalicFont} *Font
 } {Fonts {{Basic Fonts} {BoldItalicFont *Font}}}
 
-test structlset {with space} {
-	structlset "" {Fonts {Basic Fonts} {other font}} *Font
+test structlist_set {with space} {
+	structlist_set "" {Fonts {Basic Fonts} {other font}} *Font
 } {Fonts {{Basic Fonts} {{other font} *Font}}}
 
 test structlget {} {
@@ -167,18 +167,16 @@ test structlfields {check uneven} {
 	structlfields {a 1 bb 2 ccc}
 } {error: list "a 1 bb 2 ccc" does not have an even number of elements} 1
 
-test structlfind {present} {
-	structlfind {a try1 bb try2 ccc try3} bb
+test structlist_find {present} {
+	structlist_find {a try1 bb try2 ccc try3} bb
 } 3
 
-test structlfind {not present} {
-	structlfind {a try1 bb try2 ccc try3} try
+test structlist_find {not present} {
+	structlist_find {a try1 bb try2 ccc try3} try
 } -1
 
 testsummarize
 
 # no test yet for
-# ffind <switches> filelist pattern ?varName? ?pattern? ?varname?
-# ffind -matches -allfiles <switches> filelist pattern nulvalue ?varName? ?pattern? ?nulvalue? ?varname? ..
-# lload <filename>
-# lwrite ?file? ?list?
+# list_load <filename>
+# list_write ?file? ?list?

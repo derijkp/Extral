@@ -8,6 +8,8 @@
 # =============================================================
 #doc ssort title {
 #ssort
+#} shortdescr {
+#enhanced lsort
 #} descr {
 #	enhanced lsort:
 #	<dl>
@@ -30,14 +32,14 @@
 #ssort ?-ascii? ?-integer? ?-real? ?-increasing? ?-decreasing? ?-dictionary? ?-command string? ?-reflist list? list
 #}
 proc ssort {args} {
-	set list [lpop args]
+	set list [list_pop args]
 	set pos [lsearch $args -reflist]
 	if {$pos==-1} {
 		return [eval lsort $args {$list}]
 	} else {
-		lpop args $pos
-		set temp [lmanip mangle $list [lpop args $pos]]
+		list_pop args $pos
+		set temp [list_mangle $list [list_pop args $pos]]
 		set temp [eval lsort $args {-index 1 $temp}]
-		return [lmanip subindex $temp 0]
+		return [list_subindex $temp 0]
 	}
 }

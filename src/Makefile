@@ -37,24 +37,13 @@ SRC_DIR =		.
 CFLAGS = -O -Wall
 CC_SWITCHES = $(CFLAGS) -I${TCL_GENERIC_DIR} ${SHLIB_CFLAGS}
 
-OBJECTS = extralInit.o extral.o lpop.o nonl.o supersort.o general.o \
-			structl.o structltypes.o date.o leval.o dbm.o
+OBJECTS = extralInit.o extral.o list_pop.o string.o array.o supersort.o general.o \
+			structl.o structltypes.o date.o leval.o
 
 all: $(PROJECT)${SHLIB_SUFFIX}
 
 $(PROJECT)${SHLIB_SUFFIX}: $(OBJECTS)
 	${SHLIB_LD} $(OBJECTS) -o ../$(PROJECT)${SHLIB_SUFFIX} 
-
-bsddbm$(SHLIB_SUFFIX): bsddbm.o ../extern/libdb.a
-	$(SHLIB_LD) bsddbm.o ../extern/libdb.a -o ./bsddbm$(SHLIB_SUFFIX) 
-	mv ./bsddbm$(SHLIB_SUFFIX) ../dbm/bsddbm$(SHLIB_SUFFIX)
-
-bsddbm.o: bsddbm.c
-	$(CC) -c $(CC_SWITCHES) -I../extern bsddbm.c
-
-gdbm$(SHLIB_SUFFIX): gdbm.o ../extern/libgdbm.a
-	$(SHLIB_LD) gdbm.o ../extern/libgdbm.a -o ./gdbm$(SHLIB_SUFFIX) 
-	mv ./gdbm$(SHLIB_SUFFIX) ../dbm/gdbm$(SHLIB_SUFFIX)
 
 extratcl: tclAppInit.o $(OBJECTS)
 	$(CC) $(CFLAGS) -o extratcl tclAppInit.o $(OBJECTS) ${TCL_LIB_SPEC} ${LIBS}
@@ -62,7 +51,7 @@ extratcl: tclAppInit.o $(OBJECTS)
 clean:
 	rm -f *.o *${SHLIB_SUFFIX} config.cache config.log lib.exp
 	rm -f core ../core extratcl
-	rm -f ../*.so ../dbm/*.so ../*.dll ./*.so ./*.dll ../win/tmp/*.obj ../win/*.csm
+	rm -f ../*.so ../*.dll ./*.so ./*.dll ../win/tmp/*.obj ../win/*.csm
 
 Makefile: Makefile.in
 	./config.status

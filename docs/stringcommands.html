@@ -1,15 +1,24 @@
 <HEAD>
-<TITLE>
-General string manipulation commands
-</TITLE>
+<TITLE>Extra string manipulation commands</TITLE>
 </HEAD>
 <BODY>
-<h1>
-General string manipulation commands
-</h1>
+<h1>Extra string manipulation commands</h1>
 
 <dl><b><dt>
-string::change string changelist
+string__split string splitstring
+</b><dd>
+ split string on exact occurence off splitstring<br>
+<br>eg.:<pre>
+	% string_split "test1||test2" "||"
+	test1 test2
+</pre>
+<b><dt>
+string_equal s1 s2
+</b><dd>
+ returns 1 if the strings are equal, 0 if the are not
+
+<b><dt>
+string_change string changelist
 </b><dd>
  change some parts of a string<br>
  changelist gives alternating a substring to be changed, and what it should be changed into.
@@ -17,22 +26,22 @@ string::change string changelist
  substrings in the changelist have been changed.
 
 <b><dt>
-string::reverse list
+string_reverse list
 </b><dd>
  returns the reverse of list.
 
 <b><dt>
-string::find mode list pattern
+string_find mode list pattern
 </b><dd>
 	returns a list of all indices which match a pattern.
 	mode can be -exact, -glob, or -regexp
 	The default mode is -exact
 <br>eg.:<pre>
-	% string::find -regexp {Ape Ball Field {Antwerp city} Egg} {^A}
-	0 3
+	% string_find -regexp {Ape Ball Field {Antwerp city} Egg} {^A}
+	0 16
 </pre>
 <b><dt>
-string::replace string first last replacement
+string_replace string first last replacement
 </b><dd>
  replace a part of a string
 

@@ -6,7 +6,11 @@
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
 # =============================================================
-#doc convenience title {Convenience functions}
+#doc convenience title {
+#Convenience functions
+#} shortdescr {
+#various useful procs
+#}
 
 #doc {convenience aproc} cmd {
 #aproc args body
@@ -29,39 +33,6 @@ proc aproc {args body} {
 		set aproc($key) ::Extral::aproc$aproc()
 	}
 	return $aproc($key)
-}
-
-
-#doc {convenience arraytrans} cmd {
-#arraytrans varName list ?default?
-#} descr {
-# returns a list of all the values in the array corresponding to the
-# indices in the given list. If the index is not present in the array,
-# the index itself will be returned.
-# If $default is given, it will be returned for indices not in the array.
-#}
-proc arraytrans {varName list args} {
-	upvar $varName var
-	set result ""
-	if {"$args" == ""} {
-		foreach item $list {
-			if [info exists var($item)] {
-				lappend result $var($item)
-			} else {
-				lappend result $item
-			}
-		}
-	} else {
-		set def [lindex $args 0]
-		foreach item $list {
-			if [info exists var($item)] {
-				lappend result $var($item)
-			} else {
-				lappend result $def
-			}
-		}
-	}
-	return $result
 }
 
 #doc {convenience ?} cmd {
@@ -171,20 +142,6 @@ proc random {min max} {
 	return [expr int($min+rand()*$r)]
 }
 
-#doc {convenience random} cmd {
-#inlist list value
-#} descr {
-#returns 1 if $value is an element of list $list
-#returns 0 if $value is not an element of list $list
-#}
-proc inlist {list value} {
-	if {[lsearch $list $value]==-1} {
-		return 0
-	} else {
-		return 1
-	}
-}
-
 #doc {convenience putsvars} cmd {
 #putsvars varname ?varname ...?
 #} descr {
@@ -203,8 +160,8 @@ proc extractoption {listName option default} {
 	upvar $listName l
 	set pos [lsearch $l $option]
 	if {$pos != -1} {
-		lpop l $pos
-		return [lpop l $pos]
+		list_pop l $pos
+		return [list_pop l $pos]
 	} else {
 		return $default
 	}
@@ -214,7 +171,7 @@ proc extractbool {listName option} {
 	upvar $listName l
 	set pos [lsearch $l $option]
 	if {$pos != -1} {
-		lpop l $pos
+		list_pop l $pos
 		return 1
 	} else {
 		return 0
@@ -244,10 +201,3 @@ proc Extral::scriptdir {} {
 	}
 }
 
-proc isint {value} {
-	if [catch {expr {1 >> $value}}] {
-		return 0
-	} else {
-		return 1
-	}
-}

@@ -199,8 +199,8 @@ proc struct {option args} {
 			if {$len<2} {
 				error "wrong # args: should be \"struct array option arrayName ?arg ...? \""
 			}
-			set option [lshift args]
-			set var [lshift args]
+			set option [list_shift args]
+			set var [list_shift args]
 			set error [catch {eval {array $option struct::$var} $args} result]
 			if $error {
 				regsub {struct::} $result {} result

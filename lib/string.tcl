@@ -8,15 +8,18 @@
 # =============================================================
 
 #doc stringcommands title {
-#General string manipulation commands
+#Extra string manipulation commands
 #}
 
-#doc {stringcommands string::split} cmd {
-#string::split string splitstring
+#doc {stringcommands string_split} cmd {
+#string__split string splitstring
 #} descr {
 # split string on exact occurence off splitstring<br>
+#} example {
+#	% string_split "test1||test2" "||"
+#	test1 test2
 #}
-proc string::split {string splitstring} {
+proc string_split {string splitstring} {
 	set result ""
 	set len [string length $splitstring]
 	while 1 {

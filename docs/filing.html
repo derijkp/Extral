@@ -1,12 +1,8 @@
 <HEAD>
-<TITLE>
-Filing commands
-</TITLE>
+<TITLE>Filing commands</TITLE>
 </HEAD>
 <BODY>
-<h1>
-Filing commands
-</h1>
+<h1>Filing commands</h1>
 
 <dl><b><dt>
 	dirglob dir pattern
@@ -14,50 +10,13 @@ Filing commands
 	returns a list of all filenames in directory dir mathing the given pattern
 
 <b><dt>
-lload filename
-</b><dd>
-	returns all lines in the specified files as a list 
-
-<b><dt>
-lwrite file list
-</b><dd>
-	writes a list to a file
-
-<b><dt>
-	readfile filename
+	file_read filename
 </b><dd>
 	returns the contents of the file given by filename
 
 <b><dt>
-	writefile filename data
+	file_write filename data
 </b><dd>
 	create a file by the name filename with data as its content
-
-<b><dt>
-	getcomplete channelId
-</b><dd>
-	get one complete Tcl command, in the sense of having no unclosed quotes, 
-	braces, brackets or array element names, from the open file given by channelId
-
-<b><dt>
-	splitcomplete data
-</b><dd>
-	split data into complete Tcl commands in the sense of having no unclosed quotes, 
-	braces, brackets or array element names.
-
-<b><dt>
-	parsecommand line
-</b><dd>
-	parses a cmdline. it returns a list where each element is the part of the cmdline that
-	will result in one element when the cmdline would be evaluated.
-	eg.
-	% parsecommand {set test [format "%2.2f" 4.3]}
-	set test {[format "%2.2f" 4.3]}
-
-<b><dt>
-	cload filename
-</b><dd>
-	returns the contents of the given file als a list of complete Tcl commands.
-	
 
 </body>

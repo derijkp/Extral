@@ -7,13 +7,13 @@
 #
 # =============================================================
 
-#doc {listcommands lpop} cmd {
-#lpop listName ?pos?
+#doc {listcommands list_pop} cmd {
+#list_pop listName ?pos?
 #} descr {
 #	returns the last element from a list, thereby removing it from the list.
 #	If pos is given it will return the pos element of the list.
 #}
-proc lpop {listname {pos end}} {
+proc list_pop {listname {pos end}} {
 	upvar $listname list
 	if {"$list"==""} {
 		return ""
@@ -23,31 +23,31 @@ proc lpop {listname {pos end}} {
 	return $result
 }
 
-#doc {listcommands lshift} cmd {
-#lshift listName
+#doc {listcommands list_shift} cmd {
+#list_shift listName
 #} descr {
 #	returns the first element from a list, thereby removing it from the list.
 #}
-proc lshift {listname} {
+proc list_shift {listname} {
 	upvar $listname list
 	set result [lindex $list 0]
 	set list [lrange $list 1 end]
 	return $result
 }
 
-#doc {listcommands lsub} cmd {
-#lsub list ?-exclude? [index list]
+#doc {listcommands list_sub} cmd {
+#list_sub list ?-exclude? [index list]
 #} descr {
 #	create a sublist from a set of indices
 #	When -exclude is specified, the elements of which the indexes are not in the list 
 #	will be given.
 #} example {
-#	% lsub {Ape Ball Field {Antwerp city} Egg} {0 3}
+#	% list_sub {Ape Ball Field {Antwerp city} Egg} {0 3}
 #	Ape {Antwerp city}
-#	% lsub {Ape Ball Field {Antwerp city} Egg} -exclude {0 3}
+#	% list_sub {Ape Ball Field {Antwerp city} Egg} -exclude {0 3}
 #	Ball Field Egg
 #}
-proc lsub {list args} {
+proc list_sub {list args} {
 	set len [llength $args]
 	if {$len==1} {
 		set result ""
@@ -65,21 +65,21 @@ proc lsub {list args} {
 		}
 		return $list
 	} else {
-		error "Format is \"lsub list ?-exclude? indices\""
+		error "Format is \"list_sub list ?-exclude? indices\""
 	}
 }
 
-#doc {listcommands lfind} cmd {
-#lfind mode list pattern
+#doc {listcommands list_find} cmd {
+#list_find mode list pattern
 #} descr {
 #	returns a list of all indices which match a pattern.
 #	mode can be -exact, -glob, or -regexp
 #	The default mode is -exact
 #} example {
-#	% lfind -regexp {Ape Ball Field {Antwerp city} Egg} {^A}
+#	% list_find -regexp {Ape Ball Field {Antwerp city} Egg} {^A}
 #	0 3
 #}
-proc lfind {args} {
+proc list_find {args} {
 	if {[llength $args]==2} {
 		set list [lindex $args 0]
 		set pattern [lindex $args 1]
@@ -89,7 +89,7 @@ proc lfind {args} {
 		set list [lindex $args 1]
 		set pattern [lindex $args 2]
 	} else {
-		error "Format is \"lfind ?mode? list pattern\""
+		error "Format is \"list_find ?mode? list pattern\""
 	}
 	set result ""
 	set pos 0
@@ -119,18 +119,18 @@ proc lfind {args} {
 	return $result
 }
 
-#doc {listcommands lcor} cmd {
-#lcor <referencelist> <list>
+#doc {listcommands list_cor} cmd {
+#list_cor <referencelist> <list>
 #} descr {
 #	gives the positions of the elements in list in the reference list. If an element is not
 #	found in the reference list, it returns -1. Elements are matched only once.
 #} example {
-#	% lcor {a b c d e f} {d b}
+#	% list_cor {a b c d e f} {d b}
 #	3 1
-#	% lcor {a b c d e f} {b d d}
+#	% list_cor {a b c d e f} {b d d}
 #	1 3 -1
 #}
-proc lcor {reflist list} {
+proc list_cor {reflist list} {
 	set pos 0
 	foreach item $reflist {
 		lappend grid($item) $pos
@@ -138,7 +138,7 @@ proc lcor {reflist list} {
 	}
 	foreach item $list {
 		if [info exists grid($item)] {
-			lappend result [lshift grid($item)]
+			lappend result [list_shift grid($item)]
 			if {"$grid($item)"==""} {unset grid($item)}
 		} else {
 			lappend result -1
@@ -148,8 +148,8 @@ proc lcor {reflist list} {
 }
 
 
-#doc {listcommands lremdup} cmd {
-#lremdup list
+#doc {listcommands list_remdup} cmd {
+#list_remdup list
 #} descr {
 #returns a list in which all duplactes are removed
 #	with the -sorted option the command will usually be a lot faster,
@@ -157,7 +157,7 @@ proc lcor {reflist list} {
 #	The optional $var gives the name of a variable in which the removed items
 #	will be stored.
 #}
-proc lremdup {args} {
+proc list_remdup {args} {
 	set len [llength $args]
 	if {"[lindex $args 0]"=="-sorted"} {
 		set list [lindex $args 1]
@@ -177,7 +177,7 @@ proc lremdup {args} {
 		set usevar 0
 	}
 	if {($len != 1)&&($len != 2)} {
-		return -code error "wrong # args: should be \"lremdup ?-sorted? list ?var?\""
+		return -code error "wrong # args: should be \"list_remdup ?-sorted? list ?var?\""
 	}
 	set len [llength $list]
 	if {($len == 1)||($len == 0)} {return $list}
@@ -206,8 +206,8 @@ proc lremdup {args} {
 	return $done
 }
 
-#doc {listcommands llremove} cmd {
-#llremove ?-sorted? list1 list2
+#doc {listcommands list_lremove} cmd {
+#list_lremove ?-sorted? list1 list2
 #} descr {
 #	returns a list with all items in list1 that are not in list2
 #	with the -sorted option the command will usually be a lot faster,
@@ -215,7 +215,7 @@ proc lremdup {args} {
 #	The optional $var gives the name of a variable in which the removed items
 #	will be stored.
 #}
-proc llremove {args} {
+proc list_lremove {args} {
 	set len [llength $args]
 	if {"[lindex $args 0]"=="-sorted"} {
 		set list [lindex $args 1]
@@ -237,7 +237,7 @@ proc llremove {args} {
 		set usevar 0
 	}
 	if {($len != 2)&&($len != 3)} {
-		return -code error "wrong # args: should be \"llremove ?-sorted? list removelist ?var?\""
+		return -code error "wrong # args: should be \"list_lremove ?-sorted? list removelist ?var?\""
 	}
 	if {"$removelist"==""} {
 		set removelist {{}}
@@ -288,19 +288,19 @@ proc llremove {args} {
 	}
 }
  
-#doc {listcommands lmerge} cmd {
-#lmerge ?list1? ?list2? ??spacing??
+#doc {listcommands list_merge} cmd {
+#list_merge ?list1? ?list2? ??spacing??
 #} descr {
 #	merges two lists into one
 #} example {
-#	% lmerge {a b c} {1 2 3}
+#	% list_merge {a b c} {1 2 3}
 #	a 1 b 2 c 3
-#	% lmerge {a b c d} {1 2} 2
+#	% list_merge {a b c d} {1 2} 2
 #	a b 1 c d 2
 #}
-proc lmerge {args} {
+proc list_merge {args} {
 	if {([llength $args]!=2)&&([llength $args]!=3)} {
-		error "wrong # args: should be \"lmerge list1 list2 ?spacing?\""
+		error "wrong # args: should be \"list_merge list1 list2 ?spacing?\""
 	}
 	set result ""
 	set list1 [lindex $args 0]
@@ -316,7 +316,7 @@ proc lmerge {args} {
 			lappend result $e1
 			incr c -1
 			if !$c {
-				lappend result [lshift list2]
+				lappend result [list_shift list2]
 				set c $spacing
 			}
 		}
@@ -330,22 +330,22 @@ proc lmerge {args} {
 	}
 }
 
-#doc {listcommands lunmerge} cmd {
-#lunmerge ?list? ??spacing?? ??var??
+#doc {listcommands list_unmerge} cmd {
+#list_unmerge ?list? ??spacing?? ??var??
 #} descr {
 #	unmerges items from a list to the result; the remaining items are stored
 #	in the given variable ?var?
 #} example {
-#	% lunmerge {a 1 b 2 c 3}
+#	% list_unmerge {a 1 b 2 c 3}
 #	a b c
-#	% lunmerge {a b 1 c d 2} 2 var
+#	% list_unmerge {a b 1 c d 2} 2 var
 #	a b c d
 #	% set var
 #	1 2
 #}
-proc lunmerge {args} {
+proc list_unmerge {args} {
 	if {([llength $args]<1)||([llength $args]>3)} {
-		error "wrong # args: should be \"lunmerge list ?spacing? ?var?\""
+		error "wrong # args: should be \"list_unmerge list ?spacing? ?var?\""
 	}
 	set result ""
 	if {[llength $args]==3} {
@@ -379,66 +379,12 @@ proc lunmerge {args} {
 	}
 }
 
-#doc leval title {
-#eval Light
-#} shortdescr {
-#a faster but more limited eval (Viktor Dukhovni)
-#}
-#doc {leval leval} cmd {
-#leval command $args
-#} descr {
-#	converted the leval patch by Viktor Dukhovni <viktor@esm.com> to
-#	a dynamically loadable version:
-#	This command is a fast light "eval" specifically designed to execute
-#	zero or more Tcl lists (concatenated) by invoking the command specified
-#	by the first list element, with the remaining list elements as "literal"
-#	arguments.  No variable or command substitution takes place on the
-#	arguments.
-#}
-
-proc leval {args} {
-	eval [eval concat $args]
-}
-
-#ffind
-#doc ffind title {
-#ffind
-#} shortdescr {
-#filesearcher (obsolete, only in C)
-#}
-#doc {ffind ffind} cmd {
-#ffind <switches> filelist pattern ?varName? ?pattern? ?varname?
-#} descr {
-#	returns the files in filelist whose content match the given pattern.
-#	if varName is given, the results will be stored in this variable.
-#	several patterns can be searched, the results for each being stored
-#	in the apropriate variable.
-#	<switches> can be -matches, -all -exact, -glob, or -regexp
-#<dl>
-#	<dt>-matches    :<dd>the text matched by the bracketed part of 
-#		              the pattern will be mangled into the result. 
-#	<dt>-allmatches :<dd>all matches in the file will be returned in
-#		              the form of: 
-#		              file1 match1 file1 match2 file2 match2
-#	<dt>-allfiles   :<dd>see next
-#</dl>
-#}
-#doc {ffind ffindall} cmd {
-#ffind -matches -allfiles <switches> filelist pattern nulvalue ?varName? ?pattern? ?nulvalue? ?varname? ..
-#} descr {
-#	ffind with these options will return a list containing one element
-#	for each file in the filelist. if the pattern was found in a file,
-#	the the element contains the match; if it was not found, it will
-#	contain the nulvalue. This is not compatible with the -allmatches
-#	options
-#}
-
-#doc {listcommands lreverse} cmd {
-#lreverse list
+#doc {listcommands list_reverse} cmd {
+#list_reverse list
 #} descr {
 # returns the reverse of the list.
 #}
-proc lreverse {list} {
+proc list_reverse {list} {
 	set i [llength $list]
 	set result ""
 	for {incr i -1} {$i >= 0} {incr i -1} {
@@ -447,12 +393,12 @@ proc lreverse {list} {
 	return $result
 }
 
-#doc {listcommands list::change} cmd {
-#list::change list change to ?change to ...?
+#doc {listcommands list_change} cmd {
+#list_change list change to ?change to ...?
 #} descr {
 # change matching elements in a list to other values
 #}
-proc list::change {list change to args} {
+proc list_change {list change to args} {
 	set trans($change) $to
 	array set trans $args
 	foreach element $list {

@@ -8,117 +8,117 @@ proc r {} {
 	uplevel source ../lib/structltypes.tcl
 }
 
-test structlset-struct {basic set one} {
+test structlist_set-struct {basic set one} {
 	set struct {a {*int ?}}
 	set try {}
-	structlset -struct $struct $try a 10
+	structlist_set -struct $struct $try a 10
 } {a 10}
 
-test structlset-struct {basic: 2 tags} {
+test structlist_set-struct {basic: 2 tags} {
 	set struct {a {a {*int ?}}}
 	set try {}
-	structlset -struct $struct $try {a a} 10
+	structlist_set -struct $struct $try {a a} 10
 } {a {a 10}}
 
-test structlset-struct {basic: set to default} {
+test structlist_set-struct {basic: set to default} {
 	set struct {a {*int ?}}
 	set try {}
-	structlset -struct $struct $try a ?
+	structlist_set -struct $struct $try a ?
 } {}
 
-test structlset-struct {basic: set to default: 2 tags} {
+test structlist_set-struct {basic: set to default: 2 tags} {
 	set struct {a {a {*int ?}}}
 	set try {}
-	structlset -struct $struct $try {a a} ?
+	structlist_set -struct $struct $try {a a} ?
 } {}
 
-test structlset-struct {basic: set to default: remove old} {
+test structlist_set-struct {basic: set to default: remove old} {
 	set struct {a {a {*int ?}}}
 	set try {a {a 10}}
-	structlset -struct $struct $try {a a} ?
+	structlist_set -struct $struct $try {a a} ?
 } {}
 
-test structlset-struct {check empty field with set} {
+test structlist_set-struct {check empty field with set} {
 	set struct {a {*int ?}}
 	set try {}
-	structlset -struct $struct $try {} {a 1}
+	structlist_set -struct $struct $try {} {a 1}
 } {a 1}
 
-test structlset-struct {basic: set one of 2 to default} {
+test structlist_set-struct {basic: set one of 2 to default} {
 	set struct {a {a {*int ?} b {*int ?}}}
 	set try {a {a 1 b 2}}
-	structlset -struct $struct $try {a a} ?
+	structlist_set -struct $struct $try {a a} ?
 } {a {b 2}}
 
-test structlset-struct {named: replace one} {
+test structlist_set-struct {named: replace one} {
 	set struct {*named {*int ?} {}}
 	set try {a 1}
-	structlset -struct $struct $try a 10
+	structlist_set -struct $struct $try a 10
 } {a 10}
 
-test structlset-struct {named: add one} {
+test structlist_set-struct {named: add one} {
 	set struct {*named {*int ?} {}}
 	set try {a 1}
-	structlset -struct $struct $try b 10
+	structlist_set -struct $struct $try b 10
 } {a 1 b 10}
 
-test structlset-struct {basic: set multi} {
+test structlist_set-struct {basic: set multi} {
 	set struct {*named {*int ?} {}}
 	set try {a 1}
-	structlset -struct $struct $try b 10 a 2
+	structlist_set -struct $struct $try b 10 a 2
 } {a 2 b 10}
 
-test structlset-struct {basic: add one: 2 tags} {
+test structlist_set-struct {basic: add one: 2 tags} {
 	set struct {a {*named {*int ?} {}}}
 	set try {a {a 1}}
-	structlset -struct $struct $try {a b} 10
+	structlist_set -struct $struct $try {a b} 10
 } {a {a 1 b 10}}
 
-test structlset-struct {basic: change one} {
+test structlist_set-struct {basic: change one} {
 	set struct {a {*named {*int ?} {}}}
 	set try {a {a 1 b 1}}
-	structlset -struct $struct $try {a b} 10
+	structlist_set -struct $struct $try {a b} 10
 } {a {a 1 b 10}}
 
-test structlset-struct {basic long format} {
+test structlist_set-struct {basic long format} {
 	set struct {{? aa a} {*int ?}}
 	set try {}
-	structlset -struct $struct $try aa 10
+	structlist_set -struct $struct $try aa 10
 } {a 10}
 
-test structlset-struct {basic long format error} {
+test structlist_set-struct {basic long format error} {
 	set struct {? {*int ?}}
 	set try {}
-	structlset -struct $struct $try aa 10
+	structlist_set -struct $struct $try aa 10
 } {error: tag "aa" not present in structure "? {*int ?}"} 1
 
-test structlset-struct {basic: error} {
+test structlist_set-struct {basic: error} {
 	set struct {a {a {*int ?}}}
 	set try {}
-	structlset -struct $struct $try a 10
+	structlist_set -struct $struct $try a 10
 } {error: incorrect value trying to assign "10" to struct "a {*int ?}" at field "a"} 1
 
-test structlset-struct {basic cmd error} {
+test structlist_set-struct {basic cmd error} {
 	set struct {a {*int ?}}
 	set try {}
-	structlset -struct $struct $try a
-} {wrong # args: should be "structlset ?-struct schema? ?-data clientdata? list field value ?field value ...?"} 1
+	structlist_set -struct $struct $try a
+} {wrong # args: should be "structlist_set ?-struct schema? ?-data clientdata? list field value ?field value ...?"} 1
 
-test structlset-struct {basic: error too much tags} {
+test structlist_set-struct {basic: error too much tags} {
 	set struct {a {a {*int ?}}}
 	set try {}
-	structlset -struct $struct $try {a a a} 10
+	structlist_set -struct $struct $try {a a a} 10
 } {error: field "a" not present in structure "*int ?" at field "a" at field "a"} 1
 
-test structlset-struct {basic: error with *named} {
+test structlist_set-struct {basic: error with *named} {
 	set struct {a {*named {*int ?} {}}}
 	set try {}
-	structlset -struct $struct $try a 10
+	structlist_set -struct $struct $try a 10
 } {error: "10" does not have an even number of elements at field "a"} 1
 
-test structlset-struct {empty -struct: set} {
+test structlist_set-struct {empty -struct: set} {
 	set try {}
-	structlset -struct {} $try a 10
+	structlist_set -struct {} $try a 10
 } {error: tag "a" not present in structure ""} 1
 
 test structlget-struct {empty -struct: get} {
@@ -126,46 +126,46 @@ test structlget-struct {empty -struct: get} {
 	structlget -struct {} $try a
 } {error: tag "a" not present in structure ""} 1
 
-test structlset-struct {basic: set one by value} {
+test structlist_set-struct {basic: set one by value} {
 	set struct {a {a {*int ?}}}
 	set try {}
-	structlset -struct $struct $try a {a 10}
+	structlist_set -struct $struct $try a {a 10}
 } {a {a 10}}
 
-test structlset-struct {basic: add one by value} {
+test structlist_set-struct {basic: add one by value} {
 	set struct {a {*named {*int ?} {}}}
 	set try {a {a 1}}
-	structlset -struct $struct $try a {b 10}
+	structlist_set -struct $struct $try a {b 10}
 } {a {a 1 b 10}}
 
-test structlset-struct {basic: named remove default} {
+test structlist_set-struct {basic: named remove default} {
 	set struct {a {*named {*int ?} {}}}
 	set try {a {a 1}}
-	structlset -struct $struct $try {a a} ?
+	structlist_set -struct $struct $try {a a} ?
 } {}
 
-test structlset-struct {basic: named remove default} {
+test structlist_set-struct {basic: named remove default} {
 	set struct {a {*named {*int ?} {}}}
 	set try {a {a 1}}
-	structlset -struct $struct $try a {a ?}
+	structlist_set -struct $struct $try a {a ?}
 } {}
 
-test structlset-struct {basic: change one by value} {
+test structlist_set-struct {basic: change one by value} {
 	set struct {a {*named {*int ?} {}}}
 	set try {a {a 1 b 1}}
-	structlset -struct $struct $try a {b 10}
+	structlist_set -struct $struct $try a {b 10}
 } {a {a 1 b 10}}
 
-test structlset-struct {basic: change one} {
+test structlist_set-struct {basic: change one} {
 	set struct {a {*named {*int ?} {}}}
 	set try {a {a 1 b 1}}
-	structlset -struct $struct $try {a b} 10
+	structlist_set -struct $struct $try {a b} 10
 } {a {a 1 b 10}}
 
-test structlset-struct {basic: set empty} {
+test structlist_set-struct {basic: set empty} {
 	set struct {a {*named {*int ?} {}}}
 	set try {a {a 1 b 1}}
-	structlset -struct $struct $try a {}
+	structlist_set -struct $struct $try a {}
 } {a {a 1 b 1}}
 
 # get tests
@@ -212,9 +212,9 @@ test structlget-struct {basic: default struct} {
 	structlget -struct $struct $try a
 } {a ?}
 
-test structlset-struct {by value} {
+test structlist_set-struct {by value} {
 	set struct {i {*int ?} s {*any ?}}
-	structlset -struct $struct {} {} {i 2 s try}
+	structlist_set -struct $struct {} {} {i 2 s try}
 } {i 2 s try}
 
 test structlget-struct {basic: long format} {
@@ -239,7 +239,7 @@ test structlget-struct {check for error} {
 	structlget -struct $struct {} {}
 } {invalid command name "::Extral::geta"} 1
 
-test structlset-struct {named by field} {
+test structlist_set-struct {named by field} {
 	set struct {
 		*named {
 			s {*any ?}
@@ -247,10 +247,10 @@ test structlset-struct {named by field} {
 		} {}
 	}
 	set try {a {s {Some Street} n 10} b {}}
-	structlset -struct $struct $try {a s} 1
+	structlist_set -struct $struct $try {a s} 1
 } {a {s 1 n 10} b {}}
 
-test structlset-struct {named by field and value} {
+test structlist_set-struct {named by field and value} {
 	set struct {
 		*named {
 			s {*any ?}
@@ -258,10 +258,10 @@ test structlset-struct {named by field and value} {
 		} {}
 	}
 	set try {a {s {Some Street} n 10}}
-	structlset -struct $struct $try a {s a n 1}
+	structlist_set -struct $struct $try a {s a n 1}
 } {a {s a n 1}}
 
-test structlset-struct {named no name: not even} {
+test structlist_set-struct {named no name: not even} {
 	set struct {
 		*named {
 			s {*any ?}
@@ -269,19 +269,19 @@ test structlset-struct {named no name: not even} {
 		} {}
 	}
 	set try {a {s {Some Street} n 10}}
-	structlset -struct $struct $try {} try
+	structlist_set -struct $struct $try {} try
 } {error: "try" does not have an even number of elements} 1
 
-test structlset-struct {named no name} {
+test structlist_set-struct {named no name} {
 	set struct {*named {a {*int ?}} {}}
 	set try {}
-	structlset -struct $struct $try {} {try 1}
+	structlist_set -struct $struct $try {} {try 1}
 } {error: incorrect value trying to assign "1" to struct "a {*int ?}" in named "try"} 1
 
-test structlset-struct {named no name} {
+test structlist_set-struct {named no name} {
 	set struct {*named {a {*int ?}} {}}
 	set try {}
-	structlset -struct $struct $try {} {try {a a}}
+	structlist_set -struct $struct $try {} {try {a a}}
 } {expected integer but got "a" at field "a" in named "try"} 1
 
 test structlget-struct {named by value} {
@@ -328,7 +328,7 @@ test structlget-struct {long format} {
 	structlget -struct $struct $try Address
 } {Street {Some Street} Number 10}
 
-test structlset-struct {long format: set by field} {
+test structlist_set-struct {long format: set by field} {
 	set struct {
 		{? Address a} {
 			{? Street s} {*any ?}
@@ -336,10 +336,10 @@ test structlset-struct {long format: set by field} {
 		}
 	}
 	set try {a {s {Some Street} n 10}}
-	structlset -struct $struct $try {Address Street} {try it}
+	structlist_set -struct $struct $try {Address Street} {try it}
 } {a {s {try it} n 10}}
 
-test structlset-struct {long format: set by value} {
+test structlist_set-struct {long format: set by value} {
 	set struct {
 		{? Address a} {
 			{? Street s} {*any ?}
@@ -347,13 +347,13 @@ test structlset-struct {long format: set by value} {
 		}
 	}
 	set try {a {s {Some Street} n 10}}
-	structlset -struct $struct $try Address {Street {try it} Number 1}
+	structlist_set -struct $struct $try Address {Street {try it} Number 1}
 } {a {s {try it} n 1}}
 
-test structlset-struct {long format: withnamed} {
+test structlist_set-struct {long format: withnamed} {
 	set struct {*named {{? try t} {*int ?}} {}}
 	set try {a {t 1}}
-	structlset -struct $struct $try b {try 2} a {try 4}
+	structlist_set -struct $struct $try b {try 2} a {try 4}
 } {a {t 4} b {t 2}}
 
 test structlfields {see values of long format} {
@@ -442,10 +442,10 @@ test structlunset-struct {one not present} {
 	structlunset -struct $struct $try {a 0 a} d
 } {error: tag "d" not present in structure "a {*list {a {*any ?}}} b {*int ?}"} 1
 
-test structlset-struct {parameters} {
+test structlist_set-struct {parameters} {
 	set struct {*any {}}
-	structlset -struct $struct {}
-} {wrong # args: should be "structlset ?-struct schema? ?-data clientdata? list field value ?field value ...?"} 1
+	structlist_set -struct $struct {}
+} {wrong # args: should be "structlist_set ?-struct schema? ?-data clientdata? list field value ?field value ...?"} 1
 
 testsummarize
 

@@ -1,0 +1,34 @@
+<HEAD>
+<TITLE>Command manipulation commands</TITLE>
+</HEAD>
+<BODY>
+<h1>Command manipulation commands</h1>
+
+<dl><b><dt>
+	cmd_get channelId
+</b><dd>
+	get one complete Tcl command, in the sense of having no unclosed quotes, 
+	braces, brackets or array element names, from the open file given by channelId
+
+<b><dt>
+	cmd_split data
+</b><dd>
+	split data into complete Tcl commands in the sense of having no unclosed quotes, 
+	braces, brackets or array element names.
+
+<b><dt>
+	cmd_parse line
+</b><dd>
+	parses a cmdline. it returns a list where each element is the part of the cmdline that
+	will result in one element when the cmdline would be evaluated.
+	eg.
+	% cmd_parse {set test [format "%2.2f" 4.3]}
+	set test {[format "%2.2f" 4.3]}
+
+<b><dt>
+	cmd_load filename
+</b><dd>
+	returns the contents of the given file als a list of complete Tcl commands.
+	
+
+</body>

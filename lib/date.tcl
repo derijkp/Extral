@@ -1,4 +1,4 @@
-# Tcl version of scantime and formattime
+# Tcl version of time_scan and time_format
 #
 # Copyright (c) 1997 Peter De Rijk
 #
@@ -9,11 +9,12 @@
 #doc time title {
 #Date and time
 #} shortdescr {
+# extra commands for handling dates
 #} descr {
-#The scantime transforms a string containing date and/or time into a 
+#The time_scan transforms a string containing date and/or time into a 
 #double value (number of seconds since 0). These values can
 #be sorted, compared or stored, and transformed back into a human readable
-#date and time string using the formattime command. The clock scan and
+#date and time string using the time_format command. The clock scan and
 #format commands in Tcl give up before somewhere before 1901 and after
 #2037, which is a bit of a bummer (eg. for genealogy). The transformation
 #takes into account leap-years properly (I hope). However, it extrapolated
@@ -23,15 +24,15 @@
 #correctly.
 #}
 
-#doc {time scantime} cmd {
-#scantime time ?date/time/both?
+#doc {time time_scan} cmd {
+#time_scan time ?date/time/both?
 #} descr {
 #	!! the year should be specified fully (>=4 numbers)
 #} example {
-#	% scantime {9 May 1997 12:30}
+#	% time_scan {9 May 1997 12:30}
 #	62998777800.0
 #}
-proc scantime {time {musthave date}} {
+proc time_scan {time {musthave date}} {
 	foreach {var val} {
 		bc 0 year -1 month -1 day -1 hour -1 min -1 sec -1 ms -1
 		first -1 second -1 days -1 schrikkel 0
@@ -198,8 +199,8 @@ proc scantime {time {musthave date}} {
 	return [expr {$result*86400.0 + $hour*3600 + $min*60 + $sec + $ms/100.0}]
 }
 
-#doc {time formattime} cmd {
-#formattime time ?formatstring?
+#doc {time time_format} cmd {
+#time_format time ?formatstring?
 #} descr {
 #	!! not all options of clock scan are supported
 #<pre>
@@ -217,12 +218,12 @@ proc scantime {time {musthave date}} {
 #	%s : hundreds of a second
 #</pre>
 #} example {
-#	% formattime 62998777800.0
+#	% time_format 62998777800.0
 #	1997 May 09 12:30:00
-#	% formattime 62998777800.0 "%B %e %Y"
+#	% time_format 62998777800.0 "%B %e %Y"
 #	May 9 1997
 #}
-proc formattime {time {format {%Y %b %d %H:%M:%S}}} {
+proc time_format {time {format {%Y %b %d %H:%M:%S}}} {
 	set bc 0
 	if ($time<0) {
 		set bc 1;

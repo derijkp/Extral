@@ -12,7 +12,7 @@ if {[llength $argv] == 0} {
 # $Format: "set version 1.$ProjectMajorVersion$"$
 set version 1.1
 # $Format: "set minorversion $ProjectMinorVersion$"$
-set minorversion 8
+set minorversion 9
 
 set targetdir [file join $targetdir Extral-$tcl_platform(os)-$version.$minorversion]
 puts "Building binary distribution in $targetdir"
@@ -40,7 +40,7 @@ proc clean {filemode dirmode dir} {
 		error "Target build directory $targetdir exists"
 	}
 	file mkdir $targetdir
-	file copy dbm docs lib $targetdir
+	file copy docs lib $targetdir
 	file copy README pkgIndex.tcl $targetdir
 	if [catch {file copy extral[info sharedlibextension] $targetdir}] {
 		puts stderr "Warning, no compiled version available"

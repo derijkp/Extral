@@ -20,7 +20,7 @@
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_LfindCmd --
+ * ExtraL_List_findCmd --
  *
  *		This procedure is invoked to process the "lfind" command.
  *		It finds all occurences of a pattern in a list, and returns
@@ -34,7 +34,7 @@
  */
 
 int
-ExtraL_LfindObjCmd(clientData, interp, objc, objv)
+ExtraL_List_findObjCmd(clientData, interp, objc, objv)
 	ClientData clientData;	/* Not used. */
 	Tcl_Interp *interp;		/* Current interpreter. */
 	int objc;			/* Number of arguments. */
@@ -114,7 +114,7 @@ ExtraL_LfindObjCmd(clientData, interp, objc, objv)
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_LsubCmd --
+ * ExtraL_List_subCmd --
  *
  *		This procedure is invoked to process the "lsub" command.
  *		It creates a subset of a list
@@ -127,7 +127,7 @@ ExtraL_LfindObjCmd(clientData, interp, objc, objv)
  */
 
 int
-ExtraL_LsubObjCmd(dummy, interp, objc, objv)
+ExtraL_List_subObjCmd(dummy, interp, objc, objv)
 	ClientData dummy;		/* Not used. */
 	Tcl_Interp *interp;		/* Current interpreter. */
 	int objc;			/* Number of arguments. */
@@ -215,7 +215,7 @@ ExtraL_LsubObjCmd(dummy, interp, objc, objv)
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_LcorCmd --
+ * ExtraL_List_corCmd --
  *
  *		This procedure is invoked to process the "lcor" command.
  *
@@ -227,7 +227,7 @@ ExtraL_LsubObjCmd(dummy, interp, objc, objv)
  */
 
 int
-ExtraL_LcorObjCmd(notUsed, interp, objc, objv)
+ExtraL_List_corObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;				 /* Not used. */
 	Tcl_Interp *interp;					/* Current interpreter. */
 	int objc;						/* Number of arguments. */
@@ -286,7 +286,7 @@ ExtraL_LcorObjCmd(notUsed, interp, objc, objv)
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_LremdupCmd --
+ * ExtraL_List_remdupCmd --
  *
  *		This procedure is invoked to process the "lremdup" command.
  *		It creates a subset of a list
@@ -299,7 +299,7 @@ ExtraL_LcorObjCmd(notUsed, interp, objc, objv)
  */
 
 int
-ExtraL_LremdupObjCmd(dummy, interp, objc, objv)
+ExtraL_List_remdupObjCmd(dummy, interp, objc, objv)
 	ClientData dummy;		/* Not used. */
 	Tcl_Interp *interp;		/* Current interpreter. */
 	int objc;			/* Number of arguments. */
@@ -391,7 +391,7 @@ ExtraL_LremdupObjCmd(dummy, interp, objc, objv)
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_LlremoveCmd --
+ * ExtraL_List_lremoveCmd --
  *
  *		This procedure is invoked to process the "llremove" command.
  *
@@ -403,7 +403,7 @@ ExtraL_LremdupObjCmd(dummy, interp, objc, objv)
  */
 
 int
-ExtraL_LlremoveObjCmd(notUsed, interp, objc, objv)
+ExtraL_List_lremoveObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;				 /* Not used. */
 	Tcl_Interp *interp;					/* Current interpreter. */
 	int objc;						/* Number of arguments. */
@@ -528,7 +528,7 @@ ExtraL_LlremoveObjCmd(notUsed, interp, objc, objv)
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_LunmergeCmd --
+ * ExtraL_List_unmergeCmd --
  *
  *		This procedure is invoked to process the "lunmerge" command.
  *
@@ -540,7 +540,7 @@ ExtraL_LlremoveObjCmd(notUsed, interp, objc, objv)
  */
 
 int
-ExtraL_LunmergeObjCmd(notUsed, interp, objc, objv)
+ExtraL_List_unmergeObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;				 /* Not used. */
 	Tcl_Interp *interp;					/* Current interpreter. */
 	int objc;						/* Number of arguments. */
@@ -599,7 +599,7 @@ ExtraL_LunmergeObjCmd(notUsed, interp, objc, objv)
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_LmergeCmd --
+ * ExtraL_List_mergeCmd --
  *
  *		This procedure is invoked to process the "lmerge" command.
  *
@@ -611,7 +611,7 @@ ExtraL_LunmergeObjCmd(notUsed, interp, objc, objv)
  */
 
 int
-ExtraL_LmergeObjCmd(notUsed, interp, objc, objv)
+ExtraL_List_mergeObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;				 /* Not used. */
 	Tcl_Interp *interp;					/* Current interpreter. */
 	int objc;						/* Number of arguments. */
@@ -682,7 +682,7 @@ ExtraL_LmergeObjCmd(notUsed, interp, objc, objv)
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_LreverseObjCmd --
+ * ExtraL_List_reverseObjCmd --
  *
  *		This procedure is invoked to process the "lreverse" command.
  *
@@ -694,7 +694,7 @@ ExtraL_LmergeObjCmd(notUsed, interp, objc, objv)
  */
 
 int
-ExtraL_LreverseObjCmd(notUsed, interp, objc, objv)
+ExtraL_List_reverseObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;				 /* Not used. */
 	Tcl_Interp *interp;					/* Current interpreter. */
 	int objc;						/* Number of arguments. */
@@ -725,7 +725,7 @@ ExtraL_LreverseObjCmd(notUsed, interp, objc, objv)
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_LchangeCmd --
+ * ExtraL_List_changeCmd --
  *
  *		This procedure is invoked to process the "lremdup" command.
  *		It creates a subset of a list
@@ -738,7 +738,7 @@ ExtraL_LreverseObjCmd(notUsed, interp, objc, objv)
  */
 
 int
-ExtraL_LchangeObjCmd(dummy, interp, objc, objv)
+ExtraL_List_changeObjCmd(dummy, interp, objc, objv)
 	ClientData dummy;		/* Not used. */
 	Tcl_Interp *interp;		/* Current interpreter. */
 	int objc;			/* Number of arguments. */

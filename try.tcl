@@ -49,7 +49,7 @@ structlget try tryingit98
 
 # 210
 time {
-structlset $try g try
+structlist_set $try g try
 }
 # 501 422
 time {
@@ -59,16 +59,16 @@ structlunset $try g
 set file temp
 #set file /data/test/ssu/temp
 time {
-set c [lreadfile $file]
+set c [lfile_read $file]
 set try [lindex $c 10]
 set try2 [lindex $c 11]
 }
 
 time {
-lwritefile temp2 $c
+list_writefile temp2 $c
 }
 
-proc readfile {file} {
+proc file_read {file} {
 	set f [open $file]
 	fconfigure $f -buffersize 100000
 	set c [read $f]
@@ -77,7 +77,7 @@ proc readfile {file} {
 }
 
 time {
-	set c [readfile $file]
+	set c [file_read $file]
 	set try [lindex $c 10]
 	set try2 [lindex $c 11]
 }
@@ -97,33 +97,29 @@ for {set i 0} {$i<5000} {incr i} {
 
 time {replace {thg th rty ty ey} {a $ t # y \\&}} 100
 
-time {lremove $try {b a}} 10
-time {lremove $big {1 4 5}} 10
-time {lremove {1 2 8067 3} $big} 10
+time {list_remove $try {b a}} 10
+time {list_remove $big {1 4 5}} 10
+time {list_remove {1 2 8067 3} $big} 10
 
-lmanip subindex {{a 1} {b 2} {c 3}} 1
+list_subindex {{a 1} {b 2} {c 3}} 1
 
-time {lremdup $try} 100
-time {lremdup $big}
+time {list_remdup $try} 100
+time {list_remdup $big}
 time {lmanip2 remdup $big}
 set temp $big
-ptime lremove temp 100 1000
+ptime list_remove temp 100 1000
 
-set list [lfind $try a]
-lsub {a b c d} {1 3}
-lsub {a b c d} -except {}
-ptime lsub $try $list
+set list [list_find $try a]
+list_sub {a b c d} {1 3}
+list_sub {a b c d} -except {}
+ptime list_sub $try $list
 set newtry [lsort $try]
-ptime lcor {a b c d e f g h i j} {f i g a h b c d e j}
-ptime lcor $try $newtry
-ptime lremove temp a
+ptime list_cor {a b c d e f g h i j} {f i g a h b c d e j}
+ptime list_cor $try $newtry
+ptime list_remove temp a
 
-set long [lmanip fill 10000 1 1]
-time {lregsub {c$} $long {!}}
-
-ffind -regexp -matches -allmatches [glob ../test/*] "\norg:(\[^\n\]*)\n"
-ffind -regexp -matches -allfiles [glob ../test/*] "\norg:(\[^\n\]*)\n" null
-ffind -regexp [glob ../test/*] "\norg:(\[^\n\]*)\n"
+set long [list_fill 10000 1 1]
+time {list_regsub {c$} $long {!}}
 
 load extral.so
 ssort -reflist {a a b a b c b a} {1 2 3 4 5 6 7 8}
@@ -132,23 +128,12 @@ set list1 {a {b sdf} c {d dsfg}}
 set list2 {c {d dsfg} {e sd} f}
 
 set try $list
-time {eval lremove try $args}
-
-ffind -regexp -matches -allfiles [glob test/*] "\norg:(\[^\n\]*)\n" ::NULL::
-
-ffind -regexp -matches -allfiles [glob test/*] "\norg:(\[^\n\]*)\n" ::NULL:: org "\nsrc:(\[^\n\]*)\n" none src
-ffind -regexp -allmatches -matches [glob test/*] "\norg:(\[^\n\]*)\n" org "\n(s..):" try
-ffind -regexp -matches -allfiles ::NULL:: [glob test/*] "\norg:(\[^\n\]*)\n"
-ffind -regexp -matches -allfiles {} [glob test/*] "\naut:(\[^\n\]*)\n" aut "\norg:(\[^\n\]*)\n" org
-
-ffind -regexp -matches -allmatches [glob test/*] "\nt2:(\[^\n\]*)\n"
-ffind -regexp -matches -allfiles null [glob test/*] "\nt2:(\[^\n\]*)\n"
-ffind -regexp [glob test/*] "\nt2:(\[^\n\]*)\n"
+time {eval list_remove try $args}
 
 ssort -dictionary -increasing -reflist {{org 2} {org 20} {org 10} {org 8}} {1 2 3 4}
 
 set try {dfg {gfxh j} "File dfg"}
-lshift try
+list_shift try
 set try
 
 package require Peos
@@ -171,7 +156,7 @@ proc Peos__button {event {object .}} {
 proc Peos__button {event {object .}} {
 	global table
 	set list [split $event "-"]
-	set last [lpop list]
+	set last [list_pop list]
 	foreach el $list {
 		if [info exists table($el)] {
 			append result $table(${el}M)-
@@ -218,11 +203,11 @@ proc Peos__bind {window patterns command {w {}}} {
 
 set try {a b c d e f g}
 set try {a {b c} d e {ff sfgh} g}
-lpop try 4
-lpop try
+list_pop try 4
+list_pop try
 time {
 	set try {a b c d e f g}
-	lpop try 1
+	list_pop try 1
 } 100
 puts $try
 
@@ -253,8 +238,8 @@ menu file.try
 	action Try "Trying" {puts try}
 }
 	set data [split $trydata "\n"]
-	set data [lremove $data {}]
-	set lines [lsub $data -exclude [lfind -regexp $data {^#}]]
+	set data [list_remove $data {}]
+	set lines [list_sub $data -exclude [list_find -regexp $data {^#}]]
 	foreach line $lines {
 		if [regexp {^menu} $line] {
 			set men [lindex $line 1]
@@ -262,9 +247,9 @@ menu file.try
 			menu $curmenu
 			set num 1
 		} else {
-			set type [lshift line]
-			set key [lshift line]
-			set text [lshift line]
+			set type [list_shift line]
+			set key [list_shift line]
+			set text [list_shift line]
 		}
 	}
 
