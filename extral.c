@@ -8,7 +8,7 @@
     ####      ###    ####   ######                   Peter De Rijk
     ________________________________________________________________________
 
-    File:    lfile.h
+    File:    extral.c
     Author:  Copyright © 1993 Peter De Rijk
     Purpose: extraL extension to Tcl
 */
@@ -24,8 +24,7 @@
 #include "tclRegexp.h"
   typedef enum {false,true,other} PBOOL;
 
-extern regexp *TclCompileRegexp(Tcl_Interp *interp,char *string);
-extern char *		tclRegexpError;
+extern Tcl_RegExp Tcl_RegExpCompile(Tcl_Interp *interp,char *string);
 
 typedef struct {
 	int number;
@@ -392,7 +391,7 @@ int Dcse_LfileCmd(ClientData clientData, Tcl_Interp *interp, int argc, char *arg
   if (regpattern==NULL) {
       L_pos->regexpPtr=NULL;
   } else {
-      L_pos->regexpPtr = TclCompileRegexp(interp, regpattern);
+      L_pos->regexpPtr = (regexp *)Tcl_RegExpCompile(interp, regpattern);
       if (L_pos->regexpPtr == NULL) {
 	  Tcl_AppendResult(interp, "error in regexp specifier", (char *) NULL);
 	  return(false);
@@ -439,11 +438,8 @@ int Dcse_LfileCmd(ClientData clientData, Tcl_Interp *interp, int argc, char *arg
   if (regexpPtr==NULL) {
       Tcl_AppendElement(interp, result);
   } else {
-      tclRegexpError = NULL;
-      match = TclRegExec(regexpPtr, result, result);
-      if (tclRegexpError != NULL) {
-	  Tcl_AppendResult(interp, "error while matching pattern: ",
-		    tclRegexpError, (char *) NULL);
+      match = Tcl_RegExpExec(interp,(Tcl_RegExp)regexpPtr, result, result);
+      if (match == -1) {
 	  return(false);
       }
       if (!match) {
@@ -943,8 +939,8 @@ Dcse_LmanipCmd(notUsed, interp, argc, argv)
 		    " extract ?list? ?expression?\"", (char *) NULL);
 	    return TCL_ERROR;
 	}
-	regexpPtr = TclCompileRegexp(interp, argv[3]);
-	if (regexpPtr==NULL) {
+       regexpPtr = (regexp *)Tcl_RegExpCompile(interp, argv[3]);
+       	if (regexpPtr==NULL) {
 	    Tcl_AppendResult(interp, "error in regexp expression", (char *) NULL);
 	    return TCL_ERROR;
 	}
@@ -955,11 +951,8 @@ Dcse_LmanipCmd(notUsed, interp, argc, argv)
 	nr=0;
 	while(nr<listArgc) {
 	    line=listArgv[nr];
-	    tclRegexpError = NULL;
-	    match = TclRegExec(regexpPtr, line, line);
-	    if (tclRegexpError != NULL) {
-	        Tcl_AppendResult(interp, "error while matching pattern: ",
-	  		tclRegexpError, (char *) NULL);
+	    match = Tcl_RegExpExec(interp,(Tcl_RegExp)regexpPtr, line, line);
+	    if (match == -1) {
 	        return TCL_ERROR;
 	    }
 	    if (!match) {
@@ -1448,3 +1441,5 @@ Dcse_RandomCmd(notUsed, interp, argc, argv)
     free(resultstring);
     return TCL_OK;
 }
+
+
