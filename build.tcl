@@ -1,6 +1,6 @@
 #!/bin/sh
 # the next line restarts using wish \
-exec tclsh7.5 "$0" "$@"
+exec tclsh7.6 "$0" "$@"
 #package require extral
 
 #set targetdir $env(HOME)/bin/[file tail [pwd]]

@@ -49,25 +49,26 @@ ffind -regexp [glob ../test/*] "\nt2:(\[^\n\]*)\n"
 */
 	Tcl_RegExp regexp;
 	char *start, *end;
-	FILE *file=NULL;
+	Tcl_Channel file;
 	char **argPtr;
 	int listArgc;
 	char **listArgv;
-	char *allfiles;
+	int allfiles;
 	int matches, allmatches, multiple, number;
 	int i, j, match, mode, index;
+	int step=2;
 
 	if (argc < 4) {
 		wrongNumArgs:
 		Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-			" ?switches? fileList pattern ?varName pattern varName ...?\"", (char *) NULL);
+			" ?switches? fileList pattern ?nullvalue? ?varName pattern ?nullvalue? varName ...?\"", (char *) NULL);
 		return TCL_ERROR;
 	}
 	argPtr = argv+1;
 	argc--;
 	matches = 0;
-	allmatches=0;
-	allfiles=NULL;
+	allmatches = 0;
+	allfiles = 0;
 	multiple = 0;
 	mode = EXACT;
 	while ((argc > 0) && (argPtr[0][0] == '-')) {
@@ -76,10 +77,14 @@ ffind -regexp [glob ../test/*] "\nt2:(\[^\n\]*)\n"
 		} else if (strcmp(argPtr[0], "-allmatches") == 0) {
 			allmatches = 1;
 		} else if (strcmp(argPtr[0], "-allfiles") == 0) {
+/*
 			argPtr++;
 			argc--;
 			if (argc==0) break;
 			allfiles = argPtr[0];
+*/
+			allfiles = 1;
+			step=3;
 		} else if (strcmp(argPtr[0], "-exact") == 0) {
 			mode = EXACT;
 		} else if (strcmp(argPtr[0], "-glob") == 0) {
@@ -106,15 +111,25 @@ ffind -regexp [glob ../test/*] "\nt2:(\[^\n\]*)\n"
 		Tcl_AppendResult(interp, "-allmatches only applicable with -matches options", (char *) NULL);
 		return TCL_ERROR;
 	}
-	if ((allfiles!=NULL)&&(matches==0)) {
+	if ((allfiles!=0)&&(matches==0)) {
 		Tcl_AppendResult(interp, "-allfiles only applicable with -matches options", (char *) NULL);
 		return TCL_ERROR;
 	}
-	if ((allmatches==1)&&(allfiles!=NULL)) {
+	if ((allmatches==1)&&(allfiles!=0)) {
 		Tcl_AppendResult(interp, "-allmatches and -allfiles not compatible", (char *) NULL);
 		return TCL_ERROR;
 	}
 	if (argc == 2) {
+		if (allfiles==1) goto wrongNumArgs;
+		multiple=0;
+		number=1;
+		if (mode == REGEXP) {
+			regexp=Tcl_RegExpCompile(interp, argPtr[1]);
+			if (regexp==NULL) {
+				return TCL_ERROR;
+			}
+		}
+	} else if ((allfiles==1)&&(argc == 3)) {
 		multiple=0;
 		number=1;
 		if (mode == REGEXP) {
@@ -126,8 +141,14 @@ ffind -regexp [glob ../test/*] "\nt2:(\[^\n\]*)\n"
 	} else if (argc > 2) {
 		multiple=1;
 		number=argc-1;
-		if ((2*(number/2))!=number) {
-			goto wrongNumArgs;
+		if (allfiles==0) {
+			if ((2*(number/2))!=number) {
+				goto wrongNumArgs;
+			}
+		} else {
+			if ((3*(number/3))!=number) {
+				goto wrongNumArgs;
+			}
 		}
 	} else {
 		goto wrongNumArgs;
@@ -140,31 +161,29 @@ ffind -regexp [glob ../test/*] "\nt2:(\[^\n\]*)\n"
 	index = -1;
 
 	if (multiple) {
-		for(j=0;j<number;j+=2) {
-			Tcl_SetVar(interp, argPtr[j+1], "", 0);
+		for(j=0;j<number;j+=step) {
+			Tcl_SetVar(interp, argPtr[j+step-1], "", 0);
 		}
 	}
 	for (i = 0; i < listArgc; i++) {
-		char *string, *search;
-		file=fopen(listArgv[i],"r");
+		Tcl_DString string;
+		char *search,*cstring;
+		file=Tcl_OpenFileChannel(interp,listArgv[i],"r",644);
 		if (file==NULL) {
-			fclose(file);
-			free(file);
-			Tcl_AppendResult(interp, "Couldn't open file ", listArgv[i], (char *) NULL);
 			return TCL_ERROR;
 		}
-		string=ExtraL_read_file(file);
-		if (string==NULL) {
-			fclose(file);
-			free(file);
-			continue;
+		Tcl_DStringInit(&string);
+		if (ExtraL_read_file(file,&string)==TCL_ERROR) {
+			return TCL_ERROR;
 		}
-		search=string;
-		for(j=0;j<number;j+=2) {
+		cstring=Tcl_DStringValue(&string);
+		search=cstring;
+		for(j=0;j<number;j+=step) {
+			int any=0;
 			if (multiple) {
 				regexp=Tcl_RegExpCompile(interp, argPtr[j]);
 				if (regexp==NULL) {
-					free(string);
+					Tcl_DStringFree(&string);
 					return TCL_ERROR;
 				}
 			}
@@ -178,7 +197,7 @@ ffind -regexp [glob ../test/*] "\nt2:(\[^\n\]*)\n"
 						match = Tcl_StringMatch(search, argPtr[j]);
 						break;
 					case REGEXP:
-						match = Tcl_RegExpExec(interp, regexp, search, string);
+						match = Tcl_RegExpExec(interp, regexp, search, cstring);
 						if (match < 0) {
 							ckfree((char *) listArgv);
 							return TCL_ERROR;
@@ -186,14 +205,20 @@ ffind -regexp [glob ../test/*] "\nt2:(\[^\n\]*)\n"
 						break;
 				}
 				if (match==0) {
-					if (allfiles!=NULL) {
-/*						Tcl_AppendElement(interp, listArgv[i]); */
-						Tcl_AppendElement(interp, allfiles);
+					if (any==0) {
+						if (allfiles!=0) {
+							if (multiple==0) {
+								Tcl_AppendElement(interp, argPtr[1]);
+							} else {
+								Tcl_SetVar(interp, argPtr[j+2], argPtr[j+1], TCL_APPEND_VALUE|TCL_LIST_ELEMENT);
+							}
+						}
 					}
 					break;
 				}
+				any=1;
 				if (multiple==0) {
-					if (allfiles==NULL) Tcl_AppendElement(interp, listArgv[i]);
+					if (allfiles==0) Tcl_AppendElement(interp, listArgv[i]);
 					if (matches == 1) {
 						Tcl_RegExpRange(regexp, 1, &start, &end);
 						if (start==NULL) {Tcl_AppendElement(interp, "");}
@@ -206,17 +231,17 @@ ffind -regexp [glob ../test/*] "\nt2:(\[^\n\]*)\n"
 						}
 					}
 				} else {
-					if (allfiles==NULL) Tcl_SetVar(interp, argPtr[j+1], listArgv[i], TCL_APPEND_VALUE|TCL_LIST_ELEMENT);
+					if (allfiles==0) Tcl_SetVar(interp, argPtr[j+1], listArgv[i], TCL_APPEND_VALUE|TCL_LIST_ELEMENT);
 					if (matches == 1) {
 						Tcl_RegExpRange(regexp, 1, &start, &end);
 						if (start==NULL) {
-							Tcl_SetVar(interp, argPtr[j+1], "", TCL_APPEND_VALUE|TCL_LIST_ELEMENT);
+							Tcl_SetVar(interp, argPtr[j+step-1], "", TCL_APPEND_VALUE|TCL_LIST_ELEMENT);
 						}
 						else {
 							char savedChar;
 							savedChar = *end;
 							*end = 0;
-							Tcl_SetVar(interp, argPtr[j+1], start, TCL_APPEND_VALUE|TCL_LIST_ELEMENT);
+							Tcl_SetVar(interp, argPtr[j+step-1], start, TCL_APPEND_VALUE|TCL_LIST_ELEMENT);
 							*end = savedChar;
 						}
 					}
@@ -225,8 +250,19 @@ ffind -regexp [glob ../test/*] "\nt2:(\[^\n\]*)\n"
 				search = end;
 			} /* while */
 		}
-		free(string);
-		fclose(file);
+		Tcl_DStringFree(&string);
+		if (Tcl_UnregisterChannel(interp, file) != TCL_OK) {
+			int len;
+			ckfree((char *) listArgv);
+			len = strlen(interp->result);
+			if ((len > 0) && (interp->result[len - 1] == '\n')) {
+				interp->result[len - 1] = '\0';
+			}   
+			return TCL_ERROR;
+		}
+		if (Tcl_Close(interp, file) != TCL_OK) {
+			return TCL_ERROR;
+		}
 	}
 	ckfree((char *) listArgv);
 	return TCL_OK;

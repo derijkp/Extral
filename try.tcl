@@ -1,3 +1,25 @@
+set auto_path {/home/peter/dev/Extral0.94 /home/peter/bin/Peos0.84 /usr/local/lib/tcl7.6 /usr/local/lib/tk4.2}
+package require Extral
+
+set list1 {a {b sdf} c {d dsfg}}
+set list2 {c {d dsfg} {e sd} f}
+
+set try $list
+time {eval lremove try $args}
+
+ffind -regexp -matches -allfiles [glob test/*] "\norg:(\[^\n\]*)\n" ::NULL::
+
+ffind -regexp -matches -allfiles [glob test/*] "\norg:(\[^\n\]*)\n" ::NULL:: org "\nsrc:(\[^\n\]*)\n" none src
+ffind -regexp -allmatches -matches [glob test/*] "\norg:(\[^\n\]*)\n" org "\n(s..):" try
+ffind -regexp -matches -allfiles ::NULL:: [glob test/*] "\norg:(\[^\n\]*)\n"
+ffind -regexp -matches -allfiles {} [glob test/*] "\naut:(\[^\n\]*)\n" aut "\norg:(\[^\n\]*)\n" org
+
+ffind -regexp -matches -allmatches [glob test/*] "\nt2:(\[^\n\]*)\n"
+ffind -regexp -matches -allfiles null [glob test/*] "\nt2:(\[^\n\]*)\n"
+ffind -regexp [glob test/*] "\nt2:(\[^\n\]*)\n"
+
+ssort -dictionary -increasing -reflist {{org 2} {org 20} {org 10} {org 8}} {1 2 3 4}
+
 set try {dfg {gfxh j} "File dfg"}
 lshift try
 set try

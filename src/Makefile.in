@@ -31,7 +31,7 @@ SRC_DIR =		@srcdir@
 CFLAGS = -g
 CC_SWITCHES = $(CFLAGS) $(SHLIB_CFLAGS) -I${TCL_GENERIC_DIR} -I$(TCL_UNIX_DIR) -I${TK_GENERIC_DIR} ${SHLIB_CFLAGS}
 
-OBJECTS = extral.o general.o lpop.o extralInit.o lfile.o nonl.o
+OBJECTS = extralInit.o extral.o lpop.o nonl.o supersort.o general.o
 
 all: extral${SHLIB_SUFFIX}
 
@@ -42,8 +42,8 @@ extratcl: tclAppInit.o $(OBJECTS)
 	$(CC) $(CC_SWITCHES) -o extratcl tclAppInit.o $(OBJECTS) ${TCL_LIB_SPEC} ${LIBS}
 
 clean:
-	rm -f *.o *${SHLIB_SUFFIX} config.cache config.log config.status lib.exp
-	rm -f core
+	rm -f *.o *${SHLIB_SUFFIX} config.cache config.log lib.exp
+	rm -f core ../core
 	rm -f ../extral$(SHLIB_SUFFIX) ../extral.dll ../win/*.obj ../win/*.csm
 
 Makefile: Makefile.in

@@ -4,10 +4,23 @@
 #
 # Copyright (c) 1996 Peter De Rijk
 #
-# See the file "README" for information on usage and redistribution
+# See the file "README.txt" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
 # =============================================================
+
+proc lload {filename} {
+	set f [open $filename "r"]
+	set result [split [read $f] "\n"]
+	close $f
+	return $result
+}
+
+proc lwrite {filename list} {
+	set f [open $filename "a"]
+	puts $f [join $list "\n"] nonewline
+	close $f
+}
 
 #proc lpop {ulist args} {
 #	upvar $ulist list
@@ -73,12 +86,12 @@ proc larrayset {array varlist valuelist} {
 	uplevel "array set $array \[lmanip join \[lmanip merge [list $varlist] [list $valuelist]\] \{ \} all\]"
 }
 
-proc leor {list1 list2} {
-	set cor [lcor $list1 $list2]
-	set exclusive [lfind $cor -1]
-	set join [lsub $cor -exclude $exclusive]
-	set result [lsub $list1 -exclude $join]
-	eval lappend result [lsub $list2 $exclusive]
+proc lcommon {args} {
+	set result [lpop args]
+	foreach arg $args {
+		set result [lsub $arg [lcor $arg $result]]
+	}
+	return [lmanip remdup $result]
 }
 
 proc lunion {args} {
@@ -86,12 +99,12 @@ proc lunion {args} {
 	return [lmanip remdup $result]
 }
 
-proc lcommon {args} {
-	set result [lpop args]
-	foreach arg $args {
-		set result [lsub $arg [lcor $arg $result]]
-	}
-	return [lmanip remdup $result]
+proc leor {list1 list2} {
+	set cor [lcor $list1 $list2]
+	set exclusive [lfind $cor -1]
+	set join [lsub $cor -exclude $exclusive]
+	set result [lsub $list1 -exclude $join]
+	eval lappend result [lsub $list2 $exclusive]
 }
 
 proc lremove {listref args} {
@@ -104,7 +117,7 @@ proc lremove {listref args} {
 	}
 	return $list
 }
-
+ 
 proc laddnew {listref args} {
 	upvar $listref list
 	if ![info exists list] {set list ""}
@@ -114,12 +127,6 @@ proc laddnew {listref args} {
 		}
 	}
 	return $list
-}
-
-proc lcorsort {list sortlist args} {
-	set sorted [eval lsort $args {$sortlist}]
-	set cor [lcor $sortlist $sorted]
-	return [lsub $list $cor]
 }
 
 # Code to let a variable iterate over a list

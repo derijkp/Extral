@@ -11,8 +11,5 @@
 typedef enum {false,true,other} PBOOL;
 PBOOL ExtraL_find_bool(char *string, char *trues,char *falses);
 char *ExtraL_numstr(int num);
-PBOOL ExtraL_read_string(FILE *file,char *place,int size);
 int *ExtraL_get_intlist(Tcl_Interp *interp, char *string, int *number, int min);
-PBOOL ExtraL_skip_lines(FILE *file,int number);
-char *ExtraL_read_line(FILE *file);
-char *ExtraL_read_file(FILE *file);
+int ExtraL_read_file(Tcl_Channel file, Tcl_DString *result);

@@ -12,6 +12,7 @@
 #include <malloc.h>
 #include "tcl.h"
 #include "general.h"
+
 /*------------------------------------------------------------------*/
 PBOOL ExtraL_find_bool(char *string, char *trues,char *falses)
 {
@@ -35,23 +36,6 @@ char *ExtraL_numstr(int num)
 	result=(char *)malloc((i+1)*sizeof(char));
 	sprintf(result, "%*d", i,	num);
 	return(result);
-}
-/*--------------------------------------------------------------------*/
-PBOOL ExtraL_read_string(FILE *file,char *place,int size)
-{
-	int l;
-	clearerr(file);
-	if (size==0) {
-		place[0]='\0';
-		return(true);
-	}
-	if (fgets(place,size+1,file)==NULL) return(false);
-	l=strlen(place)-1;
-	if (place[l]=='\n') {
-		place[l]='\0';
-		return(other);
-	} 
-	else return(true);
 }
 /*--------------------------------------------------------------------*/
 int *ExtraL_get_intlist(Tcl_Interp *interp, char *string, int *number, int min)
@@ -98,77 +82,20 @@ int *ExtraL_get_intlist(Tcl_Interp *interp, char *string, int *number, int min)
 	return(list);
 }
 /*------------------------------------------------------------------*/
-PBOOL ExtraL_skip_lines(FILE *file,int number)
-{
-	int i;
-	int ch;
-	if (number==0) return(true);
-	for (i=0;i<number;i++) {
-		do {
-			ch=getc(file);
-			} while ((ch!='\n')&&(ch!=EOF));
-		}
-		if (ch==EOF) {
-		clearerr(file);
-		return(false);
-	}
-	return(true);
-}
-/*--------------------------------------------------------------------*/
-char *ExtraL_read_line(FILE *file)
-{
-	PBOOL b;
-	char buffer[501];
-	char *result=NULL, *temp;
-	int bl=0;
-
-	do {
-		b=ExtraL_read_string(file,buffer,500);
-		if (b==false) break;
-		if (b==true) {
-			temp=(char *)realloc(result,((bl+1)*500+1)*sizeof(char));
-		}
-		else {
-			temp=(char *)realloc(result,(bl*500+strlen(buffer)+1)*sizeof(char));
-		}
-		if (temp==NULL) {
-			free(result);
-			return(NULL);
-		}
-		result=temp;
-		strcpy(result+(bl*500),buffer);
-		bl++;
-	} while (b==true);
-	return(result);
-}
-/*--------------------------------------------------------------------*/
 #define FILEBUFFER 1000
-char *ExtraL_read_file(FILE *file)
-{
-	PBOOL b;
-	char *result=NULL, *place, *temp;
-	int i, r, bl=0;
-	int end;
 
-	clearerr(file);
-	result=(char *)malloc((FILEBUFFER+1)*sizeof(char));
-	place=result;
+int ExtraL_read_file(Tcl_Channel file, Tcl_DString *result)
+{
+	char *temp;
+	int b;
+
+	temp=(char *)Tcl_Alloc((FILEBUFFER+1)*sizeof(char));
 	while(1) {
-		for(i=0;i<FILEBUFFER;i++) {
-			r=getc(file);
-			if (r==EOF) break;
-			if (r==0) break;
-			*place=r;
-			place++;
-		}
-		if (i!=FILEBUFFER) break;
-		bl++;
-		temp=(char *)realloc(result,((bl+1)*FILEBUFFER+1)*sizeof(char));
-		if (temp==NULL) {free(result);return(NULL);} else {result=temp;}
-		place=result+bl*FILEBUFFER;
-	} 
-	end=bl*FILEBUFFER+i;
-	result=(char *)realloc(result,(end+2)*sizeof(char));
-	result[end]='\0';
-	return(result);
+		b = Tcl_Read(file,temp,FILEBUFFER);
+		if (b==-1) {Tcl_Free(temp);return TCL_ERROR;}
+		Tcl_DStringAppend(result,temp,b);
+		if (b<FILEBUFFER) break;
+	}
+	Tcl_Free(temp);
+	return TCL_OK;
 }

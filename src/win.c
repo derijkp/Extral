@@ -2,6 +2,7 @@
 #include <sys\stat.h>
 #include "tcl.h"
 #include "dir.h"
+/*
 int
 ExtraL_MkdirCmd(notUsed, interp, argc, argv)
 	 ClientData notUsed;        	        /* Not used. */
@@ -73,6 +74,7 @@ ExtraL_RenameCmd(notUsed, interp, argc, argv)
 	if (err==0) {return TCL_OK;}
 	else {return TCL_ERROR;}
 }
+*/
 
 int
 ExtraL_ChmodCmd(notUsed, interp, argc, argv)
@@ -98,6 +100,7 @@ ExtraL_ChmodCmd(notUsed, interp, argc, argv)
 	else {return TCL_ERROR;}
 }
 
+/*
 int
 ExtraL_CpCmd(notUsed, interp, argc, argv)
 	 ClientData notUsed;        	        /* Not used. */
@@ -131,4 +134,5 @@ ExtraL_CpCmd(notUsed, interp, argc, argv)
 	fclose(src);
 	fclose(dst);
 }
+*/
 
