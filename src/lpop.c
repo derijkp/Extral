@@ -83,9 +83,6 @@ ExtraL_LpopCmd(notUsed, interp, argc, argv)
 		return TCL_ERROR;
     }
 
-    if (size == 0) {
-		return TCL_OK;
-    }
     if (size >= TCL_RESULT_SIZE) {
 		interp->result = (char *) ckalloc((unsigned) size+1);
 		interp->freeProc = TCL_DYNAMIC;
@@ -168,9 +165,6 @@ ExtraL_LshiftCmd(notUsed, interp, argc, argv)
 	element = string;
 	result = TclFindElement(interp, string, &element, &next, &size, &parenthesized);
 	if (result != TCL_OK) {return result;}
-	if (size == 0) {
-		return TCL_OK;
-	}
 	if (size >= TCL_RESULT_SIZE) {
 		interp->result = (char *) ckalloc((unsigned) size+1);
 		interp->freeProc = TCL_DYNAMIC;
