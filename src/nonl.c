@@ -42,11 +42,7 @@ ExtraL_FfindCmd(notUsed, interp, argc, argv)
 	int argc;								/* Number of arguments. */
 	char **argv;						/* Argument strings. */
 {
-/*
-ffind -regexp -matches -allmatches [glob ../test/*] "\norg:(\[^\n\]*)\n"
-ffind -regexp -matches -allfiles null [glob ../test/*] "\norg:(\[^\n\]*)\n"
-ffind -regexp [glob ../test/*] "\norg:(\[^\n\]*)\n"
-*/
+
 	Tcl_RegExp regexp;
 	char *start, *end;
 	Tcl_Channel file;

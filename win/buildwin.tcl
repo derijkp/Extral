@@ -2,11 +2,11 @@
 # the next line restarts using wish \
 exec tclsh7.5 "$0" "$@"
 #package require extral
-cd D:/peter/dev/Extral
-load D:/peter/dev/Extral/extral.dll
+cd C:/peter/dev/Extral
+load C:/peter/dev/Extral/extral.dll
 
 lappend auto_path [pwd]/lib
-set targetdir C:/tcl76/lib/Extral0.94
+set targetdir "C:/Program Files/tcl8.0/lib/Extral1a"
 
 proc access {mode pattern} {
 	set list [glob $pattern]
@@ -40,4 +40,4 @@ proc difaccess {filemode dirmode dir} {
 	file copy lib $targetdir
 	catch {file delete [file join $targetdir lib *~]}
 	difaccess 0644 0755 $targetdir
-
+exit
