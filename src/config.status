@@ -2,7 +2,7 @@
 # Generated automatically by configure.
 # Run this file to recreate the current configuration.
 # This directory was configured as follows,
-# on host peos:
+# on host belgarath:
 #
 # ./configure 
 #
@@ -62,7 +62,7 @@ s%@SHLIB_LD_LIBS@%%g
 s%@SHLIB_SUFFIX@%.so%g
 s%@SHLIB_VERSION@%%g
 s%@TCL_BUILD_LIB_SPEC@%-L/home/peter/tcl/tcl8.0/unix -ltcl8.0%g
-s%@TCL_LIBS@%-ldl  -lm%g
+s%@TCL_LIBS@%-ldl  -lieee -lm%g
 s%@TCL_VERSION@%8.0%g
 s%@TCL_SRC_DIR@%/home/peter/tcl/tcl8.0%g
 

@@ -418,8 +418,65 @@ proc leval {args} {
 
 #not really the same
 proc replace {string replacelist} {
-	foreach {pattern new} $replacelist {
-		regsub -all -- $pattern $string $new string
+	array set a $replacelist
+	foreach name [array names a] {
+		set fpos($name) [string first $name $string]
+		if {$fpos($name) == -1} {unset fpos($name)}
+	}
+	while 1 {
+		set names [array names fpos]
+		if {"$name" == ""} break
+		set name [lpop names]
+		set found $name
+		foreach name $names {
+			if {$fpos($name) < $fpos($found)} {
+				set found $name
+			}
+		}
+		set end [string range $string [expr {$fpos($found)+[string length $a($found)]+1}] end]
+		set string [string range $string 0 [expr {$fpos($found)-1}]]
+		append string $a($found)$end
+		set fpos($found) [string first $found $string]
+		if {$fpos($found) == -1} {unset fpos($found)}
+	}
+	return $string
+}
+
+#doc {convenience replace} cmd {
+#replace string replacelist
+#} descr {
+# replace some parts of a string<br>
+# replacelist gives alternating a substring to be replaced, and what it should be replaced by.
+# The command returns a string that is the given string where each occurence of the
+# substrings in the replacelist have been replaced.
+#}
+
+proc replace {string replacelist} {
+	array set a $replacelist
+	set rem $string
+	set string ""
+	while 1 {
+		set names [array names a]
+		if {"$names" == ""} break
+		set fpos [string length $rem]
+		foreach name $names {
+			set pos [string first $name $rem]
+			if {$pos == -1} {
+				unset a($name)
+			} elseif {$pos < $fpos} {
+				set found $name
+				set fpos $pos
+			}
+		}
+		if ![info exists found] {
+			append string $rem
+			break
+		}
+		append string [string range $rem 0 [expr {$fpos-1}]]
+		append string $a($found)
+		set rem [string range $rem [expr {$fpos+[string length $found]}] end]
+		if {"$rem" == ""} break
+		unset found
 	}
 	return $string
 }

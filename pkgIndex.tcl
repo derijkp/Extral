@@ -9,16 +9,20 @@
 
 namespace eval __temp [list set dir $dir]
 namespace eval __temp {
-	# $Format: "\tset version 0.$ProjectMajorVersion$$ProjectMinorVersion$"$
-	set version 0.93
+	# $Format: "\tset version 0.$ProjectMajorVersion$"$
+	set version 0.9
+	# $Format: "\tset minorversion $ProjectMinorVersion$"$
+	set minorversion 4
 	regsub -all {[ab]} $version {} version
 	set loadcmd {
 		package provide Extral @version@
 		namespace eval Extral {set dir @dir@}
 		source [file join @dir@ lib init.tcl]
 		namespace eval Extral {set version @version@}
+		namespace eval ::Extral {set minorversion @minorversion@}
 	}
 	regsub -all {@version@} $loadcmd [list $version] loadcmd
+	regsub -all {@minorversion@} $loadcmd [list $minorversion] loadcmd
 	regsub -all {@dir@} $loadcmd [list $dir] loadcmd
 	package ifneeded Extral $version $loadcmd
 }

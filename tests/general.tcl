@@ -456,6 +456,18 @@ test invoke {basic} {
 	invoke {a} {list $a $args} 1 2 3
 } {1 {2 3}}
 
+test replace {basic} {
+	replace "%W %%%W" {%% % %W $w}
+} {$w %$w}
+
+test replace {basic 2} {
+	replace {tkButtonEnter %W} {%W {[::class::bind %W]}}
+} {tkButtonEnter [::class::bind %W]}
+
+test replace {basic 3} {
+	replace {tkButtonEnter [::class::bind %W]} {{[::class::bind %W]} %W}
+} {tkButtonEnter %W}
+
 # no test yet for
 # ffind <switches> filelist pattern ?varName? ?pattern? ?varname?
 # ffind -matches -allfiles <switches> filelist pattern nulvalue ?varName? ?pattern? ?nulvalue? ?varname? ..

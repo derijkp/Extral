@@ -101,7 +101,7 @@ test structlset-types {regexp: not enough arguments} {
 	set struct {a {*regexp}}
 	set try {}
 	structlset -struct $struct $try a try
-} {error: wrong number of arguments in structure "*regexp" at field "a"} 1
+} {error: wrong number of arguments in structure "*regexp": should be "*regexp pattern errormsg default" at field "a"} 1
 
 test structlset-types {between: ok} {
 	set struct {a {*between 0 10 ?}}

@@ -19,6 +19,14 @@
 	first given by literate.
 
 <b><dt>
+replace string replacelist
+</b><dd>
+ replace some parts of a string<br>
+ replacelist gives alternating a substring to be replaced, and what it should be replaced by.
+ The command returns a string that is the given string where each occurence of the
+ substrings in the replacelist have been replaced.
+
+<b><dt>
 invoke vars cmd ...
 </b><dd>
  invoke simply evals $cmd in a private space. This eg. allows using

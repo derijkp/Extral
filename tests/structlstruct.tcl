@@ -434,7 +434,7 @@ test structlunset-struct {basic one in list subfield} {
 	set struct {a {*list {a {*any ?}}} b {*int ?}}
 	set try {a {{a a} {a b}} b 2}
 	Extral::structlunset -struct $struct $try {a 0 a}
-} {a {{a b}} b 2}
+} {a {{} {a b}} b 2}
 
 test structlset-struct {parameters} {
 	set struct {*any {}}
