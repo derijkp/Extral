@@ -6,6 +6,9 @@
 
 int Extral_taglInit _ANSI_ARGS_((Tcl_Interp *interp));
 
+extern int	ExtraL_LevalObjCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]));
+
 extern int ExtraL_LpopObjCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int objc, Tcl_Obj *argv[]));
 
@@ -110,7 +113,9 @@ Extral_Init(interp)
 	Tcl_CreateObjCommand(interp,"taglfind",(Tcl_ObjCmdProc *)ExtraL_TaglfindObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"scantime",(Tcl_ObjCmdProc *)ExtraL_ScanTimeObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"formattime",(Tcl_ObjCmdProc *)ExtraL_FormatTimeObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"leval",(Tcl_ObjCmdProc *)ExtraL_LevalObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Extral_taglInit(interp);
+	Extral_DbmInit(interp);
 
 /*	dld_AddTclCommand(interp, "ffind", ExtraL_FfindCmd); */
 	dld_AddTclCommand(interp, "amanip", ExtraL_AmanipCmd);

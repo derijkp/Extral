@@ -9,7 +9,15 @@
 
 #include "tcl.h"
 
-int ExtraL_TaglScanTimeObj(interp,musthavedate,musthavetime,dateObj,resultPtr)
+/*
+ *----------------------------------------------------------------------
+ *
+ * ScanTime C API
+ *
+ *----------------------------------------------------------------------
+ */
+
+int ExtraL_TaglScanTime(interp,musthavedate,musthavetime,dateObj,resultPtr)
 	Tcl_Interp *interp;
 	int musthavedate;
 	int musthavetime;
@@ -313,7 +321,7 @@ ExtraL_ScanTimeObjCmd(notUsed, interp, objc, objv)
 	int error;
 
 	if ((objc != 2)&&(objc != 3)) {
-		Tcl_WrongNumArgs(interp, 1, objv, " time ?date/time/both?");
+		Tcl_WrongNumArgs(interp, 1, objv, "time ?date/time/both?");
 		return TCL_ERROR;
 	}
 
@@ -333,11 +341,19 @@ ExtraL_ScanTimeObjCmd(notUsed, interp, objc, objv)
 		musthavedate = 1;
 		musthavetime = 0;
 	}
-	error = ExtraL_TaglScanTimeObj(interp,musthavedate,musthavetime,objv[1],&result);
+	error = ExtraL_TaglScanTime(interp,musthavedate,musthavetime,objv[1],&result);
 	if (error != TCL_OK) {return error;}
 	Tcl_SetObjResult(interp,Tcl_NewDoubleObj(result));
 	return TCL_OK;
 }
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * FormatTime C API
+ *
+ *----------------------------------------------------------------------
+ */
 
 int
 ExtraL_FormatTime(Tcl_Interp *interp, double time, char *format, char **result)
@@ -535,10 +551,10 @@ ExtraL_FormatTime(Tcl_Interp *interp, double time, char *format, char **result)
 
 int
 ExtraL_FormatTimeObjCmd(notUsed, interp, objc, objv)
-	ClientData notUsed;				 /* Not used. */
-	Tcl_Interp *interp;					/* Current interpreter. */
-	int objc;						/* Number of arguments. */
-	Tcl_Obj *CONST objv[];	/* Argument objects. */
+	ClientData notUsed;
+	Tcl_Interp *interp;
+	int objc;
+	Tcl_Obj *CONST objv[];
 {
 	char *format, *result;
 	double time;
@@ -546,7 +562,7 @@ ExtraL_FormatTimeObjCmd(notUsed, interp, objc, objv)
 	int error;
 
 	if ((objc != 2)&&(objc != 3)) {
-		Tcl_WrongNumArgs(interp, 1, objv, " time ?formatstring?");
+		Tcl_WrongNumArgs(interp, 1, objv, "time ?formatstring?");
 		return TCL_ERROR;
 	}
 

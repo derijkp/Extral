@@ -3,7 +3,7 @@ source tools.tcl
 
 proc testtime {time} {
 	set descr "scan and format: $time"
-	set cmd "formattime \[scantime \{$time\}\] \"%e %b %Y %H:%M:%S:%s\""
+	set cmd "formattime \[scantime \{$time\}\] \"%e %b %Y %H:%M:%S\""
 	uplevel 0 {test scantime $descr $cmd $time}
 }
 
@@ -14,7 +14,6 @@ test scantime {scan: 1 Jan 0001} {
 test scantime {scan: 1 Jan 0001 0:0:10} {
 	scantime {1 Jan 0001 0:0:10}
 } {10.0}
-
 test scantime {scan: 2 Jan 0001} {
 	scantime {2 Jan 0001}
 } {86400.0}
@@ -135,20 +134,26 @@ test scantime {date: schrikkeljaar 1996} {
 	formattime [scantime {29 Feb 1996}]
 } {1996 Feb 29 00:00:00}
 
-testtime {1 Jan 0001 BC 00:00:00:01}
-testtime {1 Jan 0001 BC 00:00:00:00}
-testtime {5 Jan 0001 BC 00:00:00:00}
-testtime {1 Jan 0001 00:00:00:00}
-testtime {31 Dec 0050 BC 00:00:00:00}
-testtime {1 Jan 0050 00:00:00:00}
-testtime {1 Jan 0100 BC 00:00:00:00}
-testtime {1 Jan 1500 BC 00:00:00:00}
-testtime {1 Apr 0050 BC 23:59:59:99}
-testtime {18 Mar 15000 BC 15:00:00:00}
-testtime {18 Mar 15000 15:00:00:00}
+test scantime {date: schrikkeljaar 1996} {
+	formattime [scantime {09/08/1996 0:0:0}]
+} {1996 Sep 08 00:00:00}
 
 test formattime {} {
 	formattime [scantime {29 Feb 1996 17:30:15:80}] "%% %Y %d %e %j %m %b %B %H %M %S %s"
 } {% 1996 29 29 060 02 Feb February 17 30 15 80}
+
+testtime {1 Jan 0001 BC 00:00:00}
+testtime {5 Jan 0001 BC 00:00:00}
+testtime {1 Jan 0001 00:00:00}
+testtime {31 Dec 0050 BC 00:00:00}
+testtime {1 Jan 0050 00:00:00}
+testtime {1 Jan 0100 BC 00:00:00}
+testtime {1 Jan 1500 BC 00:00:00}
+testtime {1 Apr 0050 BC 23:59:59}
+testtime {18 Mar 15000 BC 15:00:00}
+testtime {18 Mar 15000 15:00:00}
+testtime {1 Jun 0003 00:00:00}
+testtime {9 May 1997 12:30:24}
+testtime {9 May 1997 12:30:24}
 
 testsummarize

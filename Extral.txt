@@ -2,6 +2,15 @@ ExtraL Commands
 ===============  extra list manipulation commands for Tcl
                  by Peter De Rijk (Universiteit Antwerpen) 
 
+	- General list manipulation commands
+	- Tagged lists
+	- Date and time
+	- Convenience functions
+	- Other commands
+	- Dbm frontend
+
+General list manipulation commands
+----------------------------------
 lregsub ?switches? exp list subSpec
 	does a regsub for each element in the list, and returns the resulting list.
 	eg.
@@ -137,70 +146,6 @@ lpop listName ?pos?
 lshift listName
 	returns the first element from a list, thereby removing it from the list.
 
-ffind <switches> filelist pattern ?varName? ?pattern? ?varname?
-	returns the files in filelist whose content match the given pattern.
-	if varName is given, the results will be stored in this variable.
-	several patterns can be searched, the results for each being stored
-	in the apropriate variable.
-	<switches> can be -matches, -all -exact, -glob, or -regexp
-		-matches    : the text matched by the bracketed part of 
-		              the pattern will be mangled into the result. 
-		-allmatches : all matches in the file will be returned in
-		              the form of: 
-		              file1 match1 file1 match2 file2 match2
-		-allfiles   : see next
-ffind -matches -allfiles <switches> filelist pattern nulvalue ?varName? ?pattern? ?nulvalue? ?varname? ..
-	ffind with these options will return a list containing one element
-	for each file in the filelist. if the pattern was found in a file,
-	the the element contains the match; if it was not found, it will
-	contain the nulvalue. This is not compatible with the -allmatches
-	options
-
-ssort ?-ascii? ?-integer? ?-real? ?-increasing? ?-decreasing? ?-dictionary? ?-command string? ?-reflist list? list
-	enhanced lsort:
-		by D. Richard Hipp -- drh@tobit.vnet.net -- 704.948.4565 :
-			- re-entrant and thread-safe: eg. ssort can be used in its
-			  own -command proc
-				- 10% faster
-			- option -dictionary: Using -dict, "B" comes in between
-			  "a" and "b".  Also "x10" comes after "x9" 
-		by Peter De Rijk :
-			extra option -reflist: sort the elements in the list according
-			to the comparisons of the corresponding elements in the 
-			reflist.
-
-Tagged lists
-------------
-In a tagged list tags alternate with the value attached to this tag, 
-eg.: {tag1 {value of tag1} tag2 {value of tag2} ...}
-Using the tagged list commands, you can use a list as a sort of array.
-However, tagged lists have some advantages to arrays:
- - They can be passed to functions easily
- - an element of a tagged list can contain another tagged list, etc.
- - although finding a value in an array should be faster,
-   creating the array can take more time.
-
-taglset list tag value
-	set the value for tag
-	eg.:
-		% set list {a 1 b 4}
-		a 1 b 4
-		% set list [taglset $list c 3]
-		a 1 b 4 c 3
-		% taglset {a 1 b 4 c 3} b 2
-		a 1 b 2 c 3
-
-
-taglget list tag ?default?
-taglunset list tag
-taglfields list ?valueVar?
-
-
-Commands in extral.tcl
-----------------------
-There are also some extra listprocessing commands written in tcl in the 
-package. Some use the commands written in C:
-
 lload <filename>
 	returns all lines in the specified files as a list 
 
@@ -241,7 +186,97 @@ literate variableName list
 	variable. Every 'lnext variableName' will puts the next element into the 
 	variable.
 
-struct
+Tagged lists
+------------
+In a tagged list tags alternate with the value attached to this tag, 
+eg.: {tag1 {value of tag1} tag2 {value of tag2} ...}
+Using the tagged list commands, you can use a list as a sort of array.
+However, tagged lists have some advantages to arrays:
+ - They can be passed to functions easily
+ - tagged lists can be nested: an element of a tagged list can 
+   contain another tagged list, etc.
+ - although finding a value in an array should be faster,
+   creating the array can take more time.
+ - tagged list can be handled according to a certain structure
+
+taglset ?-struct schema? list taglist value
+taglget ?-struct schema? list taglist
+taglunset list tag
+taglfields list ?valueVar?
+	examples.:
+	set the value for tag
+		% set list {a 1 b 4}
+		a 1 b 4
+		% set list [taglset $list c 3]
+		a 1 b 4 c 3
+		% taglset {a 1 b 4 c 3} b 2
+		a 1 b 2 c 3
+	example of nesting:
+		% taglset {a 1 b {a 1 b 4} c 3} {b b} 2
+		a 1 b {a 1 b 2} c 3
+	example of structure:
+		% set struct {
+			reg {*regexp {^a[0-9]} ?}
+			sub {
+				a {*any ?}
+				b {*between 0 10 ?}
+			}
+			ints {
+				* {*int ?}
+			}
+		}
+		% set data {}
+		% set data [taglset -struct $struct $data {sub b} 9]
+		sub {b 9}
+		% set data [taglset -struct $struct $data {sub b} 11]
+		error: 11 is not between 0 and 10
+		% set data [taglset -struct $struct $data ints {a 9}]
+		sub {b 9} ints {a 9}
+		% set data [taglset -struct $struct $data {sub b} ?]
+		ints {a 9}
+		% taglget -struct $struct $data {sub b}
+		?
+
+Date and time
+-------------
+	The scantime transforms a string containing date and/or time into a 
+	double value (number of seconds since 0). These values can
+	be sorted, compared or stored, and transformed back into a human readable
+	date and time string using the formattime command. The clock scan and
+	format commands in Tcl give up before somewhere before 1901 and after
+	2037, which is a bit of a bummer (eg. for genealogy). The transformation
+	takes into account leap-years properly (I hope). However, it extrapolated
+	the current rule to the past (so eg. 0004 BC is a leap year), and doesn't
+	take into account the meddling that has happened to time over 
+	time (missing days, ...). I don't know enough about that to do this
+	correctly.
+
+	scantime time ?date/time/both?
+		!! the year should be specified fully (>=4 numbers)
+		eg.:
+			% scantime {9 May 1997 12:30}
+			62998777800.0
+	formattime time ?formatstring?
+		!! not all options of clock scan are supported
+		%% : %
+		%Y : year
+		%d : day (09)
+		%e : day (9)
+		%j : day of year
+		%m : month number
+		%b : abbreviated month name
+		%B : full month name
+		%H : hour
+		%M : minute
+		%S : second
+		%s : hundreds of a second
+		eg.:
+			% formattime 62998777800.0
+			1997 May 09 12:30:00
+			% formattime 62998777800.0 "%B %e %Y"
+			May 9 1997
+
+Struct
 ------
 	This code emulates structures in a way. all data is actually stored in 
 	one global array extraL__Struct. You cannot use the generic array command 
@@ -324,6 +359,15 @@ rm		remove files
 
 Other commands
 --------------
+leval command $args
+	converted the leval patch by Viktor Dukhovni <viktor@esm.com> to
+	a dynamically loadable version:
+	This command is a fast light "eval" specifically designed to execute
+	zero or more Tcl lists (concatenated) by invoking the command specified
+	by the first list element, with the remaining list elements as "literal"
+	arguments.  No variable or command substitution takes place on the
+	arguments.
+
 atexit add command
 	adds a command to the atexit handler: This command will be executed when
 	the program exits. It can be used to do a cleanup. This command redefines
@@ -338,3 +382,66 @@ tempfile ?get?
 
 tempfile clean
 	remove all temporary files for the running program.
+
+ffind <switches> filelist pattern ?varName? ?pattern? ?varname?
+	returns the files in filelist whose content match the given pattern.
+	if varName is given, the results will be stored in this variable.
+	several patterns can be searched, the results for each being stored
+	in the apropriate variable.
+	<switches> can be -matches, -all -exact, -glob, or -regexp
+		-matches    : the text matched by the bracketed part of 
+		              the pattern will be mangled into the result. 
+		-allmatches : all matches in the file will be returned in
+		              the form of: 
+		              file1 match1 file1 match2 file2 match2
+		-allfiles   : see next
+ffind -matches -allfiles <switches> filelist pattern nulvalue ?varName? ?pattern? ?nulvalue? ?varname? ..
+	ffind with these options will return a list containing one element
+	for each file in the filelist. if the pattern was found in a file,
+	the the element contains the match; if it was not found, it will
+	contain the nulvalue. This is not compatible with the -allmatches
+	options
+
+ssort ?-ascii? ?-integer? ?-real? ?-increasing? ?-decreasing? ?-dictionary? ?-command string? ?-reflist list? list
+	enhanced lsort:
+		by D. Richard Hipp -- drh@tobit.vnet.net -- 704.948.4565 :
+			- re-entrant and thread-safe: eg. ssort can be used in its
+			  own -command proc
+				- 10% faster
+			- option -dictionary: Using -dict, "B" comes in between
+			  "a" and "b".  Also "x10" comes after "x9" 
+		by Peter De Rijk :
+			extra option -reflist: sort the elements in the list according
+			to the comparisons of the corresponding elements in the 
+			reflist.
+
+Dbm frontend
+------------
+dbm support that can have different backends: availble backend systems are
+	fdbm: file system based; slow but easy, relatively safe and very portable
+	gdbm: using the gdbm routines; as a loadable module (gdbm.so)
+	bsddbm: using the bsd db routines; as a loadable module (bsddbm.so)
+			 this seems to be the faster and most reliable than gdbm
+New backends can be added (in C) using the ExtraL_DbmCreateType function.
+The database code can also be used from C using the ExtraL_DbmOpen function.
+
+dbm command
+	dbm types
+		list the available type of database systems; fdbm is provided,
+		gdbm and bsddbm are dynamically loadable
+	dbm create type database ?mode?
+		create a database of the given type (fdbm, gdbm, bsddbm) in 
+		the "file" database. the optional mode gives the permissions 
+		in integer form. The database is not opened by this command.
+	dbm open type dbcmd database ?read/write?
+		open a database for reading (read = default) or reading and 
+		writing (write).
+		type: the type of the database (fdbm, gdbm, bsddbm).
+		dbcmd: the command by which the opened database can be queried
+		database: place of the database in the filing system
+database commands: The dbmcmd created by the "dbm create" above will 
+have the following options:
+	dbmcmd set key value
+		set key in the database to value.
+	dbmcmd get key
+		get the value associated with key from the database.

@@ -12,14 +12,17 @@ extension was originally written to overcome this problem. With the
 advent of the Tcl byte compiler, the performance is not such a great 
 issue any longer, but I still find many of the functions very
 convenient, and some of those that were now rewritten using the
-object system in C are still faster.
+object system in C are still faster. Extral is also growing into
+my own generally useful library.
 
-All functions in Extral.txt are now available in Tcl-only form as well.
+Most functions in Extral.txt are now available in Tcl-only form as well.
 Using the C code just gives a speedup. Several of the functions are now
 only in Tcl.
 
 Documentation is still rather scarce unfortunately. You can find a short
-description of all commands in the extral.txt file
+description of the commands in the extral.txt file. For some of the 
+commands, you can find out a lot by checking the testing suite in the 
+directory tests.
 
 INCOMPATIBLE CHANGES
 --------------------

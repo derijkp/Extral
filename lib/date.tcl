@@ -157,7 +157,7 @@ proc formattime {time {format {%Y %b %d %H:%M:%S}}} {
 	set days [expr int($time/86400.0)]
 	set year [expr int($days/365.25)]
 	while 1 {
-		set i [expr $year+1;]
+		set i [expr $year+1]
 		set i [expr $i*365+int($i/4)-int($i/100)+int($i/400)]
 		if $bc {
 			if {$i>=$days} break
@@ -239,7 +239,7 @@ proc formattime {time {format {%Y %b %d %H:%M:%S}}} {
 	set seconds [expr {$seconds - ($min*60.0)}]
 	set sec [expr {int($seconds)}]
 	set seconds [expr {$seconds - $sec}]
-	set ms [expr {int($seconds*100)}]
+	set ms [expr {round($seconds*100)}]
 
 	set buffer ""
 	set pos 0

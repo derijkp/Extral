@@ -162,7 +162,7 @@ test taglset-struct {proc} {
 	taglset -struct $struct $try a 11
 } {a try:11}
 
-test taglset-struct {proc with argument} {
+test taglset-struct {proc with argument: set} {
 	namespace eval ::Extral {
 		proc setproc {arg default value} {
 			return "$arg:$value"
@@ -184,7 +184,7 @@ test taglget-struct {proc} {
 	taglget -struct $struct $try a
 } {try:10}
 
-test taglget-struct {proc with argument} {
+test taglget-struct {proc with argument: get} {
 	namespace eval ::Extral {
 		proc getproc {arg default value} {
 			return "$arg:$value"
@@ -193,19 +193,43 @@ test taglget-struct {proc with argument} {
 	set struct {a {*proc t ?}}
 	set try {a 10}
 	taglget -struct $struct $try a
-} {a t:10}
+} {t:10}
 
-test taglset-struct {date} {
+test taglset-struct {set date} {
 	set struct {a {*date t ?}}
 	set try {}
-	taglset -struct $struct $try a 10
-} {try}
+	taglset -struct $struct $try a {9 May 1997}
+} {a 62998732800.0}
 
-test taglget-struct {date} {
+test taglset-struct {set date 2} {
 	set struct {a {*date t ?}}
-	set try {a 10}
+	set try {}
+	taglset -struct $struct $try a {05/09/1997}
+} {a 62998732800.0}
+
+test taglget-struct {get date} {
+	set struct {a {*date t ?}}
+	set try {a 62998732800.0}
 	taglget -struct $struct $try a
-} {try}
+} {9 May 1997}
+
+test taglset-struct {set time} {
+	set struct {a {*time t ?}}
+	set try {}
+	taglset -struct $struct $try a {9 May 1997 12:30:24}
+} {a 62998777824.0}
+
+test taglset-struct {set time 2} {
+	set struct {a {*time t ?}}
+	set try {}
+	taglset -struct $struct $try a {05/09/1997 12:30:24}
+} {a 62998777824.0}
+
+test taglget-struct {get time} {
+	set struct {a {*time t ?}}
+	set try {a 62998777824.0}
+	taglget -struct $struct $try a
+} {9 May 1997 12:30:24}
 
 
 testsummarize

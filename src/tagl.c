@@ -169,10 +169,15 @@ int ExtraL_TaglSetDate(interp,substructure,value)
 	Tcl_Obj *substructure;
 	Tcl_Obj **value;
 {
+	double result;
 	int temp, error;
 
-	error = Tcl_GetIntFromObj(interp,*value,&temp);
+	error = ExtraL_TaglScanTime(interp,1,0,*value,&result);
 	if (error != TCL_OK) {return error;}
+	if Tcl_IsShared(*value) {
+		*value = Tcl_DuplicateObj(*value);
+	}
+	Tcl_SetDoubleObj(*value,result);
 	return TCL_OK;
 }
 
@@ -181,6 +186,57 @@ int ExtraL_TaglGetDate(interp,substructure,value)
 	Tcl_Obj *substructure;
 	Tcl_Obj **value;
 {
+	double time;
+	char *result;
+	int error;
+
+	error = Tcl_GetDoubleFromObj(interp,*value,&time);
+	if (error != TCL_OK) {
+		Tcl_ResetResult(interp);
+		Tcl_AppendResult(interp,"time should be a double", (char *)NULL);
+		return TCL_ERROR;
+	}
+	error = ExtraL_FormatTime(interp,time,"%e %b %Y",&result);
+	if (error != TCL_OK) {return error;}
+	*value = Tcl_NewStringObj(result,strlen(result));
+	return TCL_OK;
+}
+
+int ExtraL_TaglSetTime(interp,substructure,value)
+	Tcl_Interp *interp;
+	Tcl_Obj *substructure;
+	Tcl_Obj **value;
+{
+	double result;
+	int temp, error;
+
+	error = ExtraL_TaglScanTime(interp,1,1,*value,&result);
+	if (error != TCL_OK) {return error;}
+	if Tcl_IsShared(*value) {
+		*value = Tcl_DuplicateObj(*value);
+	}
+	Tcl_SetDoubleObj(*value,result);
+	return TCL_OK;
+}
+
+int ExtraL_TaglGetTime(interp,substructure,value)
+	Tcl_Interp *interp;
+	Tcl_Obj *substructure;
+	Tcl_Obj **value;
+{
+	double time;
+	char *result;
+	int error;
+
+	error = Tcl_GetDoubleFromObj(interp,*value,&time);
+	if (error != TCL_OK) {
+		Tcl_ResetResult(interp);
+		Tcl_AppendResult(interp,"time should be a double", (char *)NULL);
+		return TCL_ERROR;
+	}
+	error = ExtraL_FormatTime(interp,time,"%e %b %Y %H:%M:%S",&result);
+	if (error != TCL_OK) {return error;}
+	*value = Tcl_NewStringObj(result,strlen(result));
 	return TCL_OK;
 }
 
@@ -217,6 +273,7 @@ int Extral_taglInit(interp)
 	ExtraL_TaglCreateType(interp,"*between",(ExtraL_TaglTypeProc *)ExtraL_TaglSetBetween,(ExtraL_TaglTypeProc *)NULL);
 	ExtraL_TaglCreateType(interp,"*dbetween",(ExtraL_TaglTypeProc *)ExtraL_TaglSetDBetween,(ExtraL_TaglTypeProc *)NULL);
 	ExtraL_TaglCreateType(interp,"*date",(ExtraL_TaglTypeProc *)ExtraL_TaglSetDate,(ExtraL_TaglTypeProc *)ExtraL_TaglGetDate);
+	ExtraL_TaglCreateType(interp,"*time",(ExtraL_TaglTypeProc *)ExtraL_TaglSetTime,(ExtraL_TaglTypeProc *)ExtraL_TaglGetTime);
 }
 
 int ExtraL_TaglsetValidate(interp,substructure,ctag,clen,value) 
