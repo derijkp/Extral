@@ -8,6 +8,7 @@
 # full path name of this file's directory.
 
 package ifneeded extral 0.94 [subst {
-load [file join $dir extral[info sharedlibextension]]
-source [file join $dir extral.tcl]
+	load [file join $dir extral[info sharedlibextension]]
+	lappend auto_path [file join $dir lib]
+	package provide extral 0.94
 }]

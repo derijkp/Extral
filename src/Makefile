@@ -31,7 +31,7 @@ CC_SWITCHES =	${CFLAGS} -I./ -I${TCL_DIR} -I${TCL_DIR2}
 all: extral.so
 
 extral.so: extral.o extralInit.o
-	$(LD) -o ../inst/extral.so -shared extral.o extralInit.o
+	$(LD) -o ../extral.so -shared extral.o extralInit.o
 
 extratcl: tclAppInit.o extral.o extralInit.o
 	$(CC) -g -o extratcl tclAppInit.o extral.o extralInit.o ${LIBS}
@@ -39,10 +39,10 @@ extratcl: tclAppInit.o extral.o extralInit.o
 install: extral.so
 	mkdir $(INST_DIR)
 	cp extral.so $(INST_DIR)
-	cp ../inst/extral.tcl $(INST_DIR)
-	cp ../inst/pkgIndex.tcl $(INST_DIR)
-	cp ../inst/extral.txt $(INST_DIR)
-	cp ../inst/readme $(INST_DIR)
+	cp -r ../lib $(INST_DIR)
+	cp ../pkgIndex.tcl $(INST_DIR)
+	cp ../extral.txt $(INST_DIR)
+	cp ../readme $(INST_DIR)
 
 depend:
 	makedepend -- $(CC_SWITCHES) -- $(SRCS)

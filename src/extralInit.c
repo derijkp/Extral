@@ -39,6 +39,7 @@ extern int ExtraL_RandomCmd _ANSI_ARGS_((ClientData clientData,
 extern int ExtraL_AmanipCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
 
+extern int ExtraL_AtexitCmd _ANSI_ARGS_((ClientData clientData));
 
 int
 Extral_Init(interp)

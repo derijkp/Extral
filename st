@@ -1,1 +1,1 @@
-edit [pwd]/src/extral.c [pwd]/inst/extral.tcl [pwd]/inst/extral.txt [pwd]/src/Makefile
+eval edit [glob [pwd]/lib/*.tcl] [glob [pwd]/src/*.c] [pwd]/extral.txt [pwd]/src/Makefile
