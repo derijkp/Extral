@@ -15,10 +15,14 @@
 #} descr {
 #	returns a list of all filenames in directory dir mathing the given pattern
 #}
-proc dirglob {dir pattern} {
+proc dirglob {dir pattern args} {
 	set pwd [pwd]
 	if [catch {cd $dir}] {return ""}
-	set result [glob -nocomplain -- $pattern]
+	if {[llength $args]} {
+		set result [eval {glob -nocomplain -- $pattern} $args]
+	} else {
+		set result [glob -nocomplain -- $pattern]
+	}
 	cd $pwd
 	return $result
 }
