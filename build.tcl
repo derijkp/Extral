@@ -135,7 +135,10 @@ proc build {targetdir} {
 	}
 	file mkdir $targetdir
 
-	file copy README extral.so pkgIndex.tcl $targetdir		
+	file copy README pkgIndex.tcl $targetdir		
+	if [catch {file copy extral.so $targetdir}] {
+		puts "Warning: no compiled version"
+	}
 	file copy lib docs $targetdir		
 	catch {file delete [file join $targetdir lib *~]}
 	difaccess 0644 0755 $targetdir

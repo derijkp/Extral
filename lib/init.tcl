@@ -10,7 +10,7 @@
 # $Format: "set ::Extral::version 1.$ProjectMajorVersion$"$
 set ::Extral::version 1.0
 # $Format: "set ::Extral::patchlevel $ProjectMinorVersion$"$
-set ::Extral::patchlevel 4
+set ::Extral::patchlevel 5
 package provide Extral $::Extral::version
 #
 # Load the shared library if present

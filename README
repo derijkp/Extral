@@ -36,10 +36,11 @@ on rrna.uia.ac.be. in the directory /pub/tcl
 
 This package can be build as a loadable object to Tcl8.0. Go to the
 src directory and type
-./configure --with-tcl=<path of tcl distribution>
+./configure
 Then run make. This should produce the loadable module. The build.tcl and
 buildwin.tcl files are a tool to make a nice package in a different
-directory.
+directory.You can invoke them with the folowing command
+./build.tcl ?build directory?
 
 If you want to make gdbm and bsd-db support, you will have to create a 
 libgdbm.a and libdb.a (should position independend code) and put these

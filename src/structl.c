@@ -403,7 +403,7 @@ extern int ExtraL_StructlsetStruct(interp, structure, data, list, tagsc, tagsv, 
 	Tcl_Obj **resultPtr;
 {
 	Tcl_Obj *temp, *tagObj,*result,*res;
-	char *ctag,*tag;
+	char *ctag = NULL,*tag;
 	Tcl_Obj *substructure, *sublist, *structtag, *subtag;
 	int sublistpos, structpos;
 	int clen,len;
@@ -676,7 +676,7 @@ extern int ExtraL_StructlunsetStruct(interp, structure, data, list, tagsc, tagsv
 	Tcl_Obj **resultPtr;
 {
 	Tcl_Obj *temp, *tagObj,*result,*res;
-	char *ctag,*tag;
+	char *ctag = NULL,*tag;
 	Tcl_Obj *substructure, *sublist, *structtag, *subtag;
 	int sublistpos, structpos;
 	int clen,len;
