@@ -19,14 +19,6 @@
 	first given by literate.
 
 <b><dt>
-replace string replacelist
-</b><dd>
- replace some parts of a string<br>
- replacelist gives alternating a substring to be replaced, and what it should be replaced by.
- The command returns a string that is the given string where each occurence of the
- substrings in the replacelist have been replaced.
-
-<b><dt>
 invoke vars cmd ...
 </b><dd>
  invoke simply evals $cmd in a private space. This eg. allows using
@@ -36,6 +28,17 @@ invoke vars cmd ...
  Further arguments (when given) are parameters that will be available in the
  variables given in vars. If more parameters are supplied than vars are given,
  the remaining parameters will be stored in the variable args.
+
+<b><dt>
+aproc args body
+</b><dd>
+ aproc creates an 'anonymous' procedure; this means you don't have to provide a name. It
+ returns the name to invoke it. These procedures are cached based on the arguments and body.
+ This is actually somewhat similar to the invoke command, but is faster when the proc
+ is being reused many times.
+ Typical use would be in parameters that expect a command name that will be called later with 
+ a number of arguments:
+ .ctable configure -getcommand [aproc {args} {return $args}]
 
 <b><dt>
 arraytrans varName list ?default?
@@ -82,7 +85,14 @@ random min max
 returns a random number between min and max
 
 <b><dt>
-varsubst varlist string
+putsvars varname ?varname ...?
+</b><dd>
+returns the values of the given variables in the form:<br>
+set variable1 value1<br>
+set variable2 value2
+
+<b><dt>
+varsubst string varlist valuelist
 </b><dd>
 	substitutes only the variables in varlist for their content
 	in the given string

@@ -99,29 +99,13 @@ proc getcomplete {channelId} {
 proc splitcomplete {data} {
 	set result ""
 	set current ""
-	regsub -all "\\\\\n" $data {} data
 	foreach line [split $data "\n"] {
 		if {"$current" != ""} {
 			append current "\n"
 		}
 		append current $line
-		if [info complete $current] {
-			lappend result $current
-			set current ""
-		}
-	}
-	return $result
-}
-
-proc splitesccomplete {data} {
-	set result ""
-	set current ""
-	regsub -all "\\\\\n" $data {} data
-	foreach line [split $data "\n"] {
-		if {"$current" != ""} {
-			append current "\n"
-		}
-		append current $line
+		set end [string length $line]
+		incr end -1
 		if ![regexp {\\$} $current] {
 			if [info complete $current] {
 				lappend result $current
@@ -132,7 +116,25 @@ proc splitesccomplete {data} {
 	return $result
 }
 
-#doc {filing splitcomplete} cmd {
+#proc splitesccomplete {data} {
+#	set result ""
+#	set current ""
+#	foreach line [split $data "\n"] {
+#		if {"$current" != ""} {
+#			append current "\n"
+#		}
+#		append current $line
+#		if ![regexp {\\$} $current] {
+#			if [info complete $current] {
+#				lappend result $current
+#				set current ""
+#			}
+#		}
+#	}
+#	return $result
+#}
+
+#doc {filing parsecommand} cmd {
 #	parsecommand line
 #} descr {
 #	parses a cmdline. it returns a list where each element is the part of the cmdline that
@@ -173,7 +175,7 @@ proc parsecommand {line {recurse 0}} {
 				while 1 {
 					incr i
 					if {$i == $len} break
-					switch [string index $line $i] {
+					switch -- [string index $line $i] {
 						"\{" {
 							incr level
 						}

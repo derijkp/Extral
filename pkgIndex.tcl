@@ -9,4 +9,4 @@
 
 # $Format: "package ifneeded Extral 1.$ProjectMajorVersion: 1 $ \"$
 package ifneeded Extral 1.1 \
-	"[list namespace eval ::Extral [list set dir $dir]] ; [list source [file join $dir lib init.tcl]]"
+	"[list namespace eval ::Extral {}] ; [list set ::Extral::dir $dir] ; [list source [file join $dir lib init.tcl]]"

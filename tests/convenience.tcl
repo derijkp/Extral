@@ -6,11 +6,20 @@ source tools.tcl
 
 test varsubst {} {
 set try {try it}
-varsubst {try} {
+varsubst try {
 puts [list $try $try2]
 }
 } {
 puts [list {try it} $try2]
+}
+
+test varsubst {} {
+set try {try it}
+varsubst try {
+puts [list $try $try2]
+} {{try it now}}
+} {
+puts [list {try it now} $try2]
 }
 
 test ? {basic true} {
@@ -33,7 +42,7 @@ test aproc {basic} {
 
 test aproc {error} {
 	[aproc {a} {list $a $args}] 1 2 3
-} {called "::Extral::aproc1" with too many arguments}
+} {called "::Extral::aproc2" with too many arguments} 1
 
 test aproc {more} {
 	[aproc {a args} {list $a $args}] 1 2 3

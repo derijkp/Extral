@@ -33,13 +33,12 @@ set data {
 		puts ok
 	}
 	# test
-	$w configure \
-		-test try
 }
-splitcomplete $data
-} {{} {	proc try {} {
-		puts ok
-	}} {	# test} {	$w configure  -test try} {}}
+append data	"\t\$w configure \\\n"
+append data "\t\t-test try\n"
+set t [splitcomplete $data]
+lindex $t 3
+} "\t\$w configure \\\n\t	-test try"
 
 test parsecommand {basic} {
 	parsecommand {set test [format "%2.2f" 4.3]}

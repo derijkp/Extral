@@ -6,7 +6,7 @@
 # =============================================================
 
 #doc {convenience varsubst} cmd {
-#varsubst varlist string
+#varsubst string varlist valuelist
 #} descr {
 #	substitutes only the variables in varlist for their content
 #	in the given string
@@ -19,10 +19,14 @@
 #		puts [list {try it} $try2]
 #}
 
-proc varsubst {varlist string} {
+proc varsubst {varlist string {valuelist {}}} {
 	append string " "
-	foreach arg $varlist {
-		upvar $arg temp
+	foreach arg $varlist value $valuelist {
+		if ![llength $valuelist] {
+			set temp [uplevel set $arg]
+		} else {
+			set temp $value
+		}
 		if ![info exists temp] {
 			return -code error "can't read \"$arg\": no such variable"
 		}

@@ -448,19 +448,19 @@ proc lreverse {list} {
 }
 
 #doc stringcommands title {
-#General astring manipulation commands
+#General string manipulation commands
 #}
 
-#doc {stringcommands replace} cmd {
-#replace string replacelist
+#doc {stringcommands string::change} cmd {
+#string::change string changelist
 #} descr {
-# replace some parts of a string<br>
-# replacelist gives alternating a substring to be replaced, and what it should be replaced by.
+# change some parts of a string<br>
+# changelist gives alternating a substring to be changed, and what it should be changed into.
 # The command returns a string that is the given string where each occurence of the
-# substrings in the replacelist have been replaced.
+# substrings in the changelist have been changed.
 #}
-proc replace {string replacelist} {
-	array set a $replacelist
+proc string::change {string changelist} {
+	array set a $changelist
 	set rem $string
 	set string ""
 	while 1 {
@@ -489,12 +489,12 @@ proc replace {string replacelist} {
 	return $string
 }
 
-#doc {stringcommands sreverse} cmd {
-#lreverse list
+#doc {stringcommands string::reverse} cmd {
+#string::reverse list
 #} descr {
 # returns the reverse of list.
 #}
-proc sreverse {string} {
+proc string::reverse {string} {
 	set i [string length $string]
 	set result ""
 	for {incr i -1} {$i >= 0} {incr i -1} {
@@ -503,17 +503,17 @@ proc sreverse {string} {
 	return $result
 }
 
-#doc {stringcommands sfind} cmd {
-#sfind mode list pattern
+#doc {stringcommands string::find} cmd {
+#string::find mode list pattern
 #} descr {
 #	returns a list of all indices which match a pattern.
 #	mode can be -exact, -glob, or -regexp
 #	The default mode is -exact
 #} example {
-#	% lfind -regexp {Ape Ball Field {Antwerp city} Egg} {^A}
+#	% string::find -regexp {Ape Ball Field {Antwerp city} Egg} {^A}
 #	0 3
 #}
-proc sfind {args} {
+proc string::find {args} {
 	if {[llength $args]==2} {
 		set string [lindex $args 0]
 		set pattern [lindex $args 1]
@@ -551,5 +551,24 @@ proc sfind {args} {
 		}
 	}
 	return $result
+}
+
+#doc {stringcommands string::replace} cmd {
+#string::replace string first last replacement
+#} descr {
+# replace a part of a string
+#}
+proc string::replace {string first last replacement} {
+	if {$last < $first} {
+		set last $first
+	} else {
+		incr last 1
+	}
+	incr first -1
+	set diff [expr {$first - [string length $string]}]
+	if {$diff > 0} {
+		for {set i 0} {$i < $diff} {incr i} {append string " "}
+	}
+	return [string range $string 0 $first]$replacement[string range $string $last end]
 }
 

@@ -1,3 +1,22 @@
+load ./compress.so
+set f [open ~/lsu/total.ali]
+#set f [open /IDE2/peter/ssu/scomp_jan1999.ali]
+catch {gets $f ; gets $f ; gets $f ; gets $f}
+catch {set seq [gets $f]}
+close $f
+time {set try [compressseq $seq]}
+string length $try
+
+time {set try [compress -level 1 $seq]}
+
+set test " - - - - - - - - - - - - - - - - - - - - - - - - - - - - A G C "
+set test " - - - - A G - - C - - - - A G - - C - - - - A G - - C"
+catch {set try [compress $test]}
+string length $test
+string length $try
+uncompress $try
+
+
 package require Extral 1
 
 set try {a 1 b 2 c {a 1 b 2 c {a 1 b 2}}}

@@ -7,6 +7,7 @@ What is ExtraL
 
 Extral is a generally useful library which extends Tcl with a.o.:
 	- extral list manipulation commands
+	- extra string manipulation commands
 	- array manipulation
 	- atexit
 	- dbm support: file based, gdbm and bsd-db support

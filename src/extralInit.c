@@ -58,7 +58,10 @@ extern int ExtraL_LreverseObjCmd _ANSI_ARGS_((ClientData clientData,
 extern int ExtraL_SreverseObjCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
 
-extern int ExtraL_ReplaceObjCmd _ANSI_ARGS_((ClientData clientData,
+extern int ExtraL_StringChangeObjCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int argc, char *argv[]));
+
+extern int ExtraL_StringReplaceObjCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
 
 extern int ExtraL_AmanipObjCmd _ANSI_ARGS_((ClientData clientData,
@@ -108,11 +111,12 @@ Extral_Init(interp)
 	Tcl_CreateObjCommand(interp,"formattime",(Tcl_ObjCmdProc *)ExtraL_FormatTimeObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"leval",(Tcl_ObjCmdProc *)ExtraL_LevalObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"lreverse",(Tcl_ObjCmdProc *)ExtraL_LreverseObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"replace",(Tcl_ObjCmdProc *)ExtraL_ReplaceObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"sreverse",(Tcl_ObjCmdProc *)ExtraL_SreverseObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"amanip",(Tcl_ObjCmdProc *)ExtraL_AmanipObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"ssort",(Tcl_ObjCmdProc *)ExtraL_SSortObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"sfind",(Tcl_ObjCmdProc *)ExtraL_SFindObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"string::change",(Tcl_ObjCmdProc *)ExtraL_StringChangeObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"string::replace",(Tcl_ObjCmdProc *)ExtraL_StringReplaceObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"string::reverse",(Tcl_ObjCmdProc *)ExtraL_SreverseObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"string::find",(Tcl_ObjCmdProc *)ExtraL_SFindObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 
 /*	Tcl_CreateCommand(interp,"ffind",ExtraL_FfindCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL); */
 

@@ -97,6 +97,7 @@ lfind mode list pattern
 </b><dd>
 	returns a list of all indices which match a pattern.
 	mode can be -exact, -glob, or -regexp
+	The default mode is -exact
 <br>eg.:<pre>
 	% lfind -regexp {Ape Ball Field {Antwerp city} Egg} {^A}
 	0 3
@@ -153,4 +154,9 @@ lunmerge ?list? ??spacing?? ??var??
 	% set var
 	1 2
 </pre>
+<b><dt>
+lreverse list
+</b><dd>
+ returns the reverse of the list.
+
 </body>

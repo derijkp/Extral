@@ -439,11 +439,10 @@ ExtraL_AmanipObjCmd(notUsed, interp, objc, objv)
 	return TCL_OK;
 }
 
-
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_ReplaceObjCmd --
+ * ExtraL_StringChangeObjCmd --
  *
  *
  * Results:
@@ -453,7 +452,7 @@ ExtraL_AmanipObjCmd(notUsed, interp, objc, objv)
  *----------------------------------------------------------------------
  */
 int
-ExtraL_ReplaceObjCmd(notUsed, interp, objc, objv)
+ExtraL_StringChangeObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;				 /* Not used. */
 	Tcl_Interp *interp;					/* Current interpreter. */
 	int objc;						/* Number of arguments. */
@@ -467,7 +466,7 @@ ExtraL_ReplaceObjCmd(notUsed, interp, objc, objv)
 	int j;
 
 	if (objc != 3) {
-		Tcl_WrongNumArgs(interp, 1, objv, "string replacelist");
+		Tcl_WrongNumArgs(interp, 1, objv, "string changelist");
 		return TCL_ERROR;
 	}
 	if (Tcl_ListObjGetElements(interp, objv[2], &listObjc, &listObjv) != TCL_OK) {
@@ -501,6 +500,60 @@ ExtraL_ReplaceObjCmd(notUsed, interp, objc, objv)
 	}
 	if (ppos == plen) {
 		Tcl_AppendToObj(result,p + prev,plen - prev);
+	}
+	Tcl_SetObjResult(interp,result);
+	return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ExtraL_StringReplaceObjCmd --
+ *
+ *
+ * Results:
+ *		A standard Tcl result.
+ *
+ *
+ *----------------------------------------------------------------------
+ */
+int
+ExtraL_StringReplaceObjCmd(notUsed, interp, objc, objv)
+	ClientData notUsed;				 /* Not used. */
+	Tcl_Interp *interp;					/* Current interpreter. */
+	int objc;						/* Number of arguments. */
+	Tcl_Obj *CONST objv[];	/* Argument objects. */
+{
+	Tcl_Obj *result;
+	char *replacement,*string;
+	int i,error;
+	int first,last,slen,rlen;
+	/* */
+	if (objc != 5) {
+		Tcl_WrongNumArgs(interp, 1, objv, "string first last replacement");
+		return TCL_ERROR;
+	}
+	error = Tcl_GetIntFromObj(interp, objv[2], &first);
+	if (error) {return error;}
+	error = Tcl_GetIntFromObj(interp, objv[3], &last);
+	if (error) {return error;}
+	last++;
+	replacement = Tcl_GetStringFromObj(objv[4],&rlen);
+	string = Tcl_GetStringFromObj(objv[1],&slen);
+	result = Tcl_NewStringObj("",0);
+	if (first < slen) {
+		if (first+rlen < slen) {
+			Tcl_AppendToObj(result, string, first);
+			Tcl_AppendToObj(result, replacement, rlen);
+			Tcl_AppendToObj(result, string+last, slen-last);
+		} else {
+			Tcl_AppendToObj(result, string, first);
+			Tcl_AppendToObj(result, replacement, rlen);
+		}
+	} else {
+		Tcl_AppendToObj(result, string, slen);
+		for (i = slen + 1 ; i < first ; i++) {Tcl_AppendToObj(result, " ", 1);}
+		Tcl_AppendToObj(result, replacement, rlen);
 	}
 	Tcl_SetObjResult(interp,result);
 	return TCL_OK;

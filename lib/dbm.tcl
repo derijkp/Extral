@@ -28,34 +28,6 @@
 #The database code can also be used from C using the ExtraL_DbmOpen function.
 #}
 
-proc Extral::types {} {
-	set list ""
-	foreach item [lunion [array names ::auto_index ::Extral::dbmtype_*] [info commands ::Extral::dbmtype_*]] {
-		if [uplevel #0 $item] {
-			regsub ::Extral::dbmtype_ $item {} item
-			lappend list $item
-		}
-	}
-	return $list
-}
-
-proc Extral::loaddbm {type} {
-	if [info exists ::Extral::dbm_loaded_types($type)] {
-		return
-	}
-	if [catch {uplevel #0 ::Extral::dbminittype_$type} result] {
-		return -code error -errorinfo $::errorInfo "Could not load type \"$type\": $result"
-	}
-	set ::Extral::dbm_loaded_types($type) 1
-}
-
-if {"[info commands dbm]" != ""} {
-	set Extral::temp [dbm implementation]
-} else {
-	set Extral::temp tcl
-}
-if {"$Extral::temp" == "tcl"} {
-
 #doc {dbm dbm} h2 "dbm command"
 #doc {dbm dbm types} cmd {
 #dbm types
@@ -233,6 +205,4 @@ proc Extral::dbmcmd {object arg} {
 			return -code error "bad option \"[lindex $arg 0]\": must be one of set, get, unset, keys, sync or reorganize"
 		}
 	}
-}
-
 }

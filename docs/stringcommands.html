@@ -1,0 +1,34 @@
+<HEAD>
+<TITLE>
+General astring manipulation commands
+</TITLE>
+</HEAD>
+<BODY>
+<h1>
+General astring manipulation commands
+</h1>
+
+<dl><b><dt>
+replace string replacelist
+</b><dd>
+ replace some parts of a string<br>
+ replacelist gives alternating a substring to be replaced, and what it should be replaced by.
+ The command returns a string that is the given string where each occurence of the
+ substrings in the replacelist have been replaced.
+
+<b><dt>
+lreverse list
+</b><dd>
+ returns the reverse of list.
+
+<b><dt>
+sfind mode list pattern
+</b><dd>
+	returns a list of all indices which match a pattern.
+	mode can be -exact, -glob, or -regexp
+	The default mode is -exact
+<br>eg.:<pre>
+	% lfind -regexp {Ape Ball Field {Antwerp city} Egg} {^A}
+	0 3
+</pre>
+</body>

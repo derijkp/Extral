@@ -46,6 +46,15 @@ lwrite file list
 	braces, brackets or array element names.
 
 <b><dt>
+	parsecommand line
+</b><dd>
+	parses a cmdline. it returns a list where each element is the part of the cmdline that
+	will result in one element when the cmdline would be evaluated.
+	eg.
+	% parsecommand {set test [format "%2.2f" 4.3]}
+	set test {[format "%2.2f" 4.3]}
+
+<b><dt>
 	cload filename
 </b><dd>
 	returns the contents of the given file als a list of complete Tcl commands.
