@@ -6,6 +6,9 @@
 extern int ExtraL_LfindCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
 
+extern int ExtraL_FfindCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int argc, char *argv[]));
+
 extern int ExtraL_LsubCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
 
@@ -41,6 +44,7 @@ Extral_Init(interp)
     char *libDir;
 
     dld_AddTclCommand(interp, "lfind", ExtraL_LfindCmd);
+    dld_AddTclCommand(interp, "ffind", ExtraL_FfindCmd);
     dld_AddTclCommand(interp, "lsub", ExtraL_LsubCmd);
     dld_AddTclCommand(interp, "lcor", ExtraL_LcorCmd);
     dld_AddTclCommand(interp, "lload", ExtraL_LloadCmd);

@@ -43,6 +43,19 @@ proc leor {l1 l2} {
     eval lappend result [lsub $l2 $exclusive]
 }
 
+proc lunion {args} {
+    set result [lmanip join $args { } all]
+    return [lmanip remdup $result]
+}
+
+proc lcommon {args} {
+    set result [lpop args]
+    foreach arg $args {
+        set result [lsub $arg [lcor $arg $result]]
+    }
+    return [lmanip remdup $result]
+}
+
 proc lremove {listref args} {
     upvar $listref list
     foreach item $args {

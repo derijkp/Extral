@@ -2,6 +2,24 @@ ExtraL Commands
 ===============  extra list manipulation commands for Tcl
                  by Peter De Rijk (Universiteit Antwerpen) 
 
+lmanip mangle ?list1? ?list2?
+    mangles two lists into one
+	eg.
+	% lmanip mangle {a b c} {1 2 3}
+	a 1 b 2 c 3
+
+lmanip unmangle ?list? ?list1? ?list2?
+    unmangles a list to 2 lists setting the first one in the result, 
+    and the second one in a given variable
+	eg.
+	% lmanip unmangle {a 1 b 2 c 3} var
+        var:a b c
+
+ffind <switches> filelist pattern
+    returns a list of all files in filelist which match a pattern.
+    <switches> can be -matches -exact, -glob, or -regexp
+    with -matches, the text matching the bracketed pattern will be mangled into the result.
+
 lregsub ?switches? exp list subSpec
     does a regsub for each element in the list, and returns the resulting list.
     eg.
@@ -100,8 +118,8 @@ lmanip fill ?size? ?start? ??incr??
 	% lmanip fill 5 10 -2
 	10 8 6 4 2
 
-Commands in
------------
+Commands in extral.tcl
+----------------------
 There are also some extra listprocessing commands written in tcl in the 
 package. Some use the commands written in C:
 

@@ -1,5 +1,5 @@
 # Version number
-VERSION=0.9
+VERSION=0.91
 
 # The directory containing the Tcl sources and headers
 # To build against Tcl7.4
@@ -12,9 +12,9 @@ TCL_DIR2 =	../tcl7.5a2/unix
 # compiler flags: -KPICT is to create position independed code, this might be
 # different for your compiler
 # Linux
-# CFLAGS = -O2 -fpic -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -Dvfork=fork
+CFLAGS = -O2 -fpic -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -Dvfork=fork
 # IRIX 5.3
-CFLAGS = -O2 -KPIC 
+# CFLAGS = -O2 -KPIC 
 
 
 # Some versions of make, like SGI's, use the following variable to
@@ -40,3 +40,5 @@ depend:
 	$(CC) -c $(CC_SWITCHES) $<
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
+
+
