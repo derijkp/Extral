@@ -263,64 +263,6 @@ ExtraL_FfindCmd(notUsed, interp, argc, argv)
 	ckfree((char *) listArgv);
 	return TCL_OK;
 }
-/*
- *----------------------------------------------------------------------
- *
- * ExtraL_RandomCmd --
- *
- * Results:
- *		A standard Tcl result.
- *
- *
- *----------------------------------------------------------------------
- */
-
-int
-ExtraL_RandomCmd(notUsed, interp, argc, argv)
-	ClientData notUsed;					/* Not used. */
-	Tcl_Interp *interp;					/* Current interpreter. */
-	int argc;							 	/* Number of arguments. */
-	char **argv;						 /* Argument strings. */
-{
-	FILE *file;
-	char *string=NULL;
-	long number;
-	int deler;
-	int result;
-	int min, max;
-	char *resultstring;
-
-	if (argc != 3) {
-		Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-			" min max\"", (char *) NULL);
-		return TCL_ERROR;
-	}
-	if (Tcl_GetInt(interp, argv[1], &min) != TCL_OK) {
-		return TCL_ERROR;
-	}
-	if (Tcl_GetInt(interp, argv[2], &max) != TCL_OK) {
-		return TCL_ERROR;
-	}
-	if (max<=min) {
-		Tcl_AppendResult(interp, "wrong arguments", (char *) NULL);
-		return TCL_ERROR;
-	}
-	number=rand();
-	deler=RAND_MAX/(max-min);
-	result=number/deler;
-	if (result<min) {
-		Tcl_AppendResult(interp, "Something strange happened: Result too small", (char *) NULL);
-		return TCL_ERROR;
-	}
-	if (result>max) {
-		Tcl_AppendResult(interp, "Something strange happened: Result too big", (char *) NULL);
-		return TCL_ERROR;
-	}
-	resultstring=ExtraL_numstr(result+min);
-	Tcl_AppendResult(interp, resultstring, (char *) NULL);
-	free(resultstring);
-	return TCL_OK;
-}
 
 /*
  *----------------------------------------------------------------------

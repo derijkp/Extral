@@ -8,11 +8,11 @@
 # full path name of this file's directory.
 
 # $Format: "set version $ProjectVersion$"$
-set version 1a.7
+set version 1a.8
 regsub -all {[ab]} $version {} version
 package ifneeded Extral $version [subst {
-	load [file join $dir extral[info sharedlibextension]]
-	lappend auto_path [file join $dir lib]
+	[list load [file join $dir extral[info sharedlibextension]]]
+	[list lappend auto_path [file join $dir lib]]
 	set Extral_version $version
 	package provide Extral $version
 }]

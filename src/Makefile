@@ -5,17 +5,15 @@
 # The directory containing the Tcl sources and headers appropriate
 # for this version of Tk ("srcdir" will be replaced or has already
 # been replaced by the configure script):
-TCL_GENERIC_DIR =	/home/peter/tcl/tcl8.0a2/generic
-TCL_UNIX_DIR =	/home/peter/tcl/tcl8.0a2/unix
-TK_GENERIC_DIR =	@TK_SRC_DIR@/../tk4.1/generic
+TCL_GENERIC_DIR =	/home/peter/tcl/tcl8.0b1/generic
+TCL_UNIX_DIR =	/home/peter/tcl/tcl8.0b1/unix
 
 # The directory containing the Tcl library archive file appropriate
 # for this version of Tk:
 TCL_BIN_DIR = @TCL_BIN_DIR@
-TK_BIN_DIR = @TCL_BIN_DIR@/../tk4.1
 
 # Libraries to use when linking:
-LIBS = -L/home/peter/tcl/tcl8.0a2/unix -ltcl8.0 -ldl  -lm -lc
+LIBS = -L/home/peter/tcl/tcl8.0b1/unix -ltcl8.0 -ldl  -lm -lc
 
 #----------------------------------------------------------------
 # The information below is modified by the configure script when
@@ -37,7 +35,7 @@ OBJECTS = extralInit.o extral.o lpop.o nonl.o supersort.o lfile.o general.o
 all: extral${SHLIB_SUFFIX}
 
 extral$(SHLIB_SUFFIX): $(OBJECTS)
-	$(SHLIB_LD) $(SHLIB_CFLAGS) -o ../extral$(SHLIB_SUFFIX) $(OBJECTS) ${LIBS}
+	$(SHLIB_LD) $(SHLIB_CFLAGS) -o ../extral$(SHLIB_SUFFIX) $(OBJECTS) 
 
 extratcl: tclAppInit.o $(OBJECTS)
 	$(CC) $(CC_SWITCHES) -o extratcl tclAppInit.o $(OBJECTS) ${TCL_LIB_SPEC} ${LIBS}

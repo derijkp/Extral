@@ -6,12 +6,10 @@
 # been replaced by the configure script):
 TCL_GENERIC_DIR =	@TCL_SRC_DIR@/generic
 TCL_UNIX_DIR =	@TCL_SRC_DIR@/unix
-TK_GENERIC_DIR =	@TK_SRC_DIR@/../tk4.1/generic
 
 # The directory containing the Tcl library archive file appropriate
 # for this version of Tk:
 TCL_BIN_DIR = @TCL_BIN_DIR@
-TK_BIN_DIR = @TCL_BIN_DIR@/../tk4.1
 
 # Libraries to use when linking:
 LIBS = @TCL_BUILD_LIB_SPEC@ @TCL_LIBS@ -lc

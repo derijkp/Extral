@@ -66,3 +66,8 @@ proc setglobal {varName args} {
 		set var [lindex $args 0]
 	}
 }
+
+proc random {min max} {
+	set r [expr $max-$min+1]
+	return [expr int($min+rand()*$r)]
+}

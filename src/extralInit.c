@@ -30,9 +30,6 @@ extern int ExtraL_LmathCmd _ANSI_ARGS_((ClientData clientData,
 extern int ExtraL_LregsubCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
 
-extern int ExtraL_RandomCmd _ANSI_ARGS_((ClientData clientData,
-	Tcl_Interp *interp, int argc, char *argv[]));
-
 extern int ExtraL_AmanipCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
 
@@ -73,8 +70,8 @@ Extral_Init(interp)
 	char *libDir;
 
 	Tcl_PkgProvide(interp, "extral", "0.94");
-	Tcl_CreateObjCommand(interp,"lpop",4,(Tcl_ObjCmdProc *)ExtraL_LpopObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,"lshift",6,(Tcl_ObjCmdProc *)ExtraL_LshiftObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"lpop",(Tcl_ObjCmdProc *)ExtraL_LpopObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"lshift",(Tcl_ObjCmdProc *)ExtraL_LshiftObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 
 
 	dld_AddTclCommand(interp, "lfind", ExtraL_LfindCmd);
@@ -88,7 +85,6 @@ Extral_Init(interp)
 	dld_AddTclCommand(interp, "replace", ExtraL_ReplaceCmd);
 	dld_AddTclCommand(interp, "ssort", ExtraL_SSortCmd);
 	dld_AddTclCommand(interp, "lfile", ExtraL_LfileCmd);
-	dld_AddTclCommand(interp, "random", ExtraL_RandomCmd);
 #ifdef windows
 /*
 	dld_AddTclCommand(interp, "win_mkdir", ExtraL_MkdirCmd);
@@ -101,7 +97,6 @@ Extral_Init(interp)
 	dld_AddTclCommand(interp, "win_cp", ExtraL_CpCmd);
 */
 #endif
-	srand((unsigned int)time(0));
 	return TCL_OK;
 }
 

@@ -23,8 +23,8 @@ set data {
 {lcor {a b c d e f} {b d d}}
 {1 3 -1}
 
-{lmath calc {1 2 3.2 4} + {1 2 3.2 4}}
-{2.0 4.0 6.4 8.0}
+{lmath calc {1 2 3.2 4} + {1 2 3.3 4}}
+{2.0 4.0 6.5 8.0}
 
 {lmath sum {1 4 5}}
 {10}
@@ -144,6 +144,25 @@ set data {
 {a b c}
 {set list {a b c};set l $list;lshift list;set l}
 {a b c}
+
+{	set data {{fdfg sdfg gh} sdfh {dgh sdh}}
+	set line [lindex $data 0]
+	lshift line
+	set line
+}
+{sdfg gh}
+
+{	set try {a b c d e}
+	foreach t $try {
+		lshift t
+		lshift t
+	}
+	foreach t $try {
+		lshift t
+		lshift t
+	}
+}
+{}
 }
 
 # Run tests

@@ -21,7 +21,7 @@ proc lsub {list args} {
 		return $result
 	} elseif {"[lindex $args 0]"=="-exclude"} {
 		set result ""
-		foreach index [lindex $args 1] {
+		foreach index [lsort -integer -decreasing [lindex $args 1]] {
 			set list [lreplace $list	$index $index]
 		}
 		return $list

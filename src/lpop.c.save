@@ -33,15 +33,17 @@ ExtraL_LpopObjCmd(dummy, interp, objc, objv)
 	int objc;			/* Number of arguments. */
 	Tcl_Obj **objv;		/* Argument objects. */
 {
+	Interp *iPtr = (Interp *) interp;
 	register Tcl_Obj *listObjPtr;
 	Tcl_Obj *popPtr, *newValuePtr;
 	char *firstStr;
 	int listLen;
-	long index;
-	int result;
+	long first;
+	int result,mustDecrRefCt;
 
 	if ((objc != 2)&&(objc != 3)) {
-		Tcl_WrongNumArgs(interp, 1, objv, "varName ?index?");
+		Tcl_AppendResult(interp, "wrong # args: should be \"", objv[0],
+	 	 	   " listName pos\"", (char *) NULL);
 		return TCL_ERROR;
 	}
 
@@ -51,6 +53,10 @@ ExtraL_LpopObjCmd(dummy, interp, objc, objv)
 		return TCL_ERROR;
 	}
 
+	/*
+	 * THIS FAILS IF THE OBJECT'S STRING REP CONTAINS NULLS.
+	 */
+	
 	result=Tcl_ListObjLength(interp,listObjPtr,&listLen);
 	if (result==TCL_ERROR) {
 		return TCL_ERROR;
@@ -59,48 +65,53 @@ ExtraL_LpopObjCmd(dummy, interp, objc, objv)
 		return TCL_OK;
 	}
 	if (objc==2) {
-		index = (listLen - 1);
+		first = (listLen - 1);
 	} else {
 		firstStr = Tcl_GetStringFromObj(objv[2], (int *)NULL);
 		if ((*firstStr == 'e') && (strcmp(firstStr, "end") == 0)) {
-			index = (listLen - 1);
+			first = (listLen - 1);
 		} else {
-			result=Tcl_GetLongFromObj(interp,objv[2],&index);
+			result=Tcl_GetLongFromObj(interp,objv[2],&first);
 			if (result==TCL_ERROR) {
 				return TCL_ERROR;
 			}
 		}
-		if (index < 0)  {
-			index = 0;
+		if (first < 0)  {
+			first = 0;
 		}
-		if (index >= listLen) {
+		if (first >= listLen) {
 			Tcl_ResetResult(interp);
-			Tcl_AppendResult(interp, "list doesn't contain element ",firstStr, (char *) NULL);
+			Tcl_AppendResult(interp, "list doesn't contain element ",
+				objv[2], (char *) NULL);
 			return TCL_ERROR;
 		}
 	}
 
-	result = Tcl_ListObjIndex(interp,listObjPtr,index,&popPtr);
+	result = Tcl_ListObjIndex(interp,listObjPtr,first,&popPtr);
 	if (result != TCL_OK) {
 		return result;
 	}
 	Tcl_SetObjResult(interp,popPtr);
-
 	if (Tcl_IsShared(listObjPtr)) {	
 		listObjPtr = Tcl_DuplicateObj(listObjPtr);
+	    mustDecrRefCt = 1;
+	} else {
+	    mustDecrRefCt = 0;
 	}
-	result = Tcl_ListObjReplace(interp, listObjPtr, index, 1, 0, NULL);
+	result = Tcl_ListObjReplace(interp, listObjPtr, first, 1, 0, NULL);
 	if (result != TCL_OK) {
-		Tcl_DecrRefCount(listObjPtr);
+		if (mustDecrRefCt) {Tcl_DecrRefCount(listObjPtr);}
 		return result;
 	}
 
 	newValuePtr = Tcl_ObjSetVar2(interp, objv[1], (Tcl_Obj *) NULL,
 		listObjPtr, (TCL_LEAVE_ERR_MSG | TCL_PARSE_PART1));
 	if (newValuePtr == NULL) {
-		Tcl_DecrRefCount(listObjPtr);
-		return TCL_ERROR;
+		if (mustDecrRefCt) {Tcl_DecrRefCount(listObjPtr);}
+	    return TCL_ERROR;
 	}
+
+	if (mustDecrRefCt) {Tcl_DecrRefCount(listObjPtr);}
 	return TCL_OK;
 }
 
@@ -126,15 +137,14 @@ ExtraL_LshiftObjCmd(notUsed, interp, objc, objv)
 	int objc;			/* Number of arguments. */
 	Tcl_Obj **objv;		/* Argument objects. */
 {
+	Interp *iPtr = (Interp *) interp;
 	register Tcl_Obj *listObjPtr;
 	Tcl_Obj *popPtr, *newValuePtr;
-	char *firstStr;
-	int listLen;
-	long index;
-	int result;
+	int result,len,mustDecrRefCt;
 
-	if ((objc != 2)&&(objc != 3)) {
-		Tcl_WrongNumArgs(interp, 1, objv, "varName");
+	if (objc != 2) {
+		Tcl_AppendResult(interp, "wrong # args: should be \"",
+		objv[0], " listName\"", (char *) NULL);
 		return TCL_ERROR;
 	}
 
@@ -143,36 +153,38 @@ ExtraL_LshiftObjCmd(notUsed, interp, objc, objv)
 	if (listObjPtr == NULL) {
 		return TCL_ERROR;
 	}
-
-	result=Tcl_ListObjLength(interp,listObjPtr,&listLen);
+	result=Tcl_ListObjLength(interp,listObjPtr,&len);
 	if (result==TCL_ERROR) {
 		return TCL_ERROR;
-	}		
-	if (listLen==0) {
+	}
+	if (len==0) {
 		return TCL_OK;
 	}
-
-	index=0;
-	result = Tcl_ListObjIndex(interp,listObjPtr,index,&popPtr);
+	result = Tcl_ListObjIndex(interp,listObjPtr,0,&popPtr);
 	if (result != TCL_OK) {
 		return result;
 	}
 	Tcl_SetObjResult(interp,popPtr);
-
 	if (Tcl_IsShared(listObjPtr)) {	
 		listObjPtr = Tcl_DuplicateObj(listObjPtr);
+	    mustDecrRefCt = 1;
+	} else {
+	    mustDecrRefCt = 0;
 	}
-	result = Tcl_ListObjReplace(interp, listObjPtr, index, 1, 0, NULL);
+	
+	result = Tcl_ListObjReplace(interp, listObjPtr, 0, 1, 0, NULL);
 	if (result != TCL_OK) {
-		Tcl_DecrRefCount(listObjPtr);
+		if (mustDecrRefCt) {Tcl_DecrRefCount(listObjPtr);}
 		return result;
 	}
 
 	newValuePtr = Tcl_ObjSetVar2(interp, objv[1], (Tcl_Obj *) NULL,
 		listObjPtr, (TCL_LEAVE_ERR_MSG | TCL_PARSE_PART1));
 	if (newValuePtr == NULL) {
-		Tcl_DecrRefCount(listObjPtr);
-		return TCL_ERROR;
+		if (mustDecrRefCt) {Tcl_DecrRefCount(listObjPtr);}
+	    return TCL_ERROR;
 	}
+
+	if (mustDecrRefCt) {Tcl_DecrRefCount(listObjPtr);}
 	return TCL_OK;
 }
