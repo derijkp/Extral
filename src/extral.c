@@ -237,7 +237,7 @@ int Lfile_ObjectCmd(ClientData clientData, Tcl_Interp *interp, int argc, char *a
 		ind_ref=LfilePtr->index;
 		if ((argc != 4)&&(argc != 5)) {
 			Tcl_AppendResult(interp, "wrong # args: should be \"",
-				argv[0], " get ?line?:?begin?-?end???|regexp?? ?modifier:-all/-exclude? ??indexlist??\"", (char *) NULL);
+				argv[0], " get line:begin-end?|regexp? ?modifier:-all/-exclude? ??indexlist??\"", (char *) NULL);
 			return TCL_ERROR;
 		}
 
@@ -333,7 +333,7 @@ int ExtraL_LfileCmd(ClientData clientData, Tcl_Interp *interp, int argc, char *a
 
 	if ((argc != 3)&&(argc != 5)) {
 		Tcl_AppendResult(interp, "wrong # args: should be \"",
-				argv[0], " pathName ?file? ??-before/-after seperator??\"", (char *) NULL);
+				argv[0], " pathName fileName ?-before/-after seperator?\"", (char *) NULL);
 		return TCL_ERROR;
 	}
 	Tcl_VarEval(interp,"info commands ",argv[1],(char *)NULL);
@@ -603,6 +603,11 @@ ExtraL_FfindCmd(notUsed, interp, argc, argv)
 	int argc;								/* Number of arguments. */
 	char **argv;						/* Argument strings. */
 {
+/*
+ffind -regexp -matches -allmatches [glob ../test/*] "\nt2:(\[^\n\]*)\n"
+ffind -regexp -matches -allfiles null [glob ../test/*] "\nt2:(\[^\n\]*)\n"
+ffind -regexp [glob ../test/*] "\nt2:(\[^\n\]*)\n"
+*/
 	Tcl_RegExp regexp;
 	char *start, *end;
 	FILE *file=NULL;
@@ -610,27 +615,27 @@ ExtraL_FfindCmd(notUsed, interp, argc, argv)
 	int listArgc;
 	char **listArgv;
 	char *allfiles;
-	int matches, all, multiple, number;
+	int matches, allmatches, multiple, number;
 	int i, j, match, mode, index;
 
 	if (argc < 4) {
 		wrongNumArgs:
 		Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-			" ?switches? ?filelist? ?pattern? [?var? ?pattern2? ?var2? ...]\"", (char *) NULL);
+			" ?switches? fileList pattern ?varName pattern varName ...?\"", (char *) NULL);
 		return TCL_ERROR;
 	}
 	argPtr = argv+1;
 	argc--;
 	matches = 0;
-	all=0;
+	allmatches=0;
 	allfiles=NULL;
 	multiple = 0;
 	mode = EXACT;
 	while ((argc > 0) && (argPtr[0][0] == '-')) {
 		if (strcmp(argPtr[0], "-matches") == 0) {
 			matches = 1;
-		} else if (strcmp(argPtr[0], "-all") == 0) {
-			all = 1;
+		} else if (strcmp(argPtr[0], "-allmatches") == 0) {
+			allmatches = 1;
 		} else if (strcmp(argPtr[0], "-allfiles") == 0) {
 			argPtr++;
 			argc--;
@@ -648,7 +653,7 @@ ExtraL_FfindCmd(notUsed, interp, argc, argv)
 			break;
 		} else {
 			Tcl_AppendResult(interp, "bad switch \"", argPtr[0],
-				"\": must be -matches, -all, -allfiles, -exact, -glob, -regexp or --", (char *) NULL);
+				"\": must be -matches, -allmatches, -allfiles, -exact, -glob, -regexp or --", (char *) NULL);
 			return TCL_ERROR;
 		}
 		argPtr++;
@@ -658,8 +663,16 @@ ExtraL_FfindCmd(notUsed, interp, argc, argv)
 		Tcl_AppendResult(interp, "-matches only applicable with -regexp matching", (char *) NULL);
 		return TCL_ERROR;
 	}
-	if (((all==1)||(allfiles!=NULL))&&(matches==0)) {
-		Tcl_AppendResult(interp, "-all and -allfiles only applicable with -matches options", (char *) NULL);
+	if ((allmatches==1)&&(matches==0)) {
+		Tcl_AppendResult(interp, "-allmatches only applicable with -matches options", (char *) NULL);
+		return TCL_ERROR;
+	}
+	if ((allfiles!=NULL)&&(matches==0)) {
+		Tcl_AppendResult(interp, "-allfiles only applicable with -matches options", (char *) NULL);
+		return TCL_ERROR;
+	}
+	if ((allmatches==1)&&(allfiles!=NULL)) {
+		Tcl_AppendResult(interp, "-allmatches and -allfiles not compatible", (char *) NULL);
 		return TCL_ERROR;
 	}
 	if (argc == 2) {
@@ -735,13 +748,13 @@ ExtraL_FfindCmd(notUsed, interp, argc, argv)
 				}
 				if (match==0) {
 					if (allfiles!=NULL) {
-						Tcl_AppendElement(interp, listArgv[i]);
+/*						Tcl_AppendElement(interp, listArgv[i]); */
 						Tcl_AppendElement(interp, allfiles);
 					}
 					break;
 				}
 				if (multiple==0) {
-					Tcl_AppendElement(interp, listArgv[i]);
+					if (allfiles==NULL) Tcl_AppendElement(interp, listArgv[i]);
 					if (matches == 1) {
 						Tcl_RegExpRange(regexp, 1, &start, &end);
 						if (start==NULL) {Tcl_AppendElement(interp, "");}
@@ -754,7 +767,7 @@ ExtraL_FfindCmd(notUsed, interp, argc, argv)
 						}
 					}
 				} else {
-					Tcl_SetVar(interp, argPtr[j+1], listArgv[i], TCL_APPEND_VALUE|TCL_LIST_ELEMENT);
+					if (allfiles==NULL) Tcl_SetVar(interp, argPtr[j+1], listArgv[i], TCL_APPEND_VALUE|TCL_LIST_ELEMENT);
 					if (matches == 1) {
 						Tcl_RegExpRange(regexp, 1, &start, &end);
 						if (start==NULL) {
@@ -769,7 +782,7 @@ ExtraL_FfindCmd(notUsed, interp, argc, argv)
 						}
 					}
 				}
-				if (all==0) break;
+				if (allmatches==0) break;
 				search = end;
 			} /* while */
 		}
@@ -933,7 +946,7 @@ ExtraL_LcorCmd(notUsed, interp, argc, argv)
  *
  *		This procedure is invoked to process the "lload" command.
  *		It creates a list from a file
- *		lload ?file?	??nosep??
+ *		lload fileName	?nosep?
  *
  * Results:
  *		A standard Tcl result.
@@ -956,7 +969,7 @@ ExtraL_LloadCmd(notUsed, interp, argc, argv)
 
 	if ((argc != 2)&&(argc != 3)) {
 		Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-			" ?file? ??nosep??\"", (char *) NULL);
+			" fileName ?nosep?\"", (char *) NULL);
 		return TCL_ERROR;
 	}
 
@@ -994,7 +1007,7 @@ ExtraL_LloadCmd(notUsed, interp, argc, argv)
  *
  *		This procedure is invoked to process the "lwrite" command.
  *		It creates a file from a list
- *		lwrite ?file? ?list?
+ *		lwrite fileName list
  *
  * Results:
  *		A standard Tcl result.
@@ -1018,7 +1031,7 @@ ExtraL_LwriteCmd(notUsed, interp, argc, argv)
 
 	if (argc != 3) {
 		Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-			" ?file? ?list?\"", (char *) NULL);
+			" fileName list\"", (char *) NULL);
 		return TCL_ERROR;
 	}
 
@@ -1046,7 +1059,7 @@ ExtraL_LwriteCmd(notUsed, interp, argc, argv)
  *
  *		This procedure is invoked to process the "lmanip" command.
  *		It manipulates lists in all kinds of ways
- *		lmanip ?option? ?list? ?arg? ...
+ *		lmanip option list ?args ...?
  *
  * Results:
  *		A standard Tcl result.
@@ -1071,7 +1084,7 @@ ExtraL_LmanipCmd(notUsed, interp, argc, argv)
 
 	if (argc < 2) {
 		Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-			" ?option? ??arg?? ...\"", (char *) NULL);
+			" option ?args ...?\"", (char *) NULL);
 		return TCL_ERROR;
 	}
 	c=argv[1][0];
@@ -1083,7 +1096,7 @@ ExtraL_LmanipCmd(notUsed, interp, argc, argv)
 	
 		if (argc != 4) {
 			Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-				" subindex ?list? ??pos??\"", (char *) NULL);
+				" subindex list ?pos?\"", (char *) NULL);
 			return TCL_ERROR;
 		}
 		if (Tcl_GetInt(interp, argv[3], &pos) != TCL_OK) {
@@ -1113,7 +1126,7 @@ ExtraL_LmanipCmd(notUsed, interp, argc, argv)
 	
 		if (argc != 4) {
 			Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-				" merge ?list1? ?list2?\"", (char *) NULL);
+				" merge list list\"", (char *) NULL);
 			return TCL_ERROR;
 		}
 		if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
@@ -1147,7 +1160,7 @@ ExtraL_LmanipCmd(notUsed, interp, argc, argv)
 	
 		if ((argc != 4)&&(argc != 5)) {
 			Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-				" mangle ?list1? ?list2? ??spacing??\"", (char *) NULL);
+				" mangle list list ?spacing?\"", (char *) NULL);
 			return TCL_ERROR;
 		}
 		if (argc==5) {
@@ -1189,7 +1202,7 @@ ExtraL_LmanipCmd(notUsed, interp, argc, argv)
 	
 		if ((argc < 3)&&(argc > 5)) {
 			Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-				" unmangle ?list? ??spacing?? ??var??\"", (char *) NULL);
+				" unmangle list ?spacing? ?var?\"", (char *) NULL);
 			return TCL_ERROR;
 		}
 		if (argc>3) {
@@ -1232,7 +1245,7 @@ ExtraL_LmanipCmd(notUsed, interp, argc, argv)
 	
 		if (argc != 4) {
 			Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-				" extract ?list? ?expression?\"", (char *) NULL);
+				" extract list expression\"", (char *) NULL);
 			return TCL_ERROR;
 		}
 		 regexpPtr = (regexp *)Tcl_RegExpCompile(interp, argv[3]);
@@ -1287,7 +1300,7 @@ ExtraL_LmanipCmd(notUsed, interp, argc, argv)
 	
 		if (argc != 3) {
 			Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-				" remdup ?list?\"\n - returns the list in which duplicates are removed", (char *) NULL);
+				" remdup list\"\n - returns the list in which duplicates are removed", (char *) NULL);
 			return TCL_ERROR;
 		}
 		if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
@@ -1318,7 +1331,7 @@ ExtraL_LmanipCmd(notUsed, interp, argc, argv)
 	
 		if (argc != 5) {
 			Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-				" split ?list? -before/-after/-outside ?positions?\"", (char *) NULL);
+				" split list -before/-after/-outside positions\"", (char *) NULL);
 			return TCL_ERROR;
 		}
 		before=find_bool(argv[3],"-before","-after");
@@ -1370,29 +1383,34 @@ ExtraL_LmanipCmd(notUsed, interp, argc, argv)
 	} else if ((c == 'j')&&(strncmp(argv[1], "join",len) == 0)) {
 		Tcl_DString element;
 		char savedChar, *first, *last;
-		PBOOL before;
-	char *string, *join;
+		char *string, *join;
 		int *list;
 		int number=1, elements=0;
-		int nr;
-		int i;
+		int nr,every=0;
+		int i,count;
 	
-		if (argc != 5) {
+		if ((argc != 5)&&(argc != 6)) {
 			Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-				" join ?list? ?join string? ?positions?\"", (char *) NULL);
+				" join list joinstring ?-every? positions\"", (char *) NULL);
 			return TCL_ERROR;
 		}
 		join=argv[3];
-		if (strcmp(argv[4], "all") == 0) {
+		if ((argc == 6)&&(strcmp(argv[4], "-every") == 0)) {
 			list=NULL;
-			before=true;
+			if (Tcl_GetInt(interp, argv[5], &every) != TCL_OK) {
+				return TCL_ERROR;
+			}
 		} else {
-			list=get_intlist(interp, argv[4], &number, 0);
-			if (list==NULL) {
-			return TCL_ERROR;
+			if (strcmp(argv[4], "all") == 0) {
+				list=NULL;
+			} else {
+				list=get_intlist(interp, argv[4], &number, 0);
+				if (list==NULL) {
+				return TCL_ERROR;
+				}
 			}
 		}
-
+	
 		if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
 			return TCL_ERROR;
 		}
@@ -1401,30 +1419,36 @@ ExtraL_LmanipCmd(notUsed, interp, argc, argv)
 		Tcl_DStringInit(&element);
 		
 		i=0;
+		count=1;
 		while(nr<listArgc) {
 			Tcl_DStringAppend(&element, listArgv[nr], -1);
 			if (list!=NULL) {
-			i=0;
-			while(i<number) {
-				if (nr==list[i]) break;
-				i++;
-			}
-			} else {
 				i=0;
+				while(i<number) {
+					if (nr==list[i]) break;
+					i++;
+				}
+			} else {
+				if (every==0) {
+					i=0;
+				} else {
+					count--;
+					if (count==0) {i=0;count=every;} else {i=number+1;}
+				}
 			}
 			nr++;
 			if (i>=number) {
 				Tcl_AppendElement(interp, Tcl_DStringValue(&element));
-		elements++;
-		Tcl_DStringSetLength(&element, 0);
+				elements++;
+				Tcl_DStringSetLength(&element, 0);
 			} else {
-		Tcl_DStringAppend(&element, join, -1);
+				Tcl_DStringAppend(&element, join, -1);
+			}
 		}
-		}
-	string = Tcl_DStringValue(&element);
+		string = Tcl_DStringValue(&element);
 		if (string[0] != 0) {
-		if (elements!=0) Tcl_AppendElement(interp, string);
-		else Tcl_DStringResult(interp, &element);
+			if (elements!=0) Tcl_AppendElement(interp, string);
+			else Tcl_DStringResult(interp, &element);
 		}
 		Tcl_DStringFree(&element);
 		ckfree((char *) listArgv);
@@ -1434,7 +1458,7 @@ ExtraL_LmanipCmd(notUsed, interp, argc, argv)
 	
 		if (argc != 3) {
 			Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-				" lengths ?list?\"\n - returns a list of the lengths", (char *) NULL);
+				" lengths list\"\n - returns a list of the lengths", (char *) NULL);
 			return TCL_ERROR;
 		}
 		if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
@@ -1455,7 +1479,7 @@ ExtraL_LmanipCmd(notUsed, interp, argc, argv)
 		
 		if ((argc != 4)&&(argc != 5)) {
 			Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-				" fill ?size? ?start? ??incr??\"\n", (char *) NULL);
+				" fill size start ?incr?\n - fills a list with the value in start, can be incremented by ?incr?\"\n", (char *) NULL);
 			return TCL_ERROR;
 		}
 		if (Tcl_GetInt(interp, argv[2], &size) != TCL_OK) {
@@ -1486,7 +1510,7 @@ ExtraL_LmanipCmd(notUsed, interp, argc, argv)
 		
 		if ((argc != 4)&&(argc != 5)) {
 			Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-				" fill ?size? ?start? ??incr??\"\n", (char *) NULL);
+				" fill size start ?incr?\n - fills a list with the floating value in start, can be incremented by ?incr?\"\n", (char *) NULL);
 			return TCL_ERROR;
 		}
 		if (Tcl_GetInt(interp, argv[2], &size) != TCL_OK) {
@@ -1542,7 +1566,7 @@ lmanip remdup {aa bc aa b d b}
  *
  *		This procedure is invoked to process the "lmath" command.
  *		It calculates things from lists in all kinds of ways
- *		lmath ?option? ?list? ?arg? ...
+ *		lmath option list ?arg ...?
  *
  * Results:
  *		A standard Tcl result.
@@ -1567,7 +1591,7 @@ ExtraL_LmathCmd(notUsed, interp, argc, argv)
 
 	if (argc < 3) {
 		Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-			" ?option? ?list? ??arg?? ...\"", (char *) NULL);
+			" option list ?arg ...?\"", (char *) NULL);
 		return TCL_ERROR;
 	}
 	c=argv[1][0];
@@ -1579,7 +1603,7 @@ ExtraL_LmathCmd(notUsed, interp, argc, argv)
 	
 		if (argc != 3) {
 			Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-				" sum ?list?\"", (char *) NULL);
+				" sum list\"", (char *) NULL);
 			return TCL_ERROR;
 		}
 		if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
@@ -1604,7 +1628,7 @@ ExtraL_LmathCmd(notUsed, interp, argc, argv)
 	
 		if (argc != 3) {
 			Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-				" max ?list?\"", (char *) NULL);
+				" max list\"", (char *) NULL);
 			return TCL_ERROR;
 		}
 		if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
@@ -1632,7 +1656,7 @@ ExtraL_LmathCmd(notUsed, interp, argc, argv)
 	
 		if (argc != 3) {
 			Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-				" min ?list?\"", (char *) NULL);
+				" min list\"", (char *) NULL);
 			return TCL_ERROR;
 		}
 		if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
@@ -1660,7 +1684,7 @@ ExtraL_LmathCmd(notUsed, interp, argc, argv)
 	
 		if (argc != 3) {
 			Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-				" cumul ?list?\"", (char *) NULL);
+				" cumul list\"", (char *) NULL);
 			return TCL_ERROR;
 		}
 		if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
@@ -1688,7 +1712,7 @@ ExtraL_LmathCmd(notUsed, interp, argc, argv)
 	
 		if (argc != 4) {
 			Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-				" incr ?list? ?value?\"", (char *) NULL);
+				" incr list value\"", (char *) NULL);
 			return TCL_ERROR;
 		}
 		if (Tcl_GetDouble(interp, argv[3], &incr) != TCL_OK) {
@@ -1720,7 +1744,7 @@ ExtraL_LmathCmd(notUsed, interp, argc, argv)
 	
 		if (argc != 5) {
 			Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-				" calc ?list1? ?action (+-*/)? ?list2?\"", (char *) NULL);
+				" calc list action(+-*/) list\"", (char *) NULL);
 			return TCL_ERROR;
 		}
 		if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
@@ -1773,7 +1797,7 @@ ExtraL_LmathCmd(notUsed, interp, argc, argv)
 	
 		if (argc != 3) {
 			Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-				" expr ?list?\"", (char *) NULL);
+				" expr list\"", (char *) NULL);
 			return TCL_ERROR;
 		}
 		if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
@@ -1839,7 +1863,7 @@ ExtraL_LregsubCmd(dummy, interp, argc, argv)
 	if (argc < 4) {
 		wrongNumArgs:
 		Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-			" ?switches? exp list subSpec\"", (char *) NULL);
+			" ?switches? expr list subSpec\"", (char *) NULL);
 		return TCL_ERROR;
 	}
 	argPtr = argv+1;
@@ -2063,7 +2087,7 @@ ExtraL_RandomCmd(notUsed, interp, argc, argv)
 
 	if (argc != 3) {
 		Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-			" ?min? ?max?\"", (char *) NULL);
+			" min max\"", (char *) NULL);
 		return TCL_ERROR;
 	}
 	if (Tcl_GetInt(interp, argv[1], &min) != TCL_OK) {
@@ -2099,7 +2123,7 @@ ExtraL_RandomCmd(notUsed, interp, argc, argv)
  *
  *		This procedure is invoked to process the "amanip" command.
  *		It manipulates arrays
- *		amanip ?option? ?array? ?arg? ...
+ *		amanip option array ?arg ...?
  *
  * Results:
  *		A standard Tcl result.
@@ -2125,7 +2149,7 @@ ExtraL_AmanipCmd(notUsed, interp, argc, argv)
 
 	if (argc < 2) {
 		Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-			" ?option? ??arg?? ...\"", (char *) NULL);
+			" option ?arg ...?\"", (char *) NULL);
 		return TCL_ERROR;
 	}
 	array=argv[2];
@@ -2134,7 +2158,7 @@ ExtraL_AmanipCmd(notUsed, interp, argc, argv)
 	if ((c == 'a')&&(strncmp(argv[1], "append",len) == 0)) {
 		if (argc != 4) {
 			Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-				" append ?array ?list?\"", (char *) NULL);
+				" append arrayName list\"", (char *) NULL);
 			return TCL_ERROR;
 		}
 		if (Tcl_SplitList(interp, argv[3], &listArgc, &listArgv) != TCL_OK) {
@@ -2147,6 +2171,36 @@ ExtraL_AmanipCmd(notUsed, interp, argc, argv)
 			i+=2;
 		}
 		ckfree((char *) listArgv);
+	} else if ((c == 'g')&&(strncmp(argv[1], "get",len) == 0)) {
+/*
+array set try {a 1 b 2 c 3 d 4 e 5 f 6}
+amanip get try {a d g f}
+amanip get try {a d g f} null
+*/
+		char *defval, *result;
+		if ((argc != 4)&&(argc != 5)) {
+			Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
+				" get arrayName list ?alldefault?\"", (char *) NULL);
+			return TCL_ERROR;
+		}
+		if (Tcl_SplitList(interp, argv[3], &listArgc, &listArgv) != TCL_OK) {
+			return TCL_ERROR;
+		}
+		if (argc==5) {
+			defval=argv[4];
+		}
+		i=0;
+		while(i<listArgc) {
+			result=Tcl_GetVar2(interp,array,listArgv[i],0);
+			if (result!=NULL) {
+				if (argc!=5) Tcl_AppendElement(interp, listArgv[i]);
+				Tcl_AppendElement(interp, result);
+			} else if (argc==5) {
+				Tcl_AppendElement(interp, defval);
+			}
+			i++;
+		}
+		ckfree((char *) listArgv);
 	} else {
 		Tcl_AppendResult(interp, "wrong option: should be:",
 					 "append", (char *) NULL);
@@ -2154,4 +2208,3 @@ ExtraL_AmanipCmd(notUsed, interp, argc, argv)
 	}
 	return TCL_OK;
 }
-

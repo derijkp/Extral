@@ -112,6 +112,12 @@ proc laddnew {listref args} {
 	set list [lmanip remdup $list]
 }
 
+proc lcorsort {list sortlist args} {
+	set sorted [eval lsort $args {$sortlist}]
+	set cor [lcor $sortlist $sorted]
+	return [lsub $list $cor]
+}
+
 # Code to let a variable iterate over a list
 # handy when checking a foreach loop manually
 # literate ?variable name? ?list?

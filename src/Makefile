@@ -16,7 +16,7 @@ LIBS = -L$(TCL_DIR)/unix -ltcl7.5 -ldl -lieee -lm -lc
 # compiler flags: -KPICT is to create position independed code, this might be
 # different for your compiler
 # Linux
-CFLAGS = -fpic -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -Dvfork=fork
+CFLAGS = -g -fpic -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -Dvfork=fork
 # IRIX 5.3
 # CFLAGS = -O2 -KPIC 
 
