@@ -46,13 +46,10 @@ proc lpush {ulist item {pos {}}} {
 	}
 }
 
-proc lshift {ulist} {
-	upvar $ulist list
-	if {[llength $list]==0} {return ""}
-	set result [lindex $list 0]
-	set list [lrange $list 1 end]
-	return $result
-}
+#proc lshift {ulist} {
+#	upvar $ulist list
+#	lpop list 0
+#}
 
 proc lunshift {ulist item} {
 	upvar $ulist list

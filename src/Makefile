@@ -45,6 +45,11 @@ install: extral.so
 	cp ../extral.txt $(INST_DIR)
 	cp ../readme $(INST_DIR)
 
+clean:
+	rm *.o
+	rm extratcl
+	rm ../extral.so
+
 depend:
 	makedepend -- $(CC_SWITCHES) -- $(SRCS)
 

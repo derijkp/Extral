@@ -1,3 +1,7 @@
+set try {dfg {gfxh j} "File dfg"}
+lshift try
+set try
+
 package require Peos
 array set table {Action 1 Adjust 2 Menu 3 ActionM "B1" AdjustM "B2" MenuM "B3"}
 
@@ -67,5 +71,11 @@ set try {a b c d e f g}
 set try {a {b c} d e {ff sfgh} g}
 lpop try 4
 lpop try
-time {lpop try 1}
+time {
+	set try {a b c d e f g}
+	lpop try 1
+} 100
 puts $try
+
+replace Adjust-Motion-Action {Action- B1- -Action -1 Adjust- B2- -Adjust -2}
+time {replace Adjust-Motion-Action {Action- B1- -Action -1 Adjust- B2- -Adjust -2}} 100

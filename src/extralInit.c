@@ -36,10 +36,16 @@ extern int ExtraL_LregsubCmd _ANSI_ARGS_((ClientData clientData,
 extern int ExtraL_LpopCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
 
+extern int ExtraL_LshiftCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int argc, char *argv[]));
+
 extern int ExtraL_RandomCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
 
 extern int ExtraL_AmanipCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int argc, char *argv[]));
+
+extern int ExtraL_ReplaceCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
 
 extern int ExtraL_AtexitCmd _ANSI_ARGS_((ClientData clientData));
@@ -62,7 +68,9 @@ Extral_Init(interp)
     dld_AddTclCommand(interp, "lmath", ExtraL_LmathCmd);
     dld_AddTclCommand(interp, "lregsub", ExtraL_LregsubCmd);
     dld_AddTclCommand(interp, "lpop", ExtraL_LpopCmd);
+    dld_AddTclCommand(interp, "lshift", ExtraL_LshiftCmd);
     dld_AddTclCommand(interp, "amanip", ExtraL_AmanipCmd);
+    dld_AddTclCommand(interp, "replace", ExtraL_ReplaceCmd);
     dld_AddTclCommand(interp, "random", ExtraL_RandomCmd);
     srand((unsigned int)time(0));
     return TCL_OK;

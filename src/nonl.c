@@ -12,6 +12,7 @@
 #include <malloc.h>
 #include "tcl.h"
 #include "tclRegexp.h"
+#include "general.h"
 #define UCHAR(c) ((unsigned char) (c))
 #define EXACT		0
 #define GLOB		1
@@ -379,5 +380,66 @@ amanip get try {a d g f} null
 					 "append", (char *) NULL);
 		return TCL_ERROR;
 	}
+	return TCL_OK;
+}
+/*
+ *----------------------------------------------------------------------
+ *
+ * ExtraL_ReplaceCmd --
+ *
+ *
+ * Results:
+ *		A standard Tcl result.
+ *
+ *
+ *----------------------------------------------------------------------
+ */
+
+		/* ARGSUSED */
+int
+ExtraL_ReplaceCmd(notUsed, interp, argc, argv)
+	ClientData notUsed;						/* Not used. */
+	Tcl_Interp *interp;						/* Current interpreter. */
+	int argc;								/* Number of arguments. */
+	char **argv;						/* Argument strings. */
+{
+	Tcl_DString result;
+	int listArgc;
+	char **listArgv;
+	char *string,*p,*lp,*tp;
+	int i,j,pos,len;
+
+	Tcl_DStringInit(&result);
+
+	if (argc != 3) {
+		Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
+				" string replacelist\"", (char *) NULL);
+		return TCL_ERROR;
+	}
+	if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
+		return TCL_ERROR;
+	}
+	p=argv[1];
+	while (*p!='\0') {
+		for(j=0;j<listArgc;j+=2) {
+			lp=listArgv[j];
+			tp=p;
+			while ((*lp!='\0')&tp!='\0') {
+				if (*tp!=*lp) break;
+				tp++;lp++;
+			}
+			if (*lp=='\0') {
+				Tcl_DStringAppend(&result,listArgv[j+1],-1);
+				p=tp;
+				if (*tp=='\0') {
+					Tcl_DStringResult(interp,&result);
+					return TCL_OK;
+				}
+			}
+		}
+		Tcl_DStringAppend(&result,p,1);
+		p++;
+	}
+	Tcl_DStringResult(interp,&result);
 	return TCL_OK;
 }
