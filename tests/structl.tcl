@@ -143,9 +143,13 @@ test structlfields {} {
 } {a bb ccc}
 
 test structlfields {see values} {
-	structlfields {a 1 bb 2 ccc 3} values
+	structlfields {a 1 bb 2 ccc 3} {} values
 	set values
 } {1 2 3}
+
+test structlfields {see values} {
+	structlfields {a {a 1 b 2 c 3}} a
+} {a b c}
 
 test structlunset {check uneven} {
 	structlfields {a 1 bb 2 ccc}

@@ -7,10 +7,10 @@
  *	 of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  */
 
-#include "tcl.h"
-#include "extral.h"
 #include <fcntl.h>
 #include "db_185.h"
+#include "tcl.h"
+#include "extral.h"
 
 int ExtraL_BsddbmCreate(
 	Tcl_Interp *interp,
@@ -88,7 +88,7 @@ int ExtraL_BsddbmOpen(
 	DB *dbf;
 	char *name;
 	DBTYPE dbtype;
-	int namelen, mode, error, i;
+	int namelen, error, i;
 
 	dbtype = DB_BTREE;
 	i = 0;
@@ -155,7 +155,7 @@ int ExtraL_BsddbmUnset(
 	Tcl_Obj *keyObj)
 {
 	DB *dbf = token;
-	DBT key, value;
+	DBT key;
 	int error;
 
 	key.data = Tcl_GetStringFromObj(keyObj,&(key.size));
@@ -198,7 +198,6 @@ int ExtraL_BsddbmKeys(
 	char *temp;
 	int flag,len,templen;
 	int error;
-	int i;
 
 	Tcl_ResetResult(interp);
 	resultObj = Tcl_GetObjResult(interp);

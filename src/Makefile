@@ -13,7 +13,7 @@ TCL_UNIX_DIR =	/home/peter/tcl/tcl8.0/unix
 TCL_BIN_DIR = @TCL_BIN_DIR@
 
 # Libraries to use when linking:
-LIBS = -L/home/peter/tcl/tcl8.0/unix -ltcl8.0 -ldl  -lm -lc
+LIBS = -L/home/peter/tcl/tcl8.0/unix -ltcl8.0 -ldl  -lieee -lm -lc
 
 #----------------------------------------------------------------
 # The information below is modified by the configure script when
@@ -21,14 +21,14 @@ LIBS = -L/home/peter/tcl/tcl8.0/unix -ltcl8.0 -ldl  -lm -lc
 # modify any of this stuff by hand.
 #----------------------------------------------------------------
 
-CC = gcc -Wall
+CC = gcc
 SHLIB_CFLAGS =		-fPIC
 SHLIB_LD =		gcc -shared
 SHLIB_SUFFIX =		.so
 SHLIB_VERSION =		
 SRC_DIR =		.
 CFLAGS = -g
-CC_SWITCHES = $(CFLAGS) $(SHLIB_CFLAGS) -I${TCL_GENERIC_DIR} -I$(TCL_UNIX_DIR) -I${TK_GENERIC_DIR} ${SHLIB_CFLAGS} -I../extern/
+CC_SWITCHES = $(CFLAGS) $(SHLIB_CFLAGS) -I${TCL_GENERIC_DIR} -I$(TCL_UNIX_DIR) ${SHLIB_CFLAGS} -I../extern/
 
 OBJECTS = extralInit.o extral.o lpop.o nonl.o supersort.o general.o \
 			structl.o structltypes.o date.o leval.o dbm.o

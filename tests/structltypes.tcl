@@ -504,4 +504,51 @@ test structlget-types {proc get: test data} {
 	structlget -data d -struct $struct $try a
 } {d 10}
 
+test structlset-types {named set to default} {
+	set struct {*named {{* try t} {*int ?}} {}}
+	set try {a {t 1}}
+	structlset -struct $struct $try b {try 2} a {try ?}
+} {b {t 2}}
+
+test structlset-types {named set to empty} {
+	set struct {t {*named {*int ?} {}}}
+	set try {t {a 1}}
+	structlset -struct $struct $try t {}
+} {t {a 1}}
+
+test structlset-types {named set to default} {
+	set struct {t {*named {*int ?} {}}}
+	set try {t {a 1}}
+	structlset -struct $struct $try t {a ?}
+} {}
+
+test structlset-types {list regexp} {
+	set struct {{* parts pts} {*list {*regexp ^a "does not start with an a" ?} {}}}
+	set try {}
+	structlset -struct $struct $try pts {b}
+} {error: "b" does not start with an a at field "pts"} 1
+
+test structlset-types {set empty list sub element} {
+	set dbstruct {*list {a {*any {}}} {}}
+	Extral::structlset -struct $dbstruct {} next {}
+} {{}}
+
+test structlset-types {set empty list sub element} {
+	set dbstruct {
+	        {* article art} {
+	            *list {
+	                {* author a} {*any {}}
+	            } {}
+	        }
+	}
+	set db [structlset -struct $dbstruct {} {art next} {}]
+} {art {{}}}
+
+test structlget-types {quotes in any} {
+	set dbstruct {t {*any {}}}
+	set db {t { "try}}
+	Extral::structlget -struct $dbstruct $db t
+} { "try}
+
+
 testsummarize

@@ -3,6 +3,10 @@
 exec tclsh8.0 "$0" "$@"
 
 source tools.tcl
+proc r {} {
+	uplevel source ../lib/structl.tcl
+	uplevel source ../lib/structltypes.tcl
+}
 
 test structlset-struct {basic} {
 	set struct {a {*int ?}}
@@ -70,11 +74,29 @@ test structlset-struct {basic: change one} {
 	structlset -struct $struct $try {a b} 10
 } {a {a 1 b 10}}
 
+test structlset-struct {basic long format} {
+	set struct {{* aa a} {*int ?}}
+	set try {}
+	structlset -struct $struct $try aa 10
+} {a 10}
+
+test structlset-struct {basic long format error} {
+	set struct {* {*int ?}}
+	set try {}
+	Extral::structlset -struct $struct $try aa 10
+} {error: tag "aa" not present in structure "* {*int ?}"} 1
+
 test structlset-struct {basic: error} {
 	set struct {a {a {*int ?}}}
 	set try {}
 	structlset -struct $struct $try a 10
 } {error: incorrect value trying to assign "10" to struct "a {*int ?}" at field "a"} 1
+
+test structlset-struct {basic cmd error} {
+	set struct {a {*int ?}}
+	set try {}
+	structlset -struct $struct $try a
+} {wrong # args: should be "structlset ?-struct schema? ?-data clientdata? list taglist value ?taglist value?"} 1
 
 test structlset-struct {basic: error too much tags} {
 	set struct {a {a {*int ?}}}
@@ -82,7 +104,7 @@ test structlset-struct {basic: error too much tags} {
 	structlset -struct $struct $try {a a a} 10
 } {error: field "a" not present in structure "*int ?" at field "a" at field "a"} 1
 
-test structlset-struct {basic: error with *} {
+test structlset-struct {basic: error with *named} {
 	set struct {a {*named {*int ?} {}}}
 	set try {}
 	structlset -struct $struct $try a 10
@@ -138,7 +160,7 @@ test structlset-struct {basic: set empty} {
 	set struct {a {*named {*int ?} {}}}
 	set try {a {a 1 b 1}}
 	structlset -struct $struct $try a {}
-} {}
+} {a {a 1 b 1}}
 
 # get tests
 
@@ -188,6 +210,18 @@ test structlset-struct {by value} {
 	set struct {i {*int ?} s {*any ?}}
 	structlset -struct $struct {} {} {i 2 s try}
 } {i 2 s try}
+
+test structlget-struct {basic: long format} {
+	set struct {{* aa a} {*int ?}}
+	set try {a {a 10}}
+	Extral::structlget -struct $struct $try aa
+} {a 10}
+
+test structlget-struct {basic: long format error} {
+	set struct {* {*int ?}}
+	set try {a {a 10}}
+	Extral::structlget -struct $struct $try aa
+} {error: tag "aa" not present in structure "* {*int ?}"} 1
 
 test structlget-struct {check for error: struct not even} {
 	set struct accn
@@ -266,19 +300,135 @@ test structlget-struct {named by field} {
 	structlget -struct $struct $try {a s}
 } {Some Street}
 
-#test structlget-struct {long format} {
-#source ../lib/structl.tcl
-#source ../lib/structltypes.tcl
-#	set struct {
-#		{Address a} {
-#			{Street s} {*any ?}
-#			{Number n} {*int ?}
-#		}
-#		* {*int ?}
-#	}
-#	set try {a {s {Some Street} n 10}}
-#	structlget -struct $struct $try {}
-#} {a ?}
+test structlget-struct {long format} {
+	set struct {
+		{* Address a} {
+			{* Street s} {*any ?}
+			{* Number n} {*int ?}
+		}
+	}
+	set try {a {s {Some Street} n 10}}
+	structlget -struct $struct $try {}
+} {Address {Street {Some Street} Number 10}}
+
+test structlget-struct {long format} {
+	set struct {
+		{* Address a} {
+			{* Street s} {*any ?}
+			{* Number n} {*int ?}
+		}
+	}
+	set try {a {s {Some Street} n 10}}
+	structlget -struct $struct $try Address
+} {Street {Some Street} Number 10}
+
+test structlset-struct {long format: set by field} {
+	set struct {
+		{* Address a} {
+			{* Street s} {*any ?}
+			{* Number n} {*int ?}
+		}
+	}
+	set try {a {s {Some Street} n 10}}
+	structlset -struct $struct $try {Address Street} {try it}
+} {a {s {try it} n 10}}
+
+test structlset-struct {long format: set by value} {
+	set struct {
+		{* Address a} {
+			{* Street s} {*any ?}
+			{* Number n} {*int ?}
+		}
+	}
+	set try {a {s {Some Street} n 10}}
+	structlset -struct $struct $try Address {Street {try it} Number 1}
+} {a {s {try it} n 1}}
+
+test structlset-struct {long format: withnamed} {
+	set struct {*named {{* try t} {*int ?}} {}}
+	set try {a {t 1}}
+	structlset -struct $struct $try b {try 2} a {try 4}
+} {a {t 4} b {t 2}}
+
+test structlfields {see values of long format} {
+	Extral::structlfields {a {{* aa a} 1 b 2 c 3}} a
+} {aa b c}
+
+test structlfields {error in long format} {
+	Extral::structlfields {a {* 1 b 2 c 3}} a
+} {{} b c}
+
+test structlunset-struct {basic} {
+	set struct {a {*int ?}}
+	set try {a 1}
+	Extral::structlunset -struct $struct $try a
+} {}
+
+test structlunset-struct {basic 2} {
+	set struct {a {*int ?} b {*int ?}}
+	set try {a 1 b 2}
+	structlunset -struct $struct $try a
+} {b 2}
+
+test structlunset-struct {basic 2 and 2 tags} {
+	set struct {a {a {*int ?}} b {*int ?}}
+	set try {a {a 1} b 2}
+	structlunset -struct $struct $try {a a}
+} {b 2}
+
+test structlunset-struct {basic long format} {
+	set struct {{* aa a} {a {*int ?}} b {*int ?}}
+	set try {a {a 1} b 2}
+	structlunset -struct $struct $try {aa a}
+} {b 2}
+
+test structlunset-struct {basic named} {
+	set struct {a {*named {*int ?} {}} b {*int ?}}
+	set try {a {a 1 b 2} b 2}
+	structlunset -struct $struct $try a
+} {b 2}
+
+test structlunset-struct {basic one of named} {
+	set struct {a {*named {*int ?} {}} b {*int ?}}
+	set try {a {a 1 b 2} b 2}
+	structlunset -struct $struct $try {a a}
+} {a {b 2} b 2}
+
+test structlunset-struct {basic one of named subfields} {
+	set struct {a {*named {a {*int ?} b {*int ?}} {}}}
+	set try {a {a {a 1 b 2} b {a 2}}}
+	structlunset -struct $struct $try {a a a}
+} {a {a {b 2} b {a 2}}}
+
+test structlunset-struct {basic one of named subfields} {
+	set struct {a {*named {a {*int ?} b {*int ?}} {}}}
+	set try {a {a {a 1 b 2} b {a 2}}}
+	structlunset -struct $struct $try {a c}
+} {a {a {a 1 b 2} b {a 2}}}
+
+test structlunset-struct {basic list} {
+	set struct {a {*list {*any ?} {}} b {*int ?}}
+	set try {a {a b} b 2}
+	structlunset -struct $struct $try a
+} {b 2}
+
+test structlunset-struct {basic one of list} {
+	set struct {a {*list {*any ?} {}} b {*int ?}}
+	set try {a {a b} b 2}
+	structlunset -struct $struct $try {a 0}
+} {a b b 2}
+
+test structlunset-struct {basic one of list} {
+	set struct {a {*list {*any ?} {}} b {*int ?}}
+	set try {a {a b} b 2}
+	structlunset -struct $struct $try {a end}
+} {a a b 2}
+
+test structlunset-struct {basic one in list subfield} {
+	set struct {a {*list {a {*any ?}} {}} b {*int ?}}
+	set try {a {{a a} {a b}} b 2}
+	Extral::structlunset -struct $struct $try {a 0 a}
+} {a {{a b}} b 2}
 
 
 testsummarize
