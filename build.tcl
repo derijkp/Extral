@@ -135,7 +135,7 @@ proc build {targetdir} {
 	}
 	file mkdir $targetdir
 
-	file copy Readme.txt extral.so pkgIndex.tcl $targetdir		
+	file copy README extral.so pkgIndex.tcl $targetdir		
 	file copy lib docs $targetdir		
 	catch {file delete [file join $targetdir lib *~]}
 	difaccess 0644 0755 $targetdir
