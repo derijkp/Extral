@@ -259,13 +259,21 @@ int ExtraL_DbmObjectCmd(
 			if (error != TCL_OK) {return error;}
 			return TCL_OK;
 		} else if (strcmp(cmd,"get") == 0) {
-			if (objc != 3) {
-				Tcl_WrongNumArgs(interp, 1, objv, "get key");
+			if ((objc != 3)&&(objc != 4)) {
+				Tcl_WrongNumArgs(interp, 1, objv, "get key ?default?");
 				return TCL_ERROR;
 			}
 			resultObj = Tcl_GetObjResult(interp);
 			error = type->get(interp,token,objv[2],resultObj);
-			if (error != TCL_OK) {return error;}
+			if (error != TCL_OK) {
+				if (objc == 3) {
+					return error;
+				} else {
+					Tcl_ResetResult(interp);
+					Tcl_SetObjResult(interp,objv[3]);
+					return TCL_OK;
+				}
+			}
 			return TCL_OK;
 		}
 	} else if (cmdlen == 4) {

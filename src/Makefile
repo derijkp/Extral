@@ -31,7 +31,7 @@ CFLAGS = -g
 CC_SWITCHES = $(CFLAGS) $(SHLIB_CFLAGS) -I${TCL_GENERIC_DIR} -I$(TCL_UNIX_DIR) -I${TK_GENERIC_DIR} ${SHLIB_CFLAGS} -I../extern/
 
 OBJECTS = extralInit.o extral.o lpop.o nonl.o supersort.o general.o \
-			structl.o date.o leval.o dbm.o
+			structl.o structltypes.o date.o leval.o dbm.o
 
 all: extral${SHLIB_SUFFIX} extratcl
 

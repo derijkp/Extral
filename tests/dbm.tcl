@@ -66,6 +66,13 @@ test [type] {set and get} {
 	db get try
 } {try it}
 
+test [type] {get default} {
+	catch {file delete -force db.test}
+	dbm create [type] db.test
+	dbm open [type] db db.test
+	db get try ?
+} {?}
+
 test [type] {set and get error: key not present} {
 	catch {file delete -force db.test}
 	dbm create [type] db.test

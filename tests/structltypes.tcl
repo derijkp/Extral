@@ -156,7 +156,7 @@ test structlset-struct {dbetween: too high} {
 
 test structlset-struct {proc} {
 	namespace eval ::Extral {
-		proc setproc {default value} {
+		proc setproc {stucture oldvalue value} {
 			return "try:$value"
 		}
 	}
@@ -167,8 +167,8 @@ test structlset-struct {proc} {
 
 test structlset-struct {proc with argument: set} {
 	namespace eval ::Extral {
-		proc setproc {arg default value} {
-			return "$arg:$value"
+		proc setproc {structure oldvalue value} {
+			return "[lindex $structure 1]:$value"
 		}
 	}
 	set struct {a {*proc t ?}}
@@ -176,9 +176,20 @@ test structlset-struct {proc with argument: set} {
 	structlset -struct $struct $try a 11
 } {a t:11}
 
+test structlset-struct {proc set: use oldvalue} {
+	namespace eval ::Extral {
+		proc setproc {structure oldvalue value} {
+			return "$oldvalue -> $value"
+		}
+	}
+	set struct {a {*proc t ?}}
+	set try {a 8}
+	structlset -struct $struct $try a 9
+} {a {8 -> 9}}
+
 test structlget-struct {proc} {
 	namespace eval ::Extral {
-		proc getproc {default value} {
+		proc getproc {structure value} {
 			return "try:$value"
 		}
 	}
@@ -189,8 +200,8 @@ test structlget-struct {proc} {
 
 test structlget-struct {proc with argument: get} {
 	namespace eval ::Extral {
-		proc getproc {arg default value} {
-			return "$arg:$value"
+		proc getproc {structure value} {
+			return "[lindex $structure 1]:$value"
 		}
 	}
 	set struct {a {*proc t ?}}

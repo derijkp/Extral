@@ -7,7 +7,7 @@
 #
 # =============================================================
 
-Extral::export {rem REM remoff true setglobal random} {
+Extral::export {rem REM remoff true setglobal random extractoption extractbool} {
 
 # Remark
 # rem: 
@@ -63,4 +63,25 @@ proc random {min max} {
 	return [expr int($min+rand()*$r)]
 }
 
+proc extractoption {listName option default} {
+	upvar $listName l
+	set pos [lsearch $l $option]
+	if {$pos != -1} {
+		lpop l $pos
+		return [lpop l $pos]
+	} else {
+		return $default
+	}
+}
+
+proc extractbool {listName option} {
+	upvar $listName l
+	set pos [lsearch $l $option]
+	if {$pos != -1} {
+		lpop l $pos
+		return 1
+	} else {
+		return 0
+	}
+}
 }

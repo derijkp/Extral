@@ -115,7 +115,7 @@ proc ::object::classcmd {class arg} {
 				return -code error "wrong # args: should be \"$class method name args body\""
 			}
 			set name [lindex $arg 0]
-			if [regexp {^subclass|parent|method|methods|class$} $name] {
+			if [regexp {^subclass$|^parent$|^method$|^methods$|^class$} $name] {
 				return -code error "$name cannot be redefined"
 			}
 			set args [lindex $arg 1]

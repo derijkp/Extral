@@ -36,6 +36,10 @@ test structlset {empty list} {
 	structlset {} a 1
 } {a 1}
 
+test structlset {empty taglist} {
+	structlset {} {} {a 1}
+} {a 1}
+
 test structlset {empty sublist} {
 	structlset {a {}} {a b} 1
 } {a {b 1}}
@@ -45,6 +49,10 @@ test structlset {check for object errors in C code} {
 	structlset $try bb try
 	set try 
 } {a 1 bb 2 ccc 3}
+
+test structlset {multiple tags not found} {
+	structlset {a 1 bb 2} {c a b} 1
+} {a 1 bb 2 c {a {b 1}}}
 
 test structlget {} {
 	structlget {a 1 bb 2 ccc 3} bb
@@ -60,15 +68,15 @@ test structlget {with larger structure} {
 
 test structlget {tag not present} {
 	structlget {a 1 bb 2 ccc 3} e
-} {structlist "e" not found} 1
+} {taglist "e" not found} 1
 
-test structlget {structlist larger than structure} {
+test structlget {taglist larger than structure} {
 	structlget {a 1 bb 2 ccc 3} {a b}
 } {error: list "1" does not have an even number of elements} 1
 
-test structlget {structlist in struct not present} {
+test structlget {taglist in struct not present} {
 	structlget {a {a 1 b 2} bb 2 ccc 3} {a c}
-} {structlist "a c" not found} 1
+} {taglist "a c" not found} 1
 
 test structlget {get partial} {
 	structlget {a {a 1 b 2} bb 2 ccc 3} a
@@ -82,7 +90,7 @@ test structlunset {} {
 	structlunset {a 1 bb 2 ccc 3} bb
 } {a 1 ccc 3}
 
-test structlunset {} {
+test structlunset {not present} {
 	structlunset {a 1 bb 2 ccc 3} d
 } {a 1 bb 2 ccc 3}
 
@@ -90,7 +98,11 @@ test structlunset {check uneven} {
 	structlunset {a 1 bb 2 ccc} bb
 } {error: list "a 1 bb 2 ccc" does not have an even number of elements} 1
 
-test structlunset {unset, 2 tags} {
+test structlunset {present, 2 tags} {
+	structlunset {a 1 b 2 c {a 1 b 2}} {c a}
+} {a 1 b 2 c {b 2}}
+
+test structlunset {not present, 2 tags} {
 	structlunset {a 1 b 2 c {a 1 b 2}} {c c}
 } {a 1 b 2 c {a 1 b 2}}
 
@@ -117,7 +129,7 @@ test structlfind {present} {
 
 test structlfind {not present} {
 	structlfind {a try1 bb try2 ccc try3} try
-} 0
+} -1
 
 
 testsummarize

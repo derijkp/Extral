@@ -54,6 +54,12 @@ test class {subclass methods} {
 	Subclass methods
 } {class destroy parent}
 
+test class {try method *class} {
+	clean
+	Class method addclass {} {}
+	Class methods
+} {addclass class destroy parent}
+
 test class {subclass destroy: test command} {
 	clean
 	Class subclass Test
