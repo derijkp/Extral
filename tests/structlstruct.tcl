@@ -436,10 +436,16 @@ test structlunset-struct {basic one in list subfield} {
 	structlunset -struct $struct $try {a 0 a}
 } {a {{} {a b}} b 2}
 
+test structlunset-struct {one not present} {
+	set struct {a {*list {a {*any ?}}} b {*int ?}}
+	set try {a {{a a} {a b}} b 2}
+	structlunset -struct $struct $try {a 0 a} d
+} {error: tag "d" not present in structure "a {*list {a {*any ?}}} b {*int ?}"} 1
+
 test structlset-struct {parameters} {
 	set struct {*any {}}
 	structlset -struct $struct {}
 } {wrong # args: should be "structlset ?-struct schema? ?-data clientdata? list field value ?field value ...?"} 1
 
-
 testsummarize
+

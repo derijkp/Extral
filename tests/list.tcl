@@ -53,7 +53,7 @@ test lcor {2 times} {
 } {1 3 -1}
 
 test lcor {number bug} {
-	Extral::lcor {hobbit.seq orc.seq} {sphinx.seq hobbit.seq orc.seq centaur.seq}
+	lcor {hobbit.seq orc.seq} {sphinx.seq hobbit.seq orc.seq centaur.seq}
 } {-1 0 1 -1}
 
 test lmath {calc} {
@@ -84,56 +84,6 @@ test lmath {between} {
 	lmath between {-1 4 9 11 8} 0 10
 } {0 4 9 10 8}
 
-test lmanip {subindex} {
-	lmanip subindex {{a 1} {b 2} {c 3}} 1
-} {1 2 3}
-
-test lmanip {mangle} {
-	lmanip mangle {a b c} {1 2 3}
-} {{a 1} {b 2} {c 3}}
-
-test lmanip {extract} {
-	lmanip extract {Results {A: 50%} {B: 25%} {C: 25%}} { ([0-9+]+)\%}
-} {{} 50 25 25}
-
-test lmanip {extract} {
-	lmanip extract {} {}
-} {}
-
-test lmanip {split} {
-	lmanip split {a b c d e} -before {1 3}
-} {a {b c} {d e}}
-
-test lmanip {join} {
-	lmanip join {a b c {a d} e} { } {0 2}
-} {{a b} {c a d} e}
-
-test lmanip {join} {
-	lmanip join {a b c {a d} e} {} {0 2}
-} {ab {ca d} e}
-
-test lmanip {join} {
-	lmanip join {a b c {a d} e} {} all
-} {abca de}
-
-
-test lmanip {lengths} {
-	lmanip lengths {abc abcdef}
-} {3 6}
-
-
-test lmanip {fill} {
-	lmanip fill 4 "Hello world"
-} {{Hello world} {Hello world} {Hello world} {Hello world}}
-
-test lmanip {fill counting} {
-	lmanip fill 5 2 2
-} {2 4 6 8 10}
-
-test lmanip {fill negative counting} {
-	lmanip fill 5 10 -2
-} {10 8 6 4 2}
-
 test lremdup {} {
 	lremdup {a b c a b d}
 } {a b c d}
@@ -159,11 +109,20 @@ test lremdup {large} {
 	llength [lremdup $list]
 } 10000
 
+test lremdup {small sorted} {
+	set list {}
+	for {set i 0} {$i < 10} {incr i} {lappend list "try $i"}
+	lappend list "try 1" "try 2"
+	set list [lsort $list]
+	llength [lremdup -sorted $list]
+} 10
+
 test lremdup {large sorted} {
 	set list {}
 	for {set i 0} {$i < 10000} {incr i} {lappend list "try $i"}
 	lappend list "try 100" "try 200"
-	llength [lremdup -sorted [lsort $list]]
+	set list [lsort $list]
+	llength [lremdup -sorted $list]
 } 10000
 
 test lmerge {} {
@@ -266,14 +225,6 @@ test lshift {stays empty} {
 	lshift try
 	lshift try
 } {}
-
-test ssort {dict} {
-	ssort -dict {a10 a9 b2 a11}
-} {a9 a10 a11 b2}
-
-test ssort {normal} {
-	ssort {a10 a9 b2 a11}
-} {a10 a11 a9 b2}
 
 test lpush {} {
 	lpush try a
@@ -423,53 +374,14 @@ test lshift {with foreach} {
 	}
 } {}
 
-test varsubst {} {
-set try {try it}
-varsubst {try} {
-puts [list $try $try2]
-}
-} {
-puts [list {try it} $try2]
-}
-
-test ? {basic true} {
-	set try 1
-	? {$try<10} under over
-} {under}
-
-test ? {basic false} {
-	set try 20
-	? {$try<10} under over
-} {over}
-
-test arraytrans {basic} {
-	array set a {a 1 b 2 c 3 d 4}
-	arraytrans a {a c}
-} {1 3}
-
-test arraytrans {basic with default} {
-	array set a {a 1 b 2 c 3 d 4}
-	arraytrans a {a e} def
-} {1 def}
-
-test invoke {basic} {
-	invoke {a} {list $a $args} 1 2 3
-} {1 {2 3}}
-
-test replace {basic} {
-	replace "%W %%%W" {%% % %W $w}
-} {$w %$w}
-
-test replace {basic 2} {
-	replace {tkButtonEnter %W} {%W {[::class::bind %W]}}
-} {tkButtonEnter [::class::bind %W]}
-
-test replace {basic 3} {
-	replace {tkButtonEnter [::class::bind %W]} {{[::class::bind %W]} %W}
-} {tkButtonEnter %W}
+test lreverse {basic} {
+	lreverse {{a b} c {d e}}
+} {{d e} c {a b}}
 
 # no test yet for
 # ffind <switches> filelist pattern ?varName? ?pattern? ?varname?
 # ffind -matches -allfiles <switches> filelist pattern nulvalue ?varName? ?pattern? ?nulvalue? ?varname? ..
 # lload <filename>
 # lwrite ?file? ?list?
+
+testsummarize

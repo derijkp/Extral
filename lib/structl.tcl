@@ -45,7 +45,7 @@
 # structlget will return the long form.
 #}
 
-proc structlsetstruct {structure data list taglen taglist value} {
+proc Extral::structlsetstruct {structure data list taglen taglist value} {
 #putsvars structure list taglen taglist value
 	set ctag [lindex $structure 0]
 	if [regexp {^\*[^ ]} $ctag] {
@@ -75,7 +75,7 @@ proc structlsetstruct {structure data list taglen taglist value} {
 			} else {
 				set sublist [lindex $list $sublistpos]
 			}
-			set code [catch {structlsetstruct $substructure $data $sublist 0 "" $val} sublist]
+			set code [catch {Extral::structlsetstruct $substructure $data $sublist 0 "" $val} sublist]
 			if {$code == 1} {
 				error "$sublist at field \"$tag\""
 			} elseif {$code == 5} {
@@ -114,7 +114,7 @@ proc structlsetstruct {structure data list taglen taglist value} {
 		} else {
 			set sublist [lindex $list $sublistpos]
 		}
-		set code [catch {structlsetstruct $substructure $data $sublist $taglen $taglist $value} sublist]
+		set code [catch {Extral::structlsetstruct $substructure $data $sublist $taglen $taglist $value} sublist]
 		if {$code == 1} {
 			error "$sublist at field \"$tag\""
 		} elseif {$code == 5} {
@@ -136,7 +136,7 @@ proc structlsetstruct {structure data list taglen taglist value} {
 	}
 }
 
-proc structlsetnostruct {list taglen taglist value} {
+proc Extral::structlsetnostruct {list taglen taglist value} {
 	set tag [lpop taglist 0]
 	incr taglen -1
 	set pos 1
@@ -147,7 +147,7 @@ proc structlsetnostruct {list taglen taglist value} {
 	foreach {ctag cvalue} $list {
 		if {"$tag"=="$ctag"} {
 			if {$taglen != 0} {
-				set value [structlsetnostruct [lindex $list $pos] $taglen $taglist $value]
+				set value [Extral::structlsetnostruct [lindex $list $pos] $taglen $taglist $value]
 			}
 			return [lreplace $list $pos $pos $value]
 		}
@@ -226,7 +226,7 @@ proc structlset {args} {
 		set list [lshift args]
 		foreach {taglist value} $args {
 			set taglen [llength $taglist]
-			set code [catch {structlsetstruct $struct $data $list $taglen $taglist $value} result]
+			set code [catch {Extral::structlsetstruct $struct $data $list $taglen $taglist $value} result]
 			if {"$code" == 1} {
 				error $result
 			} elseif {"$code" == 5} {
@@ -242,13 +242,13 @@ proc structlset {args} {
 			if {$taglen == 0} {
 				return $value
 			}
-			set list [structlsetnostruct $list $taglen $taglist $value]
+			set list [Extral::structlsetnostruct $list $taglen $taglist $value]
 		}
 	}
 	return $list
 }
 
-proc structlgetstruct {structure data list taglen taglist} {
+proc Extral::structlgetstruct {structure data list taglen taglist} {
 #putsvars structure data list taglen taglist
 	# Is this an endnode
 	# ------------------
@@ -256,7 +256,6 @@ proc structlgetstruct {structure data list taglen taglist} {
 	if [regexp {^\*[^ ]} $ctag] {
 		return [::Extral::get[string range $ctag 1 end] $structure $data $taglist $list]
 	}
-
 	# out of tags
 	# -----------
 	if {$taglen == 0} {
@@ -268,10 +267,10 @@ proc structlgetstruct {structure data list taglen taglist} {
 			foreach {tag str} $structure {
 				if {"[lindex $tag 0]" == "?"} {
 					set sublist [structlfind $list [lindex $tag 2] value]
-					lappend result [lindex $tag 1] [structlgetstruct $str $data $sublist 0 ""]
+					lappend result [lindex $tag 1] [Extral::structlgetstruct $str $data $sublist 0 ""]
 				} else {
 					set sublist [structlfind $list $tag value]
-					lappend result $tag [structlgetstruct $str $data $sublist 0 ""]
+					lappend result $tag [Extral::structlgetstruct $str $data $sublist 0 ""]
 				}
 			}
 			return $result
@@ -296,11 +295,11 @@ proc structlgetstruct {structure data list taglen taglist} {
 		# find the tag
 		# ------------
 		set sublist [structlfind $list $tag value]
-		return [structlgetstruct $substructure $data $sublist $taglen $taglist]
+		return [Extral::structlgetstruct $substructure $data $sublist $taglen $taglist]
 	}
 }
 
-proc structlgetnostruct {list taglen taglist} {
+proc Extral::structlgetnostruct {list taglen taglist} {
 	foreach tag $taglist {
 		set len [llength $list]
 		if {[expr $len%2] != 0} {
@@ -366,25 +365,25 @@ proc structlget {args} {
 		set taglist [lindex $args 0]
 		set len [llength $taglist]
 		if {$usestr == 1} {
-			return [structlgetstruct $struct $data $list $len $taglist]
+			return [Extral::structlgetstruct $struct $data $list $len $taglist]
 		} else {
-			return [structlgetnostruct $list $len $taglist]
+			return [Extral::structlgetnostruct $list $len $taglist]
 		}
 	} else {
 		set result ""
 		foreach taglist $args {
 			set len [llength $taglist]
 			if {$usestr == 1} {
-				lappend result [structlgetstruct $struct $data $list $len $taglist]
+				lappend result [Extral::structlgetstruct $struct $data $list $len $taglist]
 			} else {
-				lappend result [structlgetnostruct $list $len $taglist]
+				lappend result [Extral::structlgetnostruct $list $len $taglist]
 			}
 		}
 		return $result
 	}
 }
 
-proc structlunsetstruct {structure data list taglen taglist} {
+proc Extral::structlunsetstruct {structure data list taglen taglist} {
 #putsvars structure list taglen taglist
 	set ctag [lindex $structure 0]
 	if [regexp {^\*[^ ]} $ctag] {
@@ -419,7 +418,7 @@ proc structlunsetstruct {structure data list taglen taglist} {
 		} else {
 			set sublist [lindex $list $sublistpos]
 		}
-		set code [catch {structlunsetstruct $substructure $data $sublist $taglen $taglist} sublist]
+		set code [catch {Extral::structlunsetstruct $substructure $data $sublist $taglen $taglist} sublist]
 		if {$code == 1} {
 			error "$sublist at field \"$tag\""
 		} elseif {$code == 5} {
@@ -441,7 +440,7 @@ proc structlunsetstruct {structure data list taglen taglist} {
 	}
 }
 
-proc structlunsetnostruct {list taglist} {
+proc Extral::structlunsetnostruct {list taglist} {
 	set len [llength $list]
 	if {[expr $len%2] != 0} {
 		return -code error "error: list \"$list\" does not have an even number of elements"
@@ -495,7 +494,7 @@ proc structlunset {args} {
 		set list [lshift args]
 		foreach taglist $args {
 			set taglen [llength $taglist]
-			set code [catch {structlunsetstruct $struct $data $list $taglen $taglist} result]
+			set code [catch {Extral::structlunsetstruct $struct $data $list $taglen $taglist} result]
 			if {"$code" == 1} {
 				error $result
 			} elseif {"$code" == 5} {
@@ -506,7 +505,7 @@ proc structlunset {args} {
 		}
 		return $list
 	} else {
-		return [structlunsetnostruct [lindex $args 0] [lindex $args 1]]
+		return [Extral::structlunsetnostruct [lindex $args 0] [lindex $args 1]]
 	}
 }
 

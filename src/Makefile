@@ -1,3 +1,4 @@
+# Generated automatically from Makefile.in by configure.
 #
 # This file is a Makefile.  If it has the name "Makefile.in"
 # then it is a template for a Makefile;  to generate the actual Makefile,
@@ -11,14 +12,14 @@ PROJECT = extral
 # The directory containing the Tcl sources and headers appropriate
 # for this version of Tk ("srcdir" will be replaced or has already
 # been replaced by the configure script):
-TCL_GENERIC_DIR =	@TCL_SRC_DIR@/generic
+TCL_GENERIC_DIR =	/home/peter/tcl/tcl8.0/generic
 
 # The directory containing the Tcl library archive file appropriate
 # for this version of Tk:
 TCL_BIN_DIR = @TCL_BIN_DIR@
 
 # Libraries to use when linking:
-LIBS = @TCL_BUILD_LIB_SPEC@ @TCL_LIBS@ -lc
+LIBS = -L/home/peter/tcl/tcl8.0/unix -ltcl8.0 -ldl  -lieee -lm -lc
 
 #----------------------------------------------------------------
 # The information below is modified by the configure script when
@@ -26,12 +27,12 @@ LIBS = @TCL_BUILD_LIB_SPEC@ @TCL_LIBS@ -lc
 # modify any of this stuff by hand.
 #----------------------------------------------------------------
 
-CC = @CC@
-SHLIB_CFLAGS =		@SHLIB_CFLAGS@
-SHLIB_LD =		@SHLIB_LD@
-SHLIB_SUFFIX =		@SHLIB_SUFFIX@
-SHLIB_VERSION =		@SHLIB_VERSION@
-SRC_DIR =		@srcdir@
+CC = gcc
+SHLIB_CFLAGS =		-fPIC
+SHLIB_LD =		gcc -shared
+SHLIB_SUFFIX =		.so
+SHLIB_VERSION =		
+SRC_DIR =		.
 
 CFLAGS = -g -Wall
 CC_SWITCHES = $(CFLAGS) -I${TCL_GENERIC_DIR} ${SHLIB_CFLAGS}
@@ -42,17 +43,17 @@ OBJECTS = extralInit.o extral.o lpop.o nonl.o supersort.o general.o \
 all: $(PROJECT)${SHLIB_SUFFIX}
 
 $(PROJECT)${SHLIB_SUFFIX}: $(OBJECTS)
-	${SHLIB_LD} $(OBJECTS) -o ../$(PROJECT)${SHLIB_SUFFIX} @SHLIB_LD_LIBS@
+	${SHLIB_LD} $(OBJECTS) -o ../$(PROJECT)${SHLIB_SUFFIX} 
 
 bsddbm$(SHLIB_SUFFIX): bsddbm.o ../extern/libdb.a
-	$(SHLIB_LD) bsddbm.o ../extern/libdb.a -o ./bsddbm$(SHLIB_SUFFIX) @SHLIB_LD_LIBS@
+	$(SHLIB_LD) bsddbm.o ../extern/libdb.a -o ./bsddbm$(SHLIB_SUFFIX) 
 	mv ./bsddbm$(SHLIB_SUFFIX) ../dbm/bsddbm$(SHLIB_SUFFIX)
 
 bsddbm.o: bsddbm.c
 	$(CC) -c $(CC_SWITCHES) -I../extern bsddbm.c
 
 gdbm$(SHLIB_SUFFIX): gdbm.o ../extern/libgdbm.a
-	$(SHLIB_LD) gdbm.o ../extern/libgdbm.a -o ./gdbm$(SHLIB_SUFFIX) @SHLIB_LD_LIBS@
+	$(SHLIB_LD) gdbm.o ../extern/libgdbm.a -o ./gdbm$(SHLIB_SUFFIX) 
 	mv ./gdbm$(SHLIB_SUFFIX) ../dbm/gdbm$(SHLIB_SUFFIX)
 
 extratcl: tclAppInit.o $(OBJECTS)

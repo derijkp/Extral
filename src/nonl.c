@@ -43,7 +43,7 @@ ExtraL_FfindCmd(notUsed, interp, argc, argv)
 	char **argv;						/* Argument strings. */
 {
 
-	Tcl_RegExp regexp=NULL;
+	Tcl_RegExp regexp;
 	char *start, *end;
 	Tcl_Channel file;
 	char **argPtr;
@@ -279,7 +279,6 @@ ExtraL_FfindCmd(notUsed, interp, argc, argv)
  *
  *----------------------------------------------------------------------
  */
-
 int
 ExtraL_AmanipCmd(notUsed, interp, argc, argv)
 	ClientData notUsed;					/* Not used. */
@@ -292,7 +291,6 @@ ExtraL_AmanipCmd(notUsed, interp, argc, argv)
 	char *array;
 	int c,len;
 	int i;
-
 	if (argc < 2) {
 		Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
 			" option ?arg ...?\"", (char *) NULL);
@@ -323,7 +321,7 @@ array set try {a 1 b 2 c 3 d 4 e 5 f 6}
 amanip get try {a d g f}
 amanip get try {a d g f} null
 */
-		char *defval=NULL, *result;
+		char *defval, *result;
 		if ((argc != 4)&&(argc != 5)) {
 			Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
 				" get arrayName list ?alldefault?\"", (char *) NULL);
@@ -354,11 +352,15 @@ amanip get try {a d g f} null
 	}
 	return TCL_OK;
 }
+
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_ReplaceCmd --
+ * ExtraL_AmanipObjCmd --
  *
+ *		This procedure is invoked to process the "amanip" command.
+ *		It manipulates arrays
+ *		amanip option array ?arg ...?
  *
  * Results:
  *		A standard Tcl result.
@@ -367,51 +369,258 @@ amanip get try {a d g f} null
  *----------------------------------------------------------------------
  */
 
-		/* ARGSUSED */
 int
-ExtraL_ReplaceCmd(notUsed, interp, argc, argv)
-	ClientData notUsed;						/* Not used. */
-	Tcl_Interp *interp;						/* Current interpreter. */
-	int argc;								/* Number of arguments. */
-	char **argv;						/* Argument strings. */
+ExtraL_AmanipObjCmd(notUsed, interp, objc, objv)
+	ClientData notUsed;				 /* Not used. */
+	Tcl_Interp *interp;					/* Current interpreter. */
+	int objc;						/* Number of arguments. */
+	Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
-	Tcl_DString result;
-	int listArgc;
-	char **listArgv;
-	char *p,*lp,*tp;
+	int listobjc;
+	Tcl_Obj **listobjv;
+	char *string;
+	int c,len;
+	int i;
+	if (objc < 2) {
+		Tcl_WrongNumArgs(interp, 1, objv, "option ?arg ...?");
+		return TCL_ERROR;
+	}
+	string = Tcl_GetStringFromObj(objv[1],&len);
+	c = string[0];
+	if ((c == 'l')&&(strncmp(string,"lappend",len) == 0)) {
+		if (objc != 4) {
+			Tcl_WrongNumArgs(interp, 2, objv, "arrayName list");
+			return TCL_ERROR;
+		}
+		if (Tcl_ListObjGetElements(interp, objv[3], &listobjc, &listobjv) != TCL_OK) {
+			return TCL_ERROR;
+		}
+		i=0;
+		len=listobjc-1;
+		while(i<len) {
+			Tcl_ObjSetVar2(interp, objv[2], listobjv[i], listobjv[i+1], TCL_APPEND_VALUE|TCL_LIST_ELEMENT);
+			i+=2;
+		}
+	} else if ((c == 'g')&&(strncmp(string,"get",len) == 0)) {
+		/*
+			array set try {a 1 b 2 c 3 d 4 e 5 f 6}
+			amanip get try {a d g f}
+			amanip get try {a d g f} null
+		*/
+		Tcl_Obj *defval, *result, *element;
+		if ((objc != 4)&&(objc != 5)) {
+			Tcl_WrongNumArgs(interp, 2, objv, "arrayName list ?alldefault?");
+			return TCL_ERROR;
+		}
+		if (Tcl_ListObjGetElements(interp, objv[3], &listobjc, &listobjv) != TCL_OK) {
+			return TCL_ERROR;
+		}
+		if (objc == 5) {
+			defval = objv[4];
+		}
+		i = 0;
+		result = Tcl_NewObj();
+		while(i<listobjc) {
+			element = Tcl_ObjGetVar2(interp,objv[2],listobjv[i],0);
+			if (element != NULL) {
+				if (objc!=5) Tcl_ListObjAppendElement(interp, result, listobjv[i]);
+				Tcl_ListObjAppendElement(interp, result, element);
+			} else if (objc==5) {
+				Tcl_ListObjAppendElement(interp, result, defval);
+			}
+			i++;
+		}
+		Tcl_SetObjResult(interp,result);
+		return TCL_OK;
+	} else {
+		Tcl_AppendResult(interp, "wrong option: should be: lappend or get", (char *) NULL);
+		return TCL_ERROR;
+	}
+	return TCL_OK;
+}
+
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ExtraL_ReplaceObjCmd --
+ *
+ *
+ * Results:
+ *		A standard Tcl result.
+ *
+ *
+ *----------------------------------------------------------------------
+ */
+int
+ExtraL_ReplaceObjCmd(notUsed, interp, objc, objv)
+	ClientData notUsed;				 /* Not used. */
+	Tcl_Interp *interp;					/* Current interpreter. */
+	int objc;						/* Number of arguments. */
+	Tcl_Obj *CONST objv[];	/* Argument objects. */
+{
+	Tcl_Obj *result;
+	int listObjc;
+	Tcl_Obj **listObjv;
+	char *p,*lp;
+	int plen,lplen,ppos,tppos,lppos,prev;
 	int j;
 
-	Tcl_DStringInit(&result);
-
-	if (argc != 3) {
-		Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-				" string replacelist\"", (char *) NULL);
+	if (objc != 3) {
+		Tcl_WrongNumArgs(interp, 1, objv, "string replacelist");
 		return TCL_ERROR;
 	}
-	if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
+	if (Tcl_ListObjGetElements(interp, objv[2], &listObjc, &listObjv) != TCL_OK) {
 		return TCL_ERROR;
 	}
-	p=argv[1];
-	while (*p!='\0') {
-		for(j=0;j<listArgc;j+=2) {
-			lp=listArgv[j];
-			tp=p;
-			while ((*lp!='\0')&(tp!='\0')) {
-				if (*tp!=*lp) break;
-				tp++;lp++;
+	result = Tcl_NewObj();
+	p = Tcl_GetStringFromObj(objv[1],&plen);
+	ppos = 0;
+	prev = 0;
+	while (ppos < plen) {
+		for(j=0;j<listObjc;j+=2) {
+			lp = Tcl_GetStringFromObj(listObjv[j],&lplen);
+			tppos = ppos;
+			lppos = 0;
+			while ((lppos < lplen)&&(tppos < plen)) {
+				if (p[tppos] != lp[lppos]) break;
+				tppos++;lppos++;
 			}
-			if (*lp=='\0') {
-				Tcl_DStringAppend(&result,listArgv[j+1],-1);
-				p=tp;
-				if (*tp=='\0') {
-					Tcl_DStringResult(interp,&result);
-					return TCL_OK;
+			if (lppos == lplen) {
+				if (prev != ppos) {
+					Tcl_AppendToObj(result,p + prev,ppos - prev);
 				}
+				lp = Tcl_GetStringFromObj(listObjv[j+1],&lplen);
+				Tcl_AppendToObj(result,lp,lplen);
+				ppos = tppos-1;
+				prev = tppos;
+				break;
 			}
 		}
-		Tcl_DStringAppend(&result,p,1);
-		p++;
+		ppos++;
 	}
-	Tcl_DStringResult(interp,&result);
+	if (ppos == plen) {
+		Tcl_AppendToObj(result,p + prev,plen - prev);
+	}
+	Tcl_SetObjResult(interp,result);
+	return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ExtraL_SreverseObjCmd --
+ *
+ *		This procedure is invoked to process the "sreverse" command.
+ *
+ * Results:
+ *		A standard Tcl result.
+ *
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+ExtraL_SreverseObjCmd(notUsed, interp, objc, objv)
+	ClientData notUsed;				 /* Not used. */
+	Tcl_Interp *interp;					/* Current interpreter. */
+	int objc;						/* Number of arguments. */
+	Tcl_Obj *CONST objv[];	/* Argument objects. */
+{
+	char *string, *result,*pos;
+	int stringlen,i;
+	if (objc != 2) {
+		Tcl_WrongNumArgs(interp, 1, objv, "string");
+		return TCL_ERROR;
+	}
+	string = Tcl_GetStringFromObj(objv[1], &stringlen);
+	result = (char *)Tcl_Alloc(stringlen*sizeof(char));
+	pos = result;
+	i = stringlen;
+	for(i--;i >= 0;i--) {
+		*pos++ = string[i];
+	}
+	Tcl_SetObjResult(interp,Tcl_NewStringObj(result,stringlen));
+	return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ExtraL_SfindCmd --
+ *
+ *		This procedure is invoked to process the "sfind" command.
+ *		It finds all occurences of a pattern in a list, and returns
+ *		their indexes as a list.
+ *
+ * Results:
+ *		A standard Tcl result.
+ *
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+ExtraL_SFindObjCmd(clientData, interp, objc, objv)
+	ClientData clientData;	/* Not used. */
+	Tcl_Interp *interp;		/* Current interpreter. */
+	int objc;			/* Number of arguments. */
+	Tcl_Obj *CONST objv[];	/* Argument values. */
+{
+#define EXACT	0
+#define GLOB	1
+#define REGEXP	2
+	char *string;
+	char *bytes, *patternBytes;
+	int i, match, mode, result, length, stringlen;
+	Tcl_Obj *indexObj, *resultObj;
+	static char *switches[] =
+		{"-exact", "-glob", "-regexp", (char *) NULL};
+	mode = EXACT;
+	if (objc == 4) {
+		if (Tcl_GetIndexFromObj(interp, objv[1], switches,
+			"search mode", 0, &mode) != TCL_OK) {
+			return TCL_ERROR;
+		}
+	} else if (objc != 3) {
+		Tcl_WrongNumArgs(interp, 1, objv, "?mode? string pattern");
+		return TCL_ERROR;
+	}
+	string = Tcl_GetStringFromObj(objv[objc-2], &stringlen);
+	patternBytes = Tcl_GetStringFromObj(objv[objc-1], &length);
+ 	Tcl_ResetResult(interp);
+	resultObj = Tcl_GetObjResult(interp);
+	for (i = 0; i < stringlen; i++) {
+		match = 0;
+		bytes = string+i;
+		switch (mode) {
+			case EXACT:
+				if (i+length < stringlen) {
+					match = (memcmp(bytes, patternBytes,(size_t) length) == 0);
+				}
+				break;
+			case GLOB:
+				/*
+				 * WARNING: will not work with data containing NULLs.
+				 */
+				match = Tcl_StringMatch(bytes, patternBytes);
+				break;
+			case REGEXP:
+				/*
+				 * WARNING: will not work with data containing NULLs.
+				 */
+				match = Tcl_RegExpMatch(interp, bytes, patternBytes);
+				if (match < 0) {
+					return TCL_ERROR;
+				}
+				break;
+		}
+		if (match) {
+			indexObj = Tcl_NewIntObj(i);
+			result = Tcl_ListObjAppendElement(interp,resultObj,indexObj);
+			if (result != TCL_OK) {return result;}
+		}
+	}
+	Tcl_SetObjResult(interp,resultObj);
 	return TCL_OK;
 }

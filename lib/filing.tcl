@@ -159,7 +159,6 @@ proc chmod {args} {
 	eval exec chmod $cl
 }
 
-
 if {"$tcl_platform(platform)"=="windows"} {
 #
 # ls and chmod for Windows ?

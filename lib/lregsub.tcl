@@ -4,7 +4,6 @@
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
 # =============================================================
-
 #doc {listcommands lregsub} cmd {
 #lregsub ?switches? exp list subSpec
 #} descr {

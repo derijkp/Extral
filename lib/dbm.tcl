@@ -28,6 +28,34 @@
 #The database code can also be used from C using the ExtraL_DbmOpen function.
 #}
 
+proc Extral::types {} {
+	set list ""
+	foreach item [lunion [array names ::auto_index ::Extral::dbmtype_*] [info commands ::Extral::dbmtype_*]] {
+		if [uplevel #0 $item] {
+			regsub ::Extral::dbmtype_ $item {} item
+			lappend list $item
+		}
+	}
+	return $list
+}
+
+proc Extral::loaddbm {type} {
+	if [info exists ::Extral::dbm_loaded_types($type)] {
+		return
+	}
+	if [catch {uplevel #0 ::Extral::dbminittype_$type} result] {
+		return -code error -errorinfo $::errorInfo "Could not load type \"$type\": $result"
+	}
+	set ::Extral::dbm_loaded_types($type) 1
+}
+
+if {"[info commands dbm]" != ""} {
+	set Extral::temp [dbm implementation]
+} else {
+	set Extral::temp tcl
+}
+if {"$Extral::temp" == "tcl"} {
+
 #doc {dbm dbm} h2 "dbm command"
 #doc {dbm dbm types} cmd {
 #dbm types
@@ -143,16 +171,16 @@ proc Extral::dbmcmd {object arg} {
 			if [set ::Extral::dbm($object,readonly)] {
 				return -code error "error: trying to set value from reader"
 			}
-			return [${type}__set $object [lindex $arg 1] [lindex $arg 2]]
+			return [Extral::${type}__set $object [lindex $arg 1] [lindex $arg 2]]
 		}
 		get {
 			if {($len != 2)&&($len != 3)} {
 				return -code error "wrong # args: should be \"$object get key ?default?\""
 			}
 			if {$len == 2} {
-				return [${type}__get $object [lindex $arg 1]]
+				return [Extral::${type}__get $object [lindex $arg 1]]
 			} else {
-				set error [catch {${type}__get $object [lindex $arg 1]} result]
+				set error [catch {Extral::${type}__get $object [lindex $arg 1]} result]
 				if {$error == 1} {
 					return [lindex $arg 2]
 				} else {
@@ -167,7 +195,7 @@ proc Extral::dbmcmd {object arg} {
 			if [set ::Extral::dbm($object,readonly)] {
 				return -code error "error: trying to unset value from reader"
 			}
-			return [${type}__unset $object [lindex $arg 1]]
+			return [Extral::${type}__unset $object [lindex $arg 1]]
 		}
 		keys {
 			if {($len != 1)&&($len != 2)} {
@@ -178,25 +206,25 @@ proc Extral::dbmcmd {object arg} {
 			} else {
 				set pattern [lindex $arg 1]
 			}
-			return [${type}__keys $object $pattern]
+			return [Extral::${type}__keys $object $pattern]
 		}
 		sync {
 			if {$len != 1} {
 				return -code error "wrong # args: should be \"$object sync\""
 			}
-			return [${type}__sync $object]
+			return [Extral::${type}__sync $object]
 		}
 		reorganize {
 			if {$len != 1} {
 				return -code error "wrong # args: should be \"$object reorganize\""
 			}
-			return [${type}__reorganize $object]
+			return [Extral::${type}__reorganize $object]
 		}
 		close {
 			if {$len != 1} {
 				return -code error "wrong # args: should be \"$object close\""
 			}
-			${type}__close $object
+			Extral::${type}__close $object
 			unset ::Extral::dbm($object,type)
 			unset ::Extral::dbm($object,readonly)
 			rename $object {}
@@ -205,4 +233,6 @@ proc Extral::dbmcmd {object arg} {
 			return -code error "bad option \"[lindex $arg 0]\": must be one of set, get, unset, keys, sync or reorganize"
 		}
 	}
+}
+
 }

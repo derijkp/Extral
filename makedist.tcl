@@ -1,11 +1,51 @@
 #!/bin/sh
 # the next line restarts using wish \
-exec tclsh8.0 "$0" "$@"
+exec tclsh8.0 "$0" ${1+"$@"}
+#
 
-set targetdir $argv
+if {[llength $argv] == 0} {
+	set targetdir [file dir [pwd]]
+} else {
+	set targetdir [lindex $argv 0]
+}
 
-#set targetdir $env(HOME)/src/[file tail [pwd]]0.9
+# $Format: "set version 1.$ProjectMajorVersion$"$
+set version 1.1
+# $Format: "set minorversion $ProjectMinorVersion$"$
+set minorversion 1
 
-file mkdir $targetdir
-file copy Readme.txt pkgIndex.tcl extral.so $targetdir
-file copy dbm docs extern lib src tests win $targetdir
+set targetdir [file join $targetdir Extral-$tcl_platform(os)-$version.$minorversion]
+puts "Building binary distribution in $targetdir"
+
+proc clean {filemode dirmode dir} {
+	if [catch {glob [file join $dir *]} files] return
+	foreach file $files {
+		if [regexp {~$} $file] {
+			file delete $file
+		} elseif [regexp {.save$} $file] {
+			file delete $file
+		} elseif [regexp "[info sharedlibextension]\$" $file] {
+		} elseif [file isdirectory $file] {
+			catch {file attributes $file -permissions $dirmode}
+			clean $filemode $dirmode $file
+		} else {
+			catch {file attributes $file -permissions $filemode}
+		}
+	}
+}
+
+# Main Program
+# ---------------------------------------------------------
+	if [file exists $targetdir] {
+		error "Target build directory $targetdir exists"
+	}
+	file mkdir $targetdir
+	file copy dbm docs lib $targetdir
+	file copy README pkgIndex.tcl $targetdir
+	if [catch {file copy extral[info sharedlibextension] $targetdir}] {
+		puts stderr "Warning, no compiled version available"
+	}
+	clean 0644 0755 $targetdir
+exit
+
+

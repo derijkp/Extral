@@ -50,7 +50,7 @@ ExtraL_LfindObjCmd(clientData, interp, objc, objv)
 	static char *switches[] =
 		{"-exact", "-glob", "-regexp", (char *) NULL};
 
-	mode = GLOB;
+	mode = EXACT;
 	if (objc == 4) {
 		if (Tcl_GetIndexFromObj(interp, objv[1], switches,
 			"search mode", 0, &mode) != TCL_OK) {
@@ -102,15 +102,15 @@ ExtraL_LfindObjCmd(clientData, interp, objc, objv)
 				break;
 		}
 		if (match) {
-			indexObj=Tcl_NewIntObj(i);
-			result=Tcl_ListObjAppendElement(interp,resultObj,indexObj);
-			if (result!=TCL_OK) {return result;}
+			indexObj = Tcl_NewIntObj(i);
+			result = Tcl_ListObjAppendElement(interp,resultObj,indexObj);
+			if (result != TCL_OK) {return result;}
 		}
 	}
-
 	Tcl_SetObjResult(interp,resultObj);
 	return TCL_OK;
 }
+
 /*
  *----------------------------------------------------------------------
  *
@@ -141,7 +141,6 @@ ExtraL_LsubObjCmd(dummy, interp, objc, objv)
 	int listLen, indexlistLen, index, result;
 	int i;
 	char *mode=NULL;
-
 	if (objc == 4) {
 		mode=Tcl_GetStringFromObj(objv[2],(int *)NULL);
 		if (strcmp(mode,"-exclude")!=0) {
@@ -152,31 +151,25 @@ ExtraL_LsubObjCmd(dummy, interp, objc, objv)
 		Tcl_WrongNumArgs(interp, 1, objv, "list ?-exclude? indices");
 		return TCL_ERROR;
 	}
-
 	/*
 	 * Convert the first argument to a list if necessary.
 	 */
-
 	listPtr = objv[1];
 	result = Tcl_ListObjGetElements(interp, listPtr, &listLen, &elemPtrs);
 	if (result != TCL_OK) {
 		return result;
 	}
-
 	/*
 	 * Convert the indices to a list if necessary.
 	 */
-
 	indexlistPtr = objv[objc-1];
 	result = Tcl_ListObjGetElements(interp, indexlistPtr, &indexlistLen, &indexelemPtrs);
 	if (result != TCL_OK) {
 		return result;
 	}
-
 	/* Initialise result */
 	Tcl_ResetResult(interp);
 	resultObj = Tcl_GetObjResult(interp);
-
 	if (mode==NULL) {
 		if (indexlistLen==0) {
 			Tcl_SetResult(interp, "",TCL_STATIC);
@@ -216,7 +209,6 @@ ExtraL_LsubObjCmd(dummy, interp, objc, objv)
 			}
 		}
 	}
-
 	return TCL_OK;
 }
 
@@ -253,24 +245,19 @@ ExtraL_LcorObjCmd(notUsed, interp, objc, objv)
 	int reflen,len;
 	int pos,result;
 	int i;
-
 	if (objc != 3) {
 		Tcl_WrongNumArgs(interp, 1, objv, "referencelist list");
 		return TCL_ERROR;
 	}
-
 	if (Tcl_ListObjGetElements(interp, objv[1], &refArgc, &refArgv) != TCL_OK) {
 		return TCL_ERROR;
 	}
-
 	if (Tcl_ListObjGetElements(interp, objv[2], &listArgc, &listArgv) != TCL_OK) {
 		return TCL_ERROR;
 	}
-
 	/* Initialise result */
 	Tcl_ResetResult(interp);
 	resultObj = Tcl_NewObj();
-
 	done=(int *)Tcl_Alloc(refArgc*sizeof(int));
 	for(i=0;i<refArgc;i++) {done[i]=0;}
 	for(pos=0;pos<listArgc;pos++) {
@@ -292,7 +279,6 @@ ExtraL_LcorObjCmd(notUsed, interp, objc, objv)
 		}
 	}
 	Tcl_SetObjResult(interp,resultObj);
-
 	Tcl_Free((char *)done);
 	return TCL_OK;
 }
@@ -324,7 +310,7 @@ ExtraL_LremdupObjCmd(dummy, interp, objc, objv)
 	Tcl_Obj *resultObj;
 	int listLen, result;
 	char *string,*checkstring;
-	int i,len,checklen,sort,var=0;
+	int i,len,checklen,sort,var;
 
 	sort = 0;
 	if (objc>2) {
@@ -640,29 +626,23 @@ ExtraL_LmergeObjCmd(notUsed, interp, objc, objv)
 	int spacing=1;
 	int pos,pos2,result;
 	int i;
-
 	if ((objc != 3)&&(objc != 4)) {
 		Tcl_WrongNumArgs(interp, 1, objv, "list1 list2 ?spacing?");
 		return TCL_ERROR;
 	}
-
 	if (objc==4) {
 		result=Tcl_GetIntFromObj(interp, objv[3], &spacing);
 		if (result!=TCL_OK) {return result;}
 	}
-
 	if (Tcl_ListObjGetElements(interp, objv[1], &list1Argc, &list1Argv) != TCL_OK) {
 		return TCL_ERROR;
 	}
-
 	if (Tcl_ListObjGetElements(interp, objv[2], &list2Argc, &list2Argv) != TCL_OK) {
 		return TCL_ERROR;
 	}
-
 	/* Initialise result */
 	Tcl_ResetResult(interp);
 	resultObj = Tcl_GetObjResult(interp);
-
 	pos=0;
 	pos2=0;
 	i=spacing;
@@ -695,5 +675,49 @@ ExtraL_LmergeObjCmd(notUsed, interp, objc, objv)
 		if (result!=TCL_OK) {return result;}
 	}
 	Tcl_DecrRefCount(emptyObj);
+	return TCL_OK;
+}
+
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ExtraL_LreverseObjCmd --
+ *
+ *		This procedure is invoked to process the "lreverse" command.
+ *
+ * Results:
+ *		A standard Tcl result.
+ *
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+ExtraL_LreverseObjCmd(notUsed, interp, objc, objv)
+	ClientData notUsed;				 /* Not used. */
+	Tcl_Interp *interp;					/* Current interpreter. */
+	int objc;						/* Number of arguments. */
+	Tcl_Obj *CONST objv[];	/* Argument objects. */
+{
+	Tcl_Obj **Argv;
+	int Argc;
+	Tcl_Obj *resultObj;
+	int error;
+	if (objc != 2) {
+		Tcl_WrongNumArgs(interp, 1, objv, "list");
+		return TCL_ERROR;
+	}
+	if (Tcl_ListObjGetElements(interp, objv[1], &Argc, &Argv) != TCL_OK) {
+		return TCL_ERROR;
+	}
+	resultObj = Tcl_NewObj();
+	Argc--;
+	while (Argc >= 0) {
+		error = Tcl_ListObjAppendElement(interp,resultObj,Argv[Argc]);
+		if (error != TCL_OK) {Tcl_DecrRefCount(resultObj);return error;}
+		Argc--;
+	}
+	Tcl_SetObjResult(interp,resultObj);
 	return TCL_OK;
 }

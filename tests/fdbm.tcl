@@ -5,9 +5,15 @@ exec tclsh8.0 "$0" "$@"
 source tools.tcl
 proc type {} {return fdbm}
 
+if {"[dbm implementation]" == "tcl"} {
 test [type] {types} {
 	dbm types
 } {fdbm}
+} else {
+test [type] {types} {
+	dbm types
+} {fdbm bsddbm gdbm}
+}
 
 source dbm.tcl
 
@@ -23,4 +29,5 @@ test fdbm {create error: no options} {
 
 
 catch {file delete -force db.test}
+
 testsummarize

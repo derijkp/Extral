@@ -6,8 +6,7 @@ source tools.tcl
 
 test struct {tempfile} {
 	set tempfile [tempfile get]
-} {}
-
+	expr {[string length $tempfile] > 0}
+} 1
 
 testsummarize
-

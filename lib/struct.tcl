@@ -83,6 +83,43 @@
 #}
 
 namespace eval struct {
+	proc example {} {
+		set pointer [examplecreate]
+		exampleread $pointer
+		exampledestruct $pointer
+	}
+	
+	proc examplecreate {} {
+		set current [struct new]
+		set root $current
+		foreach value {a b c d} {
+			struct set $current->value $value
+			struct set $current->next [struct new]
+			set keep $current
+			set current [struct set $current->next]
+		}
+		struct set $keep->next ""
+		return $root
+	}
+	
+	proc exampleread {current} {
+		while 1 {
+			puts stdout [struct set $current->value]
+			puts [struct array get $current->array]
+			if {[struct set $current->next] == ""} {break}
+			set keep $current
+			set current [struct set $current->next]
+		}
+	}
+	
+	proc exampledestruct {current} {
+		while 1 {
+			if {[struct set $current->next] == ""} {break}
+			set keep $current
+			set current [struct set $current->next]
+			struct unset $keep
+		}
+	}
 }
 
 proc struct {option args} {
@@ -185,41 +222,3 @@ proc struct {option args} {
 		}
 	}
 }
-
-#proc example {} {
-#	set pointer [examplecreate]
-#	exampleread $pointer
-#	exampledestruct $pointer
-#}
-#
-#proc examplecreate {} {
-#	set current [struct new]
-#	set root $current
-#	foreach value {a b c d} {
-#		struct set $current->value $value
-#		struct set $current->next [struct new]
-#		set keep $current
-#		set current [struct set $current->next]
-#	}
-#	struct set $keep->next ""
-#	return $root
-#}
-#
-#proc exampleread {current} {
-#	while 1 {
-#		puts stdout [struct set $current->value]
-#		puts [struct array get $current->array]
-#		if {[struct set $current->next] == ""} {break}
-#		set keep $current
-#		set current [struct set $current->next]
-#	}
-#}
-#
-#proc exampledestruct {current} {
-#	while 1 {
-#		if {[struct set $current->next] == ""} {break}
-#		set keep $current
-#		set current [struct set $current->next]
-#		struct unset $keep
-#	}
-#}

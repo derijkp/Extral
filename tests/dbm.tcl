@@ -268,3 +268,5 @@ test [type] {see if reorganize doesn't fail} {
 	db reorganize
 	db get {try 18}
 } {try it the 18 time}
+
+testsummarize

@@ -74,6 +74,14 @@ test structlset {multiple tags not found} {
 	structlset {a 1 bb 2} {c a b} 1
 } {a 1 bb 2 c {a {b 1}}}
 
+test structlset {with space} {
+	structlset "" {Fonts {Basic Fonts} BoldItalicFont} *Font
+} {Fonts {{Basic Fonts} {BoldItalicFont *Font}}}
+
+test structlset {with space} {
+	structlset "" {Fonts {Basic Fonts} {other font}} *Font
+} {Fonts {{Basic Fonts} {{other font} *Font}}}
+
 test structlget {} {
 	structlget {a 1 bb 2 ccc 3} bb
 } {2}
@@ -138,6 +146,10 @@ test structlunset {unset, 3 tags} {
 	structlunset {a 1 b 2 c {a 1 b 2 c {a 1 b 2}}} {c c a}
 } {a 1 b 2 c {a 1 b 2 c {b 2}}}
 
+test structlunset {check bug} {
+	structlunset {a 1 b 2} a 1
+} {b 2}
+
 test structlfields {} {
 	structlfields {a 1 bb 2 ccc 3}
 } {a bb ccc}
@@ -162,7 +174,6 @@ test structlfind {present} {
 test structlfind {not present} {
 	structlfind {a try1 bb try2 ccc try3} try
 } -1
-
 
 testsummarize
 

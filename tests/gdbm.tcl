@@ -33,4 +33,6 @@ test [type] {open options: -blocksize error} {
 
 
 catch {file delete -force db.test}
+
 testsummarize
+

@@ -74,6 +74,7 @@ proc lsub {list args} {
 #} descr {
 #	returns a list of all indices which match a pattern.
 #	mode can be -exact, -glob, or -regexp
+#	The default mode is -exact
 #} example {
 #	% lfind -regexp {Ape Ball Field {Antwerp city} Egg} {^A}
 #	0 3
@@ -192,7 +193,7 @@ proc lremdup {args} {
 		}
 	} else {
 		set prev [lindex $list 0]
-		set done $prev
+		lappend done $prev
 		foreach e [lrange $list 1 end] {
 			if {"$e" != "$prev"} {
 				lappend done $e
@@ -399,71 +400,6 @@ proc leval {args} {
 	eval [eval concat $args]
 }
 
-#not really the same
-proc replace {string replacelist} {
-	array set a $replacelist
-	foreach name [array names a] {
-		set fpos($name) [string first $name $string]
-		if {$fpos($name) == -1} {unset fpos($name)}
-	}
-	while 1 {
-		set names [array names fpos]
-		if {"$name" == ""} break
-		set name [lpop names]
-		set found $name
-		foreach name $names {
-			if {$fpos($name) < $fpos($found)} {
-				set found $name
-			}
-		}
-		set end [string range $string [expr {$fpos($found)+[string length $a($found)]+1}] end]
-		set string [string range $string 0 [expr {$fpos($found)-1}]]
-		append string $a($found)$end
-		set fpos($found) [string first $found $string]
-		if {$fpos($found) == -1} {unset fpos($found)}
-	}
-	return $string
-}
-
-#doc {convenience replace} cmd {
-#replace string replacelist
-#} descr {
-# replace some parts of a string<br>
-# replacelist gives alternating a substring to be replaced, and what it should be replaced by.
-# The command returns a string that is the given string where each occurence of the
-# substrings in the replacelist have been replaced.
-#}
-
-proc replace {string replacelist} {
-	array set a $replacelist
-	set rem $string
-	set string ""
-	while 1 {
-		set names [array names a]
-		if {"$names" == ""} break
-		set fpos [string length $rem]
-		foreach name $names {
-			set pos [string first $name $rem]
-			if {$pos == -1} {
-				unset a($name)
-			} elseif {$pos < $fpos} {
-				set found $name
-				set fpos $pos
-			}
-		}
-		if ![info exists found] {
-			append string $rem
-			break
-		}
-		append string [string range $rem 0 [expr {$fpos-1}]]
-		append string $a($found)
-		set rem [string range $rem [expr {$fpos+[string length $found]}] end]
-		if {"$rem" == ""} break
-		unset found
-	}
-	return $string
-}
-
 #ffind
 #doc ffind title {
 #ffind
@@ -496,3 +432,124 @@ proc replace {string replacelist} {
 #	contain the nulvalue. This is not compatible with the -allmatches
 #	options
 #}
+
+#doc {listcommands lreverse} cmd {
+#lreverse list
+#} descr {
+# returns the reverse of the list.
+#}
+proc lreverse {list} {
+	set i [llength $list]
+	set result ""
+	for {incr i -1} {$i >= 0} {incr i -1} {
+		lappend result [lindex $list $i]
+	}
+	return $result
+}
+
+#doc stringcommands title {
+#General astring manipulation commands
+#}
+
+#doc {stringcommands replace} cmd {
+#replace string replacelist
+#} descr {
+# replace some parts of a string<br>
+# replacelist gives alternating a substring to be replaced, and what it should be replaced by.
+# The command returns a string that is the given string where each occurence of the
+# substrings in the replacelist have been replaced.
+#}
+proc replace {string replacelist} {
+	array set a $replacelist
+	set rem $string
+	set string ""
+	while 1 {
+		set names [array names a]
+		if {"$names" == ""} break
+		set fpos [string length $rem]
+		foreach name $names {
+			set pos [string first $name $rem]
+			if {$pos == -1} {
+				unset a($name)
+			} elseif {$pos < $fpos} {
+				set found $name
+				set fpos $pos
+			}
+		}
+		if ![info exists found] {
+			append string $rem
+			break
+		}
+		append string [string range $rem 0 [expr {$fpos-1}]]
+		append string $a($found)
+		set rem [string range $rem [expr {$fpos+[string length $found]}] end]
+		if {"$rem" == ""} break
+		unset found
+	}
+	return $string
+}
+
+#doc {stringcommands sreverse} cmd {
+#lreverse list
+#} descr {
+# returns the reverse of list.
+#}
+proc sreverse {string} {
+	set i [string length $string]
+	set result ""
+	for {incr i -1} {$i >= 0} {incr i -1} {
+		append result [string index $string $i]
+	}
+	return $result
+}
+
+#doc {stringcommands sfind} cmd {
+#sfind mode list pattern
+#} descr {
+#	returns a list of all indices which match a pattern.
+#	mode can be -exact, -glob, or -regexp
+#	The default mode is -exact
+#} example {
+#	% lfind -regexp {Ape Ball Field {Antwerp city} Egg} {^A}
+#	0 3
+#}
+proc sfind {args} {
+	if {[llength $args]==2} {
+		set string [lindex $args 0]
+		set pattern [lindex $args 1]
+		set mode -exact
+	} elseif {[llength $args]==3} {
+		set mode [lindex $args 0]
+		set string [lindex $args 1]
+		set pattern [lindex $args 2]
+	} else {
+		error "Format is \"lfind ?mode? list pattern\""
+	}
+	set result ""
+	set pos 0
+	set len [string length $string]
+	switch -- $mode {
+		{-exact} {
+			set end [expr {[string length $pattern] - 1}]
+			for {set i 0} {$i < $len} {incr i} {
+				if {"[string range $string $i $end]"=="$pattern"} {lappend result $i}
+				incr end
+			}
+		}
+		{-glob} {
+			for {set i 0} {$i < $len} {incr i} {
+				if [string match $pattern [string range $string $i end]] {lappend result $i}
+			}
+		}
+		{-regexp} {
+			for {set i 0} {$i < $len} {incr i} {
+				if [regexp $pattern [string range $string $i end]] {lappend result $i}
+			}
+		}
+		default {
+			error "Unkown mode \"$mode\""
+		}
+	}
+	return $result
+}
+

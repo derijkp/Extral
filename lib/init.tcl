@@ -7,11 +7,6 @@
 #
 # =============================================================
 
-# $Format: "set ::Extral::version 1.$ProjectMajorVersion$"$
-set ::Extral::version 1.0
-# $Format: "set ::Extral::patchlevel $ProjectMinorVersion$"$
-set ::Extral::patchlevel 5
-package provide Extral $::Extral::version
 #
 # Load the shared library if present
 # If not, Tcl code will be loaded when necessary
@@ -31,10 +26,7 @@ if [file exists [file join ${Extral::dir} extral[info sharedlibextension]]] {
 #
 # The lib dir contains the Tcl code defining the public Extral 
 # functions. The lib dir is added to the auto_path so that
-# these functions will be loaded on demand. The export function
-# is used in the Tcl files to automatically export the
-# public functions from the Extral namespace, and import them 
-# in the parent namespace.
+# these functions will be loaded on demand.
 #
 
 lappend auto_path [file join ${Extral::dir} lib]

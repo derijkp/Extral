@@ -1,24 +1,28 @@
-/*
- * The important part of this code originates from the lsort function posted
- * by D. Richard Hipp -- drh@tobit.vnet.net -- 704.948.4565
+/* 
+ * tclCmdIL.c --
+ *
+ * adaptation from code in the original Tcl8.0 release
+ * Copyright (c) 1987-1993 The Regents of the University of California.
+ * Copyright (c) 1993-1997 Lucent Technologies.
+ * Copyright (c) 1994-1997 Sun Microsystems, Inc.
  * -reflist option and building into Extral by Peter De Rijk
+ *
  */
 
-#include "tcl.h"
-#include "stdlib.h"
-#include "string.h"
-#include "ctype.h"
-#include "malloc.h"
+#include "tclInt.h"
+#include "tclPort.h"
 
 /*
- * During execution of the "lsort" command, a Tcl list is represented as
- * a linked list of the following structures.
+ * During execution of the "lsort" command, structures of the following
+ * type are used to arrange the objects being sorted into a collection
+ * of linked lists.
  */
 
 typedef struct SortElement {
-	char *reftextPtr;                   /* Text of the ref list element */
-	char *textPtr;                      /* Text of the list element */
-	struct SortElement *nextPtr;        /* Next element on the list */
+    Tcl_Obj *refobjPtr;			/* ref Object for sort. */
+    Tcl_Obj *objPtr;			/* Object being sorted. */
+    struct SortElement *nextPtr;        /* Next element in the list, or
+					 * NULL for end of list. */
 } SortElement;
 
 /*
@@ -30,15 +34,21 @@ typedef struct SortElement {
  */
 
 typedef struct SortInfo {
-	int isIncreasing;                   /* True to sort in increasing order */
-	int sortMode;                       /* The sort mode.  One of SORTMODE_???
-	                                     * values defined below */
-	Tcl_DString compareCmd;             /* The Tcl comparison command when
-	                                     * sortMode==COMMAND */
-	Tcl_Interp *interp;                 /* The interpreter running the sort */
-	int resultCode;                     /* If compareCmd every fails, this
-	                                     * is changed from TCL_OK to 
-	                                     * TCL_ERROR */
+    int isIncreasing;		/* Nonzero means sort in increasing order. */
+    int sortMode;		/* The sort mode.  One of SORTMODE_*
+				 * values defined below */
+    Tcl_DString compareCmd;	/* The Tcl comparison command when sortMode
+				 * is SORTMODE_COMMAND.  Pre-initialized to
+				 * hold base of command.*/
+    int index;			/* If the -index option was specified, this
+				 * holds the index of the list element
+				 * to extract for comparison.  If -index
+				 * wasn't specified, this is -1. */
+    Tcl_Interp *interp;		/* The interpreter in which the sortis
+				 * being done. */
+    int resultCode;		/* Completion code for the lsort command.
+				 * If an error occurs during the sort this
+				 * is changed from TCL_OK to  TCL_ERROR. */
 } SortInfo;
 
 /*
@@ -56,18 +66,19 @@ typedef struct SortInfo {
  * Forward declarations for procedures defined in this file:
  */
 
-
-static SortElement *    MergeSort _ANSI_ARGS_((SortElement*, SortInfo*));
-static SortElement *    MergeLists _ANSI_ARGS_((SortElement*,SortElement*,
-                            SortInfo*));
-static int		SortCompareProc _ANSI_ARGS_((char *first,
-			    char *second, SortInfo *));
-static int              DictionaryCompare _ANSI_ARGS_((char*,char*));
+static int		DictionaryCompare _ANSI_ARGS_((char *left,
+			    char *right));
+static SortElement *    MergeSort _ANSI_ARGS_((SortElement *headPt,
+			    SortInfo *infoPtr));
+static SortElement *    MergeLists _ANSI_ARGS_((SortElement *leftPtr,
+			    SortElement *rightPtr, SortInfo *infoPtr));
+static int		SortCompare _ANSI_ARGS_((Tcl_Obj *firstPtr,
+			    Tcl_Obj *second, SortInfo *infoPtr));
 
 /*
  *----------------------------------------------------------------------
  *
- * ExtraL_SsortCmd --
+ * Tcl_LsortObjCmd --
  *
  *	This procedure is invoked to process the "lsort" Tcl command.
  *	See the user documentation for details on what it does.
@@ -82,143 +93,154 @@ static int              DictionaryCompare _ANSI_ARGS_((char*,char*));
  */
 
 int
-ExtraL_SSortCmd(notUsed, interp, argc, argv)
-	ClientData notUsed;			/* Not used. */
-	Tcl_Interp *interp;			/* Current interpreter. */
-	int argc;				/* Number of arguments. */
-	char **argv;			/* Argument strings. */
+ExtraL_SSortObjCmd(clientData, interp, objc, objv)
+    ClientData clientData;	/* Not used. */
+    Tcl_Interp *interp;		/* Current interpreter. */
+    int objc;			/* Number of arguments. */
+    Tcl_Obj *CONST objv[];	/* Argument values. */
 {
-	int listArgc, i, c;
-	int reflistArgc=0;
-	size_t length;
-	char **listArgv;
-	char **reflistArgv=NULL;
-	char *reflist=NULL;
-	char *command = NULL;		/* Initialization needed only to
-					 * prevent compiler warning. */
-	SortElement *elementArray;
-	SortElement *elementPtr;
-	SortInfo sortInfo;                  /* Information about this sort that
-	                                     * needs to be passed to the 
-	                                     * comparison function */
+    int i, index, dummy;
+    Tcl_Obj *resultPtr;
+	Tcl_Obj *reflist = NULL, **reflistObjv;
+	int reflistObjc;
+    int length;
+    Tcl_Obj *cmdPtr, **listObjPtrs;
+    SortElement *elementArray;
+    SortElement *elementPtr;        
+    SortInfo sortInfo;                  /* Information about this sort that
+                                         * needs to be passed to the 
+                                         * comparison function */
+    static char *switches[] =
+	    {"-ascii", "-command", "-decreasing", "-dictionary",
+	    "-increasing", "-index", "-integer", "-real", "-reflist", (char *) NULL};
 
-	if (argc < 2) {
-		Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-			" ?-ascii? ?-integer? ?-real? ?-increasing? ?-decreasing? ?-dictionary?",
-			" ?-command string? ?-reflist list? list\"", (char *) NULL);
-		return TCL_ERROR;
-	}
+    resultPtr = Tcl_GetObjResult(interp);
+    if (objc < 2) {
+	Tcl_WrongNumArgs(interp, 1, objv, "?options? list");
+	return TCL_ERROR;
+    }
 
-	/*
-	 * Parse arguments to set up the mode for the sort.
-	 */
+    /*
+     * Parse arguments to set up the mode for the sort.
+     */
 
-	sortInfo.interp = interp;
-	sortInfo.sortMode = SORTMODE_ASCII;
-	sortInfo.isIncreasing = 1;
-	sortInfo.resultCode = TCL_OK;
-	for (i = 1; i < argc-1; i++) {
-		length = strlen(argv[i]);
-		if (length < 2) {
-			badSwitch:
-			Tcl_AppendResult(interp, "bad switch \"", argv[i],
-				"\": must be -ascii, -integer, -real, -increasing,",
-				" -decreasing, -dictionary -reflist or -command", (char *) NULL);
-			sortInfo.resultCode = TCL_ERROR;
-			goto done;
+    sortInfo.isIncreasing = 1;
+    sortInfo.sortMode = SORTMODE_ASCII;
+    sortInfo.index = -1;
+    sortInfo.interp = interp;
+    sortInfo.resultCode = TCL_OK;
+    cmdPtr = NULL;
+    for (i = 1; i < objc-1; i++) {
+		if (Tcl_GetIndexFromObj(interp, objv[i], switches, "option", 0, &index)
+			!= TCL_OK) {
+		    return TCL_ERROR;
 		}
-		c = argv[i][1];
-		if ((c == 'a') && (strncmp(argv[i], "-ascii", length) == 0)) {
+		switch (index) {
+		    case 0:			/* -ascii */
 			sortInfo.sortMode = SORTMODE_ASCII;
-		} else if ((c == 'c') && (strncmp(argv[i], "-command", length) == 0)) {
-			if (i == argc-2) {
-				Tcl_AppendResult(interp, "\"-command\" must be",
-					" followed by comparison command", (char *) NULL);
-				sortInfo.resultCode = TCL_ERROR;
-				goto done;
+			break;
+		    case 1:			/* -command */
+			if (i == (objc-2)) {
+			    Tcl_AppendToObj(resultPtr,
+				    "\"-command\" option must be followed by comparison command",
+				    -1);
+			    return TCL_ERROR;
 			}
 			sortInfo.sortMode = SORTMODE_COMMAND;
-			command = argv[i+1];
+			cmdPtr = objv[i+1];
 			i++;
-		} else if ((c == 'r') && (strncmp(argv[i], "-reflist", length) == 0)) {
-			if (i == argc-2) {
-				Tcl_AppendResult(interp, "\"-reflist\" must be",
-					" followed by a list", (char *) NULL);
-				sortInfo.resultCode = TCL_ERROR;
-				goto done;
-			}
-			reflist = argv[i+1];
-			i++;
-		} else if ((c == 'd')
-			&& (strncmp(argv[i], "-decreasing", length) == 0)) {
+			break;
+		    case 2:			/* -decreasing */
 			sortInfo.isIncreasing = 0;
-		} else if ((c == 'd') && (length >= 4)
-			&& (strncmp(argv[i], "-dictionary", length) == 0)) {
+			break;
+		    case 3:			/* -dictionary */
 			sortInfo.sortMode = SORTMODE_DICTIONARY;
-		} else if ((c == 'i') && (length >= 4)
-			&& (strncmp(argv[i], "-increasing", length) == 0)) {
+			break;
+		    case 4:			/* -increasing */
 			sortInfo.isIncreasing = 1;
-		} else if ((c == 'i') && (length >= 4)
-			&& (strncmp(argv[i], "-integer", length) == 0)) {
+			break;
+		    case 5:			/* -index */
+			if (i == (objc-2)) {
+			    Tcl_AppendToObj(resultPtr,
+				    "\"-index\" option must be followed by list index",
+				    -1);
+			    return TCL_ERROR;
+			}
+			if (TclGetIntForIndex(interp, objv[i+1], -2, &sortInfo.index)
+				!= TCL_OK) {
+			    return TCL_ERROR;
+			}
+			cmdPtr = objv[i+1];
+			i++;
+			break;
+		    case 6:			/* -integer */
 			sortInfo.sortMode = SORTMODE_INTEGER;
-		} else if ((c == 'r')
-			&& (strncmp(argv[i], "-real", length) == 0)) {
+			break;
+		    case 7:			/* -real */
 			sortInfo.sortMode = SORTMODE_REAL;
-		} else {
-			goto badSwitch;
+		    case 8:			/* -reflist */
+			if (i == (objc-2)) {
+			    Tcl_AppendToObj(resultPtr,
+				    "\"-reflist\" option must be followed by the reflist",
+				    -1);
+			    return TCL_ERROR;
+			}
+			reflist = objv[i+1];
+			i++;
+			break;
 		}
-	}
-	if (sortInfo.sortMode == SORTMODE_COMMAND) {
-		Tcl_DStringInit(&sortInfo.compareCmd);
-		Tcl_DStringAppend(&sortInfo.compareCmd, command, -1);
-	}
+    }
+    if (sortInfo.sortMode == SORTMODE_COMMAND) {
+	Tcl_DStringInit(&sortInfo.compareCmd);
+	Tcl_DStringAppend(&sortInfo.compareCmd,
+		Tcl_GetStringFromObj(cmdPtr, &dummy), -1);
+    }
 
-	if (Tcl_SplitList(interp, argv[argc-1], &listArgc, &listArgv) != TCL_OK) {
-		sortInfo.resultCode = TCL_ERROR;
-		goto done;
-	}
-	if (listArgc<=1) {
-		Tcl_AppendResult(interp,argv[argc-1],(char *)NULL);
-		goto done;
-	}
-
+    sortInfo.resultCode = Tcl_ListObjGetElements(interp, objv[objc-1],
+	    &length, &listObjPtrs);
+    if (sortInfo.resultCode != TCL_OK) {
+	goto done;
+    }
+    if (length <= 0) {
+        return TCL_OK;
+    }
 	if (reflist!=NULL) {
-		if (Tcl_SplitList(interp, reflist, &reflistArgc, &reflistArgv) != TCL_OK) {
+		if (Tcl_ListObjGetElements(interp, reflist, &reflistObjc, &reflistObjv) != TCL_OK) {
 			sortInfo.resultCode = TCL_ERROR;
-			ckfree((char *) listArgv);
 			goto done;
 		}
 	}
-
-	elementArray = (SortElement*)ckalloc( listArgc*sizeof(SortElement) );
-	for(i=0; i<listArgc; i++){
+    elementArray = (SortElement *) ckalloc(length * sizeof(SortElement));
+    for (i=0; i < length; i++){
 		if (reflist!=NULL) {
-			elementArray[i].reftextPtr = reflistArgv[i];
+			elementArray[i].refobjPtr = reflistObjv[i];
 		} else {
-			elementArray[i].reftextPtr = listArgv[i];
+			elementArray[i].refobjPtr = listObjPtrs[i];
 		}
-		elementArray[i].textPtr = listArgv[i];
+		elementArray[i].objPtr = listObjPtrs[i];
 		elementArray[i].nextPtr = &elementArray[i+1];
-	}
-	elementArray[listArgc-1].nextPtr = 0;
-	elementPtr = MergeSort(elementArray,&sortInfo);
-	for(i=0; elementPtr; i++, elementPtr = elementPtr->nextPtr){
-		listArgv[i] = elementPtr->textPtr;
-	}
-	ckfree((char*) elementArray);
-	if (sortInfo.resultCode == TCL_OK) {
+    }
+    elementArray[length-1].nextPtr = NULL;
+    elementPtr = MergeSort(elementArray, &sortInfo);
+    if (sortInfo.resultCode == TCL_OK) {
+		/*
+		 * Note: must clear the interpreter's result object: it could
+		 * have been set by the -command script.
+		 */
+	
 		Tcl_ResetResult(interp);
-		interp->result = Tcl_Merge(listArgc, listArgv);
-		interp->freeProc = TCL_DYNAMIC;
-	}
-	if (sortInfo.sortMode == SORTMODE_COMMAND) {
-		Tcl_DStringFree(&sortInfo.compareCmd);
-	}
-	ckfree((char *) listArgv);
-	ckfree((char *) reflistArgv);
+		resultPtr = Tcl_GetObjResult(interp);
+		for (; elementPtr != NULL; elementPtr = elementPtr->nextPtr){
+		    Tcl_ListObjAppendElement(interp, resultPtr, elementPtr->objPtr);
+		}
+    }
+    ckfree((char*) elementArray);
 
-	done:
-	return sortInfo.resultCode;
+    done:
+    if (sortInfo.sortMode == SORTMODE_COMMAND) {
+	Tcl_DStringFree(&sortInfo.compareCmd);
+    }
+    return sortInfo.resultCode;
 }
 
 /*
@@ -245,32 +267,36 @@ MergeSort(headPtr, infoPtr)
     SortInfo *infoPtr;                  /* Information needed by the
                                          * comparison operator */
 {
-#   define N_SUBLIST 30
-    SortElement *subList[N_SUBLIST];
+    /*
+     * The subList array below holds pointers to temporary lists built
+     * during the merge sort.  Element i of the array holds a list of
+     * length 2**i.
+     */
+
+#   define NUM_LISTS 30
+    SortElement *subList[NUM_LISTS];
     SortElement *elementPtr;
     int i;
 
-    for(i=0; i<N_SUBLIST; i++){
-        subList[i] = 0;
+    for(i = 0; i < NUM_LISTS; i++){
+        subList[i] = NULL;
     }
-    while( headPtr ){
-        elementPtr = headPtr;
-        headPtr = headPtr->nextPtr;
-        elementPtr->nextPtr = 0;
-        for(i=0; (i < N_SUBLIST) && (subList[i] != 0); i++){
-           elementPtr = MergeLists(elementPtr, subList[i], infoPtr);
-           subList[i] = 0;
-        }
-        if (i >= N_SUBLIST) {
-          subList[N_SUBLIST-1] = MergeLists(elementPtr, 
-                   subList[N_SUBLIST-1], infoPtr);
-        } else {
-          subList[i] = elementPtr;
-        }
+    while (headPtr != NULL) {
+	elementPtr = headPtr;
+	headPtr = headPtr->nextPtr;
+	elementPtr->nextPtr = 0;
+	for (i = 0; (i < NUM_LISTS) && (subList[i] != NULL); i++){
+	    elementPtr = MergeLists(subList[i], elementPtr, infoPtr);
+	    subList[i] = NULL;
+	}
+	if (i >= NUM_LISTS) {
+	    i = NUM_LISTS-1;
+	}
+	subList[i] = elementPtr;
     }
-    elementPtr = 0;
-    for(i=0; i < N_SUBLIST; i++){
-        elementPtr = MergeLists(elementPtr, subList[i], infoPtr);
+    elementPtr = NULL;
+    for (i = 0; i < NUM_LISTS; i++){
+        elementPtr = MergeLists(subList[i], elementPtr, infoPtr);
     }
     return elementPtr;
 }
@@ -295,44 +321,45 @@ MergeSort(headPtr, infoPtr)
 
 static SortElement *
 MergeLists(leftPtr, rightPtr, infoPtr)
-    SortElement *leftPtr;               /* First list to be merged */
-    SortElement *rightPtr;              /* Second list to be merged */
+    SortElement *leftPtr;               /* First list to be merged; may be
+					 * NULL. */
+    SortElement *rightPtr;              /* Second list to be merged; may be
+					 * NULL. */
     SortInfo *infoPtr;                  /* Information needed by the
-                                         * comparison operator */
+                                         * comparison operator. */
 {
     SortElement *headPtr;
     SortElement *tailPtr;
 
-    if (leftPtr == 0) {
-        headPtr = rightPtr;
-    } else if (rightPtr == 0) {
-        headPtr = leftPtr;
+    if (leftPtr == NULL) {
+        return rightPtr;
+    }
+    if (rightPtr == NULL) {
+        return leftPtr;
+    }
+    if (SortCompare(leftPtr->refobjPtr, rightPtr->refobjPtr, infoPtr) > 0) {
+		tailPtr = rightPtr;
+		rightPtr = rightPtr->nextPtr;
     } else {
-        if (SortCompareProc(leftPtr->reftextPtr, rightPtr->reftextPtr, infoPtr) < 0) {
-            tailPtr = leftPtr;
-            leftPtr = leftPtr->nextPtr;
-        } else {
-            tailPtr = rightPtr;
-            rightPtr = rightPtr->nextPtr;
-        }
-        headPtr = tailPtr;
-        while ((leftPtr != 0) && (rightPtr != 0)) {
-            if (SortCompareProc(leftPtr->reftextPtr, rightPtr->reftextPtr,
-                                infoPtr) < 0) {
-                tailPtr->nextPtr = leftPtr;
-                tailPtr = leftPtr;
-                leftPtr = leftPtr->nextPtr;
-            } else {
-                tailPtr->nextPtr = rightPtr;
-                tailPtr = rightPtr;
-                rightPtr = rightPtr->nextPtr;
-            }
-        }
-        if (leftPtr != 0) {
-           tailPtr->nextPtr = leftPtr;
-        } else {
-           tailPtr->nextPtr = rightPtr;
-        }
+		tailPtr = leftPtr;
+		leftPtr = leftPtr->nextPtr;
+    }
+    headPtr = tailPtr;
+    while ((leftPtr != NULL) && (rightPtr != NULL)) {
+		if (SortCompare(leftPtr->refobjPtr, rightPtr->refobjPtr, infoPtr) > 0) {
+		    tailPtr->nextPtr = rightPtr;
+		    tailPtr = rightPtr;
+		    rightPtr = rightPtr->nextPtr;
+		} else {
+		    tailPtr->nextPtr = leftPtr;
+		    tailPtr = leftPtr;
+		    leftPtr = leftPtr->nextPtr;
+		}
+    }
+    if (leftPtr != NULL) {
+       tailPtr->nextPtr = leftPtr;
+    } else {
+       tailPtr->nextPtr = rightPtr;
     }
     return headPtr;
 }
@@ -340,7 +367,7 @@ MergeLists(leftPtr, rightPtr, infoPtr)
 /*
  *----------------------------------------------------------------------
  *
- * SortCompareProc --
+ * SortCompare --
  *
  *	This procedure is invoked by MergeLists to determine the proper
  *	ordering between two elements.
@@ -359,100 +386,155 @@ MergeLists(leftPtr, rightPtr, infoPtr)
  */
 
 static int
-SortCompareProc(firstString, secondString, infoPtr)
-    char *firstString, *secondString;	/* Elements to be compared. */
+SortCompare(objPtr1, objPtr2, infoPtr)
+    Tcl_Obj *objPtr1, *objPtr2;		/* Values to be compared. */
     SortInfo *infoPtr;                  /* Information passed from the
                                          * top-level "lsort" command */
 {
-    int order;
+    int order, dummy, listLen, index;
+    Tcl_Obj *objPtr;
+    char buffer[30];
 
-	order = 0;
-	if (infoPtr->resultCode != TCL_OK) {
-		/*
-		 * Once an error has occurred, skip any future comparisons
-		 * so as to preserve the error message in sortInterp->result.
-		 */
-	
-		if (order==0) {order=1;}
-		return order;
-	}
-	if (infoPtr->sortMode == SORTMODE_ASCII) {
-		order = strcmp(firstString, secondString);
-	} else if (infoPtr->sortMode == SORTMODE_DICTIONARY) {
-		order = DictionaryCompare(firstString, secondString);
-	} else if (infoPtr->sortMode == SORTMODE_INTEGER) {
-		int a, b;
-	
-		if ((Tcl_GetInt(infoPtr->interp, firstString, &a) != TCL_OK)
-			|| (Tcl_GetInt(infoPtr->interp, secondString, &b) != TCL_OK)) {
-			Tcl_AddErrorInfo(infoPtr->interp,
-				"\n    (converting list element from string to integer)");
-			infoPtr->resultCode = TCL_ERROR;
-			if (order==0) {order=1;}
-			return order;
-		}
-		if (a > b) {
-			order = 1;
-		} else if (b > a) {
-			order = -1;
-		}
-	} else if (infoPtr->sortMode == SORTMODE_REAL) {
-		double a, b;
-	
-		if ((Tcl_GetDouble(infoPtr->interp, firstString, &a) != TCL_OK)
-			  || (Tcl_GetDouble(infoPtr->interp, secondString, &b) != TCL_OK)) {
-			Tcl_AddErrorInfo(infoPtr->interp,
-				"\n    (converting list element from string to real)");
-			infoPtr->resultCode = TCL_ERROR;
-			if (order==0) {order=1;}
-			return order;
-		}
-		if (a > b) {
-			order = 1;
-		} else if (b > a) {
-			order = -1;
-		}
-	} else {
-		int oldLength;
-		char *end;
-	
-		/*
-		 * Generate and evaluate a command to determine which string comes
-		 * first.
-		 */
-	
-		oldLength = Tcl_DStringLength(&infoPtr->compareCmd);
-		Tcl_DStringAppendElement(&infoPtr->compareCmd, firstString);
-		Tcl_DStringAppendElement(&infoPtr->compareCmd, secondString);
-		infoPtr->resultCode = Tcl_Eval(infoPtr->interp, Tcl_DStringValue(&infoPtr->compareCmd));
-		Tcl_DStringTrunc(&infoPtr->compareCmd, oldLength);
-		if (infoPtr->resultCode != TCL_OK) {
-			Tcl_AddErrorInfo(infoPtr->interp,
-				"\n    (user-defined comparison command)");
-			if (order==0) {order=1;}
-			return order;
-		}
-	
-		/*
-		 * Parse the result of the command.
-		 */
-	
-		order = strtol(infoPtr->interp->result, &end, 0);
-		if ((end == infoPtr->interp->result) || (*end != 0)) {
-			Tcl_ResetResult(infoPtr->interp);
-			Tcl_AppendResult(infoPtr->interp,
-				"comparison command returned non-numeric result",
-				(char *) NULL);
-			infoPtr->resultCode = TCL_ERROR;
-			if (order==0) {order=1;}
-			return order;
-		}
-	}
-	if (!infoPtr->isIncreasing) {
-		order = -order;
-	}
-	if (order==0) {order=1;}
+    order = 0;
+    if (infoPtr->resultCode != TCL_OK) {
+	/*
+	 * Once an error has occurred, skip any future comparisons
+	 * so as to preserve the error message in sortInterp->result.
+	 */
+
 	return order;
+    }
+    if (infoPtr->index != -1) {
+	/*
+	 * The "-index" option was specified.  Treat each object as a
+	 * list, extract the requested element from each list, and
+	 * compare the elements, not the lists.  The special index "end"
+	 * is signaled here with a large negative index.
+	 */
+
+	if (Tcl_ListObjLength(infoPtr->interp, objPtr1, &listLen) != TCL_OK) {
+	    infoPtr->resultCode = TCL_ERROR;
+	    return order;
+	}
+	if (infoPtr->index < -1) {
+	    index = listLen - 1;
+	} else {
+	    index = infoPtr->index;
+	}
+
+	if (Tcl_ListObjIndex(infoPtr->interp, objPtr1, index, &objPtr)
+		!= TCL_OK) {
+	    infoPtr->resultCode = TCL_ERROR;
+	    return order;
+	}
+	if (objPtr == NULL) {
+	    objPtr = objPtr1;
+	    missingElement:
+	    sprintf(buffer, "%d", infoPtr->index);
+	    Tcl_AppendStringsToObj(Tcl_GetObjResult(infoPtr->interp),
+			"element ", buffer, " missing from sublist \"",
+			Tcl_GetStringFromObj(objPtr, (int *) NULL),
+			"\"", (char *) NULL);
+	    infoPtr->resultCode = TCL_ERROR;
+	    return order;
+	}
+	objPtr1 = objPtr;
+
+	if (Tcl_ListObjLength(infoPtr->interp, objPtr2, &listLen) != TCL_OK) {
+	    infoPtr->resultCode = TCL_ERROR;
+	    return order;
+	}
+	if (infoPtr->index < -1) {
+	    index = listLen - 1;
+	} else {
+	    index = infoPtr->index;
+	}
+
+	if (Tcl_ListObjIndex(infoPtr->interp, objPtr2, index, &objPtr)
+		!= TCL_OK) {
+	    infoPtr->resultCode = TCL_ERROR;
+	    return order;
+	}
+	if (objPtr == NULL) {
+	    objPtr = objPtr2;
+	    goto missingElement;
+	}
+	objPtr2 = objPtr;
+    }
+    if (infoPtr->sortMode == SORTMODE_ASCII) {
+	order = strcmp(Tcl_GetStringFromObj(objPtr1, &dummy),
+		Tcl_GetStringFromObj(objPtr2, &dummy));
+    } else if (infoPtr->sortMode == SORTMODE_DICTIONARY) {
+	order = DictionaryCompare(
+		Tcl_GetStringFromObj(objPtr1, &dummy),
+		Tcl_GetStringFromObj(objPtr2, &dummy));
+    } else if (infoPtr->sortMode == SORTMODE_INTEGER) {
+	int a, b;
+
+	if ((Tcl_GetIntFromObj(infoPtr->interp, objPtr1, &a) != TCL_OK)
+		|| (Tcl_GetIntFromObj(infoPtr->interp, objPtr2, &b)
+		!= TCL_OK)) {
+	    infoPtr->resultCode = TCL_ERROR;
+	    return order;
+	}
+	if (a > b) {
+	    order = 1;
+	} else if (b > a) {
+	    order = -1;
+	}
+    } else if (infoPtr->sortMode == SORTMODE_REAL) {
+	double a, b;
+
+	if ((Tcl_GetDoubleFromObj(infoPtr->interp, objPtr1, &a) != TCL_OK)
+	      || (Tcl_GetDoubleFromObj(infoPtr->interp, objPtr2, &b)
+		      != TCL_OK)) {
+	    infoPtr->resultCode = TCL_ERROR;
+	    return order;
+	}
+	if (a > b) {
+	    order = 1;
+	} else if (b > a) {
+	    order = -1;
+	}
+    } else {
+	int oldLength;
+
+	/*
+	 * Generate and evaluate a command to determine which string comes
+	 * first.
+	 */
+
+	oldLength = Tcl_DStringLength(&infoPtr->compareCmd);
+	Tcl_DStringAppendElement(&infoPtr->compareCmd,
+		Tcl_GetStringFromObj(objPtr1, &dummy));
+	Tcl_DStringAppendElement(&infoPtr->compareCmd,
+		Tcl_GetStringFromObj(objPtr2, &dummy));
+	infoPtr->resultCode = Tcl_Eval(infoPtr->interp, 
+		Tcl_DStringValue(&infoPtr->compareCmd));
+	Tcl_DStringTrunc(&infoPtr->compareCmd, oldLength);
+	if (infoPtr->resultCode != TCL_OK) {
+	    Tcl_AddErrorInfo(infoPtr->interp,
+		    "\n    (-compare command)");
+	    return order;
+	}
+
+	/*
+	 * Parse the result of the command.
+	 */
+
+	if (Tcl_GetIntFromObj(infoPtr->interp,
+		Tcl_GetObjResult(infoPtr->interp), &order) != TCL_OK) {
+	    Tcl_ResetResult(infoPtr->interp);
+	    Tcl_AppendToObj(Tcl_GetObjResult(infoPtr->interp),
+		    "-compare command returned non-numeric result", -1);
+	    infoPtr->resultCode = TCL_ERROR;
+	    return order;
+	}
+    }
+    if (!infoPtr->isIncreasing) {
+	order = -order;
+    }
+    return order;
 }
 
 /*
@@ -468,8 +550,8 @@ SortCompareProc(firstString, secondString, infoPtr)
  *      before it as it would when using strcmp().
  *
  * Results:
- *      A negative results means the the first element comes before the
- *      second, and a positive results means that the second element
+ *      A negative result means that the first element comes before the
+ *      second, and a positive result means that the second element
  *      should come first.  A result of zero means the two elements
  *      are equal and it doesn't matter which comes first.
  *
@@ -483,47 +565,94 @@ static int
 DictionaryCompare(left, right)
     char *left, *right;          /* The strings to compare */
 {
-    int diff;
+    int diff, zeros;
     int secondaryDiff = 0;
 
     while (1) {
+	if (isdigit(UCHAR(*right)) && isdigit(UCHAR(*left))) {
+	    /*
+	     * There are decimal numbers embedded in the two
+	     * strings.  Compare them as numbers, rather than
+	     * strings.  If one number has more leading zeros than
+	     * the other, the number with more leading zeros sorts
+	     * later, but only as a secondary choice.
+	     */
+
+	    zeros = 0;
+	    while ((*right == '0') && (*(right + 1) != '\0')) {
+		right++;
+		zeros--;
+	    }
+	    while ((*left == '0') && (*(left + 1) != '\0')) {
+		left++;
+		zeros++;
+	    }
+	    if (secondaryDiff == 0) {
+		secondaryDiff = zeros;
+	    }
+
+	    /*
+	     * The code below compares the numbers in the two
+	     * strings without ever converting them to integers.  It
+	     * does this by first comparing the lengths of the
+	     * numbers and then comparing the digit values.
+	     */
+
+	    diff = 0;
+	    while (1) {
+		if (diff == 0) {
+		    diff = *left - *right;
+		}
+		right++;
+		left++;
+		if (!isdigit(UCHAR(*right))) {
+		    if (isdigit(UCHAR(*left))) {
+			return 1;
+		    } else {
+			/*
+			 * The two numbers have the same length. See
+			 * if their values are different.
+			 */
+
+			if (diff != 0) {
+			    return diff;
+			}
+			break;
+		    }
+		} else if (!isdigit(UCHAR(*left))) {
+		    return -1;
+		}
+	    }
+	    continue;
+	}
         diff = *left - *right;
         if (diff) {
-            if (isupper(*left) && islower(*right)) {
+            if (isupper(UCHAR(*left)) && islower(UCHAR(*right))) {
                 diff = tolower(*left) - *right;
                 if (diff) {
-                   return diff;
+		    return diff;
                 } else if (secondaryDiff == 0) {
-                   secondaryDiff = -1;
+		    secondaryDiff = -1;
                 }
-            } else if (isupper(*right) && islower(*left)) {
-                diff = *left - tolower(*right);
+            } else if (isupper(UCHAR(*right)) && islower(UCHAR(*left))) {
+                diff = *left - tolower(UCHAR(*right));
                 if (diff) {
-                   return diff;
+		    return diff;
                 } else if (secondaryDiff == 0) {
-                   secondaryDiff = 1;
+		    secondaryDiff = 1;
                 }
-            } else if (isdigit(*right) && isdigit(*left)) {
-                int rightCnt = 0;
-                int leftCnt = 0;
-                while (isdigit(*right)) {
-                   rightCnt++;
-                   right++;
-                }
-                while (isdigit(*left)) {
-                   leftCnt++;
-                   left++;
-                }
-                return (rightCnt != leftCnt) ? leftCnt - rightCnt : diff;
             } else {
                 return diff;
             }
         }
-        if (*left == 0) break;
+        if (*left == 0) {
+	    break;
+	}
         left++;
         right++;
     }
-/* This is necessary to keep the order of the sort list for doubles in the reflist */
-    if (diff == 0) diff = secondaryDiff;
+    if (diff == 0) {
+	diff = secondaryDiff;
+    }
     return diff;
 }

@@ -31,21 +31,39 @@ by checking the testing suite in the directory tests.
 
 Installation
 ------------
-You should be able to obtain the latest version of ExtraL via anonymous ftp
+You should be able to obtain the latest version of ExtraL via www on url
+http://rrna.uia.ac.be/extral/ or via anonymous ftp
 on rrna.uia.ac.be. in the directory /pub/tcl
 
-This package can be build as a loadable object to Tcl8.0. Go to the
-src directory and type
-./configure
-Then run make. This should produce the loadable module. The build.tcl and
-buildwin.tcl files are a tool to make a nice package in a different
-directory.You can invoke them with the folowing command
-./build.tcl ?build directory?
+Binary packages
+
+A binary ExtraL package can be "installed" by placing it where Tcl can find
+it. The command 
+package require Extral
+will load the package. A binary package does not necesarily contains
+compiled code: If no compiled version (.so, .dll) is available, a 
+Tcl-only version will be used.
+
+Sources
+
+The Tcl script makedist.tcl creates a package distribution
+If no compiled version (.so, .dll) is available, a Tcl-only version will 
+be created.
+
+compiled packages for most Unix platform should be created using the following 
+steps:
+cd Extral/src
+./configure clean
+./configure distclean
+./configure --with-tcl=<path of tcl distribution>
+make
+cd ..
+./makedist.tcl
 
 If you want to make gdbm and bsd-db support, you will have to create a 
 libgdbm.a and libdb.a (should position independend code) and put these
 in the extern directory together with their header files. (gdbm.h and 
-db_185.h) and do a 
+db_185.h) and do in the src directory:
 make gdbm.so
 make bsddbm.so
 
@@ -54,7 +72,7 @@ How to contact me
 I will do my best to reply as fast as I can to any problems, etc.
 However, the development of extraL is not my only task,
 which is why my response might not be always as fast as you would
-like (although I get a very good average).
+like.
 
 Peter De Rijk
 University of Antwerp (UIA)

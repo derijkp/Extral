@@ -1,4 +1,4 @@
-package require -exact Extral 1.0
+package require Extral
 catch {tk appname test}
 
 if ![info exists testleak] {
@@ -90,7 +90,7 @@ if [info exists errors] {
 		append error "\n$test  ----------------------------"
 		append error "\n$err"
 	}
-	error $error
+	return -code error $error
 } else {
 	puts "All tests ok"
 }

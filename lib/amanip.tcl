@@ -37,12 +37,20 @@ proc amanip {option args} {
 			}
 			upvar [lindex $args 0] var
 			set result ""
-			set default [lindex $args 2]
-			foreach e [lindex $args 1] {
-				if [info exists var($e)] {
-					lappend result $e $var($e)
-				} else {
-					lappend result $e $default
+			if {[llength $args] == 3} {
+				set default [lindex $args 2]
+				foreach e [lindex $args 1] {
+					if [info exists var($e)] {
+						lappend result $var($e)
+					} else {
+						lappend result $default
+					}
+				}
+			} else {
+				foreach e [lindex $args 1] {
+					if [info exists var($e)] {
+						lappend result $e $var($e)
+					}
 				}
 			}
 			return $result

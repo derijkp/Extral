@@ -11,15 +11,16 @@
 #}
 
 rename exit ::Extral::exit
-proc exit {{returnCode 0}} {
-	global Extral::atexit
-	if [info exists Extral::atexit] {
-		foreach command $Extral::atexit {
-			eval $command
+	proc exit {{returnCode 0}} {
+		global Extral::atexit
+		if [info exists Extral::atexit] {
+			foreach command $Extral::atexit {
+				eval $command
+			}
 		}
+		Extral::exit $returnCode
 	}
-	Extral::exit $returnCode
-}
+
 
 #doc {atexit atexit} cmd {
 #atexit add command
@@ -30,14 +31,25 @@ proc exit {{returnCode 0}} {
 #	it will not work. You can redefine the destroy command to call exit when it 
 #	has . as an argument.
 #}
-proc atexit {action command} {
-	variable atexit
+proc atexit {action {command {}}} {
+	if ![info exists ::Extral::atexit] {set ::Extral::atexit ""}
 	switch $action {
 		add {
-			laddnew atexit $command
+			if {[lsearch $::Extral::atexit $command] == -1} {
+				lappend ::Extral::atexit $command
+			}
 		}
 		remove {
-			lremove atexit $command
+			set pos [lsearch $::Extral::atexit $command]
+			if {$pos != -1} {
+				set ::Extral::atexit [lreplace $::Extral::atexit $pos $pos]
+			}
+		}
+		list {
+			return $::Extral::atexit
+		}
+		default {
+			return -code error "Unknown option \"$action\": should be one of add, remove or list"
 		}
 	}
 }

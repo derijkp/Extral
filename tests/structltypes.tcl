@@ -752,5 +752,4 @@ test structlget-named {with bool} {
 	structlset -struct $schema {} {bool gvf} 1
 } {b {gvf 1}}
 
-
 testsummarize
