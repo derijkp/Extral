@@ -1,5 +1,5 @@
 # Version number
-VERSION=0.91
+VERSION=0.92
 
 # The directory containing the Tcl sources and headers
 # To build against Tcl7.4
@@ -24,13 +24,13 @@ SHELL =		/bin/sh
 CC =		cc
 CC_SWITCHES =	${CFLAGS} -I./ -I${TCL_DIR} -I${TCL_DIR2}
 
-all: libextral.so.$(VERSION)
+all: libextral$(VERSION).so
 
-libextral.so.$(VERSION): extral.o extralInit.o
-	$(LD) -o libextral.so.$(VERSION) -shared extral.o extralInit.o
+libextral$(VERSION).so: extral.o extralInit.o
+	$(LD) -o libextral$(VERSION).so -shared extral.o extralInit.o
 
-install: libextral.so.$(VERSION)
-	cp  libextral.so.$(VERSION) /home/peter/tcl/wex/lib
+install: libextral$(VERSION).so
+	cp  libextral$(VERSION).so /home/peter/tcl/wex/lib
 	cp  extral.tcl /home/peter/tcl/wex/lib/extral0.9
 
 depend:
@@ -40,5 +40,9 @@ depend:
 	$(CC) -c $(CC_SWITCHES) $<
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
+
+
+
+
 
 

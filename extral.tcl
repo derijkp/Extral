@@ -1,20 +1,45 @@
+package provide extral 0.92
 
 # Some list commands
 # ==================
-proc lpop {ulist} {
+proc lpop {ulist args} {
     upvar $ulist list
+    if {[llength $args]>1} {
+        error "Format is \"lpop listname ?position?\""
+    }
     if {[llength $list]==0} {return ""}
-    set end [llength $list]
-    incr end -1
-    set result [lindex $list $end]
-    incr end -1
-    set list [lrange $list 0 $end]
+    if {"$args"==""} { 
+        set end [llength $list]
+        incr end -1
+        set result [lindex $list $end]
+        incr end -1
+        set list [lrange $list 0 $end]
+    } else {
+        set pos $args
+        if {$pos>=[llength $list]} {
+            return {}
+        }
+        set result [lindex $list $pos]
+        set list [lsub $list -exclude $pos]
+    }
     return $result
 }
 
-proc lpush {ulist item} {
+proc lpush {ulist item args} {
     upvar $ulist list
-    lappend list $item
+    if {[llength $args]>1} {
+        error "Format is \"lpush listname item ?position?\""
+    }
+    if {"$args"==""} { 
+        lappend list $item
+    } else {
+        set pos [expr $args-1]
+        if {$pos>=[llength $list]} {
+            return {}
+        }
+        set temp [lindex $list $pos]
+        set list [lreplace $list $pos $pos $temp $item]
+    }
 }
 
 proc lshift {ulist} {
@@ -35,12 +60,24 @@ proc lunshift {ulist item} {
     set list [lreplace $list 0 0 $item $temp]
 }
 
-proc leor {l1 l2} {
-    set cor [lcor $l1 $l2]
+proc lset {listref value indices} {
+    upvar $listref list
+    foreach index $indices {
+        set list [lreplace $list $index $index $value]
+    }
+    return $list
+}
+
+proc larrayset {array varlist valuelist} {
+    uplevel "array set $array \[lmanip join \[lmanip merge [list $varlist] [list $valuelist]\] \{ \} all\]"
+}
+
+proc leor {list1 list2} {
+    set cor [lcor $list1 $list2]
     set exclusive [lfind $cor -1]
     set join [lsub $cor -exclude $exclusive]
-    set result [lsub $l1 -exclude $join]
-    eval lappend result [lsub $l2 $exclusive]
+    set result [lsub $list1 -exclude $join]
+    eval lappend result [lsub $list2 $exclusive]
 }
 
 proc lunion {args} {
@@ -62,17 +99,6 @@ proc lremove {listref args} {
         set list [lsub $list -exclude [lfind $list $item]]
     }
     return $list
-}
-
-proc larrayset {array varlist valuelist} {
-    uplevel "array set $array \[lmanip join \[lmanip merge [list $varlist] [list $valuelist]\] \{ \} all\]"
-}
-
-# Remark: does nothing
-# I use this to put some example or testing code in a program
-# without all the #'s
-# ===========================================================
-proc rem {args} {
 }
 
 # Code to let a variable iterate over a list
@@ -242,3 +268,54 @@ proc struct {option args} {
         }
     }
 }
+
+# Some convenience functions I often use, so they ended up here
+# =============================================================
+# Remark
+# rem: 
+#      does nothing
+#      I use this to put some example or testing code in a program
+#      without all the #'s
+proc rem {args} {
+}
+
+# REM:
+#      when the procedure remof is called, REM will also do nothing
+#      when the procedure remon is called, REM will put its arguments
+#      to the stdout
+if {"[info commands REM]"==""} {
+     proc remon {} {                            
+         proc REM {args} {                      
+             puts stdout $args   
+         }
+     }
+     proc remof {} {
+         proc REM {args} {}
+     }
+     remon
+}
+
+# true expr
+# returns 1 when expression is yes, true or 1
+proc true {expr} {
+    set result 0
+    switch $expr {
+        yes {set result 1}
+        true {set result 1}
+        1 {set result 1}
+    }
+    return $result
+}
+
+proc setglobal {globalvar args} {
+    upvar #0 $globalvar var
+    if [string match $args ""] {
+        if ![info exists var] {
+            error "can't read \"$globalvar\": no such global variable"
+        } else {         
+            puts $var    
+        }                
+    } else {             
+        set var $args    
+    }                    
+}                        

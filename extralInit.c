@@ -43,6 +43,7 @@ Extral_Init(interp)
 {
     char *libDir;
 
+    Tcl_PkgProvide(interp, "extral", "0.92");
     dld_AddTclCommand(interp, "lfind", ExtraL_LfindCmd);
     dld_AddTclCommand(interp, "ffind", ExtraL_FfindCmd);
     dld_AddTclCommand(interp, "lsub", ExtraL_LsubCmd);
@@ -69,4 +70,10 @@ dld_AddTclCommand(interp, command, function)
 	(Tcl_CmdDeleteProc *)NULL);
     return TCL_OK;
 }
+
+
+
+
+
+
 
