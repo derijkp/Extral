@@ -8,7 +8,7 @@
 # full path name of this file's directory.
 
 # $Format: "set version $ProjectVersion$"$
-set version 1a.10
+set version 1a.11
 regsub -all {[ab]} $Extral__version {} Extral__version
 set Extral__temp {
 	if [file exists [file join $dir extral[info sharedlibextension]]] {
@@ -17,7 +17,8 @@ set Extral__temp {
 		source [file join $dir lib noc.tcl]
 	}
 	lappend auto_path [file join $dir lib]
-	set Extral_version $Extral__version
+	set Extral__version $Extral__version
+	set Extral__dir $dir
 	package provide Extral $Extral__version
 }
 regsub -all {\$Extral__version} $Extral__temp [list $Extral__version] Extral__temp
