@@ -10,7 +10,7 @@
 # $Format: "set ::Extral::version 1.$ProjectMajorVersion$"$
 set ::Extral::version 1.1
 # $Format: "set ::Extral::patchlevel $ProjectMinorVersion$"$
-set ::Extral::patchlevel 6
+set ::Extral::patchlevel 7
 package provide Extral $::Extral::version
 
 #
@@ -39,3 +39,4 @@ if [file exists [file join ${Extral::dir} extral[info sharedlibextension]]] {
 lappend auto_path [file join ${Extral::dir} lib]
 
 source [file join ${Extral::dir} lib atexit.tcl]
+source [file join ${Extral::dir} lib always.tcl]

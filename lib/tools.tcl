@@ -1,4 +1,4 @@
-# Some convenience functions I often use, so they ended up here
+# Some tools
 #
 # Copyright (c) 1996 Peter De Rijk
 #
@@ -7,24 +7,6 @@
 #
 # =============================================================
 #doc convenience title {Convenience functions}
-
-#doc {convenience invoke} cmd {
-#invoke vars cmd ...
-#} descr {
-# invoke simply evals $cmd in a private space. This eg. allows using
-# temporary variables in bindings without creating these in global scope.
-# It is also very convenient to use values appended to a command given
-# to a binding:
-# Further arguments (when given) are parameters that will be available in the
-# variables given in vars. If more parameters are supplied than vars are given,
-# the remaining parameters will be stored in the variable args.
-#}
-proc invoke {vars cmd args} {
-	foreach var $vars {
-		set $var [lshift args]
-	}
-	eval $cmd
-}
 
 #doc {convenience aproc} cmd {
 #aproc args body
@@ -92,7 +74,7 @@ proc ? {expr truevalue falsevalue} {
 	if $::Extral::temp {return $truevalue} else {return $falsevalue}
 }
 
-#doc {convenience ?} cmd {
+#doc {convenience echo} cmd {
 #echo string
 #} descr {
 # echo returns its argument as a result
@@ -104,7 +86,7 @@ proc echo {string} {
 	return $string
 }
 
-#doc {convenience ?} cmd {
+#doc {convenience get} cmd {
 #get varName ?default?
 #} descr {
 # get returns the value of the variable given by varName if it exists.
