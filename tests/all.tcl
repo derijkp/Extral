@@ -15,4 +15,3 @@ source structlist.tcl
 source structlstruct.tcl
 source structltypes.tcl
 source ssort.tcl
-source leval.tcl

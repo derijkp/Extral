@@ -8,5 +8,5 @@ Extral::makedoc [lsort [glob lib/*.tcl]] docs Extral {
 	listcommands lmath stringcommands arraycommands cmd validatecommands
 	filing infocommands
 	time atexit tempfile structl struct
-	convenience ssort leval
+	convenience ssort
 }
