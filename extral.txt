@@ -143,13 +143,15 @@ lmanip unmangle ?list? ??spacing?? ??var??
         % set var
         a b c d
 
+lpop listName ?pos?
+    returns the last element from a list, thereby removing it from the list.
+	If pos is given it will return the pos element of the list.
+
+
 Commands in extral.tcl
 ----------------------
 There are also some extra listprocessing commands written in tcl in the 
 package. Some use the commands written in C:
-
-lpop listName [position]
-    returns the last element from a list, thereby removing it from the list.
 
 lpush listName ?item? [position]
     for completeness, it is actually the same command as lappend.

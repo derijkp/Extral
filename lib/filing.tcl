@@ -12,7 +12,15 @@
 # Using the Unix tools
 # --------------------
 proc mkdir {dir} {
-	exec mkdir $dir
+	set todo ""
+	while {![file exists $dir]} {
+		lunshift todo [file tail $dir]
+		set dir [file dir $dir]
+	}
+	foreach tail $todo {
+		set dir [file join $dir $tail]
+		exec mkdir $dir
+	}
 }
 
 proc ls {args} {

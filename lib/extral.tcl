@@ -9,40 +9,37 @@
 #
 # =============================================================
 
-proc lpop {ulist args} {
-	upvar $ulist list
-	if {[llength $args]>1} {
-		error "Format is \"lpop listname ?position?\""
-	}
-	if {[llength $list]==0} {return ""}
-	if {"$args"==""} { 
-		set end [llength $list]
-		incr end -1
-		set result [lindex $list $end]
-		incr end -1
-		set list [lrange $list 0 $end]
-	} else {
-		set pos $args
-		if {$pos>=[llength $list]} {
-			return {}
-		}
-		set result [lindex $list $pos]
-		set list [lsub $list -exclude $pos]
-	}
-	return $result
-}
+#proc lpop {ulist args} {
+#	upvar $ulist list
+#	if {[llength $args]>1} {
+#		error "Format is \"lpop listname ?position?\""
+#	}
+#	if {[llength $list]==0} {return ""}
+#	if {"$args"==""} { 
+#		set end [llength $list]
+#		incr end -1
+#		set result [lindex $list $end]
+#		incr end -1
+#		set list [lrange $list 0 $end]
+#	} else {
+#		set pos $args
+#		if {$pos>=[llength $list]} {
+#			return {}
+#		}
+#		set result [lindex $list $pos]
+#		set list [lsub $list -exclude $pos]
+#	}
+#	return $result
+#}
+#
 
-proc lpush {ulist item args} {
+proc lpush {ulist item {pos {}}} {
 	upvar $ulist list
-	if {[llength $args]>1} {
-		error "Format is \"lpush listname item ?position?\""
-	}
-	if {"$args"==""} { 
+	if {("$list"=="")||("$pos"=="")} { 
 		lappend list $item
 	} else {
-		set pos [expr $args-1]
 		if {$pos>=[llength $list]} {
-			return {}
+			return $list
 		}
 		set temp [lindex $list $pos]
 		set list [lreplace $list $pos $pos $temp $item]
@@ -60,11 +57,11 @@ proc lshift {ulist} {
 proc lunshift {ulist item} {
 	upvar $ulist list
 	if {[llength $list]==0} {
-		set list $item
-		return $item
+		lappend list $item
+	} else {
+		set temp [lindex $list 0]
+		set list [lreplace $list 0 0 $item $temp]
 	}
-	set temp [lindex $list 0]
-	set list [lreplace $list 0 0 $item $temp]
 }
 
 proc lset {listref value indices} {

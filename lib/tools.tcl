@@ -43,6 +43,15 @@ proc true {expr} {
 	return $result
 }
 
+# fload filename
+#	suck up the entire contents of a file, and return them as the result
+proc fload {fileName} {
+	set f [open $fileName]
+	set result [read $f]
+	close $f
+	return $result
+}
+
 # setglobal varName ?newValue?
 #	same as the set command, but then for global variables
 proc setglobal {varName args} {

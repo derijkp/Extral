@@ -1,13 +1,21 @@
 #!/bin/sh
 # the next line restarts using wish \
 exec tclsh7.5 "$0" "$@"
-package require extral
+#package require extral
 
 #set targetdir $env(HOME)/bin/[file tail [pwd]]
 set targetdir $argv
 
 proc mkdir {dir} {
 	exec mkdir $dir
+}
+
+proc lshift {ulist} {
+	upvar $ulist list
+	if {[llength $list]==0} {return ""}
+	set result [lindex $list 0]
+	set list [lrange $list 1 end]
+	return $result
 }
 
 proc chmod {args} {

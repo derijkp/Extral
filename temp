@@ -1,0 +1,7 @@
+#!/usr/local/bin/tclsh7.5
+rename exit tcl__exit
+proc exit {{returnCode 0}} {
+	atexit execute
+	tcl__exit
+}
+puts stdout trying
