@@ -40,8 +40,7 @@ The dbm support will be moved to a seperate package.
 Installation
 ------------
 You should be able to obtain the latest version of ExtraL via www on url
-http://rrna.uia.ac.be/extral/ or via anonymous ftp
-on rrna.uia.ac.be. in the directory /pub/tcl
+http://extral.sourceforge.net/
 
 Binary packages
 
@@ -77,20 +76,19 @@ which is why my response might not be always as fast as you would
 like.
 
 Peter De Rijk
-University of Antwerp (UIA)
+University of Antwerp (UA)
 Department of Biochemistry
 Universiteitsplein 1
 B-2610 Antwerp
 
-tel.: 32-03-820.23.16
+tel.: 32-03-820.23.27
 fax: 32-03-820.22.48
-E-mail: derijkp@uia.ua.ac.be
-web: http://rrna.uia.ac.be/~peter/personal/peter.html
+E-mail: Peter.DeRijk@ua.ac.be
 
 Legalities
 ----------
 
-ExtraL is Copyright Peter De Rijk, University of Antwerp (UIA), 1995 The
+ExtraL is Copyright Peter De Rijk, University of Antwerp (UA), 1995 The
 following terms apply to all files associated with the software unless
 explicitly disclaimed in individual files.
 

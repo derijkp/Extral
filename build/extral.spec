@@ -5,8 +5,8 @@ Release:	1
 Copyright:	BSD
 Group:	Development/Languages/Tcl
 Source:	Extral-2.0.3.src.tar.gz
-URL: http://rrna.uia.ac.be/extral
-Packager: Peter De Rijk <derijkp@uia.ua.ac.be>
+URL: http://extral.sourceforge.net/
+Packager: Peter De Rijk <Peter.DeRijk@ua.ac.be>
 Requires: tcl >= 8.3.2
 Prefix: /usr
 %description
