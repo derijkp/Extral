@@ -116,6 +116,7 @@ Extral_Init(interp)
 	Tcl_CreateObjCommand(interp,"leval",(Tcl_ObjCmdProc *)ExtraL_LevalObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Extral_taglInit(interp);
 	Extral_DbmInit(interp);
+	Gdbm_Init(interp);
 
 /*	dld_AddTclCommand(interp, "ffind", ExtraL_FfindCmd); */
 	dld_AddTclCommand(interp, "amanip", ExtraL_AmanipCmd);

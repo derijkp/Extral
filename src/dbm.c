@@ -25,7 +25,6 @@ typedef struct Fdbm_Info_str {
 	char *dir;
 	int dirlen;
 	int namebufferlen;
-	int read_write;
 	char *buffer;
 	int bufferlen;
 } Fdbm_Info;
@@ -33,15 +32,22 @@ typedef struct Fdbm_Info_str {
 int ExtraL_FdbmCreate(
 	Tcl_Interp *interp,
 	Tcl_Obj *database,
-	int mode)
+	int objc,
+	Tcl_Obj *CONST objv[])
 {
 	Fdbm_Info *fdbm;
 	char *name;
 	int namelen;
 	int error;
 
+	if (objc != 0) {
+		Tcl_ResetResult(interp);
+		Tcl_AppendResult(interp,"fdbm create has no options", (char *)NULL);
+		return TCL_ERROR;
+	}
 	name = Tcl_GetStringFromObj(database,&namelen);
-
+	error = Tcl_VarEval(interp,"if [file exists ",name,"] {error {could not create database \"",name,"\"}}",NULL);
+	if (error != TCL_OK) {return error;}
 	error = Tcl_VarEval(interp,"file mkdir ",name,NULL);
 	if (error != TCL_OK) {return error;}
 	return TCL_OK;
@@ -50,24 +56,38 @@ int ExtraL_FdbmCreate(
 int ExtraL_FdbmOpen(
 	Tcl_Interp *interp,
 	Tcl_Obj *database,
-	int read_write,
-	ClientData *token)
+	ClientData *token,
+	int readonly,
+	int objc,
+	Tcl_Obj *CONST objv[])
 {
 	Fdbm_Info *fdbm;
 	char *name;
 	int namelen;
 	int error;
+	int i;
 
+	if (objc != 0) {
+		Tcl_ResetResult(interp);
+		Tcl_AppendResult(interp,"fdbm open has no options", (char *)NULL);
+		return TCL_ERROR;
+	}
 	name = Tcl_GetStringFromObj(database,&namelen);
 	fdbm = (Fdbm_Info *)Tcl_Alloc(sizeof(Fdbm_Info));
 	fdbm->dir = (char *)Tcl_Alloc((namelen+102)*sizeof(char));
 	strncpy(fdbm->dir,name,namelen);
+	fdbm->dir[namelen] = '\0';
+	error = Tcl_VarEval(interp,"if ![file exists ",fdbm->dir,"] {error {could not open database \"",fdbm->dir,"\"}}",NULL);
 	fdbm->dir[namelen] = '/';
 	fdbm->dirlen = namelen+1;
 	fdbm->namebufferlen = 100;
 	fdbm->buffer = (char *)Tcl_Alloc(10000*sizeof(char));
 	fdbm->bufferlen = 10000;
-	fdbm->read_write = read_write;
+	if (error != TCL_OK) {
+		Tcl_Free((char *)fdbm->dir);
+		Tcl_Free((char *)fdbm);
+		return error;
+	}
 	*token = (ClientData)fdbm;
 	return TCL_OK;
 }
@@ -88,17 +108,12 @@ int ExtraL_FdbmSet(
 	Tcl_Obj *valueObj)
 {
 	Fdbm_Info *fdbm = token;
-	FILE *file;
+	Tcl_Channel file;
 	char *name;
 	datum key, value;
 	int error;
 	int i;
 
-	if (fdbm->read_write == DBM_READ) {
-		Tcl_ResetResult(interp);
-		Tcl_AppendResult(interp,"error: trying to set value from reader", (char *)NULL);
-		return TCL_ERROR;
-	}
 	key.dptr = Tcl_GetStringFromObj(keyObj,&(key.dsize));
 	value.dptr = Tcl_GetStringFromObj(valueObj,&(value.dsize));
 	if (key.dsize > fdbm->namebufferlen) {
@@ -108,14 +123,14 @@ int ExtraL_FdbmSet(
 	strncpy(fdbm->dir+fdbm->dirlen,key.dptr,key.dsize);
 	fdbm->dir[fdbm->dirlen+key.dsize] = '\0';
 
-	file = fopen(fdbm->dir,"w");
+	file = Tcl_OpenFileChannel(interp,fdbm->dir,"w",0666);
 	if (file == NULL) {
 		Tcl_ResetResult(interp);
 		Tcl_AppendResult(interp,"could not store key \"",key.dptr ,"\"", (char *)NULL);
 		return TCL_ERROR;
 	}
-	fwrite(value.dptr,sizeof(char),value.dsize,file);
-	fclose(file);
+	Tcl_Write(file, value.dptr, value.dsize);
+	Tcl_Close(interp,file);
 	return TCL_OK;
 }
 
@@ -126,7 +141,7 @@ int ExtraL_FdbmGet(
 	Tcl_Obj *valueObj)
 {
 	Fdbm_Info *fdbm = token;
-	FILE *file;
+	Tcl_Channel file;
 	char *name;
 	datum key, value;
 	int error;
@@ -141,20 +156,60 @@ int ExtraL_FdbmGet(
 	fdbm->dir[fdbm->dirlen+key.dsize] = '\0';
 	Tcl_SetStringObj(valueObj,"",0);
 
-	file = fopen(fdbm->dir,"r");
+	file = Tcl_OpenFileChannel(interp, fdbm->dir, "r", 0666);
 	if (file == NULL) {
 		Tcl_ResetResult(interp);
 		Tcl_AppendResult(interp,"error: key \"", key.dptr, "\" not found", (char *)NULL);
 		return TCL_ERROR;
 	}
 	while(1) {
-		i = fread(fdbm->buffer,sizeof(char),fdbm->bufferlen,file);
+		i = Tcl_Read(file,fdbm->buffer,fdbm->bufferlen);
 		if (i != 0) {
 			Tcl_AppendToObj(valueObj,fdbm->buffer,i);
 		}
 		if (i<fdbm->bufferlen) break;
 	}
-	fclose(file);
+	Tcl_Close(interp,file);
+	return TCL_OK;
+}
+
+int ExtraL_FdbmKeys(
+	Tcl_Interp *interp,
+	ClientData token,
+	char *pattern)
+{
+	Fdbm_Info *fdbm = token;
+	int error;
+
+	if (pattern == NULL) {
+		pattern = "*";
+	}
+	fdbm->dir[fdbm->dirlen] = '\0';
+	error = Tcl_VarEval(interp,"dirglob ",fdbm->dir," ",pattern,(char *)NULL);
+	if (error != TCL_OK) {return error;}
+	return TCL_OK;
+}
+
+int ExtraL_FdbmUnset(
+	Tcl_Interp *interp,
+	ClientData token,
+	Tcl_Obj *keyObj)
+{
+	Fdbm_Info *fdbm = token;
+	Tcl_Channel file;
+	char *name;
+	datum key, value;
+	int error;
+	int i;
+
+	key.dptr = Tcl_GetStringFromObj(keyObj,&(key.dsize));
+	if (key.dsize > fdbm->namebufferlen) {
+		fdbm->dir = (char *)Tcl_Realloc(fdbm->dir,(fdbm->dirlen+key.dsize+1)*sizeof(char));
+		fdbm->namebufferlen = key.dsize;
+	}
+	strncpy(fdbm->dir+fdbm->dirlen,key.dptr,key.dsize);
+	fdbm->dir[fdbm->dirlen+key.dsize] = '\0';
+	error = Tcl_VarEval(interp,"file delete {",fdbm->dir,"}",NULL);
 	return TCL_OK;
 }
 
@@ -175,6 +230,7 @@ int ExtraL_DbmObjectCmd(
 	char *cmd;
 	int cmdlen;
 	char *name;
+	int namelen;
 	int error;
 	
 
@@ -190,6 +246,11 @@ int ExtraL_DbmObjectCmd(
 				Tcl_WrongNumArgs(interp, 1, objv, "set key value");
 				return TCL_ERROR;
 			}
+			if (((DbmInfo *)dbminfo)->readonly) {
+				Tcl_ResetResult(interp);
+				Tcl_AppendResult(interp,"error: trying to set value from reader", (char *)NULL);
+				return TCL_ERROR;
+			}
 			error = type->set(interp,token,objv[2],objv[3]);
 			if (error != TCL_OK) {return error;}
 			return TCL_OK;
@@ -203,9 +264,61 @@ int ExtraL_DbmObjectCmd(
 			if (error != TCL_OK) {return error;}
 			return TCL_OK;
 		}
+	} else if (cmdlen == 4) {
+		if (strcmp(cmd,"keys") == 0) {
+			if ((objc != 2)&&(objc != 3)) {
+				Tcl_WrongNumArgs(interp, 1, objv, "keys ?pattern?");
+				return TCL_ERROR;
+			}
+			if (objc == 3) {
+				name = Tcl_GetStringFromObj(objv[2],&namelen);
+			} else {
+				name = NULL;
+			}
+			error = type->keys(interp,token,name);
+			if (error != TCL_OK) {return error;}
+			return TCL_OK;
+		} else if (strcmp(cmd,"sync") == 0) {
+			if (objc != 2) {
+				Tcl_WrongNumArgs(interp, 1, objv, "sync");
+				return TCL_ERROR;
+			}
+			if (type->sync != NULL) {
+				error = type->sync(interp,token);
+				if (error != TCL_OK) {return error;}
+			}
+			return TCL_OK;
+		}
+	} else if (cmdlen == 5) {
+		if (strcmp(cmd,"unset") == 0) {
+			if (objc !=3) {
+				Tcl_WrongNumArgs(interp, 1, objv, "unset key");
+				return TCL_ERROR;
+			}
+			if (((DbmInfo *)dbminfo)->readonly) {
+				Tcl_ResetResult(interp);
+				Tcl_AppendResult(interp,"error: trying to unset value from reader", (char *)NULL);
+				return TCL_ERROR;
+			}
+			error = type->unset(interp,token,objv[2]);
+			if (error != TCL_OK) {return error;}
+			return TCL_OK;
+		}
+	} else if (cmdlen == 10) {
+		if (strcmp(cmd,"reorganize") == 0) {
+			if (objc != 2) {
+				Tcl_WrongNumArgs(interp, 1, objv, "reorganize");
+				return TCL_ERROR;
+			}
+			if (type->reorganize != NULL) {
+				error = type->reorganize(interp,token);
+				if (error != TCL_OK) {return error;}
+			}
+			return TCL_OK;
+		}
 	}
 	Tcl_ResetResult(interp);
-	Tcl_AppendResult(interp,"bad option \"", cmd, "\": must be one of set, get", (char *)NULL);
+	Tcl_AppendResult(interp,"bad option \"", cmd, "\": must be one of set, get, unset, keys, sync or reorganize", (char *)NULL);
 	return TCL_ERROR;
 }
 
@@ -229,6 +342,7 @@ int ExtraL_DbmObjCmd(
 	char *cmd;
 	int cmdlen;
 	char *name;
+	int namelen, readonly;
 	int error;
 
 	if (objc < 2) {
@@ -242,32 +356,31 @@ int ExtraL_DbmObjCmd(
 			DbmInfo *dbminfo;
 			ClientData token;
 			char *rw;
-			int rwcode;
-			if ((objc != 5)&&(objc != 6)) {
-				Tcl_WrongNumArgs(interp, 1, objv, "open type dbcmd database ?read/write?");
+			if (objc < 5) {
+				Tcl_WrongNumArgs(interp, 1, objv, "open ?-readonly? type dbcmd database ?options?");
 				return TCL_ERROR;
 			}
-			if (objc == 6) {
-				rw = Tcl_GetStringFromObj(objv[5],&error);
-				if (rw[0]=='w') {
-					rwcode = DBM_WRITE;
-				} else {
-					rwcode = DBM_READ;
-				}
+			name = Tcl_GetStringFromObj(objv[2],&namelen);
+			if (strcmp(name,"-readonly") == 0) {
+				readonly = 1;
+				objc -= 3;
+				objv += 3;
 			} else {
-				rwcode = DBM_READ;
+				readonly = 0;
+				objc -= 2;
+				objv += 2;
 			}
-			typestring = Tcl_GetStringFromObj(objv[2],&error);
-			dbminfo = ExtraL_DbmOpen(interp,typestring,objv[4],rwcode);
+			typestring = Tcl_GetStringFromObj(objv[0],&error);
+			dbminfo = ExtraL_DbmOpen(interp,typestring,objv[2],readonly,objc-3,objv+3);
 			if (dbminfo == NULL) {
 				return TCL_ERROR;
 			}
 			type = dbminfo->type;
-			Tcl_CreateObjCommand(interp,Tcl_GetStringFromObj(objv[3],&error),
+			Tcl_CreateObjCommand(interp,Tcl_GetStringFromObj(objv[1],&error),
 				(Tcl_ObjCmdProc *)ExtraL_DbmObjectCmd,dbminfo,
 				(Tcl_CmdDeleteProc *)ExtraL_DbmClose);
 			Tcl_ResetResult(interp);
-			Tcl_AppendResult(interp, Tcl_GetStringFromObj(objv[3],&error), (char *)NULL);
+			Tcl_AppendResult(interp, Tcl_GetStringFromObj(objv[1],&error), (char *)NULL);
 			return TCL_OK;
 		}
 	} else if (cmdlen == 5) {
@@ -293,8 +406,8 @@ int ExtraL_DbmObjCmd(
 	} else if (cmdlen == 6) {
 		if (strcmp(cmd,"create") == 0) {
 			int mode;
-			if ((objc != 4)&&(objc != 5)) {
-				Tcl_WrongNumArgs(interp, 1, objv, "create type database ?mode?");
+			if (objc < 4) {
+				Tcl_WrongNumArgs(interp, 1, objv, "create type database ?options?");
 				return TCL_ERROR;
 			}
 			typestring = Tcl_GetStringFromObj(objv[2],&error);
@@ -305,13 +418,7 @@ int ExtraL_DbmObjCmd(
 				return TCL_ERROR;
 			}
 			type = (DbmType *)Tcl_GetHashValue(entry);
-			if (objc == 5) {
-				error = Tcl_GetIntFromObj(interp,objv[4],&mode);
-				if (error != TCL_OK) {return error;}
-			} else {
-				mode = 0666;
-			}
-			error = (type->create)(interp,objv[3],mode);
+			error = (type->create)(interp,objv[3],objc-4,objv+4);
 			if (error != TCL_OK) {return error;}
 			return TCL_OK;
 		}
@@ -325,7 +432,9 @@ EXTERN DbmInfo *ExtraL_DbmOpen(
 	Tcl_Interp *interp,
 	char *typestring,
 	Tcl_Obj *database,
-	int rwcode)
+	int readonly,
+	int objc,
+	Tcl_Obj *CONST objv[])
 {
 	Tcl_HashEntry *entry;
 	DbmType *type;
@@ -341,10 +450,12 @@ EXTERN DbmInfo *ExtraL_DbmOpen(
 	}
 	type = (DbmType *)Tcl_GetHashValue(entry);
 
-	error = (type->open)(interp,database,rwcode,&token);
+	error = type->open(interp,database,&token,readonly,objc,objv);
+	if (error != TCL_OK) {return NULL;}
 	dbminfo = (DbmInfo *)Tcl_Alloc(sizeof(DbmInfo));
 	dbminfo->type = type;
 	dbminfo->token = token;
+	dbminfo->readonly = readonly;
 	return dbminfo;
 }
 
@@ -365,9 +476,13 @@ EXTERN int ExtraL_DbmCreateType (Tcl_Interp *interp,
 	}
 	type->create = dbmtype.create;
 	type->open = dbmtype.open;
+	type->keys = dbmtype.keys;
 	type->set = dbmtype.set;
 	type->get = dbmtype.get;
 	type->close = dbmtype.close;
+	type->unset = dbmtype.unset;
+	type->sync = dbmtype.sync;
+	type->reorganize = dbmtype.reorganize;
 	return TCL_OK;
 }
 
@@ -378,9 +493,13 @@ EXTERN int Extral_DbmInit(interp)
 	Tcl_InitHashTable(&dbmtypesTable,TCL_STRING_KEYS);
 	dbmtype.create = ExtraL_FdbmCreate; 
 	dbmtype.open = ExtraL_FdbmOpen;
+	dbmtype.keys = ExtraL_FdbmKeys;
 	dbmtype.set = ExtraL_FdbmSet;
 	dbmtype.get = ExtraL_FdbmGet;
 	dbmtype.close = ExtraL_FdbmClose;
+	dbmtype.unset = ExtraL_FdbmUnset;
+	dbmtype.sync = NULL;
+	dbmtype.reorganize = NULL;
 	ExtraL_DbmCreateType(interp,"fdbm",dbmtype);
 	Tcl_CreateObjCommand(interp,"dbm",(Tcl_ObjCmdProc *)ExtraL_DbmObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	return TCL_OK;

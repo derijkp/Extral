@@ -1,4 +1,7 @@
-#!/usr/local/bin/tclsh8.0
+#!/bin/sh
+# the next line restarts using wish \
+exec tclsh8.0 "$0" "$@"
+
 source tools.tcl
 
 test leval-1.1 {basic tests} {leval list a b c} {a b c}

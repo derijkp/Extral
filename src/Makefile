@@ -30,7 +30,8 @@ SRC_DIR =		.
 CFLAGS = -g
 CC_SWITCHES = $(CFLAGS) $(SHLIB_CFLAGS) -I${TCL_GENERIC_DIR} -I$(TCL_UNIX_DIR) -I${TK_GENERIC_DIR} ${SHLIB_CFLAGS} -I../extern/
 
-OBJECTS = extralInit.o extral.o lpop.o nonl.o supersort.o general.o tagl.o date.o leval.o dbm.o
+OBJECTS = extralInit.o extral.o lpop.o nonl.o supersort.o general.o \
+			tagl.o date.o leval.o dbm.o gdbm.o ../extern/libgdbm.a
 
 all: extral${SHLIB_SUFFIX} bsddbm$(SHLIB_SUFFIX) gdbm$(SHLIB_SUFFIX) extratcl
 

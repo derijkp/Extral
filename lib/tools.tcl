@@ -71,3 +71,11 @@ proc random {min max} {
 	set r [expr $max-$min+1]
 	return [expr int($min+rand()*$r)]
 }
+
+proc dirglob {dir pattern} {
+	set pwd [pwd]
+	cd $dir
+	set result [glob -nocomplain -- $pattern]
+	cd $pwd
+	return $result
+}

@@ -17,37 +17,52 @@ EXTERN int ExtraL_TaglCreateType _ANSI_ARGS_((Tcl_Interp *interp,
  * dbm functions and definitions
  */
 
-#define DBM_READ 1
-#define DBM_WRITE 2
 typedef int ExtraL_DbmCreateProc _ANSI_ARGS_((Tcl_Interp *interp,
-	Tcl_Obj *database,int mode));
+	Tcl_Obj *database,int objc,Tcl_Obj *CONST objv[]));
 
 typedef int ExtraL_DbmOpenProc _ANSI_ARGS_((Tcl_Interp *interp,
-	Tcl_Obj *database,int read_write,ClientData *token));
+	Tcl_Obj *database,ClientData *token,int readonly,int objc,Tcl_Obj *CONST objv[]));
+
+typedef int ExtraL_DbmKeysProc _ANSI_ARGS_((Tcl_Interp *interp,
+	ClientData token,char *pattern));
 
 typedef int ExtraL_DbmSetProc _ANSI_ARGS_((Tcl_Interp *interp,
 	ClientData token,Tcl_Obj *keyObj,Tcl_Obj *valueObj));
 
+typedef int ExtraL_DbmUnsetProc _ANSI_ARGS_((Tcl_Interp *interp,
+	ClientData token,Tcl_Obj *keyObj));
+
 typedef int ExtraL_DbmGetProc _ANSI_ARGS_((Tcl_Interp *interp,
 	ClientData token,Tcl_Obj *keyObj,Tcl_Obj *valueObj));
+
+typedef int ExtraL_DbmSyncProc _ANSI_ARGS_((Tcl_Interp *interp,
+	ClientData token));
+
+typedef int ExtraL_DbmReorganizeProc _ANSI_ARGS_((Tcl_Interp *interp,
+	ClientData token));
 
 typedef int ExtraL_DbmCloseProc _ANSI_ARGS_((ClientData token));
 
 typedef struct DbmType {
 	ExtraL_DbmCreateProc *create;
 	ExtraL_DbmOpenProc *open;
+	ExtraL_DbmKeysProc *keys;
 	ExtraL_DbmSetProc *set;
 	ExtraL_DbmGetProc *get;
+	ExtraL_DbmUnsetProc *unset;
 	ExtraL_DbmCloseProc *close;
+	ExtraL_DbmSyncProc *sync;
+	ExtraL_DbmReorganizeProc *reorganize;
 } DbmType;
 
 typedef struct DbmInfo {
 	DbmType *type;
 	ClientData token;
+	int readonly;
 } DbmInfo;
 
 EXTERN int ExtraL_DbmCreateType _ANSI_ARGS_((Tcl_Interp *interp,
 	char *key,DbmType dbmtype));
 
 EXTERN DbmInfo *ExtraL_DbmOpen(Tcl_Interp *interp,
-	char *typestring,Tcl_Obj *database,int rwcode);
+	char *typestring,Tcl_Obj *database,int readonly,int objc,Tcl_Obj *CONST objv[]);
