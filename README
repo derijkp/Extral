@@ -54,7 +54,7 @@ be created.
 compiled packages for most Unix platform should be created using the following 
 steps:
 cd Extral-src-x.x.x/src
-./configure --with-tcl=<path of tcl distribution>
+./configure
 make
 cd ..
 ./makedist.tcl
