@@ -153,7 +153,7 @@ ffind -regexp [glob ../test/*] "\nt2:(\[^\n\]*)\n"
 			Tcl_AppendResult(interp, "Couldn't open file ", listArgv[i], (char *) NULL);
 			return TCL_ERROR;
 		}
-		string=read_file(file);
+		string=ExtraL_read_file(file);
 		if (string==NULL) {
 			fclose(file);
 			free(file);
@@ -284,7 +284,7 @@ ExtraL_RandomCmd(notUsed, interp, argc, argv)
 		Tcl_AppendResult(interp, "Something strange happened: Result too big", (char *) NULL);
 		return TCL_ERROR;
 	}
-	resultstring=numstr(result+min);
+	resultstring=ExtraL_numstr(result+min);
 	Tcl_AppendResult(interp, resultstring, (char *) NULL);
 	free(resultstring);
 	return TCL_OK;

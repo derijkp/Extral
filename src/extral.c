@@ -87,7 +87,7 @@ ExtraL_LfindCmd(notUsed, interp, argc, argv)
 				break;
 		}
 		if (match) {
-			line=numstr(i);
+			line=ExtraL_numstr(i);
 			Tcl_AppendElement(interp, line);
 			free(line);
 		}
@@ -141,7 +141,7 @@ ExtraL_LsubCmd(notUsed, interp, argc, argv)
 		begin=2;
 	}
 
-	list=get_intlist(interp, argv[begin], &number, -1);
+	list=ExtraL_get_intlist(interp, argv[begin], &number, -1);
 	if (list==NULL) {
 		return TCL_ERROR;
 	}
@@ -283,7 +283,7 @@ ExtraL_LloadCmd(notUsed, interp, argc, argv)
 	}
 	if (argc==2) {
 		while(1) {
-			string=read_line(file);
+			string=ExtraL_read_line(file);
 			if (string==NULL) break;
 			Tcl_AppendElement(interp,string);
 			free(string);
@@ -294,7 +294,7 @@ ExtraL_LloadCmd(notUsed, interp, argc, argv)
 			return TCL_ERROR;
 		}
 		while(1) {
-			string=read_line(file);
+			string=ExtraL_read_line(file);
 			if (string==NULL) break;
 			Tcl_AppendResult(interp,string,NULL);
 			free(string);
@@ -637,8 +637,8 @@ ExtraL_LmanipCmd(notUsed, interp, argc, argv)
 				" split list -before/-after/-outside positions\"", (char *) NULL);
 			return TCL_ERROR;
 		}
-		before=find_bool(argv[3],"-before","-after");
-		list=get_intlist(interp, argv[4], &number, 0);
+		before=ExtraL_find_bool(argv[3],"-before","-after");
+		list=ExtraL_get_intlist(interp, argv[4], &number, 0);
 		if (list==NULL) {
 			return TCL_ERROR;
 		}
@@ -707,7 +707,7 @@ ExtraL_LmanipCmd(notUsed, interp, argc, argv)
 			if (strcmp(argv[4], "all") == 0) {
 				list=NULL;
 			} else {
-				list=get_intlist(interp, argv[4], &number, 0);
+				list=ExtraL_get_intlist(interp, argv[4], &number, 0);
 				if (list==NULL) {
 				return TCL_ERROR;
 				}

@@ -7,8 +7,8 @@
 # script is sourced, the variable $dir must contain the
 # full path name of this file's directory.
 
-package ifneeded extral 0.94 [subst {
+package ifneeded Extral 0.94 [subst {
 	load [file join $dir extral[info sharedlibextension]]
 	lappend auto_path [file join $dir lib]
-	package provide extral 0.94
+	package provide Extral 0.94
 }]

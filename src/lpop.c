@@ -62,6 +62,9 @@ ExtraL_LpopCmd(notUsed, interp, argc, argv)
 			    "\": must be integer or \"end\"", (char *) NULL);
 		    return TCL_ERROR;
 		}
+		if (index==0) {
+			return(ExtraL_LshiftCmd(notUsed, interp, argc-1, argv));
+		}
     }
     if (index < 0) {
 		index = 0;
@@ -96,22 +99,28 @@ ExtraL_LpopCmd(notUsed, interp, argc, argv)
     }
 
 	if (element[-1]=='"') element--;
-    /*
-     * Add the first part to the list.
-     */
+	while ((element != argv[1]) && (isspace(UCHAR(element[-1])))) {
+		element--;
+	}
+	/*
+	 * Add the first part to the list.
+	 */
 
-    *element = 0;
+	*element = 0;
 	if (Tcl_SetVar(interp, argv[1], string,TCL_LEAVE_ERR_MSG)==NULL) {
 		return TCL_ERROR;
 	}
 
-    /*
-     * Append the remainder of the original list.
-     */
+	/*
+	 * Append the remainder of the original list.
+	 */
 
-    if (*next != 0) {
-			Tcl_SetVar(interp, argv[1], next,TCL_APPEND_VALUE);
-    }
+	if (*next != 0) {
+		if (*string	!= '\0') {
+			Tcl_SetVar(interp, argv[1], " ",TCL_APPEND_VALUE);
+		}
+		Tcl_SetVar(interp, argv[1], next,TCL_APPEND_VALUE);
+	}
     return TCL_OK;
 }
 
@@ -155,28 +164,28 @@ ExtraL_LshiftCmd(notUsed, interp, argc, argv)
 	    return TCL_ERROR;
 	}
 
-    size = 0;
-    element = string;
+	size = 0;
+	element = string;
 	result = TclFindElement(interp, string, &element, &next, &size, &parenthesized);
 	if (result != TCL_OK) {return result;}
-    if (size == 0) {
+	if (size == 0) {
 		return TCL_OK;
-    }
-    if (size >= TCL_RESULT_SIZE) {
+	}
+	if (size >= TCL_RESULT_SIZE) {
 		interp->result = (char *) ckalloc((unsigned) size+1);
 		interp->freeProc = TCL_DYNAMIC;
-    }
-    if (parenthesized) {
+	}
+	if (parenthesized) {
 		memcpy((VOID *) interp->result, (VOID *) element, (size_t) size);
 		interp->result[size] = 0;
 		element--;
-    } else {
+	} else {
 		TclCopyAndCollapse(size, element, interp->result);
-    }
+	}
 
-    /*
-     * Append the remainder of the original list.
-     */
+	/*
+	 * Append the remainder of the original list.
+	 */
 
 	if (Tcl_SetVar(interp, argv[1], next,TCL_LEAVE_ERR_MSG)==NULL) {
 		return TCL_ERROR;

@@ -1,12 +1,11 @@
-# Generated automatically from Makefile.in by configure.
 # This Makefile is used to create the extral loadable module.
 #
 
 # The directory containing the Tcl sources and headers appropriate
 # for this version of Tk ("srcdir" will be replaced or has already
 # been replaced by the configure script):
-TCL_GENERIC_DIR =	/usr/people/peter/tcl/tk4.1/tcl7.5/generic
-TCL_UNIX_DIR =	/usr/people/peter/tcl/tk4.1/tcl7.5/unix
+TCL_GENERIC_DIR =	@TCL_SRC_DIR@/generic
+TCL_UNIX_DIR =	@TCL_SRC_DIR@/unix
 TK_GENERIC_DIR =	@TK_SRC_DIR@/../tk4.1/generic
 
 # The directory containing the Tcl library archive file appropriate
@@ -15,7 +14,7 @@ TCL_BIN_DIR = @TCL_BIN_DIR@
 TK_BIN_DIR = @TCL_BIN_DIR@/../tk4.1
 
 # Libraries to use when linking:
-LIBS = -L/usr/people/peter/tcl/tk4.1/tcl7.5/unix -ltcl7.5   -lm -lc
+LIBS = @TCL_BUILD_LIB_SPEC@ @TCL_LIBS@ -lc
 
 #----------------------------------------------------------------
 # The information below is modified by the configure script when
@@ -23,12 +22,12 @@ LIBS = -L/usr/people/peter/tcl/tk4.1/tcl7.5/unix -ltcl7.5   -lm -lc
 # modify any of this stuff by hand.
 #----------------------------------------------------------------
 
-CC = cc
-SHLIB_CFLAGS =		
-SHLIB_LD =		ld -shared -rdata_shared
-SHLIB_SUFFIX =		.so
-SHLIB_VERSION =		
-SRC_DIR =		.
+CC = @CC@
+SHLIB_CFLAGS =		@SHLIB_CFLAGS@
+SHLIB_LD =		@SHLIB_LD@
+SHLIB_SUFFIX =		@SHLIB_SUFFIX@
+SHLIB_VERSION =		@SHLIB_VERSION@
+SRC_DIR =		@srcdir@
 CFLAGS = -g
 CC_SWITCHES = $(CFLAGS) $(SHLIB_CFLAGS) -I${TCL_GENERIC_DIR} -I$(TCL_UNIX_DIR) -I${TK_GENERIC_DIR} ${SHLIB_CFLAGS}
 
@@ -37,7 +36,7 @@ OBJECTS = extral.o general.o lpop.o extralInit.o lfile.o nonl.o
 all: extral${SHLIB_SUFFIX}
 
 extral$(SHLIB_SUFFIX): $(OBJECTS)
-	$(SHLIB_LD) $(SHLIB_CFLAGS) -o ../extral$(SHLIB_SUFFIX) $(OBJECTS) 
+	$(SHLIB_LD) $(SHLIB_CFLAGS) -o ../extral$(SHLIB_SUFFIX) $(OBJECTS) @SHLIB_LD_LIBS@
 
 extratcl: tclAppInit.o $(OBJECTS)
 	$(CC) $(CC_SWITCHES) -o extratcl tclAppInit.o $(OBJECTS) ${TCL_LIB_SPEC} ${LIBS}

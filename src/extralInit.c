@@ -50,6 +50,21 @@ extern int ExtraL_ReplaceCmd _ANSI_ARGS_((ClientData clientData,
 
 extern int ExtraL_AtexitCmd _ANSI_ARGS_((ClientData clientData));
 
+#ifdef windows
+extern int ExtraL_MkdirCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int argc, char *argv[]));
+extern int ExtraL_RemoveCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int argc, char *argv[]));
+extern int ExtraL_RmdirCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int argc, char *argv[]));
+extern int ExtraL_RenameCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int argc, char *argv[]));
+extern int ExtraL_ChmodCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int argc, char *argv[]));
+extern int ExtraL_CpCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int argc, char *argv[]));
+#endif
+
 int
 Extral_Init(interp)
 	Tcl_Interp *interp;		/* Interpreter to add extra commands */
@@ -70,20 +85,28 @@ Extral_Init(interp)
     dld_AddTclCommand(interp, "lpop", ExtraL_LpopCmd);
     dld_AddTclCommand(interp, "lshift", ExtraL_LshiftCmd);
     dld_AddTclCommand(interp, "amanip", ExtraL_AmanipCmd);
-    dld_AddTclCommand(interp, "replace", ExtraL_ReplaceCmd);
-    dld_AddTclCommand(interp, "random", ExtraL_RandomCmd);
-    srand((unsigned int)time(0));
-    return TCL_OK;
+	dld_AddTclCommand(interp, "replace", ExtraL_ReplaceCmd);
+	dld_AddTclCommand(interp, "random", ExtraL_RandomCmd);
+#ifdef windows
+	dld_AddTclCommand(interp, "win_mkdir", ExtraL_MkdirCmd);
+	dld_AddTclCommand(interp, "win_remove", ExtraL_RemoveCmd);
+	dld_AddTclCommand(interp, "win_rmdir", ExtraL_RmdirCmd);
+	dld_AddTclCommand(interp, "win_rename", ExtraL_RenameCmd);
+	dld_AddTclCommand(interp, "win_chmod", ExtraL_ChmodCmd);
+	dld_AddTclCommand(interp, "win_cp", ExtraL_CpCmd);
+#endif
+	srand((unsigned int)time(0));
+	return TCL_OK;
 }
 
 int
 dld_AddTclCommand(interp, command, function)
-    Tcl_Interp *interp;
-    char *command;
-    Tcl_CmdProc *function;
+	Tcl_Interp *interp;
+	char *command;
+	Tcl_CmdProc *function;
 {
 
-    Tcl_CreateCommand(interp, command, *function, (ClientData)NULL,
+	Tcl_CreateCommand(interp, command, *function, (ClientData)NULL,
 	(Tcl_CmdDeleteProc *)NULL);
-    return TCL_OK;
+	return TCL_OK;
 }

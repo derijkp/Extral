@@ -13,14 +13,14 @@
 #include "tcl.h"
 #include "general.h"
 /*------------------------------------------------------------------*/
-PBOOL find_bool(char *string, char *trues,char *falses)
+PBOOL ExtraL_find_bool(char *string, char *trues,char *falses)
 {
 	if (strcmp(string,trues)==0) return(true);
 	else if (strcmp(string,falses)==0) return(false);
 	else return(other);
 }
 /*------------------------------------------------------------------*/
-char *numstr(int num)
+char *ExtraL_numstr(int num)
 {
 	char *result=NULL;
 	int number;
@@ -37,7 +37,7 @@ char *numstr(int num)
 	return(result);
 }
 /*--------------------------------------------------------------------*/
-PBOOL read_string(FILE *file,char *place,int size)
+PBOOL ExtraL_read_string(FILE *file,char *place,int size)
 {
 	int l;
 	clearerr(file);
@@ -54,7 +54,7 @@ PBOOL read_string(FILE *file,char *place,int size)
 	else return(true);
 }
 /*--------------------------------------------------------------------*/
-int *get_intlist(Tcl_Interp *interp, char *string, int *number, int min)
+int *ExtraL_get_intlist(Tcl_Interp *interp, char *string, int *number, int min)
 {
 	int *list;
 	int listArgc;
@@ -68,10 +68,14 @@ int *get_intlist(Tcl_Interp *interp, char *string, int *number, int min)
 
 	/*---- get index list ----*/
 	*number=listArgc;
-	list=(int *)malloc(listArgc*sizeof(int));
+	if (listArgc!=0) {
+		list=(int *)malloc(listArgc*sizeof(int));
+	} else {
+		list=(int *)malloc(1*sizeof(int));
+	}
 	if (list==NULL) {
 		ckfree((char *) listArgv);
-		Tcl_AppendResult(interp, "Couldn't allocate memory", (char *) NULL);
+		Tcl_AppendResult(interp, "GetInt couldn't allocate memory", (char *) NULL);
 		return(NULL);
 	}
 	i=0;
@@ -94,7 +98,7 @@ int *get_intlist(Tcl_Interp *interp, char *string, int *number, int min)
 	return(list);
 }
 /*------------------------------------------------------------------*/
-PBOOL skip_lines(FILE *file,int number)
+PBOOL ExtraL_skip_lines(FILE *file,int number)
 {
 	int i;
 	int ch;
@@ -111,7 +115,7 @@ PBOOL skip_lines(FILE *file,int number)
 	return(true);
 }
 /*--------------------------------------------------------------------*/
-char *read_line(FILE *file)
+char *ExtraL_read_line(FILE *file)
 {
 	PBOOL b;
 	char buffer[501];
@@ -119,7 +123,7 @@ char *read_line(FILE *file)
 	int bl=0;
 
 	do {
-		b=read_string(file,buffer,500);
+		b=ExtraL_read_string(file,buffer,500);
 		if (b==false) break;
 		if (b==true) {
 			temp=(char *)realloc(result,((bl+1)*500+1)*sizeof(char));
@@ -139,7 +143,7 @@ char *read_line(FILE *file)
 }
 /*--------------------------------------------------------------------*/
 #define FILEBUFFER 1000
-char *read_file(FILE *file)
+char *ExtraL_read_file(FILE *file)
 {
 	PBOOL b;
 	char *result=NULL, *place, *temp;

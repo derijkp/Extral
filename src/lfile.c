@@ -12,10 +12,9 @@
 #include <malloc.h>
 #include "tcl.h"
 #include "tclRegexp.h"
+#include "general.h"
 #define UCHAR(c) ((unsigned char) (c))
  
-typedef enum {false,true,other} PBOOL;
-
 extern Tcl_RegExp Tcl_RegExpCompile(Tcl_Interp *interp,char *string);
 
 typedef struct {
@@ -84,10 +83,10 @@ int Lfile_ObjectCmd(ClientData clientData, Tcl_Interp *interp, int argc, char *a
 			return TCL_ERROR;
 		}
 
-		all=find_bool(argv[3],"-all","-exclude");
+		all=ExtraL_find_bool(argv[3],"-all","-exclude");
 		if (all==other) {begin=3;} else {begin=4;}
 		if (all!=true) {
-			list=get_intlist(interp, argv[begin], &number, 0);
+			list=ExtraL_get_intlist(interp, argv[begin], &number, 0);
 			if (list==NULL) {
 				return TCL_ERROR;
 			}
@@ -157,7 +156,7 @@ int Lfile_ObjectCmd(ClientData clientData, Tcl_Interp *interp, int argc, char *a
 		char *line;
 		while (1) {
 		if (before==true) {ind=ftell(file);}
-		line=read_line(file);
+		line=ExtraL_read_line(file);
 		if (line==NULL) break;
 		if (Tcl_RegExpMatch(interp, line, sep)==1) {
 			if (before==false) {ind=ftell(file);}
@@ -188,7 +187,7 @@ int ExtraL_LfileCmd(ClientData clientData, Tcl_Interp *interp, int argc, char *a
 	LfilePtr=(Lfile_index *)malloc(sizeof(Lfile_index));
 	LfilePtr->sep=NULL;
 	if (argc==5) {
-		LfilePtr->before=find_bool(argv[3],"-before","-after");
+		LfilePtr->before=ExtraL_find_bool(argv[3],"-before","-after");
 		if (LfilePtr->before==other) {
 			Tcl_AppendResult(interp, "option should be -before or -after", (char *) NULL);
 			return TCL_ERROR;
@@ -281,8 +280,8 @@ int ExtraL_LfileCmd(ClientData clientData, Tcl_Interp *interp, int argc, char *a
 	}
 
 	fseek(f_ref,ind_ref.list[org],SEEK_SET);
-	skip_lines(LfilePtr->file,L_pos->line);
-	tline=read_line(f_ref);
+	ExtraL_skip_lines(LfilePtr->file,L_pos->line);
+	tline=ExtraL_read_line(f_ref);
 	if (tline==NULL) {
 		Tcl_AppendElement(interp, "beyond EOF");
 		return(false);
