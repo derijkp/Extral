@@ -5,22 +5,39 @@ ExtraL
 What is ExtraL
 --------------
 
-Most percieved performance problems with Tcl are caused by the large
+Most percieved performance problems with Tcl were caused by the large
 overhead on loops, that have to be reinterpreted for each iteration.
-This becomes especially noticable when working with large lists. I use
-this extension to overcome this problem. It has several usefull
-manipulations on lists in C code, and some convenience functions in Tcl
-as well.
+This became especially noticable when working with large lists. This
+extension was originally written to overcome this problem. With the
+advent of the Tcl byte compiler, the performance is not such a great 
+issue any longer, but I still find many of the functions very
+convenient, and some of those that were now rewritten using the
+object system in C are still faster.
+
+All functions in Extral.txt are now available in Tcl-only form as well.
+Using the C code just gives a speedup. Several of the functions are now
+only in Tcl.
 
 Documentation is still rather scarce unfortunately. You can find a short
 description of all commands in the extral.txt file
+
+INCOMPATIBLE CHANGES
+--------------------
+There were some incompatible changes with previous releases:
+lremove syntax is now: lremove list indices
+
+I feel like I misnamed some commands in the previous releases. This 
+has been changed now:
+lmerge acts like the former "lmanip mangle"
+lunmerge acts like the reverse of lmerge
+lmanip mangle does the previous "lmanip merge"
 
 Installation
 ------------
 You should be able to obtain the latest version of ExtraL via anonymous ftp
 on rrna.uia.ac.be. in the directory /pub/tcl
 
-This package can be build as a loadable object to Tcl7.5. Go to the
+This package can be build as a loadable object to Tcl8.0. Go to the
 src directory and type
 ./configure --with-tcl=<path of tcl distribution>
 Then run make. This should produce the loadable module. The build.tcl and

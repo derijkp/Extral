@@ -360,3 +360,75 @@ ExtraL_LremdupObjCmd(dummy, interp, objc, objv)
 
 	return TCL_OK;
 }
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ExtraL_LremoveCmd --
+ *
+ *		This procedure is invoked to process the "lremove" command.
+ *
+ * Results:
+ *		A standard Tcl result.
+ *
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+ExtraL_LremoveObjCmd(notUsed, interp, objc, objv)
+	ClientData notUsed;				 /* Not used. */
+	Tcl_Interp *interp;					/* Current interpreter. */
+	int objc;						/* Number of arguments. */
+	Tcl_Obj *CONST objv[];	/* Argument objects. */
+{
+#define INCLUDE		0
+#define EXCLUDE		1
+	int refArgc;
+	Tcl_Obj **refArgv;
+	int listArgc;
+	Tcl_Obj **listArgv;
+	Tcl_Obj *indexObj, *resultObj;
+	char *refstring,*string;
+	int reflen,len;
+	int pos,result;
+	int i;
+
+	if (objc != 3) {
+		Tcl_WrongNumArgs(interp, 1, objv, "list removelist");
+		return TCL_ERROR;
+	}
+
+	if (Tcl_ListObjGetElements(interp, objv[1], &listArgc, &listArgv) != TCL_OK) {
+		return TCL_ERROR;
+	}
+
+	if (Tcl_ListObjGetElements(interp, objv[2], &refArgc, &refArgv) != TCL_OK) {
+		return TCL_ERROR;
+	}
+
+	/* Initialise result */
+	Tcl_ResetResult(interp);
+	resultObj = Tcl_GetObjResult(interp);
+
+	for(pos=0;pos<listArgc;pos++) {
+		string=Tcl_GetStringFromObj(listArgv[pos],&len);
+		if (refArgc==0) {
+			if (len!=0) {
+				result=Tcl_ListObjAppendElement(interp,resultObj,listArgv[pos]);
+			}
+		} else {
+			for(i=0;i<refArgc;i++) {
+				refstring=Tcl_GetStringFromObj(refArgv[i],&reflen);
+				if ((len==reflen)&&(strcmp(refstring,string)==0)) {
+					break;
+				}
+			}
+			if (i==refArgc) {
+				result=Tcl_ListObjAppendElement(interp,resultObj,listArgv[pos]);
+				if (result!=TCL_OK) {return result;}
+			}
+		}
+	}
+	return TCL_OK;
+}

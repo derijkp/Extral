@@ -6,6 +6,8 @@
 # element name is the name of a command and the value is
 # a script that loads the command.
 
+set auto_index(lmerge) [list source [file join $dir extral.tcl]]
+set auto_index(lunmerge) [list source [file join $dir extral.tcl]]
 set auto_index(lload) [list source [file join $dir extral.tcl]]
 set auto_index(lwrite) [list source [file join $dir extral.tcl]]
 set auto_index(lpush) [list source [file join $dir extral.tcl]]

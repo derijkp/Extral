@@ -58,10 +58,10 @@ lmanip subindex ?list? ?pos?
 	% lmanip subindex {{a 1} {b 2} {c 3}} 1
 	1 2 3
 
-lmanip merge ?list1? ?list2?
-	merge two lists into one
+lmanip mangle ?list1? ?list2?
+	mangles two lists into one
 	eg.
-	% lmanip merge {a b c} {1 2 3}
+	% lmanip mangle {a b c} {1 2 3}
 	{a 1} {b 2} {c 3}
 
 lmanip extract ?list? ?expression?
@@ -111,24 +111,24 @@ lmanip fill ?size? ?start? ??incr??
 	% lmanip fill 5 10 -2
 	10 8 6 4 2
 
-lmanip mangle ?list1? ?list2? ??spacing??
-	mangles two lists into one
+lmerge ?list1? ?list2? ??spacing??
+	merges two lists into one
 	eg.
-	% lmanip mangle {a b c} {1 2 3}
+	% lmerge {a b c} {1 2 3}
 	a 1 b 2 c 3
-	% lmanip mangle {a b c d} {1 2} 2
+	% lmerge {a b c d} {1 2} 2
 	a b 1 c d 2
 
-lmanip unmangle ?list? ??spacing?? ??var??
-	unmangles items from a list to the result; the remaining items are stored
+lunmerge ?list? ??spacing?? ??var??
+	unmerges items from a list to the result; the remaining items are stored
 	in the given variable ?var?
 	eg.
-		% lmanip unmangle {a 1 b 2 c 3}
+		% lunmerge {a 1 b 2 c 3}
 		a b c
-		% lmanip unmangle {1 a b 2 c d} 2 var
-		1 2
-		% set var
+		% lunmerge {a b 1 c d 2} 2 var
 		a b c d
+		% set var
+		1 2
 
 lpop listName ?pos?
 	returns the last element from a list, thereby removing it from the list.

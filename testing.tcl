@@ -53,7 +53,7 @@ set data {
 {lmanip subindex {{a 1} {b 2} {c 3}} 1}
 {1 2 3}
 
-{lmanip merge {a b c} {1 2 3}}
+{lmanip mangle {a b c} {1 2 3}}
 {{a 1} {b 2} {c 3}}
 
 {lmanip extract {Results {A: 50%} {B: 25%} {C: 25%}} { ([0-9+]+)\%}}
@@ -85,14 +85,14 @@ set data {
 {lmanip fill 5 10 -2}
 {10 8 6 4 2}
 
-{lmanip mangle {a b c} {1 2 3}}
+{lmerge {a b c} {1 2 3}}
 {a 1 b 2 c 3}
-{lmanip mangle {a b c d} {1 2} 2}
+{lmerge {a b c d} {1 2} 2}
 {a b 1 c d 2}
 
-{lmanip unmangle {a 1 b 2 c 3}}
+{lunmerge {a 1 b 2 c 3}}
 {a b c}
-{lmanip unmangle {a b 1 c d 2} 2 var}
+{lunmerge {a b 1 c d 2} 2 var}
 {a b c d}
 {set var}
 {1 2}
@@ -176,6 +176,37 @@ set data {
 	}
 }
 {}
+
+{
+set pointer [struct new]
+struct set $pointer->a 1
+struct set $pointer->a
+}
+{1}
+
+{
+struct set $pointer->b(try) 1
+struct set $pointer->b(try)
+}
+{1}
+
+{
+struct array set $pointer->b {ok yes new 2}
+struct array get $pointer->b
+}
+{new 2 ok yes try 1}
+
+{
+struct fields $pointer
+}
+{a b}
+
+{
+struct unset $pointer
+struct set $pointer->a
+}
+{can't read "Struct3->a": no such variabl}
+
 }
 
 # Run tests

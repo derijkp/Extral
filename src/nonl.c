@@ -303,10 +303,10 @@ ExtraL_AmanipCmd(notUsed, interp, argc, argv)
 	array=argv[2];
 	c=argv[1][0];
 	len=strlen(argv[1]);
-	if ((c == 'a')&&(strncmp(argv[1], "append",len) == 0)) {
+	if ((c == 'l')&&(strncmp(argv[1], "lappend",len) == 0)) {
 		if (argc != 4) {
 			Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-				" append arrayName list\"", (char *) NULL);
+				" lappend arrayName list\"", (char *) NULL);
 			return TCL_ERROR;
 		}
 		if (Tcl_SplitList(interp, argv[3], &listArgc, &listArgv) != TCL_OK) {
@@ -351,7 +351,7 @@ amanip get try {a d g f} null
 		ckfree((char *) listArgv);
 	} else {
 		Tcl_AppendResult(interp, "wrong option: should be:",
-					 "append", (char *) NULL);
+					 "lappend or get", (char *) NULL);
 		return TCL_ERROR;
 	}
 	return TCL_OK;

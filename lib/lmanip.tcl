@@ -1,5 +1,5 @@
-proc lmanip {command args} {
-	switch $command {
+proc lmanip {option args} {
+	switch $option {
 		subindex {
 			if {[llength $args]!=2} {
 				error "wrong # args: should be \"lmanip subindex list ?pos?\""
@@ -11,9 +11,9 @@ proc lmanip {command args} {
 			}
 			return $result
 		}
-		merge {
+		mangle {
 			if {[llength $args]!=2} {
-				error "wrong # args: should be \"lmanip merge list1 list2\""
+				error "wrong # args: should be \"lmanip mangle list1 list2\""
 			}
 			set result ""
 			foreach e1 [lindex $args 0] e2 [lindex $args 1] {
@@ -118,67 +118,6 @@ proc lmanip {command args} {
 			}
 			return $result
 		}
-		mangle {
-			if {([llength $args]!=2)&&([llength $args]!=3)} {
-				error "wrong # args: should be \"lmanip mangle list1 list2 ?spacing?\""
-			}
-			set result ""
-			if {[llength $args]==3} {
-				set spacing [lindex $args 2]
-				set list2 [lindex $args 1]
-				set c $spacing
-				foreach e1 [lindex $args 0] {
-					lappend result $e1
-					incr c -1
-					if !$c {
-						lappend result [lshift list2]
-						set c $spacing
-					}
-				}
-				return $result
-				
-			} else {
-				foreach e1 [lindex $args 0] e2 [lindex $args 1] {
-					lappend result $e1 $e2
-				}
-				return $result
-			}
-		}
-		unmangle {
-			if {([llength $args]<1)&&([llength $args]>3)} {
-				error "wrong # args: should be \"lmanip mangle list ?spacing? ?var?\""
-			}
-			set result ""
-			if {[llength $args]==3} {
-				upvar [lindex $args 2] var
-				set var ""
-			}
-			if {[llength $args]>1} {
-				set spacing [lindex $args 1]
-			} else {
-				set spacing 1
-			}
-			if {$spacing==1} {
-				foreach {e1 e2} [lindex $args 0] {
-					lappend result $e1
-					if [info exists var] {lappend var $e2}
-				}
-				return $result
-			} else {
-				set c $spacing
-				foreach e1 [lindex $args 0] {
-					if !$c {
-						if [info exists var] {lappend var $e1}
-						set c $spacing
-					} else {
-						lappend result $e1
-						incr c -1
-					}
-				}
-				return $result
-				
-			}
-		}
 		ffill {
 			if {([llength $args]!=2)&&([llength $args]!=3)} {
 				error "wrong # args: should be \"lmanip ffill size start ?incr?\n - fills a list with the floating value in start, can be incremented by ?incr?\""
@@ -194,6 +133,9 @@ proc lmanip {command args} {
 				if [info exists incr] {set item [expr $item+$incr]}
 			}
 			return $result
+		}
+		default {
+			error "bad option \"$option\": should be subindex, mangle, extract, remdup, split, join, lengths, fill or ffill"
 		}
 	}
 }

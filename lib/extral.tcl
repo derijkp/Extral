@@ -9,6 +9,69 @@
 #
 # =============================================================
 
+proc lmerge {args} {
+	if {([llength $args]!=2)&&([llength $args]!=3)} {
+		error "wrong # args: should be \"lmerge list1 list2 ?spacing?\""
+	}
+	set result ""
+	if {[llength $args]==3} {
+		set spacing [lindex $args 2]
+		set list2 [lindex $args 1]
+		set c $spacing
+		foreach e1 [lindex $args 0] {
+			lappend result $e1
+			incr c -1
+			if !$c {
+				lappend result [lshift list2]
+				set c $spacing
+			}
+		}
+		return $result
+		
+	} else {
+		foreach e1 [lindex $args 0] e2 [lindex $args 1] {
+			lappend result $e1 $e2
+		}
+		return $result
+	}
+}
+
+proc lunmerge {args} {
+	if {([llength $args]<1)&&([llength $args]>3)} {
+		error "wrong # args: should be \"lunmerge list ?spacing? ?var?\""
+	}
+	set result ""
+	if {[llength $args]==3} {
+		upvar [lindex $args 2] var
+		set var ""
+	}
+	if {[llength $args]>1} {
+		set spacing [lindex $args 1]
+	} else {
+		set spacing 1
+	}
+	if {$spacing==1} {
+		foreach {e1 e2} [lindex $args 0] {
+			lappend result $e1
+			if [info exists var] {lappend var $e2}
+		}
+		return $result
+	} else {
+		set c $spacing
+		foreach e1 [lindex $args 0] {
+			if !$c {
+				if [info exists var] {lappend var $e1}
+				set c $spacing
+			} else {
+				lappend result $e1
+				incr c -1
+			}
+		}
+		return $result
+		
+	}
+}
+
 proc lload {filename} {
 	set f [open $filename "r"]
 	set result [split [read $f] "\n"]
@@ -54,7 +117,10 @@ proc lset {listref value indices} {
 }
 
 proc larrayset {array varlist valuelist} {
-	uplevel "array set $array \[lmanip join \[lmanip merge [list $varlist] [list $valuelist]\] \{ \} all\]"
+	upvar $array v
+	foreach var $varlist value $valuelist {
+		set v($var) $value
+	}
 }
 
 proc lcommon {args} {
@@ -80,31 +146,6 @@ proc leor {list1 list2} {
 	eval lappend result [lsub $list2 $exclusive]
 }
 
-if ![info exists Extral__noc] {
-proc lremove {listref args} {
-	upvar $listref list
-	foreach item $args {
-		set poss [lfind $list $item]
-		if {"$poss"!=""} {
-			set list [lsub $list -exclude $poss]
-		}
-	}
-	return $list
-}
-} else {
-proc lremove {listref args} {
-	upvar $listref list
-	foreach item $args {
-		while 1 {
-			set pos [lsearch -exact $list $item]
-			if {$pos==-1} break
-			set list [lreplace $list $pos $pos]
-		}
-	}
-	return $list	
-}
-}
- 
 proc laddnew {listref args} {
 	upvar $listref list
 	if ![info exists list] {set list ""}

@@ -14,6 +14,12 @@ for {set i 0} {$i<5000} {incr i} {
 	lappend big [random 0 10000]
 }
 
+time {replace {thg th rty ty ey} {a $ t # y \\&}} 100
+
+time {lremove $try {b a}} 10
+time {lremove $big {1 4 5}} 10
+time {lremove {1 2 8067 3} $big} 10
+
 lmanip subindex {{a 1} {b 2} {c 3}} 1
 
 time {lremdup $try} 100

@@ -5,7 +5,7 @@ proc ssort {args} {
 		return [eval lsort $args {$list}]
 	} else {
 		lpop args $pos
-		set temp [lmanip merge $list [lpop args $pos]]
+		set temp [lmanip mangle $list [lpop args $pos]]
 		set temp [eval lsort $args {-index 1 $temp}]
 		return [lmanip subindex $temp 0]
 	}

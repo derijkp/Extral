@@ -1,5 +1,5 @@
-proc lmath {command args} {
-	switch $command {
+proc lmath {option args} {
+	switch $option {
 		calc {
 			if {[llength $args]!=3} {
 				error "wrong # args: should be \"lmanip calc list1 action list2\""
@@ -68,6 +68,9 @@ proc lmath {command args} {
 				lappend result [expr $e1+$incr]
 			}
 			return $result
+		}
+		default {
+			error "bad option \"$option\": should be calc, sum, min, max, cumul or incr"
 		}
 	}
 }

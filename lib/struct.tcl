@@ -10,14 +10,7 @@
 #
 # =============================================================
 
-proc new {} {
-	global extraL__Priv
-	if ![info exists extraL__Priv(pointernr)] {
-		set extraL__Priv(pointernr) 1
-	}
-	incr extraL__Priv(pointernr)
-	uplevel global extraL__Priv__Pointer$extraL__Priv(pointernr)
-	return extraL__Priv__Pointer$extraL__Priv(pointernr)
+namespace eval extraLstruct {
 }
 
 proc example {} {
@@ -34,7 +27,7 @@ proc examplecreate {} {
 #		struct arrayset $current->array {a b c} {1 2 3}
 		struct set $current->next [struct new]
 		set keep $current
-		set current [struct value $current->next]
+		set current [struct set $current->next]
 	}
 	struct set $keep->next ""
 	return $root
@@ -42,103 +35,113 @@ proc examplecreate {} {
 
 proc exampleread {current} {
 	while 1 {
-		puts stdout [struct value $current->value]
+		puts stdout [struct set $current->value]
 		puts [struct arrayget $current->array]
-		if {[struct value $current->next] == ""} {break}
+		if {[struct set $current->next] == ""} {break}
 		set keep $current
-		set current [struct value $current->next]
+		set current [struct set $current->next]
 	}
 }
 
 proc exampledestruct {current} {
 	while 1 {
-		if {[struct value $current->next] == ""} {break}
+		if {[struct set $current->next] == ""} {break}
 		set keep $current
-		set current [struct value $current->next]
+		set current [struct set $current->next]
 		struct unset $keep
 	}
-}
-
-proc structvar {} {
-	global extraL__Struct
 }
 
 proc struct {option args} {
 	global extraL__Struct
 
 	if [string match $option new] {
-	if ![string match $args ""] {
-		error "wrong # args: should be \"struct new\""
-	}
-	if ![info exists extraL__Struct(pointernr)] {
-		set extraL__Struct(pointernr) 1
-	}
-	incr extraL__Struct(pointernr)
-	return Struct$extraL__Struct(pointernr)
+		if ![string match $args ""] {
+			error "wrong # args: should be \"struct new\""
+		}
+		if ![info exists extraL__Struct(pointernr)] {
+			set extraL__Struct(pointernr) 1
+		}
+		incr extraL__Struct(pointernr)
+		set name Struct$extraL__Struct(pointernr)
+		set ::extraLstruct::s$name-> $extraL__Struct(pointernr)
+		return $name
 	}
 	set var [lindex $args 0]
 	switch $option {
-		set {
-			if {[llength $args]!=2} {
-				error "wrong # args: should be \"struct set struct value\""
+		names {
+			set names [namespace eval ::extraLstruct {info vars s*->}]
+			set result ""
+			foreach name $names {
+				regexp {^s(.+)->} $name temp name
+				lappend result $name
 			}
-			set extraL__Struct($var) [lindex $args 1]
+			return $result
+		}
+		fields {
+			set len [llength $args]
+			if {$len!=1} {
+				error "wrong # args: should be \"struct fields struct\""
+			}
+			set names [namespace eval ::extraLstruct [list info vars s$var->*]]
+			set result ""
+			foreach name $names {
+				if [regexp {^s.+->(.+)$} $name temp name] {
+					lappend result $name
+				}
+			}
+			return $result
+		}
+		set {
+			set len [llength $args]
+			if {($len!=1)&&($len!=2)} {
+				error "wrong # args: should be \"struct set struct ?value?\""
+			}
+			if {$len==1} {
+				set error [catch {set ::extraLstruct::s$var} result]
+			} else {
+				set error [catch {set ::extraLstruct::s$var [lindex $args 1]} result]
+			}
+			if $error {
+				regsub {::extraLstruct::s} $result {} result
+				error $result
+			} else {
+				return $result
+			}
 		}
 		unset {
 			if {[llength $args]!=1} {
 				error "wrong # args: should be \"struct unset struct\""
 			}
-		if [regexp -- {->} $var] {
-			set list [array names extraL__Struct "$var\(*"]
-				catch {unset extraL__Struct($var)}
-				catch {eval unset [lregsub {^(.+)$} $list {extraL__Struct(\1)}]}
+			if ![regexp -- {->} $var] {
+				set error [catch {namespace eval ::extraLstruct "foreach var \[info vars s$var->*\] \{unset \$var\}"} result]
 			} else {
-				set list [array names extraL__Struct "$var->*"]
-				catch {eval unset [lregsub {^(.+)$} $list {extraL__Struct(\1)}]}
+				set error [catch {unset extraLstruct::s$var} result]
+			}
+			if $error {
+				regsub {::extraLstruct::s} $result {} result
+				error $result
+			} else {
+				return $result
 			}
 		}
-	value {
-			if {[llength $args]!=1} {
-				error "wrong # args: should be \"struct value struct\""
+		array {
+			set len [llength $args]
+			if {$len<2} {
+				error "wrong # args: should be \"struct array option arrayName ?arg ...? \""
 			}
-			return $extraL__Struct($var)
-	}
-	var {
-			if {[llength $args]!=1} {
-				error "wrong # args: should be \"struct var struct\""
+			set option [lshift args]
+			set var [lshift args]
+			set error [catch {eval {array $option ::extraLstruct::s$var} $args} result]
+			if $error {
+				regsub {::extraLstruct::s} $result {} result
+				error $result
+			} else {
+				return $result
 			}
-			return extraL__Struct($var)
-	}
-		arrayset {
-			if {[llength $args]!=3} {
-				error "wrong # args: should be \"struct arrayset struct items values\""
-			}
-		set items [lregsub {^(.+)$} [lindex $args 1] "$var\(\\1\)"]
-			array set extraL__Struct [lmanip join [lmanip merge $items [lindex $args 2]] { } all]
-		}
-		arrayget {
-			if {[llength $args]!=1} {
-				error "wrong # args: should be \"struct arrayget struct\""
-			}
-		set list [array get extraL__Struct "$var\(*"]
-			return [lregsub "^$var\\((.*)\\)\$" $list {\1}]
-		}
-		arraynames {
-			if {[llength $args]!=1} {
-				error "wrong # args: should be \"struct arrayget struct\""
-			}
-		set list [array names extraL__Struct "$var\(*"]
-			return [lregsub "^$var\\((.*)\\)\$" $list {\1}]
-		}
-		arraysize {
-			if {[llength $args]!=1} {
-				error "wrong # args: should be \"struct arraysize struct\""
-			}
-		set list [array names extraL__Struct "$var\(*"]
-			return [llength $list]
 		}
 		default {
-			error "bad option \"$option\": should be new, set, value, var, unset"
+			error "bad option \"$option\": should be new, set, unset"
 		}
 	}
 }

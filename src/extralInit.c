@@ -24,6 +24,9 @@ extern int ExtraL_FfindCmd _ANSI_ARGS_((ClientData clientData,
 extern int ExtraL_LcorObjCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int objc, Tcl_Obj *argv[]));
 
+extern int ExtraL_LremoveObjCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int objc, Tcl_Obj *argv[]));
+
 extern int ExtraL_AmanipCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
 
@@ -67,9 +70,10 @@ Extral_Init(interp)
 	Tcl_CreateObjCommand(interp,"lsub",(Tcl_ObjCmdProc *)ExtraL_LsubObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"lcor",(Tcl_ObjCmdProc *)ExtraL_LcorObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"lremdup",(Tcl_ObjCmdProc *)ExtraL_LremdupObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"lremove",(Tcl_ObjCmdProc *)ExtraL_LremoveObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 
 
-	dld_AddTclCommand(interp, "ffind", ExtraL_FfindCmd);
+/*	dld_AddTclCommand(interp, "ffind", ExtraL_FfindCmd); */
 	dld_AddTclCommand(interp, "amanip", ExtraL_AmanipCmd);
 	dld_AddTclCommand(interp, "replace", ExtraL_ReplaceCmd);
 	dld_AddTclCommand(interp, "ssort", ExtraL_SSortCmd);
