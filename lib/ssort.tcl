@@ -6,9 +6,31 @@
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
 # =============================================================
+#doc ssort title {
+#ssort
+#} descr {
+#	enhanced lsort:
+#	<dl>
+#	<dt>by D. Richard Hipp -- drh@tobit.vnet.net -- 704.948.4565 :
+#	<dd><ul>
+#		<li> re-entrant and thread-safe: eg. ssort can be used in its
+#		  own -command proc
+#		<li> 10% faster
+#		<li> option -dictionary: Using -dict, "B" comes in between
+#		  "a" and "b".  Also "x10" comes after "x9" 
+#	</ul>
+#	<dt>by Peter De Rijk :
+#	<dd>extra option -reflist: sort the elements in the list according
+#		to the comparisons of the corresponding elements in the 
+#		reflist.
+#	</dl>
+#}
 
 Extral::export ssort {
 
+#doc {ssort ssort} cmd {
+#ssort ?-ascii? ?-integer? ?-real? ?-increasing? ?-decreasing? ?-dictionary? ?-command string? ?-reflist list? list
+#}
 proc ssort {args} {
 	set list [lpop args]
 	set pos [lsearch $args -reflist]

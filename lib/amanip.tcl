@@ -4,7 +4,21 @@
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
 # =============================================================
-
+#doc {amanip lappend} cmd {
+#amanip lappend arrayName list
+#} example {
+#	% array set try {a 1 b 2}
+#	% amanip lappend try {a a c 3}
+#	% array get try
+#	a {1 a} b 2 c 3
+#}
+#doc {amanip get} cmd {
+#amanip get arrayName list ?default?
+#} example {
+#	% array set try {a 1 b 2}
+#	% amanip get try {b c} def
+#	b 2 c def
+#}
 Extral::export {amanip} {
 
 proc amanip {option args} {

@@ -1,59 +1,90 @@
+<HEAD>
+<TITLE>lmanip</TITLE>
+</HEAD>
+<BODY>
+<h1>lmanip</h1>
+
+<dl><dt><b>
 lmanip subindex ?list? ?pos?
+</b><dd>
 	returns a list of the 'pos' element in each of the elements of the given list
-	eg.
+<br>eg.:<pre>
 	% lmanip subindex {{a 1} {b 2} {c 3}} 1
 	1 2 3
+</pre></ul>
 
+<dl><dt><b>
 lmanip mangle ?list1? ?list2?
+</b><dd>
 	mangles two lists into one
-	eg.
+<br>eg.:<pre>
 	% lmanip mangle {a b c} {1 2 3}
 	{a 1} {b 2} {c 3}
+</pre></ul>
 
+<dl><dt><b>
 lmanip extract ?list? ?expression?
+</b><dd>
 	tries to match each element in a list; if the element matches, it extracts the 
 	parenthesised part. It returns a list of all extracted parts. If there was no match,
 	an empty element is put in the list.
-	eg. 
+<br>eg.:<pre> 
 	% lmanip extract {Results {A: 50%} {B: 25%} {C: 25%}} { ([0-9+]+)\%}
 		{} 50 25 25
+</pre></ul>
 
+<dl><dt><b>
 lmanip remdup ?list?
+</b><dd>
 	removes duplicates from list
-	eg.
+<br>eg.:<pre>
 	% lmanip remdup {a b c a b d}
 	a b c d
+</pre></ul>
 
+<dl><dt><b>
 lmanip split ?list? -before/-after/-outside ?positions?
+</b><dd>
 	splits a list at positions into sublists
-	eg.
+<br>eg.:<pre>
 	% lmanip split {a b c d e} -before {1 3}
 	a {b c} {d e}
+</pre></ul>
 
+<dl><dt><b>
 lmanip join ?list? ?join string? ?position list?
+</b><dd>
 	joins list elements at positions given in the ?position list?. When you
 	specify all, all elements will be joined.
-	eg.
+<br>eg.:<pre>
 	% lmanip join {a b c {a d} e} { } {0 2}
 		{a b} {c a d} e
 	% lmanip join {a b c {a d} e} {} {0 2}
 		ab {ca d} e
 	% lmanip join {a b c {a d} e} {} all
 	abca de
+</pre></ul>
 
+<dl><dt><b>
 lmanip lengths ?list?
+</b><dd>
 	returns a list with the lengths of the elements
-	eg.
+<br>eg.:<pre>
 	% lmanip lengths {abc abcdef}
 	3 6
+</pre></ul>
 
+<dl><dt><b>
 lmanip fill ?size? ?start? ??incr??
+</b><dd>
 	fills a list of ?size? elements with ?start?; if ?incr? is given and ?size? is an integer, each element in the list will be the former incremented with ?incr?
-	eg.
+<br>eg.:<pre>
 	% lmanip fill 4 "Hello world"
 	{Hello world} {Hello world} {Hello world} {Hello world}
 	% lmanip fill 5 2 2
 	2 4 6 8 10
 	% lmanip fill 5 10 -2
 	10 8 6 4 2
+</pre></ul>
 
+</body>

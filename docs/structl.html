@@ -1,0 +1,97 @@
+<HEAD>
+<TITLE>
+Structured lists
+</TITLE>
+</HEAD>
+<BODY>
+<h1>
+Structured lists
+</h1>
+
+In a structured list tags alternate with the value attached to this tag,
+eg.: {tag1 {value of tag1} tag2 {value of tag2} ...}
+Using the structured list commands, you can use a list as a sort of array.
+However, structured lists have some advantages to arrays:
+<ul>
+<li>They can be passed to functions easily
+<li>tagged lists can be nested: an element of a tagged list can
+   contain another tagged list, etc.
+<li>although finding a value in an array should be faster,
+   creating the array can take more time.
+<li>tagged list can be handled according to a certain structure
+</ul>
+
+<dl><dt><b>
+structlset ?-struct schema? list taglist value
+</b><dd>
+set the value of a field in the structured list
+<br>eg.:<pre>
+	set the value for tag
+		% set list {a 1 b 4}
+		a 1 b 4
+		% set list [structlset $list c 3]
+		a 1 b 4 c 3
+		% structlset {a 1 b 4 c 3} b 2
+		a 1 b 2 c 3
+	example of nesting:
+		% structlset {a 1 b {a 1 b 4} c 3} {b b} 2
+		a 1 b {a 1 b 2} c 3
+	example of structure:
+		% set struct {
+			reg {*regexp {^a[0-9]} ?}
+			sub {
+				a {*any ?}
+				b {*between 0 10 ?}
+			}
+			ints {
+				* {*int ?}
+			}
+		}
+		% set data {}
+		% set data [structlset -struct $struct $data {sub b} 9]
+		sub {b 9}
+		% set data [structlset -struct $struct $data {sub b} 11]
+		error: 11 is not between 0 and 10
+		% set data [structlset -struct $struct $data ints {a 9}]
+		sub {b 9} ints {a 9}
+		% set data [structlset -struct $struct $data {sub b} ?]
+		ints {a 9}
+</pre></ul>
+
+<dl><dt><b>
+structlget ?-struct schema? list taglist
+</b><dd>
+get the value of a field in the structured list
+<br>eg.:<pre>
+	% set struct {
+		reg {*regexp {^a[0-9]} ?}
+		sub {
+			a {*any ?}
+			b {*between 0 10 ?}
+		}
+		ints {
+			* {*int ?}
+		}
+	}
+	% structlget -struct $struct {ints {a 9}} {sub b}
+	?
+	% structlget -struct $struct {ints {a 9}} {ints}
+	a 9
+</pre></ul>
+
+<dl><dt><b>
+structlunset list taglist
+</b><dd>
+unset the value of a field in the structured list
+<br>eg.:<pre>
+	% structlunset {a 1 b 2} b
+	a 1
+</pre></ul>
+
+<dl><dt><b>
+structlfields list ?valueVar?
+</b><dd>
+returns the fields present in the structure list
+</ul>
+
+</body>

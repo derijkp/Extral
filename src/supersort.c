@@ -5,6 +5,10 @@
  */
 
 #include "tcl.h"
+#include "stdlib.h"
+#include "string.h"
+#include "ctype.h"
+#include "malloc.h"
 
 /*
  * During execution of the "lsort" command, a Tcl list is represented as
@@ -298,7 +302,6 @@ MergeLists(leftPtr, rightPtr, infoPtr)
 {
     SortElement *headPtr;
     SortElement *tailPtr;
-	int b;
 
     if (leftPtr == 0) {
         headPtr = rightPtr;

@@ -1,12 +1,24 @@
+<HEAD>
+<TITLE>amanip</TITLE>
+</HEAD>
+<BODY>
+<h1>amanip</h1>
+
+<dl><dt><b>
 amanip lappend arrayName list
-	eg.:
+</b><br>eg.:<pre>
 	% array set try {a 1 b 2}
 	% amanip lappend try {a a c 3}
 	% array get try
 	a {1 a} b 2 c 3
+</pre></ul>
 
+<dl><dt><b>
 amanip get arrayName list ?default?
-	eg.:
+</b><br>eg.:<pre>
 	% array set try {a 1 b 2}
 	% amanip get try {b c} def
 	b 2 c def
+</pre></ul>
+
+</body>

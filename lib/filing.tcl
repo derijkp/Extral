@@ -6,17 +6,30 @@
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
 # =============================================================
+#doc filing title {
+#Filing commands
+#}
 
-Extral::export {dirglob lload lwrite readfile writefile} {
+Extral::export {dirglob lload lwrite readfile writefile getcomplete splitcomplete cload} {
 
+#doc {filing dirglob} cmd {
+#	dirglob dir pattern
+#} descr {
+#	returns a list of all filenames in directory dir mathing the given pattern
+#}
 proc dirglob {dir pattern} {
 	set pwd [pwd]
-	cd $dir
+	if [catch {cd $dir}] {return ""}
 	set result [glob -nocomplain -- $pattern]
 	cd $pwd
 	return $result
 }
 
+#doc {filing lload} cmd {
+#lload filename
+#} descr {
+#	returns all lines in the specified files as a list 
+#}
 proc lload {filename} {
 	set f [open $filename "r"]
 	set result [split [read $f] "\n"]
@@ -24,12 +37,22 @@ proc lload {filename} {
 	return $result
 }
 
+#doc {filing lwrite} cmd {
+#lwrite file list
+#} descr {
+#	writes a list to a file
+#}
 proc lwrite {filename list} {
 	set f [open $filename "a"]
 	puts $f [join $list "\n"] nonewline
 	close $f
 }
 
+#doc {filing readfile} cmd {
+#	readfile filename
+#} descr {
+#	returns the contents of the file given by filename
+#}
 proc readfile {filename} {
 	set f [open $filename "r"]
 	fconfigure $f -buffersize 100000
@@ -38,11 +61,72 @@ proc readfile {filename} {
 	return $result
 }
 
+#doc {filing writefile} cmd {
+#	writefile filename data
+#} descr {
+#	create a file by the name filename with data as its content
+#}
 proc writefile {filename list} {
 	set f [open $filename "w"]
 	fconfigure $f -buffersize 100000
 	puts -nonewline $f $list
 	close $f
+}
+
+#doc {filing getcomplete} cmd {
+#	getcomplete channelId
+#} descr {
+#	get one complete Tcl command, in the sense of having no unclosed quotes, 
+#	braces, brackets or array element names, from the open file given by channelId
+#}
+proc getcomplete {channelId} {
+	if [eof $channelId] {return ""}
+	while 1 {
+		append line "[gets $channelId]"
+		if [info complete $line] break
+		if [eof $channelId] {
+			error "file end: \"$line\" is incomplete"
+		}
+		append line "\n"
+	}
+	return $line
+}
+
+#doc {filing splitcomplete} cmd {
+#	splitcomplete data
+#} descr {
+#	split data into complete Tcl commands in the sense of having no unclosed quotes, 
+#	braces, brackets or array element names.
+#}
+proc splitcomplete {data} {
+        set result ""
+        set current ""
+        foreach line [split $data "\n"] {
+                if {"$current" != ""} {
+			append current "\n"
+		}
+		append current $line
+                if [info complete $current] {
+                        lappend result $current
+                        set current ""
+                }
+        }
+        return $result
+}
+
+#doc {filing cload} cmd {
+#	cload filename
+#} descr {
+#	returns the contents of the given file als a list of complete Tcl commands.
+#	
+#}
+proc cload {filename} {
+	set f [open $filename "r"]
+	while {[eof $f] != 1} {
+		lappend result [getcomplete $f]
+	}
+	close $f
+	return $result
 }
 
 }

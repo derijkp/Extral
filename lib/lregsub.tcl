@@ -6,6 +6,16 @@
 # =============================================================
 
 Extral::export {lregsub} {
+#doc {listcommands lregsub} cmd {
+#lregsub ?switches? exp list subSpec
+#} descr {
+#	does a regsub for each element in the list, and returns the resulting list.
+#} example {
+#	% lregsub {c$} {afdsg asdc sfgh {dfgh shgfc} dfhg} {!}
+#	afdsg asd! sfgh {dfgh shgf!} dfhg
+#	% lregsub {^([^.]+)\.([^.]+)$} {start.sh help.ps h.sh} {\2 \1}
+#	{sh start} {ps help} {sh h}
+#}
 proc lregsub {args} {
 	set len [llength $args]
 	if {$len<3} {

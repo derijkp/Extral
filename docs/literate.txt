@@ -1,5 +1,0 @@
-literate variableName list
-	debugging tool: to interactively iterate a variable over a list. literate
-	is used to initialise and it puts the first element of the list into the
-	variable. Every 'lnext variableName' will puts the next element into the 
-	variable.

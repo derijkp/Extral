@@ -8,6 +8,9 @@
  */
 
 #include "tcl.h"
+#include "extral.h"
+#include <ctype.h>
+#include <string.h>
 #include <math.h>
 
 /*
@@ -25,7 +28,6 @@ int ExtraL_ScanTime(interp,musthavedate,musthavetime,dateObj,resultPtr)
 	Tcl_Obj *dateObj;
 	double *resultPtr;
 {
-	Tcl_RegExp regexp;
 	char *date;
 	char temp[6];
 	char *ctemp = NULL;
@@ -328,10 +330,10 @@ ExtraL_ScanTimeObjCmd(notUsed, interp, objc, objv)
 
 	if (objc == 3) {
 		temp = Tcl_GetStringFromObj(objv[2],&error);
-		if (strncmp(temp,"time") == 0) {
+		if (strncmp(temp,"time",error) == 0) {
 			musthavedate = 0;
 			musthavetime = 1;
-		} else if (strncmp(temp,"both") == 0) {
+		} else if (strncmp(temp,"both",error) == 0) {
 			musthavedate = 1;
 			musthavetime = 1;
 		} else {
@@ -362,7 +364,7 @@ ExtraL_FormatTime(Tcl_Interp *interp, double time, char *format, char **result)
 	char *buffer, *fpos, *temp, *smonth;
 	char b[2];
 	int buffersize=1;
-	int i,error;
+	int i;
 	int year=-1,month=-1,day=-1,bc=0,hour=-1,min=-1,sec=-1,ms=-1;
 	int days, schrikkel=0;
 	double seconds;

@@ -39,11 +39,12 @@ extral$(SHLIB_SUFFIX): $(OBJECTS)
 	cp ./extral$(SHLIB_SUFFIX) ../extral$(SHLIB_SUFFIX)
 
 bsddbm$(SHLIB_SUFFIX): bsddbm.o ../extern/libdb.a
-	$(SHLIB_LD) $(SHLIB_CFLAGS) -o ../bsddbm$(SHLIB_SUFFIX) bsddbm.o ../extern/libdb.a @SHLIB_LD_LIBS@ ${LIBS}
+	$(SHLIB_LD) $(SHLIB_CFLAGS) -o ./bsddbm$(SHLIB_SUFFIX) bsddbm.o ../extern/libdb.a @SHLIB_LD_LIBS@ ${LIBS}
+	mv ./bsddbm$(SHLIB_SUFFIX) ../dbm/bsddbm$(SHLIB_SUFFIX)
 
 gdbm$(SHLIB_SUFFIX): gdbm.o ../extern/libgdbm.a
 	$(SHLIB_LD) $(SHLIB_CFLAGS) -o ./gdbm$(SHLIB_SUFFIX) gdbm.o ../extern/libgdbm.a @SHLIB_LD_LIBS@ ${LIBS}
-	cp ./gdbm$(SHLIB_SUFFIX) ../gdbm$(SHLIB_SUFFIX)
+	mv ./gdbm$(SHLIB_SUFFIX) ../dbm/gdbm$(SHLIB_SUFFIX)
 
 extratcl: tclAppInit.o $(OBJECTS)
 	$(CC) $(CC_SWITCHES) -o extratcl tclAppInit.o $(OBJECTS) ${TCL_LIB_SPEC} ${LIBS}
@@ -51,7 +52,7 @@ extratcl: tclAppInit.o $(OBJECTS)
 clean:
 	rm -f *.o *${SHLIB_SUFFIX} config.cache config.log lib.exp
 	rm -f core ../core extratcl
-	rm -f ../*.so ../*.dll ./*.so ./*.dll ../win/tmp/*.obj ../win/*.csm
+	rm -f ../*.so ../dbm/*.so ../*.dll ./*.so ./*.dll ../win/tmp/*.obj ../win/*.csm
 
 Makefile: Makefile.in
 	./config.status

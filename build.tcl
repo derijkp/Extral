@@ -1,6 +1,6 @@
 #!/bin/sh
 # the next line restarts using wish \
-exec tclsh7.6 "$0" "$@"
+exec tclsh8.0 "$0" "$@"
 #package require extral
 
 #set targetdir $env(HOME)/bin/[file tail [pwd]]
@@ -133,11 +133,11 @@ proc build {targetdir} {
 	if [file exists $targetdir] {
 		error "Target directory $targetdir exists"
 	}
-	mkdir $targetdir
+	file mkdir $targetdir
 
-	cp Readme.txt Extral.txt extral.so pkgIndex.tcl $targetdir		
-	cp -r lib $targetdir		
-	catch {rm [file join $targetdir lib *~]}
+	file copy Readme.txt extral.so pkgIndex.tcl $targetdir		
+	file copy lib docs $targetdir		
+	catch {file delete [file join $targetdir lib *~]}
 	difaccess 0644 0755 $targetdir
 }
 

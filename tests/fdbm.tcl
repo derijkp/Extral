@@ -3,7 +3,6 @@
 exec tclsh8.0 "$0" "$@"
 
 source tools.tcl
-load ../extral.so
 proc type {} {return fdbm}
 
 test [type] {types} {

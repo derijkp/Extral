@@ -4,7 +4,81 @@
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
 # =============================================================
-
+#doc {lmanip subindex} cmd {
+#lmanip subindex ?list? ?pos?
+#} descr {
+#	returns a list of the 'pos' element in each of the elements of the given list
+#} example {
+#	% lmanip subindex {{a 1} {b 2} {c 3}} 1
+#	1 2 3
+#}
+#doc {lmanip mangle} cmd {
+#lmanip mangle ?list1? ?list2?
+#} descr {
+#	mangles two lists into one
+#} example {
+#	% lmanip mangle {a b c} {1 2 3}
+#	{a 1} {b 2} {c 3}
+#}
+#doc {lmanip extract} cmd {
+#lmanip extract ?list? ?expression?
+#} descr {
+#	tries to match each element in a list; if the element matches, it extracts the 
+#	parenthesised part. It returns a list of all extracted parts. If there was no match,
+#	an empty element is put in the list.
+#} example { 
+#	% lmanip extract {Results {A: 50%} {B: 25%} {C: 25%}} { ([0-9+]+)\%}
+#		{} 50 25 25
+#}
+#doc {lmanip remdup} cmd {
+#lmanip remdup ?list?
+#} descr {
+#	removes duplicates from list
+#} example {
+#	% lmanip remdup {a b c a b d}
+#	a b c d
+#}
+#doc {lmanip split} cmd {
+#lmanip split ?list? -before/-after/-outside ?positions?
+#} descr {
+#	splits a list at positions into sublists
+#} example {
+#	% lmanip split {a b c d e} -before {1 3}
+#	a {b c} {d e}
+#}
+#doc {lmanip join} cmd {
+#lmanip join ?list? ?join string? ?position list?
+#} descr {
+#	joins list elements at positions given in the ?position list?. When you
+#	specify all, all elements will be joined.
+#} example {
+#	% lmanip join {a b c {a d} e} { } {0 2}
+#		{a b} {c a d} e
+#	% lmanip join {a b c {a d} e} {} {0 2}
+#		ab {ca d} e
+#	% lmanip join {a b c {a d} e} {} all
+#	abca de
+#}
+#doc {lmanip lengths} cmd {
+#lmanip lengths ?list?
+#} descr {
+#	returns a list with the lengths of the elements
+#} example {
+#	% lmanip lengths {abc abcdef}
+#	3 6
+#}
+#doc {lmanip fill} cmd {
+#lmanip fill ?size? ?start? ??incr??
+#} descr {
+#	fills a list of ?size? elements with ?start?; if ?incr? is given and ?size? is an integer, each element in the list will be the former incremented with ?incr?
+#} example {
+#	% lmanip fill 4 "Hello world"
+#	{Hello world} {Hello world} {Hello world} {Hello world}
+#	% lmanip fill 5 2 2
+#	2 4 6 8 10
+#	% lmanip fill 5 10 -2
+#	10 8 6 4 2
+#}
 Extral::export lmanip {
 
 proc lmanip {option args} {

@@ -6,6 +6,11 @@
 
 int Extral_StructlInit _ANSI_ARGS_((Tcl_Interp *interp));
 
+
+/*
+extern int	ExtraL_LfileCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]));
+*/
 extern int	ExtraL_LevalObjCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]));
 
@@ -56,6 +61,8 @@ extern int ExtraL_ScanTimeObjCmd _ANSI_ARGS_((ClientData clientData,
 extern int ExtraL_FormatTimeObjCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
 
+extern int Extral_DbmInit _ANSI_ARGS_((Tcl_Interp *interp));
+
 #ifdef windows
 /*
 extern int ExtraL_MkdirCmd _ANSI_ARGS_((ClientData clientData,
@@ -76,11 +83,21 @@ extern int ExtraL_CpCmd _ANSI_ARGS_((ClientData clientData,
 #endif
 
 int
+dld_AddTclCommand(interp, command, function)
+	Tcl_Interp *interp;
+	char *command;
+	Tcl_CmdProc *function;
+{
+
+	Tcl_CreateCommand(interp, command, *function, (ClientData)NULL,
+	(Tcl_CmdDeleteProc *)NULL);
+	return TCL_OK;
+}
+
+int
 Extral_Init(interp)
 	Tcl_Interp *interp;		/* Interpreter to add extra commands */
 {
-	char *libDir;
-
 	Tcl_PkgProvide(interp, "extral", "0.94");
 	Tcl_CreateObjCommand(interp,"Extral::lpop",(Tcl_ObjCmdProc *)ExtraL_LpopObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"Extral::lshift",(Tcl_ObjCmdProc *)ExtraL_LshiftObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
@@ -99,20 +116,9 @@ Extral_Init(interp)
 	dld_AddTclCommand(interp, "Extral::replace", ExtraL_ReplaceCmd);
 	dld_AddTclCommand(interp, "Extral::ssort", ExtraL_SSortCmd);
 /*	dld_AddTclCommand(interp, "Extral::ffind", ExtraL_FfindCmd); */
+/*	dld_AddTclCommand(interp, "lfile", ExtraL_LfileCmd); */
 
 	Extral_StructlInit(interp);
 	Extral_DbmInit(interp);
-	return TCL_OK;
-}
-
-int
-dld_AddTclCommand(interp, command, function)
-	Tcl_Interp *interp;
-	char *command;
-	Tcl_CmdProc *function;
-{
-
-	Tcl_CreateCommand(interp, command, *function, (ClientData)NULL,
-	(Tcl_CmdDeleteProc *)NULL);
 	return TCL_OK;
 }

@@ -36,6 +36,14 @@ test lsub {negative index} {
 	lsub {Ape Ball Field} {1 -1 100}
 } {Ball}
 
+test lsub {problem} {
+	set findex {{Acibri.ACR: Acidianus brierleyi} {Aciinf.ACR: Acidianus infernus} {Desmob.ACR: Desulfurococcus mobilis} {Thecel.AEU: Thermococcus celer}}
+	set pattern "\\.ACR"
+	set poss [lfind -regexp $findex $pattern]
+	set result [lsub $findex $poss]
+	set rest [lsub $findex -exclude $poss]
+} {{Thecel.AEU: Thermococcus celer}}
+
 test lcor {} {
 	lcor {a b c d e f} {d b}
 } {3 1}
@@ -67,6 +75,10 @@ test lmath {cumul} {
 test lmath {incr} {
 	lmath incr {8 18 100} 2
 } {10 20 102}
+
+test lmath {between} {
+	lmath between {-1 4 9 11 8} 0 10
+} {0 4 9 10 8}
 
 test lmanip {subindex} {
 	lmanip subindex {{a 1} {b 2} {c 3}} 1
@@ -326,6 +338,14 @@ test lshift {with foreach} {
 	}
 } {}
 
+test varsubst {} {
+set try {try it}
+varsubst {try} {
+puts [list $try $try2]
+}
+} {
+puts [list {try it} $try2]
+}
 
 # no test yet for
 # ffind <switches> filelist pattern ?varName? ?pattern? ?varname?

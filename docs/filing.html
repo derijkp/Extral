@@ -1,0 +1,62 @@
+<HEAD>
+<TITLE>
+Filing commands
+</TITLE>
+</HEAD>
+<BODY>
+<h1>
+Filing commands
+</h1>
+
+<dl><dt><b>
+	dirglob dir pattern
+</b><dd>
+	returns a list of all filenames in directory dir mathing the given pattern
+</ul>
+
+<dl><dt><b>
+lload filename
+</b><dd>
+	returns all lines in the specified files as a list 
+</ul>
+
+<dl><dt><b>
+lwrite file list
+</b><dd>
+	writes a list to a file
+</ul>
+
+<dl><dt><b>
+	readfile filename
+</b><dd>
+	returns the contents of the file given by filename
+</ul>
+
+<dl><dt><b>
+	writefile filename data
+</b><dd>
+	create a file by the name filename with data as its content
+</ul>
+
+<dl><dt><b>
+	getcomplete channelId
+</b><dd>
+	get one complete Tcl command, in the sense of having no unclosed quotes, 
+	braces, brackets or array element names, from the open file given by channelId
+</ul>
+
+<dl><dt><b>
+	splitcomplete data
+</b><dd>
+	split data into complete Tcl commands in the sense of having no unclosed quotes, 
+	braces, brackets or array element names.
+</ul>
+
+<dl><dt><b>
+	cload filename
+</b><dd>
+	returns the contents of the given file als a list of complete Tcl commands.
+	
+</ul>
+
+</body>

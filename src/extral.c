@@ -206,7 +206,7 @@ ExtraL_LsubObjCmd(dummy, interp, objc, objv)
 		for(i=0;i<listLen;i++) {
 			if (i==index)	{
 				index=-1;
-				while ((index<=1)&&(curindex<indexlistLen)) {
+				while ((index < 1)&&(curindex < indexlistLen)) {
 					result=Tcl_GetIntFromObj(interp,indexelemPtrs[curindex++],&index);
 					if (result!=TCL_OK) {return result;}
 				}
@@ -316,7 +316,7 @@ ExtraL_LremdupObjCmd(dummy, interp, objc, objv)
 {
 	Tcl_Obj *listPtr;
 	Tcl_Obj **elemPtrs;
-	Tcl_Obj *resultObj, *indexObj;
+	Tcl_Obj *resultObj;
 	int listLen, indexlistLen, result;
 	char *string,*checkstring;
 	int i,j,len,checklen;
@@ -388,7 +388,7 @@ ExtraL_LlremoveObjCmd(notUsed, interp, objc, objv)
 	Tcl_Obj **refArgv;
 	int listArgc;
 	Tcl_Obj **listArgv;
-	Tcl_Obj *indexObj, *resultObj;
+	Tcl_Obj *resultObj;
 	char *refstring,*string;
 	int reflen,len;
 	int pos,result;
@@ -458,7 +458,6 @@ ExtraL_LunmergeObjCmd(notUsed, interp, objc, objv)
 	int listArgc;
 	Tcl_Obj **listArgv;
 	Tcl_Obj *resultObj;
-	char *tag;
 	int spacing=1;
 	int pos,result;
 	int i;

@@ -6,9 +6,32 @@
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
 # =============================================================
-
+#doc time title {
+#Date and time
+#} shortdescr {
+#} descr {
+#The scantime transforms a string containing date and/or time into a 
+#double value (number of seconds since 0). These values can
+#be sorted, compared or stored, and transformed back into a human readable
+#date and time string using the formattime command. The clock scan and
+#format commands in Tcl give up before somewhere before 1901 and after
+#2037, which is a bit of a bummer (eg. for genealogy). The transformation
+#takes into account leap-years properly (I hope). However, it extrapolated
+#the current rule to the past (so eg. 0004 BC is a leap year), and doesn't
+#take into account the meddling that has happened to time over 
+#time (missing days, ...). I don't know enough about that to do this
+#correctly.
+#}
 Extral::export {scantime formattime} {
 
+#doc {time scantime} cmd {
+#scantime time ?date/time/both?
+#} descr {
+#	!! the year should be specified fully (>=4 numbers)
+#} example {
+#	% scantime {9 May 1997 12:30}
+#	62998777800.0
+#}
 proc scantime {time {musthave date}} {
 	foreach {var val} {
 		bc 0 year -1 month -1 day -1 hour -1 min -1 sec -1 ms -1
@@ -34,12 +57,12 @@ proc scantime {time {musthave date}} {
 				}
 			}
 			{[0-9]*} {
-				set temp [string trimleft $item 0]
+				set temp [string trimleft $item "0"]
 				if {"$temp"==""} {set temp 0}
 				if {$first == -1} {
-					set first $item
+					set first $temp
 				} else {
-					set second $item
+					set second $temp
 				}
 			}
 			{[bB][cC]} {
@@ -103,50 +126,50 @@ proc scantime {time {musthave date}} {
 
 	switch $month {
 		1 {
-			set days 31;
+			set days 31
 		} 
 		2 {
 			set days [expr {28+$schrikkel}]
-			incr result 31;
+			incr result 31
 		}
 		3 {
-			set days 31;
+			set days 31
 			incr result [expr {59+$schrikkel}]
 		}
 		4 {
-			set days 30;
+			set days 30
 			incr result [expr {90+$schrikkel}]
 		}
 		5 {
-			set days 31;
+			set days 31
 			incr result [expr {120+$schrikkel}]
 		}
 		6 {
-			set days 30;
+			set days 30
 			incr result [expr {151+$schrikkel}]
 		}
 		7 {
-			set days 31;
+			set days 31
 			incr result [expr {181+$schrikkel}]
 		}
 		8 {
-			set days 31;
+			set days 31
 			incr result [expr {212+$schrikkel}]
 		} 
 		9 {
-			set days 30;
+			set days 30
 			incr result [expr {243+$schrikkel}]
 		} 
 		10 {
-			set days 31;
+			set days 31
 			incr result [expr {273+$schrikkel}]
 		} 
 		11 {
-			set days 30;
+			set days 30
 			incr result [expr {304+$schrikkel}]
 		} 
 		12 {
-			set days 31;
+			set days 31
 			incr result [expr {334+$schrikkel}]
 		}
 	}
@@ -155,10 +178,51 @@ proc scantime {time {musthave date}} {
 	}
 
 	incr result [expr {$day-1}]
+	if {($hour<0)||($hour>23)} {
+		set error "invalid hour"
+	}
+	if {($min<0)||($min>59)} {
+		set error "invalid minutes"
+	}
+	if {$sec == -1} {set sec 0}
+	if {($sec<0)||($sec>59)} {
+		set error "invalid seconds"
+	}
+	if {$ms == -1} {set ms 0}
+	if {($ms<0)||($ms>99)} {
+		set error "invalid miliseconds"
+	}
+	if [info exists error] {
+		return -code error "error while parsing time in \"$time\": $error"
+	}
 #puts "$days\n$year $month $day $hour:$min:$sec:$ms"
 	return [expr {$result*86400.0 + $hour*3600 + $min*60 + $sec + $ms/100.0}]
 }
 
+#doc {time formattime} cmd {
+#formattime time ?formatstring?
+#} descr {
+#	!! not all options of clock scan are supported
+#<pre>
+#	%% : %
+#	%Y : year
+#	%d : day (09)
+#	%e : day (9)
+#	%j : day of year
+#	%m : month number
+#	%b : abbreviated month name
+#	%B : full month name
+#	%H : hour
+#	%M : minute
+#	%S : second
+#	%s : hundreds of a second
+#</pre>
+#} example {
+#	% formattime 62998777800.0
+#	1997 May 09 12:30:00
+#	% formattime 62998777800.0 "%B %e %Y"
+#	May 9 1997
+#}
 proc formattime {time {format {%Y %b %d %H:%M:%S}}} {
 	set bc 0
 	if ($time<0) {

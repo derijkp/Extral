@@ -8,6 +8,10 @@ test structlset {set} {
 	structlset {a 1 bb 2 ccc 3} bb try
 } {a 1 bb try ccc 3}
 
+test structlset {set, list check} {
+	structlset {a 1 bb 2 ccc 3} bb {try it}
+} {a 1 bb {try it} ccc 3}
+
 test structlset {set, 2 tags} {
 	structlset {a 1 b 2 c {a 1 b 2 c {a 1 b 2}}} {c a} try
 } {a 1 b 2 c {a try b 2 c {a 1 b 2}}}
@@ -16,6 +20,14 @@ test structlset {set new} {
 	structlset {a 1 bb 2 ccc 3} dddd 4
 } {a 1 bb 2 ccc 3 dddd 4}
 
+test structlset {set new, list value} {
+	structlset {a 1 bb 2 ccc 3} dddd {try it}
+} {a 1 bb 2 ccc 3 dddd {try it}}
+
+test structlset {set new, list tag, list value} {
+	structlset {a 1 bb 2 ccc 3} {{d d}} {try it}
+} {a 1 bb 2 ccc 3 {d d} {try it}}
+
 test structlset {set new, 2 tags} {
 	structlset {a 1 b 2 c {a 1 b 2 c {a 1 b 2}}} {c d} try
 } {a 1 b 2 c {a 1 b 2 c {a 1 b 2} d try}}
@@ -23,6 +35,14 @@ test structlset {set new, 2 tags} {
 test structlset {set, 3 tags} {
 	structlset {a 1 b 2 c {a 1 b 2 c {a 1 b 2}}} {c c a} try
 } {a 1 b 2 c {a 1 b 2 c {a try b 2}}}
+
+test structlset {set multi} {
+	Extral::structlset {a 1} b 2 a a
+} {a a b 2}
+
+test structlset {set multi multiple levels} {
+	Extral::structlset {a 1} {b a} 2 a a {b b} 3
+} {a a b {a 2 b 3}}
 
 test structlset {check uneven} {
 	structlset {a 1 bb 2 ccc} dddd 4
@@ -68,7 +88,7 @@ test structlget {with larger structure} {
 
 test structlget {tag not present} {
 	structlget {a 1 bb 2 ccc 3} e
-} {taglist "e" not found} 1
+} {tag "e" not found} 1
 
 test structlget {taglist larger than structure} {
 	structlget {a 1 bb 2 ccc 3} {a b}
@@ -76,7 +96,7 @@ test structlget {taglist larger than structure} {
 
 test structlget {taglist in struct not present} {
 	structlget {a {a 1 b 2} bb 2 ccc 3} {a c}
-} {taglist "a c" not found} 1
+} {tag "c" not found} 1
 
 test structlget {get partial} {
 	structlget {a {a 1 b 2} bb 2 ccc 3} a
@@ -85,6 +105,14 @@ test structlget {get partial} {
 test structlget {check uneven} {
 	structlget {a 1 bb 2 ccc} bb
 } {error: list "a 1 bb 2 ccc" does not have an even number of elements} 1
+
+test structlget {def} {
+	structlget {a 1} b def
+} {def}
+
+test structlget {not found} {
+	structlget {a 1} b
+} {tag "b" not found} 1
 
 test structlunset {} {
 	structlunset {a 1 bb 2 ccc 3} bb

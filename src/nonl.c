@@ -289,9 +289,7 @@ ExtraL_AmanipCmd(notUsed, interp, argc, argv)
 {
 	int listArgc;
 	char **listArgv;
-	char *line=NULL;
 	char *array;
-	int *list;
 	int c,len;
 	int i;
 
@@ -380,8 +378,8 @@ ExtraL_ReplaceCmd(notUsed, interp, argc, argv)
 	Tcl_DString result;
 	int listArgc;
 	char **listArgv;
-	char *string,*p,*lp,*tp;
-	int i,j,pos,len;
+	char *p,*lp,*tp;
+	int j;
 
 	Tcl_DStringInit(&result);
 
@@ -398,7 +396,7 @@ ExtraL_ReplaceCmd(notUsed, interp, argc, argv)
 		for(j=0;j<listArgc;j+=2) {
 			lp=listArgv[j];
 			tp=p;
-			while ((*lp!='\0')&tp!='\0') {
+			while ((*lp!='\0')&(tp!='\0')) {
 				if (*tp!=*lp) break;
 				tp++;lp++;
 			}

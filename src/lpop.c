@@ -128,7 +128,6 @@ ExtraL_LshiftObjCmd(notUsed, interp, objc, objv)
 {
 	register Tcl_Obj *listObjPtr;
 	Tcl_Obj *popPtr, *newValuePtr;
-	char *firstStr;
 	int listLen;
 	long index;
 	int result;

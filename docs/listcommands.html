@@ -1,0 +1,156 @@
+<HEAD>
+<TITLE>
+General list manipulation commands
+</TITLE>
+</HEAD>
+<BODY>
+<h1>
+General list manipulation commands
+</h1>
+
+<dl><dt><b>
+llremove list1 list2
+</b><dd>
+        returns a list with all items in list1 that are not in list2
+</ul>
+
+<dl><dt><b>
+lpush listName ?item? ?position?
+</b><dd>
+	opposite of lpop.
+</ul>
+
+<dl><dt><b>
+lunshift listName ?item?
+</b><dd>
+	opposite of lshift: prepends ?item? to the list.
+</ul>
+
+<dl><dt><b>
+lset listName ?item? ?indexlist?
+</b><dd>
+	sets all elements of the list at the given indices to value ?item?
+</ul>
+
+<dl><dt><b>
+larrayset array varlist valuelist
+</b><dd>
+	sets the values of valuelist to the respective elements in varlist for
+	the given array
+</ul>
+
+<dl><dt><b>
+lcommon list list ...
+</b><dd>
+	returns the common elements of the lists
+</ul>
+
+<dl><dt><b>
+lunion list list ...
+</b><dd>
+	returns the union of the lists
+</ul>
+
+<dl><dt><b>
+leor list1 list2
+</b><dd>
+	returns the elements that are not shared between both lists
+</ul>
+
+<dl><dt><b>
+laddnew listName ?item? ...
+</b><dd>
+	adds the items to the list if not already there
+</ul>
+
+<dl><dt><b>
+lregsub ?switches? exp list subSpec
+</b><dd>
+	does a regsub for each element in the list, and returns the resulting list.
+<br>eg.:<pre>
+	% lregsub {c$} {afdsg asdc sfgh {dfgh shgfc} dfhg} {!}
+	afdsg asd! sfgh {dfgh shgf!} dfhg
+	% lregsub {^([^.]+)\.([^.]+)$} {start.sh help.ps h.sh} {\2 \1}
+	{sh start} {ps help} {sh h}
+</pre></ul>
+
+<dl><dt><b>
+lpop listName ?pos?
+</b><dd>
+	returns the last element from a list, thereby removing it from the list.
+	If pos is given it will return the pos element of the list.
+</ul>
+
+<dl><dt><b>
+lshift listName
+</b><dd>
+	returns the first element from a list, thereby removing it from the list.
+</ul>
+
+<dl><dt><b>
+lsub list ?-exclude? [index list]
+</b><dd>
+	create a sublist from a set of indices
+	When -exclude is specified, the elements of which the indexes are not in the list 
+	will be given.
+<br>eg.:<pre>
+	% lsub {Ape Ball Field {Antwerp city} Egg} {0 3}
+	Ape {Antwerp city}
+	% lsub {Ape Ball Field {Antwerp city} Egg} -exclude {0 3}
+	Ball Field Egg
+</pre></ul>
+
+<dl><dt><b>
+lfind mode list pattern
+</b><dd>
+	returns a list of all indices which match a pattern.
+	mode can be -exact, -glob, or -regexp
+<br>eg.:<pre>
+	% lfind -regexp {Ape Ball Field {Antwerp city} Egg} {^A}
+	0 3
+</pre></ul>
+
+<dl><dt><b>
+lcor <referencelist> <list>
+</b><dd>
+	gives the positions of the elements in list in the reference list. If an element is not
+	found in the reference list, it returns -1. Elements are matched only once.
+<br>eg.:<pre>
+	% lcor {a b c d e f} {d b}
+	3 1
+	% lcor {a b c d e f} {b d d}
+	1 3 -1
+</pre></ul>
+
+<dl><dt><b>
+lremdup list
+</b><dd>
+returns a list in which all duplactes are removed
+</ul>
+
+<dl><dt><b>
+lmerge ?list1? ?list2? ??spacing??
+</b><dd>
+	merges two lists into one
+<br>eg.:<pre>
+	% lmerge {a b c} {1 2 3}
+	a 1 b 2 c 3
+	% lmerge {a b c d} {1 2} 2
+	a b 1 c d 2
+</pre></ul>
+
+<dl><dt><b>
+lunmerge ?list? ??spacing?? ??var??
+</b><dd>
+	unmerges items from a list to the result; the remaining items are stored
+	in the given variable ?var?
+<br>eg.:<pre>
+	% lunmerge {a 1 b 2 c 3}
+	a b c
+	% lunmerge {a b 1 c d 2} 2 var
+	a b c d
+	% set var
+	1 2
+</pre></ul>
+
+</body>

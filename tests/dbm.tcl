@@ -1,3 +1,7 @@
+test dbm-general {load not existing type} {
+	loaddbm notexists
+} {could not load dbm type "notexists"} 1
+
 test [type] {create} {
 	catch {file delete -force db.test}
 	dbm create [type] db.test
@@ -46,7 +50,7 @@ test [type] {error: try to unset in reader} {
 	dbm create [type] db.test
 	dbm open [type] db db.test
 	db set try 1
-	rename db {}
+	db close
 	dbm open -readonly [type] db db.test
 	db unset try
 } {error: trying to unset value from reader} 1
@@ -232,6 +236,11 @@ test [type] {try to open non existing database} {
 	catch {file delete -force db.test}
 	dbm open [type] db db.test
 } {could not open database "db.test"} 1
+
+test [type] {error in dbm access cmd} {
+	catch {file delete -force db.test}
+	dbm try
+} {bad option "try": must be one of create, open or types} 1
 
 test [type] {error in db access cmd} {
 	catch {file delete -force db.test}

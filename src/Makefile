@@ -21,7 +21,7 @@ LIBS = -L/home/peter/tcl/tcl8.0/unix -ltcl8.0 -ldl  -lm -lc
 # modify any of this stuff by hand.
 #----------------------------------------------------------------
 
-CC = gcc
+CC = gcc -Wall
 SHLIB_CFLAGS =		-fPIC
 SHLIB_LD =		gcc -shared
 SHLIB_SUFFIX =		.so
@@ -40,11 +40,12 @@ extral$(SHLIB_SUFFIX): $(OBJECTS)
 	cp ./extral$(SHLIB_SUFFIX) ../extral$(SHLIB_SUFFIX)
 
 bsddbm$(SHLIB_SUFFIX): bsddbm.o ../extern/libdb.a
-	$(SHLIB_LD) $(SHLIB_CFLAGS) -o ../bsddbm$(SHLIB_SUFFIX) bsddbm.o ../extern/libdb.a  ${LIBS}
+	$(SHLIB_LD) $(SHLIB_CFLAGS) -o ./bsddbm$(SHLIB_SUFFIX) bsddbm.o ../extern/libdb.a  ${LIBS}
+	mv ./bsddbm$(SHLIB_SUFFIX) ../dbm/bsddbm$(SHLIB_SUFFIX)
 
 gdbm$(SHLIB_SUFFIX): gdbm.o ../extern/libgdbm.a
 	$(SHLIB_LD) $(SHLIB_CFLAGS) -o ./gdbm$(SHLIB_SUFFIX) gdbm.o ../extern/libgdbm.a  ${LIBS}
-	cp ./gdbm$(SHLIB_SUFFIX) ../gdbm$(SHLIB_SUFFIX)
+	mv ./gdbm$(SHLIB_SUFFIX) ../dbm/gdbm$(SHLIB_SUFFIX)
 
 extratcl: tclAppInit.o $(OBJECTS)
 	$(CC) $(CC_SWITCHES) -o extratcl tclAppInit.o $(OBJECTS) ${TCL_LIB_SPEC} ${LIBS}
@@ -52,7 +53,7 @@ extratcl: tclAppInit.o $(OBJECTS)
 clean:
 	rm -f *.o *${SHLIB_SUFFIX} config.cache config.log lib.exp
 	rm -f core ../core extratcl
-	rm -f ../*.so ../*.dll ./*.so ./*.dll ../win/tmp/*.obj ../win/*.csm
+	rm -f ../*.so ../dbm/*.so ../*.dll ./*.so ./*.dll ../win/tmp/*.obj ../win/*.csm
 
 Makefile: Makefile.in
 	./config.status

@@ -31,6 +31,7 @@ int (*tclDummyMathPtr) _ANSI_ARGS_((void)) = matherr;
 }
 #endif
 
+extern int		Extral_Init _ANSI_ARGS_((Tcl_Interp *interp));
 #ifdef TCL_TEST
 extern int		Tcltest_Init _ANSI_ARGS_((Tcl_Interp *interp));
 extern int		Tclptest_Init _ANSI_ARGS_((Tcl_Interp *interp));

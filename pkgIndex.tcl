@@ -7,9 +7,10 @@
 # script is sourced, the variable $dir must contain the
 # full path name of this file's directory.
 
+namespace eval __temp [list set dir $dir]
 namespace eval __temp {
 	# $Format: "set version $ProjectVersion$"$
-set version 1a.23
+set version 1a.24
 	regsub -all {[ab]} $version {} version
 	set loadcmd {
 		package provide Extral @version@

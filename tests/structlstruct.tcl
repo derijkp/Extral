@@ -52,6 +52,12 @@ test structlset-struct {basic: add one} {
 	structlset -struct $struct $try b 10
 } {a 1 b 10}
 
+test structlset-struct {basic: set multi} {
+	set struct {* {*int ?}}
+	set try {a 1}
+	structlset -struct $struct $try b 10 a 2
+} {a 2 b 10}
+
 test structlset-struct {basic: add one: 2 tags} {
 	set struct {a {* {*int ?}}}
 	set try {a {a 1}}
@@ -74,13 +80,23 @@ test structlset-struct {basic: error too much tags} {
 	set struct {a {a {*int ?}}}
 	set try {}
 	structlset -struct $struct $try {a a a} 10
-} {error: tag "a" not present in structure "*int ?"} 1
+} {error: field "a" not present in structure "*int ?"} 1
 
 test structlset-struct {basic: error with *} {
 	set struct {a {* {*int ?}}}
 	set try {}
 	structlset -struct $struct $try a 10
 } {error: incorrect value trying to assign "10" to struct "* {*int ?}"} 1
+
+test structlset-struct {empty -struct: set} {
+	set try {}
+	structlset -struct {} $try a 10
+} {error: tag "a" not present in structure ""} 1
+
+test structlget-struct {empty -struct: get} {
+	set try {}
+	structlget -struct {} $try a
+} {error: tag "a" not present in structure ""} 1
 
 test structlset-struct {basic: set one by value} {
 	set struct {a {a {*int ?}}}
@@ -134,7 +150,7 @@ test structlset-struct {check conformance to structure} {
 	set struct {a {*int ?} b {*int ?} c {* {*int ?} a {*int ?} b {* {*int ?}}}}
 	set try {a 1 b 2 c {a 1 b {a 1 b 2}}}
 	structlset -struct $struct $try {c d a} 10
-} {error: tag "a" not present in structure "*int ?"} 1
+} {error: field "a" not present in structure "*int ?"} 1
 
 test structlset-struct {1} {
 	set struct {a {*int ?} b {*int ?} c {* {*int ?} a {*int ?} b {* {*int ?}}}}
@@ -209,5 +225,23 @@ test structlget-struct {mixed default and value} {
 	structlget -struct $struct $try a
 } {a ? b 1}
 
+test structlget-struct {get non existent *} {
+	set struct {a {* {*int ?} a {*int ?}}}
+	set try {}
+	structlget -struct $struct $try {a b}
+} {?}
+
+#test structlget-struct {* in field} {
+#	set struct {
+#		a {
+#			* {
+#				a {*int ?}
+#				b {*int ?}
+#			}
+#		}
+#	}
+#	set try {a {b {a b1 b b2} c {a c1 b c2}}}
+#	structlget -struct $struct $try {a * a}
+#} {b b1 c c1}
 
 testsummarize

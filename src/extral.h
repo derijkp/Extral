@@ -8,14 +8,47 @@
  */
 
 /*
+ * format- and scantime functions and definitions
+ */
+
+EXTERN int ExtraL_ScanTime _ANSI_ARGS_((Tcl_Interp *interp,
+	int musthavedate,
+	int musthavetime,
+	Tcl_Obj *dateObj,
+	double *resultPtr));
+
+EXTERN int ExtraL_FormatTime _ANSI_ARGS_((Tcl_Interp *interp,
+	double time,
+	char *format,
+	char **result));
+
+/*
  * structl functions and definitions
  */
 
-typedef int ExtraL_StructlTypeProc _ANSI_ARGS_((Tcl_Interp *interp,
-	Tcl_Obj *structure, Tcl_Obj **value));
+typedef int ExtraL_StructlTypeSetProc _ANSI_ARGS_((Tcl_Interp *interp,
+	Tcl_Obj *structure,Tcl_Obj *oldvalue,int tagsc,Tcl_Obj **tagsv,
+	Tcl_Obj **value));
+typedef int ExtraL_StructlTypeGetProc _ANSI_ARGS_((Tcl_Interp *interp,
+	Tcl_Obj *structure,int tagsc,Tcl_Obj **tagsv,
+	Tcl_Obj **value));
+EXTERN int ExtraL_StructlsetStruct _ANSI_ARGS_((Tcl_Interp *interp,
+	Tcl_Obj *structure,
+	Tcl_Obj *list,
+	int tagsc,
+	Tcl_Obj **tagsv,
+	Tcl_Obj *value,
+	Tcl_Obj **resultPtr));
 
 EXTERN int ExtraL_StructlCreateType _ANSI_ARGS_((Tcl_Interp *interp,
-	char *key,ExtraL_StructlTypeProc *setproc,ExtraL_StructlTypeProc *getproc));
+	char *key,ExtraL_StructlTypeSetProc *setproc,ExtraL_StructlTypeGetProc *getproc));
+
+EXTERN int ExtraL_StructlgetStruct _ANSI_ARGS_((Tcl_Interp *interp,
+	Tcl_Obj *structure,
+	Tcl_Obj *list,
+	int tagsc,
+	Tcl_Obj **tagsv,
+	Tcl_Obj **resultPtr));
 
 /*
  * dbm functions and definitions

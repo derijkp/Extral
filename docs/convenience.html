@@ -1,0 +1,73 @@
+<HEAD>
+<TITLE>Convenience functions</TITLE>
+</HEAD>
+<BODY>
+<h1>Convenience functions</h1>
+
+<dl><dt><b>
+	literate variableName list
+</b><dd>
+	debugging tool to interactively iterate a variable over a list. literate
+	is used to initialise and it sets the variable to the first element of 
+	the list. Every 'lnext variableName' will puts the next element into the 
+	variable.
+</ul>
+
+<dl><dt><b>
+	lnext variableName
+</b><dd>
+	complement to literate. sets the variable to the next element of the list 
+	first given by literate.
+</ul>
+
+<dl><dt><b>
+rem args
+</b><dd>
+	does nothing<br>
+	I use this to put some example or testing code in a program
+	without all the #'s
+</ul>
+
+<dl><dt><b>
+REM args
+</b><dd>
+	when the procedure remof is called, REM will also do nothing
+	when the procedure remon is called, REM will put its arguments
+	to the stdout
+</ul>
+
+<dl><dt><b>
+true expression
+</b><dd>
+ true expr
+	returns 1 when expression is yes, true or 1<br>
+	otherwise it returns 0.
+</ul>
+
+<dl><dt><b>
+ setglobal varName ?newValue?
+</b><dd>
+	same as the set command, but then for global variables
+</ul>
+
+<dl><dt><b>
+random min max
+</b><dd>
+returns a random number between min and max
+</ul>
+
+<dl><dt><b>
+varsubst varlist string
+</b><dd>
+	substitutes only the variables in varlist for their content
+	in the given string
+<br>eg.:<pre>
+	% set try {try it}
+	try it
+	% varsubst {try} {
+		puts [list $try $try2]
+	}
+		puts [list {try it} $try2]
+</pre></ul>
+
+</body>

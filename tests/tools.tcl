@@ -1,4 +1,11 @@
 package require Extral
+catch {tk appname test}
+proc putsvars args {
+	foreach arg $args {
+		puts [list set $arg [uplevel set $arg]]
+	}
+	puts "\n"
+}
 
 proc test {name description script expected {causeerror 0}} {
 	global errors

@@ -9,6 +9,7 @@
 
 #include "tcl.h"
 #include "extral.h"
+#include <string.h>
 
 #ifdef unix
 #define export
@@ -39,7 +40,6 @@ int ExtraL_FdbmCreate(
 	int objc,
 	Tcl_Obj *CONST objv[])
 {
-	Fdbm_Info *fdbm;
 	char *name;
 	int namelen;
 	int error;
@@ -69,7 +69,6 @@ int ExtraL_FdbmOpen(
 	char *name;
 	int namelen;
 	int error;
-	int i;
 
 	if (objc != 0) {
 		Tcl_ResetResult(interp);
@@ -113,10 +112,7 @@ int ExtraL_FdbmSet(
 {
 	Fdbm_Info *fdbm = token;
 	Tcl_Channel file;
-	char *name;
 	datum key, value;
-	int error;
-	int i;
 
 	key.dptr = Tcl_GetStringFromObj(keyObj,&(key.dsize));
 	value.dptr = Tcl_GetStringFromObj(valueObj,&(value.dsize));
@@ -146,9 +142,7 @@ int ExtraL_FdbmGet(
 {
 	Fdbm_Info *fdbm = token;
 	Tcl_Channel file;
-	char *name;
-	datum key, value;
-	int error;
+	datum key;
 	int i;
 
 	key.dptr = Tcl_GetStringFromObj(keyObj,&(key.dsize));
@@ -200,11 +194,8 @@ int ExtraL_FdbmUnset(
 	Tcl_Obj *keyObj)
 {
 	Fdbm_Info *fdbm = token;
-	Tcl_Channel file;
-	char *name;
-	datum key, value;
+	datum key;
 	int error;
-	int i;
 
 	key.dptr = Tcl_GetStringFromObj(keyObj,&(key.dsize));
 	if (key.dsize > fdbm->namebufferlen) {
@@ -315,6 +306,15 @@ int ExtraL_DbmObjectCmd(
 			error = type->unset(interp,token,objv[2]);
 			if (error != TCL_OK) {return error;}
 			return TCL_OK;
+		} else if (strcmp(cmd,"close") == 0) {
+			if (objc != 2) {
+				Tcl_WrongNumArgs(interp, 1, objv, "close");
+				return TCL_ERROR;
+			}
+			error = Tcl_DeleteCommand(interp, Tcl_GetStringFromObj(objv[0],&error));
+			if (error != TCL_OK) {return error;}
+			Tcl_ResetResult(interp);
+			return TCL_OK;
 		}
 	} else if (cmdlen == 10) {
 		if (strcmp(cmd,"reorganize") == 0) {
@@ -366,8 +366,6 @@ int ExtraL_DbmObjCmd(
 	if (cmdlen == 4) {
 		if (strcmp(cmd,"open") == 0) {
 			DbmInfo *dbminfo;
-			ClientData token;
-			char *rw;
 			if (objc < 5) {
 				Tcl_WrongNumArgs(interp, 1, objv, "open ?-readonly? type dbcmd database ?options?");
 				return TCL_ERROR;
@@ -399,7 +397,6 @@ int ExtraL_DbmObjCmd(
 		if (strcmp(cmd,"types") == 0) {
 			Tcl_HashSearch search;
 			char *key;
-			int mode;
 
 			if (objc != 2) {
 				Tcl_WrongNumArgs(interp, 1, objv, "types");
@@ -417,7 +414,6 @@ int ExtraL_DbmObjCmd(
 		}
 	} else if (cmdlen == 6) {
 		if (strcmp(cmd,"create") == 0) {
-			int mode;
 			if (objc < 4) {
 				Tcl_WrongNumArgs(interp, 1, objv, "create type database ?options?");
 				return TCL_ERROR;
@@ -436,7 +432,7 @@ int ExtraL_DbmObjCmd(
 		}
 	}
 	Tcl_ResetResult(interp);
-	Tcl_AppendResult(interp,"bad option \"", cmd, "\": must be one of create, open, types", (char *)NULL);
+	Tcl_AppendResult(interp,"bad option \"", cmd, "\": must be one of create, open or types", (char *)NULL);
 	return TCL_ERROR;
 }
 
@@ -475,7 +471,7 @@ export int ExtraL_DbmCreateType (Tcl_Interp *interp,
 	char *key,
 	DbmType dbmtype)
 {
-	Tcl_HashEntry *entry, *newentry;
+	Tcl_HashEntry *entry;
 	DbmType *type;
 	int new;
 
@@ -513,7 +509,7 @@ int Extral_DbmInit(interp)
 	dbmtype.sync = NULL;
 	dbmtype.reorganize = NULL;
 	ExtraL_DbmCreateType(interp,"fdbm",dbmtype);
-	Tcl_CreateObjCommand(interp,"dbm",(Tcl_ObjCmdProc *)ExtraL_DbmObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"Extral::dbm",(Tcl_ObjCmdProc *)ExtraL_DbmObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	return TCL_OK;
 }
 

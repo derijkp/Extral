@@ -7,6 +7,80 @@
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
 # =============================================================
+#doc struct title {
+#Structures
+#} descr {
+#	This code emulates structures in a way. all data is actually stored in 
+#	one global array extraL__Struct. You cannot use the generic array command 
+#	on structure structure members
+#}
+#doc {struct struct} cmd {
+#struct new
+#} descr {
+#	returns an unused pointer to a structure.
+#} example {
+#	set current [struct new]
+#}
+#doc {struct set} cmd {
+#struct set struct->member value
+#} descr {
+#	sets the value of a member
+#} example {
+#	struct set $current->field Test
+#	struct set $current->data(a) 1
+#}
+#doc {struct value} cmd {
+#struct value struct->member
+#} descr {
+#	returns the value of a member
+#} example {
+#	struct value $current->field
+#	struct value $current->data(a)
+#}
+#doc {struct unset} cmd {
+#struct unset struct?->member?
+#} descr {
+#	unsets a member or the entire struct
+#} example {
+#	struct unset $current->field
+#	struct unset $current
+#}
+#doc {struct var} cmd {
+#struct var struct?->member?
+#} descr {
+#	gives the actual variable name where the member is stored (global): 
+#	This can be used in -textvariable options etc.
+#} example {
+#	entry .try -textvariable [struct var $current->field]
+#	pack .try
+#}
+#doc {struct arrayset} cmd {
+#struct arrayset struct->member items values
+#} descr {
+#	sets values in an array member
+#} example {
+#	% struct arrayset $current->value {a b c} {1 2 3}
+#	% struct value $current->value(b)
+#	2
+#}
+#doc {struct arrayget} cmd {
+#struct arrayget struct->member
+#} descr {
+#	% struct arrayget $current->value
+#	b 2 a 1 c 3
+#}
+#doc {struct arraynames} cmd {
+#struct arraynames struct->member
+#} descr {
+#	% struct arraynames $current->value
+#	b a c
+#}
+#doc {struct arraysize} cmd {
+#struct arraysize struct->member
+#} descr {
+#	% struct arraysize $current->value
+#	3
+#}
 
 Extral::export struct {
 

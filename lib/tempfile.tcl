@@ -8,7 +8,6 @@
 # =============================================================
 
 namespace eval Extral {
-
 	global env
 	# Set variable temp_dir to the temporary directory.
 	# Make one if one doesn't exist.
@@ -53,9 +52,29 @@ namespace eval Extral {
 # Procedures
 # ----------------------------------------------------------------
 
-Extral::export tempfile {
-
-proc tempfile {{action {get}}} {
+#doc tempfile title {
+#tempfile
+#} shortdescr
+# get names for temporary files
+#}
+#doc {tempfile get} cmd {
+#tempfile ?get?
+#} descr {
+#	creates an (empty) temporary file and returns its name. You should remove
+#	the temporary file when not used any longer. However, leftover temporary 
+#	files will be removed by an atexit handler
+#}
+#doc {tempfile clean} cmd {
+#tempfile clean
+#} descr {
+#	remove all temporary files for the running program.
+#}
+#doc {tempfile cleanall} cmd {
+#tempfile cleanall
+#} descr {
+#	remove all temporary files, including those of other Extral programs.
+#}
+proc Extral::tempfile {{action {get}}} {
 	variable temp_dir
 	variable templock
 	switch $action {
@@ -84,4 +103,4 @@ proc tempfile {{action {get}}} {
 	}
 }
 
-}
+Extral::export tempfile {}

@@ -8,9 +8,15 @@
 # =============================================================
 
 Extral::export {
-	lpop lshift lsub lfind lcor lremdup llremove lmerge lunmerge replace
+	lpop lshift lsub lfind lcor lremdup llremove lmerge lunmerge replace leval
 } {
 
+#doc {listcommands lpop} cmd {
+#lpop listName ?pos?
+#} descr {
+#	returns the last element from a list, thereby removing it from the list.
+#	If pos is given it will return the pos element of the list.
+#}
 proc lpop {listname {pos end}} {
 	upvar $listname list
 	if {"$list"==""} {
@@ -21,6 +27,11 @@ proc lpop {listname {pos end}} {
 	return $result
 }
 
+#doc {listcommands lshift} cmd {
+#lshift listName
+#} descr {
+#	returns the first element from a list, thereby removing it from the list.
+#}
 proc lshift {listname} {
 	upvar $listname list
 	set result [lindex $list 0]
@@ -28,8 +39,21 @@ proc lshift {listname} {
 	return $result
 }
 
+#doc {listcommands lsub} cmd {
+#lsub list ?-exclude? [index list]
+#} descr {
+#	create a sublist from a set of indices
+#	When -exclude is specified, the elements of which the indexes are not in the list 
+#	will be given.
+#} example {
+#	% lsub {Ape Ball Field {Antwerp city} Egg} {0 3}
+#	Ape {Antwerp city}
+#	% lsub {Ape Ball Field {Antwerp city} Egg} -exclude {0 3}
+#	Ball Field Egg
+#}
 proc lsub {list args} {
-	if {[llength $args]==1} {
+	set len [llength $args]
+	if {$len==1} {
 		set result ""
 		set len [llength $list]
 		foreach index [lindex $args 0] {
@@ -38,7 +62,7 @@ proc lsub {list args} {
 			}
 		}
 		return $result
-	} elseif {"[lindex $args 0]"=="-exclude"} {
+	} elseif {($len == 2)&&("[lindex $args 0]"=="-exclude")} {
 		set result ""
 		foreach index [lsort -integer -decreasing [lindex $args 1]] {
 			set list [lreplace $list	$index $index]
@@ -49,6 +73,15 @@ proc lsub {list args} {
 	}
 }
 
+#doc {listcommands lfind} cmd {
+#lfind mode list pattern
+#} descr {
+#	returns a list of all indices which match a pattern.
+#	mode can be -exact, -glob, or -regexp
+#} example {
+#	% lfind -regexp {Ape Ball Field {Antwerp city} Egg} {^A}
+#	0 3
+#}
 proc lfind {args} {
 	if {[llength $args]==2} {
 		set list [lindex $args 0]
@@ -89,6 +122,17 @@ proc lfind {args} {
 	return $result
 }
 
+#doc {listcommands lcor} cmd {
+#lcor <referencelist> <list>
+#} descr {
+#	gives the positions of the elements in list in the reference list. If an element is not
+#	found in the reference list, it returns -1. Elements are matched only once.
+#} example {
+#	% lcor {a b c d e f} {d b}
+#	3 1
+#	% lcor {a b c d e f} {b d d}
+#	1 3 -1
+#}
 proc lcor {reflist list} {
 	set pos 0
 	foreach item $reflist {
@@ -106,6 +150,12 @@ proc lcor {reflist list} {
 	return $result
 }
 
+
+#doc {listcommands lremdup} cmd {
+#lremdup list
+#} descr {
+#returns a list in which all duplactes are removed
+#}
 proc lremdup list {
 	set done ""
 	foreach e $list {
@@ -116,6 +166,11 @@ proc lremdup list {
 	return $done
 }
 
+#doc {listcommands lremove} cmd {
+#llremove list1 list2
+#} descr {
+#        returns a list with all items in list1 that are not in list2
+#}
 proc llremove {list removelist} {
 	if {"$removelist"==""} {
 		set removelist {{}}
@@ -130,6 +185,16 @@ proc llremove {list removelist} {
 	return $result
 }
  
+#doc {listcommands lmerge} cmd {
+#lmerge ?list1? ?list2? ??spacing??
+#} descr {
+#	merges two lists into one
+#} example {
+#	% lmerge {a b c} {1 2 3}
+#	a 1 b 2 c 3
+#	% lmerge {a b c d} {1 2} 2
+#	a b 1 c d 2
+#}
 proc lmerge {args} {
 	if {([llength $args]!=2)&&([llength $args]!=3)} {
 		error "wrong # args: should be \"lmerge list1 list2 ?spacing?\""
@@ -162,6 +227,19 @@ proc lmerge {args} {
 	}
 }
 
+#doc {listcommands lunmerge} cmd {
+#lunmerge ?list? ??spacing?? ??var??
+#} descr {
+#	unmerges items from a list to the result; the remaining items are stored
+#	in the given variable ?var?
+#} example {
+#	% lunmerge {a 1 b 2 c 3}
+#	a b c
+#	% lunmerge {a b 1 c d 2} 2 var
+#	a b c d
+#	% set var
+#	1 2
+#}
 proc lunmerge {args} {
 	if {([llength $args]<1)||([llength $args]>3)} {
 		error "wrong # args: should be \"lunmerge list ?spacing? ?var?\""
@@ -198,6 +276,27 @@ proc lunmerge {args} {
 	}
 }
 
+#doc leval title {
+#eval Light
+#} shortdescr {
+#a faster but more limited eval (Viktor Dukhovni)
+#}
+#doc {leval leval} cmd {
+#leval command $args
+#} descr {
+#	converted the leval patch by Viktor Dukhovni <viktor@esm.com> to
+#	a dynamically loadable version:
+#	This command is a fast light "eval" specifically designed to execute
+#	zero or more Tcl lists (concatenated) by invoking the command specified
+#	by the first list element, with the remaining list elements as "literal"
+#	arguments.  No variable or command substitution takes place on the
+#	arguments.
+#}
+
+proc leval {args} {
+	eval [eval concat $args]
+}
+
 #not really the same
 proc replace {string replacelist} {
 	foreach {pattern new} $replacelist {
@@ -207,5 +306,36 @@ proc replace {string replacelist} {
 }
 
 #ffind
+#doc ffind title {
+#ffind
+#} shortdescr {
+#filesearcher (obsolete, only in C)
+#}
+#doc {ffind ffind} cmd {
+#ffind <switches> filelist pattern ?varName? ?pattern? ?varname?
+#} descr {
+#	returns the files in filelist whose content match the given pattern.
+#	if varName is given, the results will be stored in this variable.
+#	several patterns can be searched, the results for each being stored
+#	in the apropriate variable.
+#	<switches> can be -matches, -all -exact, -glob, or -regexp
+#<dl>
+#	<dt>-matches    :<dd>the text matched by the bracketed part of 
+#		              the pattern will be mangled into the result. 
+#	<dt>-allmatches :<dd>all matches in the file will be returned in
+#		              the form of: 
+#		              file1 match1 file1 match2 file2 match2
+#	<dt>-allfiles   :<dd>see next
+#</dl>
+#}
+#doc {ffind ffindall} cmd {
+#ffind -matches -allfiles <switches> filelist pattern nulvalue ?varName? ?pattern? ?nulvalue? ?varname? ..
+#} descr {
+#	ffind with these options will return a list containing one element
+#	for each file in the filelist. if the pattern was found in a file,
+#	the the element contains the match; if it was not found, it will
+#	contain the nulvalue. This is not compatible with the -allmatches
+#	options
+#}
 
 }

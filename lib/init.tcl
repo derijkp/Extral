@@ -12,6 +12,15 @@
 # If not, Tcl code will be loaded when necessary
 #
 
+namespace eval Extral {
+	proc export {items cmds} {
+		eval $cmds
+		eval namespace export $items		
+		namespace eval [namespace parent] \
+			[list foreach item $items {namespace import Extral::$item}]
+	}
+}
+
 if [file exists [file join ${Extral::dir} extral[info sharedlibextension]]] {
 	load [file join ${Extral::dir} extral[info sharedlibextension]]
 	namespace eval Extral {
@@ -29,7 +38,7 @@ if [file exists [file join ${Extral::dir} extral[info sharedlibextension]]] {
 	namespace import Extral::*
 } else {
 	set Extral::noc 1
-#	source [file join ${Extral::dir} lib noc.tcl]
+	source [file join ${Extral::dir} lib noc.tcl]
 }
 
 #
@@ -42,19 +51,12 @@ if [file exists [file join ${Extral::dir} extral[info sharedlibextension]]] {
 #
 
 lappend auto_path [file join ${Extral::dir} lib]
-namespace eval Extral {
-	proc export {items cmds} {
-		eval $cmds
-		eval namespace export $items		
-		namespace eval [namespace parent] \
-			[list foreach item $items {namespace import Extral::$item}]
-	}
-}
-
 Extral::export loaddbm {
 	proc loaddbm {name} {
 		variable dir
-		load [file join $dir $name[info sharedlibextension]]
+		if [catch {load [file join $dir dbm $name[info sharedlibextension]]}] {
+			return -code error "could not load dbm type \"$name\""
+		}
 	}
 }
 
