@@ -309,13 +309,14 @@ proc true {expr} {
 
 proc setglobal {globalvar args} {
     upvar #0 $globalvar var
-    if [string match $args ""] {
+    if {"$args" == ""} {
         if ![info exists var] {
             error "can't read \"$globalvar\": no such global variable"
         } else {         
-            puts $var    
+            return $var    
         }                
     } else {             
-        set var $args    
-    }                    
-}                        
+        set var [lindex $args 0]
+    }
+}
+
