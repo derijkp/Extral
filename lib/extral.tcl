@@ -31,14 +31,17 @@ Extral::export {
 #removes the items from the list
 #}
 if ![info exists noc] {
+
 proc lremove {list args} {
 	if {"$args"==""} {
 		return $list
 	}
 	set result ""
+	foreach item $args {
+		set a($item) {}
+	}
 	foreach item $list {
-		set pos [lsearch $args $item]
-		if {$pos==-1} {
+		if {![info exists a($item)]} {
 			lappend result $item
 		}
 	}

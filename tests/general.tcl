@@ -337,6 +337,15 @@ test llremove {large} {
 	for {set i 0} {$i < 10000} {incr i} {lappend try "try $i"}
 	for {set i 1} {$i < 10000} {incr i} {lappend try2 "try $i"}
 	set list [lsort $try]
+	llremove $list $try2
+} {{try 0}}
+
+test llremove {large sorted} {
+	set try {}
+	set try2 {}
+	for {set i 0} {$i < 10000} {incr i} {lappend try "try $i"}
+	for {set i 1} {$i < 10000} {incr i} {lappend try2 "try $i"}
+	set list [lsort $try]
 	set removelist [lsort $try2]
 	llremove -sorted $list $removelist
 } {{try 0}}
@@ -366,6 +375,10 @@ test llremove {difficult cases, sorted, check removed} {
 	llremove -sorted $list $removelist temp
 	set temp
 } {ab ab b}
+
+test llremove {empty} {
+	llremove 1 {}
+} {1}
 
 test laddnew {exists} {
 	set try {a b}

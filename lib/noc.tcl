@@ -260,9 +260,11 @@ proc llremove {args} {
 	}
 	if !$sorted {
 		set result ""
+		foreach item $removelist {
+			set a($item) {}
+		}
 		foreach item $list {
-			set pos [lsearch $removelist $item]
-			if {$pos==-1} {
+			if {![info exists a($item)]} {
 				lappend result $item
 			} elseif $usevar {
 				lappend v $item

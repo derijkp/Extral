@@ -29,17 +29,6 @@ You can find a short description of the commands in the files in the
 docs subdirectory. For some of the commands, you can find out a lot 
 by checking the testing suite in the directory tests.
 
-INCOMPATIBLE CHANGES
---------------------
-There were some incompatible changes with previous releases:
-lremove syntax is now: lremove list indices
-
-I feel like I misnamed some commands in the previous releases. This 
-has been changed now:
-lmerge acts like the former "lmanip mangle"
-lunmerge acts like the reverse of lmerge
-lmanip mangle does the previous "lmanip merge"
-
 Installation
 ------------
 You should be able to obtain the latest version of ExtraL via anonymous ftp

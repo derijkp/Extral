@@ -18,6 +18,7 @@ proc Extral::readfile {} {}
 proc Extral::writefile {} {}
 proc Extral::getcomplete {} {}
 proc Extral::splitcomple {} {}
+proc Extral::splitesccomple {} {}
 proc Extral::cload {} {}
 }
 Extral::export {dirglob lload lwrite readfile writefile getcomplete splitcomplete cload} {
@@ -112,14 +113,32 @@ proc splitcomplete {data} {
         set result ""
         set current ""
         foreach line [split $data "\n"] {
-                if {"$current" != ""} {
-			append current "\n"
-		}
-		append current $line
-                if [info complete $current] {
-                        lappend result $current
-                        set current ""
-                }
+			if {"$current" != ""} {
+				append current "\n"
+			}
+			append current $line
+			if [info complete $current] {
+				lappend result $current
+				set current ""
+			}
+        }
+        return $result
+}
+
+proc splitesccomplete {data} {
+        set result ""
+        set current ""
+        foreach line [split $data "\n"] {
+			if {"$current" != ""} {
+				append current "\n"
+			}
+			append current $line
+			if ![regexp {\\$} $current] {
+				if [info complete $current] {
+					lappend result $current
+					set current ""
+				}
+			}
         }
         return $result
 }

@@ -324,7 +324,7 @@ ExtraL_LremdupObjCmd(dummy, interp, objc, objv)
 	Tcl_Obj *resultObj;
 	int listLen, result;
 	char *string,*checkstring;
-	int i,j,len,checklen,sort,var;
+	int i,len,checklen,sort,var;
 
 	sort = 0;
 	if (objc>2) {
@@ -462,31 +462,41 @@ ExtraL_LlremoveObjCmd(notUsed, interp, objc, objv)
 		if (Tcl_ObjSetVar2(interp,objv[sort+3],NULL,Tcl_NewObj(),
 			TCL_LEAVE_ERR_MSG|TCL_PARSE_PART1) == NULL) {return TCL_ERROR;}
 	}
+	if (refArgc == 0) {
+		Tcl_SetObjResult(interp,objv[sort+1]);
+		return TCL_OK;
+	}
 	if (sort == 0) {
+		Tcl_HashTable table;
+		Tcl_HashEntry *entry;
+		int new;
+		if (refArgc!=0) {
+			Tcl_InitHashTable(&table,TCL_STRING_KEYS);
+			for(i=0;i<refArgc;i++) {
+				refstring = Tcl_GetStringFromObj(refArgv[i],&reflen);
+				Tcl_CreateHashEntry(&table,refstring,&new);
+			}
+		}
 		for(pos=0;pos<listArgc;pos++) {
-			string=Tcl_GetStringFromObj(listArgv[pos],&len);
 			if (refArgc==0) {
 				if (len!=0) {
 					result=Tcl_ListObjAppendElement(interp,resultObj,listArgv[pos]);
 					if (result!=TCL_OK) {return result;}
 				}
 			} else {
-				for(i=0;i<refArgc;i++) {
-					refstring=Tcl_GetStringFromObj(refArgv[i],&reflen);
-					if ((len==reflen)&&(strcmp(refstring,string)==0)) {
-						break;
-					}
-				}
-				if (i==refArgc) {
-					result=Tcl_ListObjAppendElement(interp,resultObj,listArgv[pos]);
-					if (result!=TCL_OK) {return result;}
+				string = Tcl_GetStringFromObj(listArgv[pos],&len);
+				entry = Tcl_FindHashEntry(&table,string);
+				if (entry == NULL) {
+					result = Tcl_ListObjAppendElement(interp,resultObj,listArgv[pos]);
+					if (result!=TCL_OK) {Tcl_DeleteHashTable(&table);return result;}
 				} else if (var == 1) {
 					if (Tcl_ObjSetVar2(interp,objv[sort+3],NULL,listArgv[pos],
 						TCL_LEAVE_ERR_MSG|TCL_APPEND_VALUE|
-						TCL_LIST_ELEMENT|TCL_PARSE_PART1) == NULL) {return TCL_ERROR;}
+						TCL_LIST_ELEMENT|TCL_PARSE_PART1) == NULL) {Tcl_DeleteHashTable(&table);return TCL_ERROR;}
 				}
 			}
 		}
+		Tcl_DeleteHashTable(&table);
 	} else {
 		pos = 0;
 		refstring = Tcl_GetStringFromObj(refArgv[pos],&reflen);

@@ -262,7 +262,7 @@ proc Extral::makedoc {files dstdir {indextitle ""}} {
 		close $f
 	}
 
-	set index ""
+	set index() ""
 	foreach section $::Extral::sections() {
 		if ![info exists ::Extral::doc($section)] {
 			set ::Extral::doc($section) {}
@@ -274,9 +274,14 @@ proc Extral::makedoc {files dstdir {indextitle ""}} {
 		if [catch {set descr [structlget $list descr]}] {
 			set descr ""
 		}
-		append index "<dt><a href=\"$section.html\">$title</a>"
-		if ![catch {set shortdescr [structlget $list shortdescr]}] {
-			append index "<dd>$shortdescr"
+		if [catch {set ind [structlget $list index]}] {
+			set ind ""
+		}
+		if {"$ind" != "none"} {
+			append index($ind) "<li><a href=\"$section.html\">$title</a>"
+			if ![catch {set shortdescr [structlget $list shortdescr]}] {
+				append index($ind) ": $shortdescr"
+			}
 		}
 		set f [open [file join $dstdir $section.html] w]
 		puts $f "<HEAD>"
@@ -303,7 +308,12 @@ proc Extral::makedoc {files dstdir {indextitle ""}} {
 	puts $f "</HEAD>"
 	puts $f "<BODY>"
 	puts $f "<h1>$indextitle</h1>"
-	puts $f $index
+	puts $f <ul>$index()</ul>
+	unset index()
+	foreach subtitle [lsort [array names index]] {
+		puts $f "<h2>$subtitle</h2>"
+		puts $f <ul>$index($subtitle)</ul>
+	}
 	puts $f "</body>"
 	close $f
 }

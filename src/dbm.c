@@ -11,9 +11,9 @@
 #include "tcl.h"
 #include "extral.h"
 
-#ifdef unix
+/* #ifdef unix*/
 #define export
-#endif
+/* #endif */
 
 Tcl_HashTable dbmtypesTable;
 
@@ -97,7 +97,7 @@ int ExtraL_FdbmOpen(
 
 int ExtraL_FdbmClose(ClientData token)
 {
-	Fdbm_Info *fdbm = token;
+	Fdbm_Info *fdbm = (Fdbm_Info *)token;
 	Tcl_Free(fdbm->dir);
 	Tcl_Free(fdbm->buffer);
 	Tcl_Free((char *)fdbm);
@@ -110,7 +110,7 @@ int ExtraL_FdbmSet(
 	Tcl_Obj *keyObj,
 	Tcl_Obj *valueObj)
 {
-	Fdbm_Info *fdbm = token;
+	Fdbm_Info *fdbm = (Fdbm_Info *)token;
 	Tcl_Channel file;
 	datum key, value;
 
@@ -140,7 +140,7 @@ int ExtraL_FdbmGet(
 	Tcl_Obj *keyObj,
 	Tcl_Obj *valueObj)
 {
-	Fdbm_Info *fdbm = token;
+	Fdbm_Info *fdbm = (Fdbm_Info *)token;
 	Tcl_Channel file;
 	datum key;
 	int i;
@@ -176,7 +176,7 @@ int ExtraL_FdbmKeys(
 	ClientData token,
 	char *pattern)
 {
-	Fdbm_Info *fdbm = token;
+	Fdbm_Info *fdbm = (Fdbm_Info *)token;
 	int error;
 
 	if (pattern == NULL) {
@@ -193,7 +193,7 @@ int ExtraL_FdbmUnset(
 	ClientData token,
 	Tcl_Obj *keyObj)
 {
-	Fdbm_Info *fdbm = token;
+	Fdbm_Info *fdbm = (Fdbm_Info *)token;
 	datum key;
 	int error;
 
@@ -339,14 +339,14 @@ void ExtraL_DbmClose(ClientData dbminfo)
 	DbmType *type = ((DbmInfo *)dbminfo)->type;
 	ClientData token = ((DbmInfo *)dbminfo)->token;
 	type->close(token);
-	Tcl_Free(dbminfo);
+	Tcl_Free((char *)dbminfo);
 }
 
 int ExtraL_DbmObjCmd(
 	ClientData notUsed,
 	Tcl_Interp *interp,
 	int objc,
-	Tcl_Obj *CONST objv[])
+	Tcl_Obj *objv[])
 {
 	Tcl_HashEntry *entry;
 	DbmType *type;
