@@ -10,7 +10,11 @@
 #include "tcl.h"
 #include "extral.h"
 
-static Tcl_HashTable dbmtypesTable;
+#ifdef unix
+#define export
+#endif
+
+Tcl_HashTable dbmtypesTable;
 
 /*
  * fdbm implementation
@@ -385,7 +389,7 @@ int ExtraL_DbmObjCmd(
 		}
 	} else if (cmdlen == 5) {
 		if (strcmp(cmd,"types") == 0) {
-			Tcl_HashSearch *searchPtr;
+			Tcl_HashSearch search;
 			char *key;
 			int mode;
 
@@ -394,12 +398,12 @@ int ExtraL_DbmObjCmd(
 				return TCL_ERROR;
 			}
 			Tcl_ResetResult(interp);
-			entry = Tcl_FirstHashEntry(&dbmtypesTable, searchPtr);
+			entry = Tcl_FirstHashEntry(&dbmtypesTable, &search);
 			while(1) {
 				if (entry == NULL) break;
 				key = Tcl_GetHashKey(&dbmtypesTable, entry);
 				Tcl_AppendElement(interp,key);
-				entry = Tcl_NextHashEntry(searchPtr);
+				entry = Tcl_NextHashEntry(&search);
 			}
 			return TCL_OK;
 		}
@@ -428,7 +432,7 @@ int ExtraL_DbmObjCmd(
 	return TCL_ERROR;
 }
 
-EXTERN DbmInfo *ExtraL_DbmOpen(
+export DbmInfo *ExtraL_DbmOpen(
 	Tcl_Interp *interp,
 	char *typestring,
 	Tcl_Obj *database,
@@ -459,7 +463,7 @@ EXTERN DbmInfo *ExtraL_DbmOpen(
 	return dbminfo;
 }
 
-EXTERN int ExtraL_DbmCreateType (Tcl_Interp *interp,
+export int ExtraL_DbmCreateType (Tcl_Interp *interp,
 	char *key,
 	DbmType dbmtype)
 {
@@ -486,7 +490,7 @@ EXTERN int ExtraL_DbmCreateType (Tcl_Interp *interp,
 	return TCL_OK;
 }
 
-EXTERN int Extral_DbmInit(interp)
+int Extral_DbmInit(interp)
 	Tcl_Interp *interp;
 {
 	DbmType dbmtype;

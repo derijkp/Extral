@@ -39,11 +39,11 @@ extral$(SHLIB_SUFFIX): $(OBJECTS)
 	$(SHLIB_LD) $(SHLIB_CFLAGS) -o ./extral$(SHLIB_SUFFIX) $(OBJECTS)  ${LIBS}
 	cp ./extral$(SHLIB_SUFFIX) ../extral$(SHLIB_SUFFIX)
 
-bsddbm$(SHLIB_SUFFIX): bsddbm.o ../extern/libdb.a  ../extral$(SHLIB_SUFFIX)
+bsddbm$(SHLIB_SUFFIX): bsddbm.o ../extern/libdb.a
 	$(SHLIB_LD) $(SHLIB_CFLAGS) -o ../bsddbm$(SHLIB_SUFFIX) bsddbm.o ../extern/libdb.a  ${LIBS}
 
-gdbm$(SHLIB_SUFFIX): gdbm.o ./extral$(SHLIB_SUFFIX) ../extern/libgdbm.a
-	$(SHLIB_LD) $(SHLIB_CFLAGS) -o ./gdbm$(SHLIB_SUFFIX) gdbm.o ../extern/libgdbm.a ./extral$(SHLIB_SUFFIX)  ${LIBS}
+gdbm$(SHLIB_SUFFIX): gdbm.o ../extern/libgdbm.a
+	$(SHLIB_LD) $(SHLIB_CFLAGS) -o ./gdbm$(SHLIB_SUFFIX) gdbm.o ../extern/libgdbm.a  ${LIBS}
 	cp ./gdbm$(SHLIB_SUFFIX) ../gdbm$(SHLIB_SUFFIX)
 
 extratcl: tclAppInit.o $(OBJECTS)

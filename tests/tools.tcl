@@ -4,8 +4,8 @@ proc test {name description script expected {causeerror 0}} {
 	global errors
 	
 	puts "testing $name: $description"
-	proc try {} $script
-	set error [catch try result]
+	proc tools__try {} $script
+	set error [catch tools__try result]
 	if $causeerror {
 		if !$error {
 			puts "test should cause an error\nresult is \n$result"

@@ -10,6 +10,10 @@
 #include "tcl.h"
 #include "extral.h"
 
+#ifdef unix
+#define extern
+#endif
+
 struct Type {
 	ExtraL_StructlTypeProc *setproc;
 	ExtraL_StructlTypeProc *getproc;
@@ -436,7 +440,7 @@ int ExtraL_StructlFindTag(interp, list, tag, structlen, resultPtr, posPtr)
  *----------------------------------------------------------------------
  */
 
-int ExtraL_Structlset(interp, structure, list, tagsc, tagsv, value, resultPtr)
+extern int ExtraL_Structlset(interp, structure, list, tagsc, tagsv, value, resultPtr)
 	Tcl_Interp *interp;
 	Tcl_Obj *structure;
 	Tcl_Obj *list;
@@ -589,7 +593,7 @@ int ExtraL_Structlset(interp, structure, list, tagsc, tagsv, value, resultPtr)
  *----------------------------------------------------------------------
  */
 
-int ExtraL_Structlunset(interp, list, tagsc, tagsv, resultPtr)
+extern int ExtraL_Structlunset(interp, list, tagsc, tagsv, resultPtr)
 	Tcl_Interp *interp;
 	Tcl_Obj *list;
 	int tagsc;
@@ -654,7 +658,7 @@ int ExtraL_Structlunset(interp, list, tagsc, tagsv, resultPtr)
  *----------------------------------------------------------------------
  */
 
-int ExtraL_StructlgetStruct(interp, structure, list, tagsc, tagsv, resultPtr)
+extern int ExtraL_StructlgetStruct(interp, structure, list, tagsc, tagsv, resultPtr)
 	Tcl_Interp *interp;
 	Tcl_Obj *structure;
 	Tcl_Obj *list;
@@ -781,7 +785,7 @@ int ExtraL_StructlgetStruct(interp, structure, list, tagsc, tagsv, resultPtr)
  *----------------------------------------------------------------------
  */
 
-int ExtraL_Structlget(interp, list, tags, result)
+extern int ExtraL_Structlget(interp, list, tags, result)
 	Tcl_Interp *interp;
 	Tcl_Obj *list;
 	Tcl_Obj *tags;

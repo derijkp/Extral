@@ -6,6 +6,10 @@ source tools.tcl
 load ../extral.so
 proc type {} {return fdbm}
 
+test [type] {types} {
+	dbm types
+} {fdbm}
+
 source dbm.tcl
 
 test fdbm {create error: no options} {

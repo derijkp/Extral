@@ -1,4 +1,5 @@
 package require Extral 1
+
 set try {a 1 b 2 c {a 1 b 2 c {a 1 b 2}}}
 structlunset $try {c c a}
 structlunset $try {c a}
