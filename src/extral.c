@@ -269,24 +269,29 @@ ExtraL_LcorObjCmd(notUsed, interp, objc, objv)
 
 	/* Initialise result */
 	Tcl_ResetResult(interp);
-	resultObj = Tcl_GetObjResult(interp);
+	resultObj = Tcl_NewObj();
 
 	done=(int *)Tcl_Alloc(refArgc*sizeof(int));
 	for(i=0;i<refArgc;i++) {done[i]=0;}
 	for(pos=0;pos<listArgc;pos++) {
 		string=Tcl_GetStringFromObj(listArgv[pos],&len);
 		for(i=0;i<refArgc;i++) {
-			refstring=Tcl_GetStringFromObj(refArgv[i],&reflen);
-			if ((done[i]==0)&&(len==reflen)&&(strcmp(refstring,string)==0)) {
-				indexObj=Tcl_NewIntObj(i);
-				result=Tcl_ListObjAppendElement(interp,resultObj,indexObj);
-				if (result!=TCL_OK) {return result;}
-				done[i]=1;
+			if (done[i] == 1) continue;
+			refstring = Tcl_GetStringFromObj(refArgv[i],&reflen);
+			if ((len == reflen)&&(strcmp(refstring,string) == 0)) {
+				indexObj = Tcl_NewIntObj(i);
+				result = Tcl_ListObjAppendElement(interp,resultObj,indexObj);
+				if (result != TCL_OK) {Tcl_DecrRefCount(resultObj);return result;}
+				done[i] = 1;
 				break;
 			}
 		}
-		if (i==refArgc) Tcl_AppendElement(interp,"-1");
+		if (i == refArgc) {
+			result = Tcl_ListObjAppendElement(interp,resultObj,Tcl_NewIntObj(-1));
+			if (result != TCL_OK) {Tcl_DecrRefCount(resultObj);return result;}
+		}
 	}
+	Tcl_SetObjResult(interp,resultObj);
 
 	Tcl_Free((char *)done);
 	return TCL_OK;
@@ -317,20 +322,28 @@ ExtraL_LremdupObjCmd(dummy, interp, objc, objv)
 	Tcl_Obj *listPtr;
 	Tcl_Obj **elemPtrs;
 	Tcl_Obj *resultObj;
-	int listLen, indexlistLen, result;
+	int listLen, result;
 	char *string,*checkstring;
-	int i,j,len,checklen;
+	int i,j,len,checklen,sort,var;
 
-	if (objc != 2) {
-		Tcl_WrongNumArgs(interp, 1, objv, "list");
+	sort = 0;
+	if (objc>2) {
+		string = Tcl_GetStringFromObj(objv[1],NULL);
+		if (strcmp(string,"-sorted") == 0) {
+			sort = 1;
+		}
+	}
+	if ((objc != (sort+2))&&(objc != (sort+3))) {
+		Tcl_WrongNumArgs(interp, 1, objv, "?-sorted? list ?var?");
 		return TCL_ERROR;
 	}
+	if (objc==(sort+3)) {var = 1;}
 
 	/*
 	 * Convert the first argument to a list if necessary.
 	 */
 
-	listPtr = objv[1];
+	listPtr = objv[sort+1];
 	result = Tcl_ListObjGetElements(interp, listPtr, &listLen, &elemPtrs);
 	if (result != TCL_OK) {
 		return result;
@@ -340,21 +353,50 @@ ExtraL_LremdupObjCmd(dummy, interp, objc, objv)
 	Tcl_ResetResult(interp);
 	resultObj = Tcl_GetObjResult(interp);
 
-	if (indexlistLen==0) {
+	if ((listLen==0)||(listLen==1)) {
 		Tcl_SetObjResult(interp, listPtr);
 		return TCL_OK;
 	}
-	for(i=0;i<listLen;i++) {
-		string = Tcl_GetStringFromObj(elemPtrs[i], &len);
-		for(j=0;j<i;j++) {
-			checkstring = Tcl_GetStringFromObj(elemPtrs[j], &checklen);
-			if ((len==checklen)&&(strcmp(string,checkstring)==0))	{
-				break;
+	if (var == 1) {
+		if (Tcl_ObjSetVar2(interp,objv[sort+2],NULL,Tcl_NewObj(),
+			TCL_LEAVE_ERR_MSG|TCL_PARSE_PART1) == NULL) {return TCL_ERROR;}
+	}
+	if (sort == 0) {
+		for(i=0;i<listLen;i++) {
+			string = Tcl_GetStringFromObj(elemPtrs[i], &len);
+			for(j=0;j<i;j++) {
+				checkstring = Tcl_GetStringFromObj(elemPtrs[j], &checklen);
+				if ((len==checklen)&&(memcmp(string,checkstring,len)==0))	{
+					break;
+				}
+			}
+			if (i==j)	{
+				result=Tcl_ListObjAppendElement(interp,resultObj,elemPtrs[i]);
+				if (result!=TCL_OK) {return result;}
+			} else if (var == 1) {
+				if (Tcl_ObjSetVar2(interp,objv[sort+2],NULL,elemPtrs[i],
+					TCL_LEAVE_ERR_MSG|TCL_APPEND_VALUE|
+					TCL_LIST_ELEMENT|TCL_PARSE_PART1) == NULL) {return TCL_ERROR;}
 			}
 		}
-		if (i==j)	{
-			result=Tcl_ListObjAppendElement(interp,resultObj,elemPtrs[i]);
-			if (result!=TCL_OK) {return result;}
+	} else {
+		checkstring = Tcl_GetStringFromObj(elemPtrs[0], &checklen);
+		result = Tcl_ListObjAppendElement(interp,resultObj,elemPtrs[0]);
+		if (result != TCL_OK) {return result;}
+		for(i=1;i<listLen;i++) {
+			string = Tcl_GetStringFromObj(elemPtrs[i], &len);
+			if ((len==checklen)&&(memcmp(string,checkstring,len)==0))	{
+				if (var == 1) {
+					if (Tcl_ObjSetVar2(interp,objv[sort+2],NULL,elemPtrs[i],
+						TCL_LEAVE_ERR_MSG|TCL_APPEND_VALUE|
+						TCL_LIST_ELEMENT|TCL_PARSE_PART1) == NULL) {return TCL_ERROR;}
+				}
+			} else {
+				result = Tcl_ListObjAppendElement(interp,resultObj,elemPtrs[i]);
+				if (result != TCL_OK) {return result;}
+				checkstring = string;
+				checklen = len;
+			}
 		}
 	}
 
@@ -382,28 +424,34 @@ ExtraL_LlremoveObjCmd(notUsed, interp, objc, objv)
 	int objc;						/* Number of arguments. */
 	Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
-#define INCLUDE		0
-#define EXCLUDE		1
 	int refArgc;
 	Tcl_Obj **refArgv;
 	int listArgc;
 	Tcl_Obj **listArgv;
 	Tcl_Obj *resultObj;
 	char *refstring,*string;
-	int reflen,len;
+	int reflen,len,sort,var=0,add;
 	int pos,result;
 	int i;
 
-	if (objc != 3) {
-		Tcl_WrongNumArgs(interp, 1, objv, "list removelist");
+	sort = 0;
+	if (objc>3) {
+		string = Tcl_GetStringFromObj(objv[1],NULL);
+		if (strcmp(string,"-sorted") == 0) {
+			sort = 1;
+		}
+	}
+	if ((objc != (sort+3))&&(objc != (sort+4))) {
+		Tcl_WrongNumArgs(interp, 1, objv, "?-sorted? list removelist ?var?");
+		return TCL_ERROR;
+	}
+	if (objc==(sort+4)) {var = 1;}
+
+	if (Tcl_ListObjGetElements(interp, objv[sort+1], &listArgc, &listArgv) != TCL_OK) {
 		return TCL_ERROR;
 	}
 
-	if (Tcl_ListObjGetElements(interp, objv[1], &listArgc, &listArgv) != TCL_OK) {
-		return TCL_ERROR;
-	}
-
-	if (Tcl_ListObjGetElements(interp, objv[2], &refArgc, &refArgv) != TCL_OK) {
+	if (Tcl_ListObjGetElements(interp, objv[sort+2], &refArgc, &refArgv) != TCL_OK) {
 		return TCL_ERROR;
 	}
 
@@ -411,23 +459,71 @@ ExtraL_LlremoveObjCmd(notUsed, interp, objc, objv)
 	Tcl_ResetResult(interp);
 	resultObj = Tcl_GetObjResult(interp);
 
-	for(pos=0;pos<listArgc;pos++) {
-		string=Tcl_GetStringFromObj(listArgv[pos],&len);
-		if (refArgc==0) {
-			if (len!=0) {
-				result=Tcl_ListObjAppendElement(interp,resultObj,listArgv[pos]);
-				if (result!=TCL_OK) {return result;}
-			}
-		} else {
-			for(i=0;i<refArgc;i++) {
-				refstring=Tcl_GetStringFromObj(refArgv[i],&reflen);
-				if ((len==reflen)&&(strcmp(refstring,string)==0)) {
-					break;
+	if (var == 1) {
+		if (Tcl_ObjSetVar2(interp,objv[sort+3],NULL,Tcl_NewObj(),
+			TCL_LEAVE_ERR_MSG|TCL_PARSE_PART1) == NULL) {return TCL_ERROR;}
+	}
+	if (sort == 0) {
+		for(pos=0;pos<listArgc;pos++) {
+			string=Tcl_GetStringFromObj(listArgv[pos],&len);
+			if (refArgc==0) {
+				if (len!=0) {
+					result=Tcl_ListObjAppendElement(interp,resultObj,listArgv[pos]);
+					if (result!=TCL_OK) {return result;}
+				}
+			} else {
+				for(i=0;i<refArgc;i++) {
+					refstring=Tcl_GetStringFromObj(refArgv[i],&reflen);
+					if ((len==reflen)&&(strcmp(refstring,string)==0)) {
+						break;
+					}
+				}
+				if (i==refArgc) {
+					result=Tcl_ListObjAppendElement(interp,resultObj,listArgv[pos]);
+					if (result!=TCL_OK) {return result;}
+				} else if (var == 1) {
+					if (Tcl_ObjSetVar2(interp,objv[sort+3],NULL,listArgv[pos],
+						TCL_LEAVE_ERR_MSG|TCL_APPEND_VALUE|
+						TCL_LIST_ELEMENT|TCL_PARSE_PART1) == NULL) {return TCL_ERROR;}
 				}
 			}
-			if (i==refArgc) {
-				result=Tcl_ListObjAppendElement(interp,resultObj,listArgv[pos]);
+		}
+	} else {
+		pos = 0;
+		refstring = Tcl_GetStringFromObj(refArgv[pos],&reflen);
+		for(i=0;i<listArgc;i++) {
+			if (pos>= refArgc) {
+				add = 1;
+			} else {
+				string = Tcl_GetStringFromObj(listArgv[i],&len);
+				while(1) {
+					result = memcmp(string,refstring,(reflen<len)?reflen:len);
+					if (result == 0) {result = len - reflen;}
+					if (result < 0) {
+						add = 1;
+						break;
+					} else if (result > 0) {
+						pos++;
+						if (pos>= refArgc) {
+							add = 1;
+							break;
+						} else {
+							add = 0;
+						}
+						refstring = Tcl_GetStringFromObj(refArgv[pos],&reflen);
+					} else {
+						add = 0;
+						break;
+					}
+				}
+			}
+			if (add == 1) {
+				result=Tcl_ListObjAppendElement(interp,resultObj,listArgv[i]);
 				if (result!=TCL_OK) {return result;}
+			} else if (var == 1) {
+				if (Tcl_ObjSetVar2(interp,objv[sort+3],NULL,listArgv[i],
+					TCL_LEAVE_ERR_MSG|TCL_APPEND_VALUE|
+					TCL_LIST_ELEMENT|TCL_PARSE_PART1) == NULL) {return TCL_ERROR;}
 			}
 		}
 	}
@@ -494,8 +590,8 @@ ExtraL_LunmergeObjCmd(notUsed, interp, objc, objv)
 		Tcl_Obj *valueObj;
 		valueObj = Tcl_NewObj();
 		for(pos=spacing-1;pos<listArgc;pos+=spacing) {
-			result=Tcl_ListObjAppendElement(interp,valueObj,listArgv[pos]);
-			if (result!=TCL_OK) {return result;}
+			result = Tcl_ListObjAppendElement(interp,valueObj,listArgv[pos]);
+			if (result!=TCL_OK) {Tcl_DecrRefCount(valueObj);return result;}
 		}
 		if (Tcl_ObjSetVar2(interp, objv[3], (Tcl_Obj *) NULL,
 			valueObj, (TCL_LEAVE_ERR_MSG | TCL_PARSE_PART1)) == NULL) {
@@ -536,7 +632,6 @@ ExtraL_LmergeObjCmd(notUsed, interp, objc, objv)
 	int pos,pos2,result;
 	int i;
 
-	emptyObj=Tcl_NewStringObj("",0);
 	if ((objc != 3)&&(objc != 4)) {
 		Tcl_WrongNumArgs(interp, 1, objv, "list1 list2 ?spacing?");
 		return TCL_ERROR;
@@ -562,6 +657,8 @@ ExtraL_LmergeObjCmd(notUsed, interp, objc, objv)
 	pos=0;
 	pos2=0;
 	i=spacing;
+	emptyObj = Tcl_NewStringObj("",0);
+	Tcl_IncrRefCount(emptyObj);
 	while(pos<list1Argc) {
 		if (i!=0) {
 			result=Tcl_ListObjAppendElement(interp,resultObj,list1Argv[pos]);
@@ -581,12 +678,13 @@ ExtraL_LmergeObjCmd(notUsed, interp, objc, objv)
 		}
 	}
 	if (pos2<list2Argc) {
-		result=Tcl_ListObjAppendElement(interp,resultObj,list2Argv[pos2]);
+		result = Tcl_ListObjAppendElement(interp,resultObj,list2Argv[pos2]);
 		if (result!=TCL_OK) {return result;}
 		pos2++;
 	} else {
 		result=Tcl_ListObjAppendElement(interp,resultObj,emptyObj);
 		if (result!=TCL_OK) {return result;}
 	}
+	Tcl_DecrRefCount(emptyObj);
 	return TCL_OK;
 }

@@ -71,7 +71,7 @@ int ExtraL_GdbmOpen(
 {
 	GDBM_FILE dbf;
 	char *name;
-	int namelen, mode, error, i;
+	int namelen, error, i;
 	int fast,blocksize;
 
 	fast = 0;
@@ -144,7 +144,7 @@ int ExtraL_GdbmUnset(
 	Tcl_Obj *keyObj)
 {
 	GDBM_FILE dbf = token;
-	datum key, value;
+	datum key;
 	int error;
 
 	key.dptr = Tcl_GetStringFromObj(keyObj,&(key.dsize));
@@ -161,7 +161,6 @@ int ExtraL_GdbmGet(
 {
 	GDBM_FILE dbf = token;
 	datum key, value;
-	int error;
 
 	key.dptr = Tcl_GetStringFromObj(keyObj,&(key.dsize));
 
@@ -172,7 +171,7 @@ int ExtraL_GdbmGet(
 		return TCL_ERROR;
 	}
 	Tcl_SetStringObj(valueObj,value.dptr,value.dsize);
-	free(value.dptr);
+	Tcl_Free(value.dptr);
 	return TCL_OK;
 }
 

@@ -22,20 +22,22 @@ namespace eval Extral {
 }
 
 if [file exists [file join ${Extral::dir} extral[info sharedlibextension]]] {
-	load [file join ${Extral::dir} extral[info sharedlibextension]]
-	namespace eval Extral {
-		foreach command {
-			lpop lshift lfind lsub lcor
-			lremdup llremove lunmerge lmerge
-			scantime formattime 
-			leval amanip replace ssort ffind
-			structlset structlunset structlget structlfields structlfind
-			dbm
-		} {
-			namespace export $command
+	if {"[info commands Extral::lpop]" == ""} {
+		load [file join ${Extral::dir} extral[info sharedlibextension]]
+		namespace eval Extral {
+			foreach command {
+				lpop lshift lfind lsub lcor
+				lremdup llremove lunmerge lmerge
+				scantime formattime 
+				leval amanip replace ssort ffind
+				structlset structlunset structlget structlfields structlfind
+				dbm
+			} {
+				namespace export $command
+			}
 		}
+		namespace import Extral::*
 	}
-	namespace import Extral::*
 } else {
 	set Extral::noc 1
 	source [file join ${Extral::dir} lib noc.tcl]

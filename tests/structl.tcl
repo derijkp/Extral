@@ -5,11 +5,11 @@ exec tclsh8.0 "$0" "$@"
 source tools.tcl
 
 test structlset {set} {
-	structlset {a 1 bb 2 ccc 3} bb try
+	Extral::structlset {a 1 bb 2 ccc 3} bb try
 } {a 1 bb try ccc 3}
 
 test structlset {set, list check} {
-	structlset {a 1 bb 2 ccc 3} bb {try it}
+	Extral::structlset {a 1 bb 2 ccc 3} bb {try it}
 } {a 1 bb {try it} ccc 3}
 
 test structlset {set, 2 tags} {
@@ -33,7 +33,7 @@ test structlset {set new, 2 tags} {
 } {a 1 b 2 c {a 1 b 2 c {a 1 b 2} d try}}
 
 test structlset {set, 3 tags} {
-	structlset {a 1 b 2 c {a 1 b 2 c {a 1 b 2}}} {c c a} try
+	Extral::structlset {a 1 b 2 c {a 1 b 2 c {a 1 b 2}}} {c c a} try
 } {a 1 b 2 c {a 1 b 2 c {a try b 2}}}
 
 test structlset {set multi} {
@@ -57,7 +57,7 @@ test structlset {empty list} {
 } {a 1}
 
 test structlset {empty field} {
-	structlset {} {} {a 1}
+	Extral::structlset {} {} {a 1}
 } {a 1}
 
 test structlset {empty sublist} {
@@ -151,7 +151,7 @@ test structlfields {see values} {
 	structlfields {a {a 1 b 2 c 3}} a
 } {a b c}
 
-test structlunset {check uneven} {
+test structlfields {check uneven} {
 	structlfields {a 1 bb 2 ccc}
 } {error: list "a 1 bb 2 ccc" does not have an even number of elements} 1
 

@@ -168,34 +168,137 @@ proc lcor {reflist list} {
 #lremdup list
 #} descr {
 #returns a list in which all duplactes are removed
+#	with the -sorted option the command will usually be a lot faster,
+#	but $list must be sorted with lsort;
+#	The optional $var gives the name of a variable in which the removed items
+#	will be stored.
 #}
-proc lremdup list {
+proc lremdup {args} {
+	set len [llength $args]
+	if {"[lindex $args 0]"=="-sorted"} {
+		set list [lindex $args 1]
+		set var [lindex $args 2]
+		set sorted 1
+		incr len -1
+	} else {
+		set list [lindex $args 0]
+		set var [lindex $args 1]
+		set sorted 0
+	}
+	if {$len == 2} {
+		upvar $var v
+		set v {}
+		set usevar 1
+	} else {
+		set usevar 0
+	}
+	if {($len != 1)&&($len != 2)} {
+		return -code error "wrong # args: should be \"lremdup ?-sorted? list ?var?\""
+	}
+	set len [llength $list]
+	if {($len == 1)||($len == 0)} {return $list}
 	set done ""
-	foreach e $list {
-		if {[lsearch $done $e]==-1} {
-			lappend done $e
+	if !$sorted {
+		foreach e $list {
+			if {[lsearch $done $e]==-1} {
+				lappend done $e
+			} elseif $usevar {
+				lappend v $e
+			}
+		}
+	} else {
+		set prev [lindex $list 0]
+		set done $prev
+		foreach e [lrange $list 1 end] {
+			if {"$e" != "$prev"} {
+				lappend done $e
+				set prev $e
+			} elseif $usevar {
+				lappend v $e
+			}
 		}
 	}
 	return $done
 }
 
-#doc {listcommands lremove} cmd {
-#llremove list1 list2
+#doc {listcommands llremove} cmd {
+#llremove ?-sorted? list1 list2
 #} descr {
-#        returns a list with all items in list1 that are not in list2
+#	returns a list with all items in list1 that are not in list2
+#	with the -sorted option the command will usually be a lot faster,
+#	but both given lists must be sorted with lsort;
+#	The optional $var gives the name of a variable in which the removed items
+#	will be stored.
 #}
-proc llremove {list removelist} {
+proc llremove {args} {
+	set len [llength $args]
+	if {"[lindex $args 0]"=="-sorted"} {
+		set list [lindex $args 1]
+		set removelist [lindex $args 2]
+		set var [lindex $args 3]
+		set sorted 1
+		incr len -1
+	} else {
+		set list [lindex $args 0]
+		set removelist [lindex $args 1]
+		set var [lindex $args 2]
+		set sorted 0
+	}
+	if {$len == 3} {
+		upvar $var v
+		set v {}
+		set usevar 1
+	} else {
+		set usevar 0
+	}
+	if {($len != 2)&&($len != 3)} {
+		return -code error "wrong # args: should be \"llremove ?-sorted? list removelist ?var?\""
+	}
 	if {"$removelist"==""} {
 		set removelist {{}}
 	}
-	set result ""
-	foreach item $list {
-		set pos [lsearch $removelist $item]
-		if {$pos==-1} {
-			lappend result $item
+	if !$sorted {
+		set result ""
+		foreach item $list {
+			set pos [lsearch $removelist $item]
+			if {$pos==-1} {
+				lappend result $item
+			} elseif $usevar {
+				lappend v $item
+			}
 		}
+		return $result
+	} else {
+		set pos 0
+		set result ""
+		set cur [lindex $removelist $pos]
+		set len [llength $removelist]
+		foreach item $list {
+			if {$pos >= $len} {
+				lappend result $item
+			} else {
+				while 1 {
+					if {"$item" < "$cur"} {
+						lappend result $item
+						break
+					} elseif {"$item" > "$cur"} {
+						incr pos
+						if {$pos >= $len} {
+							lappend result $item
+							break
+						}
+						set cur [lindex $removelist $pos]
+					} else {
+						if $usevar {
+							lappend v $item
+						}
+						break
+					}
+				}
+			}
+		}
+		return $result
 	}
-	return $result
 }
  
 #doc {listcommands lmerge} cmd {

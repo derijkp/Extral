@@ -50,9 +50,9 @@ int ExtraL_FdbmCreate(
 		return TCL_ERROR;
 	}
 	name = Tcl_GetStringFromObj(database,&namelen);
-	error = Tcl_VarEval(interp,"if [file exists ",name,"] {error {could not create database \"",name,"\"}}",NULL);
+	error = Tcl_VarEval(interp,"if [file exists {",name,"}] {error {could not create database \"",name,"\"}}",NULL);
 	if (error != TCL_OK) {return error;}
-	error = Tcl_VarEval(interp,"file mkdir ",name,NULL);
+	error = Tcl_VarEval(interp,"file mkdir {",name,"}",NULL);
 	if (error != TCL_OK) {return error;}
 	return TCL_OK;
 }
@@ -467,7 +467,8 @@ export DbmInfo *ExtraL_DbmOpen(
 	return dbminfo;
 }
 
-export int ExtraL_DbmCreateType (Tcl_Interp *interp,
+export int ExtraL_DbmCreateType(
+	Tcl_Interp *interp,
 	char *key,
 	DbmType dbmtype)
 {

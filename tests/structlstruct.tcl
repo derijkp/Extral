@@ -8,7 +8,7 @@ proc r {} {
 	uplevel source ../lib/structltypes.tcl
 }
 
-test structlset-struct {basic} {
+test structlset-struct {basic set one} {
 	set struct {a {*int ?}}
 	set try {}
 	structlset -struct $struct $try a 10
@@ -50,7 +50,13 @@ test structlset-struct {basic: set one of 2 to default} {
 	structlset -struct $struct $try {a a} ?
 } {a {b 2}}
 
-test structlset-struct {basic: add one} {
+test structlset-struct {named: replace one} {
+	set struct {*named {*int ?} {}}
+	set try {a 1}
+	structlset -struct $struct $try a 10
+} {a 10}
+
+test structlset-struct {named: add one} {
 	set struct {*named {*int ?} {}}
 	set try {a 1}
 	structlset -struct $struct $try b 10

@@ -52,6 +52,10 @@ test lcor {2 times} {
 	lcor {a b c d e f} {b d d}
 } {1 3 -1}
 
+test lcor {number bug} {
+	Extral::lcor {hobbit.seq orc.seq} {sphinx.seq hobbit.seq orc.seq centaur.seq}
+} {-1 0 1 -1}
+
 test lmath {calc} {
 	lmath calc {1 2 3.2 4} + {1 2 3.3 4}
 } {2 4 6.5 8}
@@ -96,10 +100,6 @@ test lmanip {extract} {
 	lmanip extract {} {}
 } {}
 
-test lmanip {remdup} {
-	lmanip remdup {a b c a b d}
-} {a b c d}
-
 test lmanip {split} {
 	lmanip split {a b c d e} -before {1 3}
 } {a {b c} {d e}}
@@ -133,6 +133,31 @@ test lmanip {fill counting} {
 test lmanip {fill negative counting} {
 	lmanip fill 5 10 -2
 } {10 8 6 4 2}
+
+test lremdup {} {
+	lremdup {a b c a b d}
+} {a b c d}
+
+test lremdup {sorted} {
+	lremdup -sorted {a a b b c d}
+} {a b c d}
+
+test lremdup {check removed} {
+	lremdup {a b c a b d b} temp
+	set temp
+} {a b b}
+
+test lremdup {sorted, check removed} {
+	lremdup -sorted {a a b b b c d} temp
+	set temp
+} {a b b}
+
+test lremdup {large} {
+	set list {}
+	for {set i 0} {$i < 10000} {incr i} {lappend list "try $i"}
+	lappend list "try 100" "try 200"
+	llength [lremdup -sorted [lsort $list]]
+} 10000
 
 test lmerge {} {
 	lmerge {a b c} {1 2 3}
@@ -272,6 +297,10 @@ test lcommon {} {
 	lcommon {a b c d} {a d e} {a d f h}
 } {a d}
 
+test lcommon {} {
+	lcommon {hobbit.seq orc.seq} {sphinx.seq hobbit.seq orc.seq centaur.seq}
+} {hobbit.seq orc.seq}
+
 test lunion {} {
 	lunion {a b c} {c d e}
 } {a b c d e}
@@ -294,6 +323,42 @@ test llremove {} {
 	set try {a b a c}
 	llremove $try {a c}
 } {b}
+
+test llremove {large} {
+	set try {}
+	set try2 {}
+	for {set i 0} {$i < 10000} {incr i} {lappend try "try $i"}
+	for {set i 1} {$i < 10000} {incr i} {lappend try2 "try $i"}
+	set list [lsort $try]
+	set removelist [lsort $try2]
+	llremove -sorted $list $removelist
+} {{try 0}}
+
+test llremove {difficult cases} {
+	set list {a b bd ab ab ac}
+	set removelist {ab b}
+	llremove $list $removelist
+} {a bd ac}
+
+test llremove {difficult cases, sorted} {
+	set list {a ab ab ac b bd}
+	set removelist {ab b}
+	llremove -sorted $list $removelist
+} {a ac bd}
+
+test llremove {difficult cases, check removed} {
+	set list {a b bd ab ab ac}
+	set removelist {ab b try}
+	llremove $list $removelist temp
+	set temp
+} {b ab ab}
+
+test llremove {difficult cases, sorted, check removed} {
+	set list {a ab ab ac b bd}
+	set removelist {ab b try}
+	llremove -sorted $list $removelist temp
+	set temp
+} {ab ab b}
 
 test laddnew {exists} {
 	set try {a b}

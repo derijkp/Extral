@@ -130,3 +130,4 @@ EXTERN int ExtraL_DbmCreateType _ANSI_ARGS_((Tcl_Interp *interp,
 
 EXTERN DbmInfo *ExtraL_DbmOpen(Tcl_Interp *interp,
 	char *typestring,Tcl_Obj *database,int readonly,int objc,Tcl_Obj *CONST objv[]);
+ 

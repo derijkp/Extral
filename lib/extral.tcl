@@ -22,7 +22,7 @@ proc Extral::leor {} {}
 proc Extral::laddnew {} {}
 }
 Extral::export {
-	lremove lpush lunshift lset larrayset lcommon lunion leor laddnew
+	lremove lpush lunshift lset larrayset lcommon lunion leor laddnew oneof
 } {
 
 #doc {listcommands lremove} cmd {
@@ -44,6 +44,7 @@ proc lremove {list args} {
 	}
 	return $result
 }
+
 } else {
 proc lremove {list args} {
 	if {"$args"==""} {
@@ -119,13 +120,11 @@ proc larrayset {array varlist valuelist} {
 #	returns the common elements of the lists
 #}
 proc lcommon {args} {
-	set result [lpop args]
-	set result [lmanip remdup $result]
-	foreach arg $args {
-		set list [lcor $arg $result]]
-		set result [lsub $arg [lcor $arg $result]]
+	set result [lsort [::Extral::lpop args]]
+	foreach list $args {
+		llremove -sorted $result [lsort $list] result
 	}
-	return [lmanip remdup $result]
+	return $result
 }
 
 #doc {listcommands lunion} cmd {
@@ -134,7 +133,7 @@ proc lcommon {args} {
 #	returns the union of the lists
 #}
 proc lunion {args} {
-	set result [lmanip join $args { } all]
+	set result [eval concat $args]
 	return [lmanip remdup $result]
 }
 
@@ -144,11 +143,10 @@ proc lunion {args} {
 #	returns the elements that are not shared between both lists
 #}
 proc leor {list1 list2} {
-	set cor [lcor $list1 $list2]
-	set exclusive [lfind $cor -1]
-	set join [lsub $cor -exclude $exclusive]
-	set result [lsub $list1 -exclude $join]
-	eval lappend result [lsub $list2 $exclusive]
+	set list1 [lsort $list1]
+	set list2 [lsort $list2]
+	set result [llremove $list1 $list2 rem]
+	return [concat $result [llremove $list2 $rem]]
 }
 
 #doc {listcommands laddnew} cmd {
@@ -167,4 +165,16 @@ proc laddnew {listref args} {
 	return $list
 }
 
+#doc {listcommands oneof} cmd {
+#oneof element list
+#} descr {
+#	returns 1 if the lement occurs in the list, 0 if it does not.
+#}
+proc oneof {item list} {
+	if {[lsearch -exact $list $item] == -1} {
+		return 0
+	} else {
+		return 1
+	}
+}
 }

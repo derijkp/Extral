@@ -384,7 +384,7 @@ proc ::Extral::getlist {structure data field value} {
 		} else {
 			return $res
 		}
-	} elseif {$taglen >= 2} {
+	} elseif {($taglen == 2) || ($taglen == 3} {
 		set len [llength $value]
 		if {$len == 0} {
 			return ""
