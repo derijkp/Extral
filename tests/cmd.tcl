@@ -28,6 +28,11 @@ cmd_parse $line
 } {{$window.try} configure -title {[puts "[tk appname]"]} -command {"$window command\"\n\""} -test {{try 
 it ""}}}
 
+test cmd_parse {bugcheck} {
+	set c \t\$object\ configure\ \ \\\n\t\t-xscale\ 2.5\ \\\n\t\t-group\ 0.2\ \\\n\t\t-ymax\ 1500\ \\\n\t\t-traceheight\ 150\ \\\n\t\t-annot\ all\ \\\n\t\t-bd\ 0\ \\\n\t\t-borderwidth\ 0\\\n\t\t-destroycommand\ \{exit\}
+	cmd_parse $c
+} {{$object} configure -xscale 2.5 -group 0.2 -ymax 1500 -traceheight 150 -annot all -bd 0 -borderwidth 0 -destroycommand {{exit}}}
+
 foreach {cmd options vars arg} {test {} {a b} {1 2}} break
 
 test cmd_args {basic} {

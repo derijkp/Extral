@@ -83,7 +83,7 @@ proc cmd_split {data} {
 #	set test {[format "%2.2f" 4.3]}
 #}
 proc cmd_parse {line {recurse 0}} {
-	regsub -all "\\\\\n" $line {} line
+	regsub -all "\\\\\n" $line { } line
 	set len [string length $line]
 	set i $recurse
 	while {$i < $len} {
