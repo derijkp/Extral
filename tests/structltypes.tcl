@@ -196,8 +196,44 @@ test structlset-types {proc set: use oldvalue} {
 	structlset -struct $struct $try a 9
 } {a {8 -> 9}}
 
-test structlget-types {get int} {
+test structlget-types {get int default} {
 	set struct {a {*int ?}}
+	set try {}
+	structlget -struct $struct $try a
+} {?}
+
+test structlset-types {set int default} {
+	set struct {a {*int ?}}
+	set try {a 1}
+	structlset -struct $struct $try a ?
+} {}
+
+test structlset-types {set date default} {
+	set struct {a {*date ?}}
+	set try {a 1}
+	structlset -struct $struct $try a ?
+} {}
+
+test structlget-types {get any default} {
+	set struct {a {*any ?}}
+	set try {}
+	structlget -struct $struct $try a
+} {?}
+
+test structlget-types {get date default} {
+	set struct {*date ?}
+	set try {}
+	structlget -struct $struct $try {}
+} {?}
+
+test structlget-types {get date default sub} {
+	set struct {a {*date ?}}
+	set try {}
+	structlget -struct $struct $try a
+} {?}
+
+test structlget-types {get time default sub} {
+	set struct {a {*time ?}}
 	set try {}
 	structlget -struct $struct $try a
 } {?}
@@ -279,7 +315,7 @@ test structlget-types {get time: check empty} {
 
 test structlget-types {get time: check empty with val} {
 	set struct {a {*time ?}}
-	Extral::structlget -struct $struct {} {a val}
+	structlget -struct $struct {} {a val}
 } {?}
 
 test structlget-types {get time: check empty with param} {
@@ -289,7 +325,7 @@ test structlget-types {get time: check empty with param} {
 
 test structlget-types {get date: check empty with val} {
 	set struct {a {*date ?}}
-	Extral::structlget -struct $struct {} {a val}
+	structlget -struct $struct {} {a val}
 } {?}
 
 test structlget-types {get date: check empty with param} {
@@ -331,7 +367,7 @@ test structlget-types {check for non existing error} {
 	}
 	set struct {
 		auth {
-			*named {*proc Auth {}} {}
+			*named {*proc Auth {}}
 		}
 		jou {*link Jou {}}
 	}
@@ -340,37 +376,37 @@ test structlget-types {check for non existing error} {
 } {name {}}
 
 test structlset-types {list} {
-	set struct {a {*list {*int ?} {}}}
+	set struct {a {*list {*int ?}}}
 	set try {}
 	structlset -struct $struct $try a {1 2 3}
 } {a {1 2 3}}
 
 test structlset-types {list parameter next} {
-	set struct {a {*list {*int ?} {}}}
+	set struct {a {*list {*int ?}}}
 	set try {a {1 2 3}}
 	structlset -struct $struct $try {a next} 4
 } {a {1 2 3 4}}
 
 test structlset-types {list parameter num} {
-	set struct {a {*list {*int ?} {}}}
+	set struct {a {*list {*int ?}}}
 	set try {a {1 2 3}}
 	structlset -struct $struct $try {a 1} 20
 } {a {1 20 3}}
 
 test structlset-types {list parameter: non existing num} {
-	set struct {a {*list {*int ?} {}}}
+	set struct {a {*list {*int ?}}}
 	set try {}
-	Extral::structlset -struct $struct $try {a 2} 4
+	structlset -struct $struct $try {a 2} 4
 } {empty list at field "a"} 1
 
 test structlset-types {list parameter end} {
-	set struct {a {*list {*int ?} {}}}
+	set struct {a {*list {*int ?}}}
 	set try {a {1 2 3}}
 	structlset -struct $struct $try {a end} 30
 } {a {1 2 30}}
 
 test structlset-types {list error} {
-	set struct {a {*list {*int ?} {}}}
+	set struct {a {*list {*int ?}}}
 	set try {}
 	structlset -struct $struct $try a {1 2 c}
 } {expected integer but got "c" at field "a"} 1
@@ -380,105 +416,117 @@ test structlset-types {struct in list: simple} {
 		a {*list {
 			a {*int ?}
 			b {*int ?}
-		} {}}
+		}}
 	}
 	set try {}
-	Extral::structlset -struct $struct {} {a next a} 1
+	structlset -struct $struct {} {a next a} 1
 } {a {{a 1}}}
 
 test structlset-types {struct in list} {
 	set struct {a {*list {
 		a {*int ?}
 		b {*int ?}
-	} {}}}
+	}}}
 	set try {a {{a 1}}}
-	Extral::structlset -struct $struct $try {a "" b} {1 2 3}
+	structlset -struct $struct $try {a "" b} {1 2 3}
 } {a {{a 1 b 1} {b 2} {b 3}}}
 
 test structlset-types {struct in list with parameter} {
 	set struct {a {*list {
 		a {*int ?}
 		b {*int ?}
-	} {}}}
+	}}}
 	set try {a {{a 1} {a 2}}}
-	Extral::structlset -struct $struct $try {a 1 b} 2
+	structlset -struct $struct $try {a 1 b} 2
 } {a {{a 1} {a 2 b 2}}}
 
 test structlset-types {struct in list with parameter 0} {
 	set struct {a {*list {
 		a {*int ?}
 		b {*int ?}
-	} {}}}
+	}}}
 	set try {a {{a 1} {a 2}}}
-	Extral::structlset -struct $struct $try {a 0 b} 2
+	structlset -struct $struct $try {a 0 b} 2
 } {a {{a 1 b 2} {a 2}}}
 
 test structlset-types {struct in list error} {
 	set struct {a {*list {
 		a {*int ?}
 		b {*int ?}
-	} {}}}
+	}}}
 	set try {}
-	Extral::structlset -struct $struct $try {a "" b} {1 c 3}
+	structlset -struct $struct $try {a "" b} {1 c 3}
 } {expected integer but got "c" at field "b" at field "a"} 1
 
 test structlget-types {list test type, end index} {
-	set struct {a {*list {*date ?} {}}}
+	set struct {a {*list {*date ?}}}
 	set try [structlset -struct $struct {} a {{1 Jan 1998} {2 Jan 1998}}]
 	structlget -struct $struct $try {a end}
 } {2 Jan 1998}
 
 test structlget-types {list test type, 0 index} {
-	set struct {a {*list {*date ?} {}}}
+	set struct {a {*list {*date ?}}}
 	set try [structlset -struct $struct {} a {{1 Jan 1998} {2 Jan 1998}}]
-	Extral::structlget -struct $struct $try {a 0}
+	structlget -struct $struct $try {a 0}
 } {1 Jan 1998}
 
 test structlget-types {list test type, 1 to end} {
-	set struct {a {*list {*date ?} {}}}
+	set struct {a {*list {*date ?}}}
 	set try {a {1 2 3}}
 	set try [structlset -struct $struct $try a {{1 Jan 1998} {2 Jan 1998} {3 Jan 1998}}]
 	structlget -struct $struct $try {a {1 end}}
 } {{2 Jan 1998} {3 Jan 1998}}
 
+test structlget-types {list test type, 1 to end} {
+	set struct {a {*list {*int ?}}}
+	set try {a {1 2 3 4}}
+	structlget -struct $struct $try {a {0 end {lmath sum}}}
+} {10}
+
+test structlget-types {list test type, 1 to end} {
+	set struct {a {*list {*int ?}}}
+	set try {a {1 2 3 4}}
+	structlget -struct $struct $try {a {0 end {lmath average}}}
+} {10}
+
 test structlget-types {list index out of range} {
-	set struct {a {*list {*date ?} {}}}
+	set struct {a {*list {*date ?}}}
 	set try [structlset -struct $struct {} a {{1 Jan 1998}}]
 	structlget -struct $struct $try {a 2}
 } {}
 
 test structlget-types {list index error: invalid argument} {
-	set struct {a {*list {*date ?} {}}}
+	set struct {a {*list {*date ?}}}
 	set try [structlset -struct $struct {} a {{1 Jan 1998}}]
 	structlget -struct $struct $try {a {1 2 3}}
 } {wrong # args to list: "1 2 3"} 1
 
 test structlget-types {list index out of range} {
-	set struct {a {*list {*date ?} {}}}
+	set struct {a {*list {*date ?}}}
 	set try [structlset -struct $struct {} a {{1 Jan 1998}}]
 	structlget -struct $struct $try {a {2 4}}
 } {}
 
 test structlget-types {list 2 indices out of range} {
-	set struct {a {*list {*date ?} {}}}
+	set struct {a {*list {*date ?}}}
 	set try [structlset -struct $struct {} a {{1 Jan 1998}}]
 	structlget -struct $struct $try {a {0 4}}
 } {{1 Jan 1998}}
 
 test structlget-types {list 2 indices} {
-	set struct {a {*list {*date ?} {}}}
+	set struct {a {*list {*date ?}}}
 	set try [structlset -struct $struct {} a {{1 Jan 1998} {2 Jan 1998}}]
 	structlget -struct $struct $try {a {0 end}}
 } {{1 Jan 1998} {2 Jan 1998}}
 
 test structlget-types {list 2 indices} {
-	set struct {a {*list {*date ?} {}}}
+	set struct {a {*list {*date ?}}}
 	set try [structlset -struct $struct {} a {{1 Jan 1998} {2 Jan 1998}}]
 	structlget -struct $struct $try {a {0 1}}
 } {{1 Jan 1998} {2 Jan 1998}}
 
 test structlset-struct {check empty list} {
-	set struct {auth {*list {* {*any {}}} {}}}
+	set struct {auth {*list {*named {*any {}}}}}
 	structlget -struct $struct {} {auth end name}
 } {}
 
@@ -505,40 +553,40 @@ test structlget-types {proc get: test data} {
 } {d 10}
 
 test structlset-types {named set to default} {
-	set struct {*named {{* try t} {*int ?}} {}}
+	set struct {*named {{? try t} {*int ?}}}
 	set try {a {t 1}}
 	structlset -struct $struct $try b {try 2} a {try ?}
 } {b {t 2}}
 
 test structlset-types {named set to empty} {
-	set struct {t {*named {*int ?} {}}}
+	set struct {t {*named {*int ?}}}
 	set try {t {a 1}}
 	structlset -struct $struct $try t {}
 } {t {a 1}}
 
 test structlset-types {named set to default} {
-	set struct {t {*named {*int ?} {}}}
+	set struct {t {*named {*int ?}}}
 	set try {t {a 1}}
 	structlset -struct $struct $try t {a ?}
 } {}
 
 test structlset-types {list regexp} {
-	set struct {{* parts pts} {*list {*regexp ^a "does not start with an a" ?} {}}}
+	set struct {{? parts pts} {*list {*regexp ^a "does not start with an a" ?}}}
 	set try {}
 	structlset -struct $struct $try pts {b}
 } {error: "b" does not start with an a at field "pts"} 1
 
 test structlset-types {set empty list sub element} {
-	set dbstruct {*list {a {*any {}}} {}}
-	Extral::structlset -struct $dbstruct {} next {}
+	set dbstruct {*list {a {*any {}}}}
+	structlset -struct $dbstruct {} next {}
 } {{}}
 
 test structlset-types {set empty list sub element} {
 	set dbstruct {
-	        {* article art} {
+	        {? article art} {
 	            *list {
-	                {* author a} {*any {}}
-	            } {}
+	                {? author a} {*any {}}
+	            }
 	        }
 	}
 	set db [structlset -struct $dbstruct {} {art next} {}]
@@ -547,8 +595,18 @@ test structlset-types {set empty list sub element} {
 test structlget-types {quotes in any} {
 	set dbstruct {t {*any {}}}
 	set db {t { "try}}
-	Extral::structlget -struct $dbstruct $db t
+	structlget -struct $dbstruct $db t
 } { "try}
 
+test structlget-types {non empty default} {
+	set struct {*list {*any {}}} 
+	structlget -struct $struct {} {}
+} {}
+
+test structlset-types {non empty default} {
+	set struct {*list {*any {}}} 
+	set data b
+	structlset -struct $struct $data 0 a
+} {a}
 
 testsummarize

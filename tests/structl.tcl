@@ -56,7 +56,7 @@ test structlset {empty list} {
 	structlset {} a 1
 } {a 1}
 
-test structlset {empty taglist} {
+test structlset {empty field} {
 	structlset {} {} {a 1}
 } {a 1}
 
@@ -90,11 +90,11 @@ test structlget {tag not present} {
 	structlget {a 1 bb 2 ccc 3} e
 } {tag "e" not found} 1
 
-test structlget {taglist larger than structure} {
+test structlget {field larger than structure} {
 	structlget {a 1 bb 2 ccc 3} {a b}
 } {error: list "1" does not have an even number of elements} 1
 
-test structlget {taglist in struct not present} {
+test structlget {field in struct not present} {
 	structlget {a {a 1 b 2} bb 2 ccc 3} {a c}
 } {tag "c" not found} 1
 

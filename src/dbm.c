@@ -7,9 +7,9 @@
  *	 of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  */
 
+#include <string.h>
 #include "tcl.h"
 #include "extral.h"
-#include <string.h>
 
 #ifdef unix
 #define export

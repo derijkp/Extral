@@ -12,42 +12,38 @@ Structures
 	one global array extraL__Struct. You cannot use the generic array command 
 	on structure structure members
 
-<dl><dt><b>
+<dl><b><dt>
 struct new
 </b><dd>
 	returns an unused pointer to a structure.
 <br>eg.:<pre>
 	set current [struct new]
-</pre></ul>
-
-<dl><dt><b>
+</pre>
+<b><dt>
 struct set struct->member value
 </b><dd>
 	sets the value of a member
 <br>eg.:<pre>
 	struct set $current->field Test
 	struct set $current->data(a) 1
-</pre></ul>
-
-<dl><dt><b>
+</pre>
+<b><dt>
 struct value struct->member
 </b><dd>
 	returns the value of a member
 <br>eg.:<pre>
 	struct value $current->field
 	struct value $current->data(a)
-</pre></ul>
-
-<dl><dt><b>
+</pre>
+<b><dt>
 struct unset struct?->member?
 </b><dd>
 	unsets a member or the entire struct
 <br>eg.:<pre>
 	struct unset $current->field
 	struct unset $current
-</pre></ul>
-
-<dl><dt><b>
+</pre>
+<b><dt>
 struct var struct?->member?
 </b><dd>
 	gives the actual variable name where the member is stored (global): 
@@ -55,9 +51,8 @@ struct var struct?->member?
 <br>eg.:<pre>
 	entry .try -textvariable [struct var $current->field]
 	pack .try
-</pre></ul>
-
-<dl><dt><b>
+</pre>
+<b><dt>
 struct arrayset struct->member items values
 </b><dd>
 	sets values in an array member
@@ -65,27 +60,23 @@ struct arrayset struct->member items values
 	% struct arrayset $current->value {a b c} {1 2 3}
 	% struct value $current->value(b)
 	2
-</pre></ul>
-
-<dl><dt><b>
+</pre>
+<b><dt>
 struct arrayget struct->member
 </b><dd>
 	% struct arrayget $current->value
 	b 2 a 1 c 3
-</ul>
 
-<dl><dt><b>
+<b><dt>
 struct arraynames struct->member
 </b><dd>
 	% struct arraynames $current->value
 	b a c
-</ul>
 
-<dl><dt><b>
+<b><dt>
 struct arraysize struct->member
 </b><dd>
 	% struct arraysize $current->value
 	3
-</ul>
 
 </body>

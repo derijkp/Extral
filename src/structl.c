@@ -207,7 +207,7 @@ int ExtraL_StructlgetValidate(interp,substructure,data,ctag,clen,tagsc,tagsv,val
 	Tcl_HashEntry *entry;
 	struct Type *type;
 	ExtraL_StructlTypeGetProc *cmd;
-	int error;
+	int error,i;
 	
 	entry = Tcl_FindHashEntry(&typesTable, ctag);
 	if (entry != NULL) {
@@ -216,6 +216,16 @@ int ExtraL_StructlgetValidate(interp,substructure,data,ctag,clen,tagsc,tagsv,val
 		if (cmd!=NULL) {
 			error = (*cmd)(interp,substructure,data,tagsc,tagsv,value);
 			if (error != TCL_OK) {return error;}
+		} else {
+			int listlen;
+	        if (*value != NULL) {Tcl_GetStringFromObj(*value, &listlen);} else {listlen = 0;}
+			if (listlen == 0) {
+				error = Tcl_ListObjLength(interp, substructure, &i);
+				if (error != TCL_OK) {return error;}
+				error = Tcl_ListObjIndex(interp, substructure, i-1, value);
+				if (error != TCL_OK) {return error;}
+			}
+			return TCL_OK;
 		}
 		return TCL_OK;
 	}
@@ -307,7 +317,7 @@ int ExtraL_StructlFindTag(interp, list, tag, taglen, resultPtr, posPtr)
 		if (error != TCL_OK) {return error;}
 		if (subtag == NULL) {subtag = Tcl_NewObj();}
 		ctag = Tcl_GetStringFromObj(subtag,&clen);
-		if ((clen==1)&&(ctag[0]=='*')) {
+		if ((clen==1)&&(ctag[0]=='?')) {
 			for (i=1; i<=2; i++) {
 				error = Tcl_ListObjIndex(interp, listv[pos], i, &subtag);
 				if (error != TCL_OK) {return error;}
@@ -412,7 +422,7 @@ extern int ExtraL_StructlsetStruct(interp, structure, data, list, tagsc, tagsv, 
 				error = Tcl_ListObjIndex(interp, structtag, 0, &subtag);
 				if (error != TCL_OK) {return error;}
 				ctag = Tcl_GetStringFromObj(subtag,&clen);
-				if ((clen==1)&&(ctag[0]=='*')) {
+				if ((clen==1)&&(ctag[0]=='?')) {
 					error = Tcl_ListObjIndex(interp, structtag, 2, &tagObj);
 					if (error != TCL_OK) {return error;}
 					if (tagObj == NULL) {tagObj = Tcl_NewObj();}
@@ -488,7 +498,7 @@ extern int ExtraL_StructlsetStruct(interp, structure, data, list, tagsc, tagsv, 
 		error = Tcl_ListObjIndex(interp, structtag, 0, &subtag);
 		if (error != TCL_OK) {return error;}
 		ctag = Tcl_GetStringFromObj(subtag,&clen);
-		if ((clen==1)&&(ctag[0]=='*')) {
+		if ((clen==1)&&(ctag[0]=='?')) {
 			error = Tcl_ListObjIndex(interp, structtag, 2, &tagObj);
 			if (error != TCL_OK) {return error;}
 			if (tagObj == NULL) {tagObj = Tcl_NewObj();}
@@ -691,7 +701,7 @@ extern int ExtraL_StructlunsetStruct(interp, structure, data, list, tagsc, tagsv
 		error = Tcl_ListObjIndex(interp, structtag, 0, &subtag);
 		if (error != TCL_OK) {return error;}
 		ctag = Tcl_GetStringFromObj(subtag,&clen);
-		if ((clen==1)&&(ctag[0]=='*')) {
+		if ((clen==1)&&(ctag[0]=='?')) {
 			error = Tcl_ListObjIndex(interp, structtag, 2, &tagObj);
 			if (error != TCL_OK) {return error;}
 			if (tagObj == NULL) {tagObj = Tcl_NewObj();}
@@ -837,7 +847,7 @@ extern int ExtraL_StructlgetStruct(interp, structure, data, list, tagsc, tagsv, 
 {
 	Tcl_Obj *temp, *substructure, *sublist;
 	char *ctag,*tag;
-	int clen,len,listlen;
+	int clen,len;
 	int error;
 	int pos,i;
 
@@ -848,7 +858,6 @@ if (tagsc != 0) {printf("tags: %d\ntag: %s\n",tagsc,Tcl_GetStringFromObj(tagsv[0
 printf("\n");
 fflush(stdout);
 */
-	Tcl_GetStringFromObj(list, &listlen);
 	Tcl_ListObjIndex(interp, structure, 0, &temp);
 	if (temp == NULL) {
 		ctag="";
@@ -864,12 +873,6 @@ fflush(stdout);
 			error = ExtraL_StructlgetValidate(interp,structure,data,ctag,clen,tagsc,tagsv,&list);
 			if (error != TCL_OK) {return TCL_ERROR;}
 			*resultPtr = list;
-			return TCL_OK;
-		} else if (listlen == 0) {
-			error = Tcl_ListObjLength(interp, structure, &i);
-			if (error != TCL_OK) {return error;}
-			error = Tcl_ListObjIndex(interp, structure, i-1, resultPtr);
-			if (error != TCL_OK) {return error;}
 			return TCL_OK;
 		} else {
 			error = ExtraL_StructlgetValidate(interp,structure,data,ctag,clen,0,NULL,&list);
@@ -901,7 +904,7 @@ fflush(stdout);
 				error = Tcl_ListObjIndex(interp, tempv[pos], 0, &subtag);
 				if (error != TCL_OK) {return error;}
 				ctag = Tcl_GetStringFromObj(subtag,&clen);
-				if ((clen==1)&&(ctag[0]=='*')) {
+				if ((clen==1)&&(ctag[0]=='?')) {
 					error = Tcl_ListObjIndex(interp, tempv[pos], 1, &subtag);
 					if (error != TCL_OK) {return error;}
 					if (subtag == NULL) {subtag = Tcl_NewObj();}
@@ -962,7 +965,7 @@ fflush(stdout);
 		error = Tcl_ListObjIndex(interp, structtag, 0, &subtag);
 		if (error != TCL_OK) {return error;}
 		ctag = Tcl_GetStringFromObj(subtag,&clen);
-		if ((clen==1)&&(ctag[0]=='*')) {
+		if ((clen==1)&&(ctag[0]=='?')) {
 			error = Tcl_ListObjIndex(interp, structtag, 2, &subtag);
 			if (error != TCL_OK) {return error;}
 			if (subtag == NULL) {subtag = Tcl_NewObj();}
@@ -1070,7 +1073,7 @@ ExtraL_StructlsetObjCmd(notUsed, interp, objc, objv)
 	int pos, error, i;
 
 	if (objc < 3) {
-		Tcl_WrongNumArgs(interp, 1, objv, "?-struct schema? ?-data clientdata? list taglist value ?taglist value?");
+		Tcl_WrongNumArgs(interp, 1, objv, "?-struct schema? ?-data clientdata? list field value ?field value ...?");
 		return TCL_ERROR;
 	}
 	structure = NULL;
@@ -1089,8 +1092,8 @@ ExtraL_StructlsetObjCmd(notUsed, interp, objc, objv)
 		}
 	}
 
-	if ((objc < 3)||(objc & 1)) {
-		Tcl_WrongNumArgs(interp, 1, objv, "?-struct schema? ?-data clientdata? list taglist value ?taglist value?");
+	if ((objc < (pos+3))||(objc & 1)) {
+		Tcl_WrongNumArgs(interp, 1, objv, "?-struct schema? ?-data clientdata? list field value ?field value ...?");
 		return TCL_ERROR;
 	}
 
@@ -1147,7 +1150,7 @@ ExtraL_StructlunsetObjCmd(notUsed, interp, objc, objv)
 	int pos, error, i;
 
 	if (objc < 2) {
-		Tcl_WrongNumArgs(interp, 1, objv, "?-struct schema? ?-data clientdata? list taglist ?taglist ...?");
+		Tcl_WrongNumArgs(interp, 1, objv, "?-struct schema? ?-data clientdata? list field ?field ...?");
 		return TCL_ERROR;
 	}
 	structure = NULL;
@@ -1167,7 +1170,7 @@ ExtraL_StructlunsetObjCmd(notUsed, interp, objc, objv)
 	}
 
 	if ((objc-pos) < 2) {
-		Tcl_WrongNumArgs(interp, 1, objv, "?-struct schema? ?-data clientdata? list taglist value ?taglist value?");
+		Tcl_WrongNumArgs(interp, 1, objv, "?-struct schema? ?-data clientdata? list field ?field ...?");
 		return TCL_ERROR;
 	}
 
@@ -1224,7 +1227,7 @@ ExtraL_StructlgetObjCmd(notUsed, interp, objc, objv)
 	int i, error;
 
 	if (objc < 2) {
-		Tcl_WrongNumArgs(interp, 1, objv, "?-struct schema? ?-data clientdata? list taglist ?taglist?");
+		Tcl_WrongNumArgs(interp, 1, objv, "?-struct schema? ?-data clientdata? list field ?field ...?");
 		return TCL_ERROR;
 	}
 	structure = NULL;
@@ -1246,7 +1249,7 @@ ExtraL_StructlgetObjCmd(notUsed, interp, objc, objv)
 		}
 	}
 	if (objc < 2) {
-		Tcl_WrongNumArgs(interp, 1, objv, "?-struct schema? ?-data clientdata? list taglist ?taglist?");
+		Tcl_WrongNumArgs(interp, 1, objv, "?-struct schema? ?-data clientdata? list field ?field ...?");
 		return TCL_ERROR;
 	}
 	if (objc == 2) {
@@ -1345,7 +1348,7 @@ ExtraL_StructlfieldsObjCmd(notUsed, interp, objc, objv)
 		error = Tcl_ListObjIndex(interp, listArgv[pos], 0, &subtag);
 		if (error != TCL_OK) {return error;}
 		ctag = Tcl_GetStringFromObj(subtag,&clen);
-		if ((clen==1)&&(ctag[0]=='*')) {
+		if ((clen==1)&&(ctag[0]=='?')) {
 			error = Tcl_ListObjIndex(interp, listArgv[pos], 1, &subtag);
 			if (subtag == NULL) {subtag = Tcl_NewObj();}
 			if (error != TCL_OK) {return error;}

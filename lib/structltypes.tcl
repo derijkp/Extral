@@ -12,6 +12,7 @@ proc ::Extral::unsetany {structure data oldvalue field} {
 
 proc ::Extral::getany {structure data field value} {
 	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
+	if {"$value" == ""} {return [lindex $structure end]}
 	return $value
 }
 
@@ -28,6 +29,7 @@ proc ::Extral::setint {structure data oldvalue field value} {
 
 proc ::Extral::getint {structure data field value} {
 	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
+	if {"$value" == ""} {return [lindex $structure end]}
 	return $value
 }
 
@@ -44,6 +46,7 @@ proc ::Extral::setdouble {structure data oldvalue field value} {
 
 proc ::Extral::getdouble {structure data field value} {
 	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
+	if {"$value" == ""} {return [lindex $structure end]}
 	return $value
 }
 
@@ -64,6 +67,7 @@ proc ::Extral::setbool {structure data oldvalue field value} {
 
 proc ::Extral::getbool {structure data field value} {
 	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
+	if {"$value" == ""} {return [lindex $structure end]}
 	return $value
 }
 
@@ -84,6 +88,7 @@ proc ::Extral::setregexp {structure data oldvalue field value} {
 
 proc ::Extral::getregexp {structure data field value} {
 	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
+	if {"$value" == ""} {return [lindex $structure end]}
 	return $value
 }
 
@@ -108,6 +113,7 @@ proc ::Extral::setbetween {structure data oldvalue field value} {
 
 proc ::Extral::getbetween {structure data field value} {
 	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
+	if {"$value" == ""} {return [lindex $structure end]}
 	return $value
 }
 
@@ -129,6 +135,7 @@ proc ::Extral::setdbetween {structure data oldvalue field value} {
 
 proc ::Extral::getdbetween {structure data field value} {
 	if {"$field" != ""} {return -code error "error: field \"$field\" not present in structure \"$structure\""}
+	if {"$value" == ""} {return [lindex $structure end]}
 	return $value
 }
 
@@ -214,7 +221,7 @@ proc ::Extral::setnamed {structure data oldvalue field value} {
 			}
 		}
 	}
-	if {"$result" == "[lindex $structure end]"} {
+	if {"$result" == ""} {
 		return -code 5 $result
 	} else {
 		return $result
@@ -260,6 +267,7 @@ proc ::Extral::unsetnamed {structure data oldvalue field} {
 
 proc ::Extral::getnamed {structure data field value} {
 #putsvars structure data field value
+	if {"$value" == ""} {return [lindex $structure end]}
 	set struc [lindex $structure 1]
 	if {"$field" == ""} {
 		set result ""
@@ -349,7 +357,8 @@ proc ::Extral::getlist {structure data field value} {
 #putsvars structure field value
 	set tag [lshift field]
 	set struct [lindex $structure 1]
-	if {"$tag" == ""} {
+	set taglen [llength $tag]
+	if {$taglen == 0} {
 		set result ""
 		foreach val $value {
 			set code [catch {::Extral::structlgetstruct $struct $data $val [llength $field] $field} res]
@@ -360,13 +369,13 @@ proc ::Extral::getlist {structure data field value} {
 			}
 		}
 		return $result
-	} elseif {[llength $tag] == 1} {
+	} elseif {$taglen == 1} {
 		set len [llength $value]
 		if {$len == 0} {
 			return ""
 		}
 		incr len -1
-		if {("$tag"!="end")&&($tag>$len)} {
+		if {("$tag" != "end")&&($tag > $len)} {
 			return ""
 		}
 		set code [catch {::Extral::structlgetstruct $struct $data [lindex $value $tag] [llength $field] $field} res]
@@ -375,7 +384,7 @@ proc ::Extral::getlist {structure data field value} {
 		} else {
 			return $res
 		}
-	} elseif {[llength $tag] == 2} {
+	} elseif {$taglen >= 2} {
 		set len [llength $value]
 		if {$len == 0} {
 			return ""
@@ -398,7 +407,11 @@ proc ::Extral::getlist {structure data field value} {
 				lappend result $res
 			}
 		}
-		return $result
+		if {$taglen == 2} {
+			return $result
+		} else {
+			return [eval [lindex $tag 2] {$result}]
+		}
 	} else {
 		return -code error "wrong # args to list: \"$tag\""
 	}

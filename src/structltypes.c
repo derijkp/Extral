@@ -861,11 +861,8 @@ int ExtraL_StructlSetNamed(interp,structure,data,oldvalue,tagsc,tagsv,value)
 	}
 
 	*value = result;
-	error = Tcl_ListObjLength(interp,structure,&end);
-	if (error == TCL_ERROR) {return TCL_ERROR;}
-	error = Tcl_ListObjIndex(interp,structure,end-1,&def);
-	if (error == TCL_ERROR) {return TCL_ERROR;}
-	if (ExtraL_ObjEqual(result,def) == 1) {
+	Tcl_GetStringFromObj(result,&end);
+	if (end == 0) {
 		return 5;
 	} else {
 		return TCL_OK;

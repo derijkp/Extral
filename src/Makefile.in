@@ -12,7 +12,7 @@ TCL_UNIX_DIR =	@TCL_SRC_DIR@/unix
 TCL_BIN_DIR = @TCL_BIN_DIR@
 
 # Libraries to use when linking:
-LIBS = @TCL_BUILD_LIB_SPEC@ @TCL_LIBS@ -lc
+LIBS = @TCL_BUILD_LIB_SPEC@ @TCL_LIBS@
 
 #----------------------------------------------------------------
 # The information below is modified by the configure script when

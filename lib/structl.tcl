@@ -12,18 +12,37 @@
 #} shortdescr {
 #store structured data in lists
 #} descr {
-#In a structured list tags alternate with the value attached to this tag,
-#eg.: {tag1 {value of tag1} tag2 {value of tag2} ...}
+#In a structured list names alternate with the value attached to this name,
+#eg.: {name1 {value of name1} name2 {value of name2} ...}
 #Using the structured list commands, you can use a list as a sort of array.
 #However, structured lists have some advantages to arrays:
 #<ul>
 #<li>They can be passed to functions easily
-#<li>tagged lists can be nested: an element of a tagged list can
-#   contain another tagged list, etc.
+#<li>structured lists can be nested: an element of a structured list can
+#   contain another structured list, etc.
 #<li>although finding a value in an array should be faster,
 #   creating the array can take more time.
-#<li>tagged list can be handled according to a certain structure
+#<li>structured list can be handled according to a certain schema using the -struct option.
 #</ul>
+# Using structured lists, data can be stored in a treelike structure (see examples further down).
+# Using the struclget and structlset functions, data in any of the branches or leaves can be
+# easily obtained or set, using a field (a list of names of successive branches).
+# <p>
+# Using the -struct option a schema can be specified that puts constraints on which branches are 
+# allowed, and what values are allowed in the branches.
+# A schema is also organised as a structured list. when the first element in a value starts with 
+# an asterisk, it is an endnode. Otherwise it is the schema of the substructure starting
+# at the name of that value.
+# An endnode consists of a type indicator (the first element starting with an asterisk) and 
+# type parameters. A number of types 
+# are available by default (*any, *int, *regexp, *date, *named *list, ...). 
+# New types can be added using either Tcl or C code.
+# <p>
+# If a schema contains names consisting of a list where element 0 is a questionmark these are treated specially: 
+# The list must have 2 further elements: element 1 is the long name for the value, and element
+# 2 the short name. Both long and short name can be used to set or get values from the structured list.
+# However, structlset will always return a struct with the short name (efficient storage), while
+# structlget will return the long form.
 #}
 
 if 0 {
@@ -55,7 +74,7 @@ proc structlsetstruct {structure data list taglen taglist value} {
 				return -code error "error: tag \"$tag\" not present in structure \"$structure\""
 			}
 			set structtag [lindex $structure [expr {$structpos-1}]]
-			if {"[lindex $structtag 0]" == "*"} {
+			if {"[lindex $structtag 0]" == "?"} {
 				set tag [lindex $structtag 2]
 			}
 			set substructure [lindex $structure $structpos]
@@ -76,7 +95,7 @@ proc structlsetstruct {structure data list taglen taglist value} {
 				if {$sublistpos != -1} {
 					set list [lreplace $list $sublistpos $sublistpos $sublist]
 				} else {
-					if {"[lindex $tag 0]" == "*"} {
+					if {"[lindex $tag 0]" == "?"} {
 						lappend list [lindex $tag 2] $sublist
 					} else {
 						lappend list $tag $sublist
@@ -94,7 +113,7 @@ proc structlsetstruct {structure data list taglen taglist value} {
 			return -code error "error: tag \"$tag\" not present in structure \"$structure\""
 		}
 		set structtag [lindex $structure [expr {$structpos-1}]]
-		if {"[lindex $structtag 0]" == "*"} {
+		if {"[lindex $structtag 0]" == "?"} {
 			set tag [lindex $structtag 2]
 		}
 		set substructure [lindex $structure $structpos]
@@ -157,7 +176,7 @@ proc structlsetnostruct {list taglen taglist value} {
 }
 
 #doc {structl structlset} cmd {
-#structlset ?-struct schema? ?-data clientdata? list taglist value ?taglist value?
+#structlset ?-struct schema? ?-data clientdata? list field value ?field value ...?
 #} descr {
 # set the value of a field in the structured list. The -data option can be used to
 # pass data to self defined data types.
@@ -180,14 +199,14 @@ proc structlsetnostruct {list taglen taglist value} {
 #				b {*between 0 10 ?}
 #			}
 #			ints {
-#				* {*int ?}
+#				*named {*int ?}
 #			}
 #		}
 #		% set data {}
 #		% set data [structlset -struct $struct $data {sub b} 9]
 #		sub {b 9}
 #		% set data [structlset -struct $struct $data {sub b} 11]
-#		error: 11 is not between 0 and 10
+#		error: 11 is not between 0 and 10 at field "b" at field "sub"
 #		% set data [structlset -struct $struct $data ints {a 9}]
 #		sub {b 9} ints {a 9}
 #		% set data [structlset -struct $struct $data {sub b} ?]
@@ -210,7 +229,7 @@ proc structlset {args} {
 		} else break
 	}
 	if {($len < 3)||(![expr $len&1])} {
-		return -code error "wrong # args: should be \"structlset ?-struct schema? ?-data clientdata? list taglist value ?taglist value?\""
+		return -code error "wrong # args: should be \"structlset ?-struct schema? ?-data clientdata? list field value ?field value ...?\""
 	}
 	if {$usestr == 1} {
 		set list [lshift args]
@@ -243,15 +262,8 @@ proc structlgetstruct {structure data list taglen taglist} {
 	# Is this an endnode
 	# ------------------
 	set ctag [lindex $structure 0]
-		# The space is important to make the distinction between * and *proc
 	if [regexp {^\*[^ ]} $ctag] {
-		if {$taglen > 0} {
-			return [::Extral::get[string range $ctag 1 end] $structure $data $taglist $list]
-		} elseif {"$list" == ""} {
-			return [lindex $structure end]
-		} else {	
-			return [::Extral::get[string range $ctag 1 end] $structure $data $taglist $list]
-		}
+		return [::Extral::get[string range $ctag 1 end] $structure $data $taglist $list]
 	}
 
 	# out of tags
@@ -263,7 +275,7 @@ proc structlgetstruct {structure data list taglen taglist} {
 		} elseif {$structlen != 0} {
 			set result ""
 			foreach {tag str} $structure {
-				if {"[lindex $tag 0]" == "*"} {
+				if {"[lindex $tag 0]" == "?"} {
 					set sublist [structlfind $list [lindex $tag 2] value]
 					lappend result [lindex $tag 1] [structlgetstruct $str $data $sublist 0 ""]
 				} else {
@@ -286,7 +298,7 @@ proc structlgetstruct {structure data list taglen taglist} {
 		}
 		set substructure [lindex $structure $pos]
 		set structtag [lindex $structure [expr {$pos-1}]]
-		if {"[lindex $structtag 0]" == "*"} {
+		if {"[lindex $structtag 0]" == "?"} {
 			set tag [lindex $structtag 2]
 		}
 	
@@ -319,7 +331,7 @@ proc structlgetnostruct {list taglen taglist} {
 }
 
 #doc {structl structlget} cmd {
-#structlget ?-struct schema? list taglist ?def?
+#structlget ?-struct schema? list field ?field ...?
 #} descr {
 #get the value of a field in the structured list
 #} example {
@@ -330,7 +342,7 @@ proc structlgetnostruct {list taglen taglist} {
 #			b {*between 0 10 ?}
 #		}
 #		ints {
-#			* {*int ?}
+#			*named {*int ?}
 #		}
 #	}
 #	% structlget -struct $struct {ints {a 9}} {sub b}
@@ -356,7 +368,7 @@ proc structlget {args} {
 		} else break
 	}
 	if {$alen < 2} {
-		return -code error "wrong # args: should be \"structlget ?-struct schema? list taglist ?taglist ...?\""
+		return -code error "wrong # args: should be \"structlget ?-struct schema? list field ?field ...?\""
 	}
 	set list [lshift args]
 	if {$alen == 2} {
@@ -406,7 +418,7 @@ proc structlunsetstruct {structure data list taglen taglist} {
 			return -code error "error: tag \"$tag\" not present in structure \"$structure\""
 		}
 		set structtag [lindex $structure [expr {$structpos-1}]]
-		if {"[lindex $structtag 0]" == "*"} {
+		if {"[lindex $structtag 0]" == "?"} {
 			set tag [lindex $structtag 2]
 		}
 		set substructure [lindex $structure $structpos]
@@ -461,7 +473,7 @@ proc structlunsetnostruct {list taglist} {
 }
 
 #doc {structl structlunset} cmd {
-#structlunset list taglist
+#structlunset ?-struct schema? ?-data clientdata? list field ?field ...?
 #} descr {
 #unset the value of a field in the structured list
 #} example {
@@ -508,7 +520,7 @@ proc structlunset {args} {
 }
 
 #doc {structl structlfields} cmd {
-#structlfields list ?valueVar?
+#structlfields list field ?valueVar?
 #} descr {
 #returns the fields present in the structure list
 #}
@@ -524,7 +536,7 @@ proc structlfields {list {field {}} args} {
 	}
 	if {$len == 0} {
 		foreach {tag val} $list {
-			if {"[lindex $tag 0]" == "*"} {
+			if {"[lindex $tag 0]" == "?"} {
 				lappend result [lindex $tag 1]
 			} else {
 				lappend result $tag
@@ -534,7 +546,7 @@ proc structlfields {list {field {}} args} {
 		upvar [lindex $args 0] values
 		set values ""
 		foreach {tag val} $list {
-			if {"[lindex $tag 0]" == "*"} {
+			if {"[lindex $tag 0]" == "?"} {
 				lappend result [lindex $tag 1]
 			} else {
 				lappend result $tag
@@ -548,7 +560,7 @@ proc structlfields {list {field {}} args} {
 proc structlfind {list tag args} {
 	set pos 1
 	foreach {ctag val} $list {
-		if {"[lindex $ctag 0]" == "*"} {
+		if {"[lindex $ctag 0]" == "?"} {
 			if {("$tag" == "[lindex $ctag 2]")||("$tag" == "[lindex $ctag 1]")} {
 				if {"$args" == ""} {
 					return $pos

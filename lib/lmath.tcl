@@ -44,6 +44,11 @@
 #	Any value higher than the maximum is changed to the maximum.
 #	Any value lower than the minimum is changed to the minimum.
 #}
+#doc {lmath average} cmd {
+#	lmath between ?list?
+#} descr {
+#	returns the average of the numbers in the list.
+#}
 
 if 0 {
 proc Extral::lmath {} {}
@@ -69,7 +74,7 @@ proc lmath {option args} {
 			}
 			set result 0
 			foreach e1 [lindex $args 0]  {
-				set result [expr $result+$e1]
+				set result [expr {$result+$e1}]
 			}
 			return $result
 		}
@@ -105,7 +110,7 @@ proc lmath {option args} {
 			}
 			set prev 0
 			foreach e1 [lindex $args 0]  {
-				set prev [expr $prev+$e1]
+				set prev [expr {$prev+$e1}]
 				lappend result $prev
 			}
 			return $result
@@ -117,7 +122,7 @@ proc lmath {option args} {
 			set result ""
 			set incr [lindex $args 1]
 			foreach e1 [lindex $args 0]  {
-				lappend result [expr $e1+$incr]
+				lappend result [expr {$e1+$incr}]
 			}
 			return $result
 		}
@@ -141,6 +146,17 @@ proc lmath {option args} {
 				}
 			}
 			return $result
+		}
+		average {
+			if {[llength $args]!=1} {
+				error "wrong # args: should be \"lmath average list\""
+			}
+			set result 0.0
+			set list [lindex $args 0]
+			foreach e1 $list  {
+				set result [expr {$result+$e1}]
+			}
+			return [expr {$result/[llength $list]}]
 		}
 		default {
 			error "bad option \"$option\": should be calc, sum, min, max, cumul or incr"

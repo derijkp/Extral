@@ -13,7 +13,7 @@ TCL_UNIX_DIR =	/home/peter/tcl/tcl8.0/unix
 TCL_BIN_DIR = @TCL_BIN_DIR@
 
 # Libraries to use when linking:
-LIBS = -L/home/peter/tcl/tcl8.0/unix -ltcl8.0 -ldl  -lieee -lm -lc
+LIBS = -L/home/peter/tcl/tcl8.0/unix -ltcl8.0 -ldl  -lieee -lm
 
 #----------------------------------------------------------------
 # The information below is modified by the configure script when

@@ -23,19 +23,17 @@ Several of the commands can have options depending on the type of dbm.
 New backends can be added (in C) using the ExtraL_DbmCreateType function.
 The database code can also be used from C using the ExtraL_DbmOpen function.
 
-<h2>dbm command</h2><dl><dt><b>
+<h2>dbm command</h2><dl><b><dt>
 dbm types
 </b><dd>
 	list the available type of database systems; fdbm is provided,
 	gdbm and bsddbm are dynamically loadable
-</ul>
-<dl><dt><b>
+<b><dt>
 dbm create type database ?options?
 </b><dd>
 	create a database of the given type (fdbm, gdbm, bsddbm) in 
 	the "file" database. The database is not opened by this command.
-</ul>
-<dl><dt><b>
+<b><dt>
 dbm open type dbcmd database ?options?
 </b><dd>
 	open a database for reading (read = default) or reading and 
@@ -43,36 +41,38 @@ dbm open type dbcmd database ?options?
 	type: the type of the database (fdbm, gdbm, bsddbm).
 	dbcmd: the command by which the opened database can be queried
 	database: place of the database in the filing system
-</ul>
 
-<h2>
+</dl><h2>
 database commands
 </h2>
 The dbmcmd created by the "dbm open" above will have the following options:
-<dl><dt><b>
+<dl><b><dt>
 	dbmcmd set key value
 </b><dd>
 		set key in the database to value.
-</ul>
-<dl><dt><b>
+<b><dt>
 	dbmcmd get key
 </b><dd>
 		get the value associated with key from the database.
-</ul>
-<dl><dt><b>
+<b><dt>
 	dbmcmd unset key
 </b><dd>
 		remove a key from the database.
-</ul>
-<dl><dt><b>
+<b><dt>
+	dbmcmd keys ?pattern?
+</b><dd>
+		return the keys in the database.
+<b><dt>
+	dbmcmd close
+</b><dd>
+		close the database. The dbmcmd will be removed
+<b><dt>
 	dbmcmd sync
 </b><dd>
 		sync the database (for those types that need it).
-</ul>
-<dl><dt><b>
+<b><dt>
 	dbmcmd reorganize
 </b><dd>
 		reorganize the database (for those types that need it).
-</ul>
 
 </body>
