@@ -48,6 +48,7 @@ proc lremove {listref args} {
     foreach item $args {
         set list [lsub $list -exclude [lfind $list $item]]
     }
+    return $list
 }
 
 proc larrayset {array varlist valuelist} {
@@ -67,34 +68,44 @@ proc rem {args} {
 # ===========================================
 
 proc literate {var list} {
-    global extraL_Priv_iterate
+    global extraL__Priv_iterate
     upvar $var ref
-    set extraL_Priv_iterate($var:list) $list
-    set extraL_Priv_iterate($var:len) [llength $list]
-    set extraL_Priv_iterate($var:pos) 0
-    set ref [lindex $extraL_Priv_iterate($var:list) 0]
+    set extraL__Priv_iterate($var:list) $list
+    set extraL__Priv_iterate($var:len) [llength $list]
+    set extraL__Priv_iterate($var:pos) 0
+    set ref [lindex $extraL__Priv_iterate($var:list) 0]
 }
 
 proc lnext {var} {
-    global extraL_Priv_iterate
+    global extraL__Priv_iterate
     upvar $var ref
-    if ![info exists extraL_Priv_iterate($var:list)] {
+    if ![info exists extraL__Priv_iterate($var:list)] {
         error "No iteration over $var set"
     }
-    incr extraL_Priv_iterate($var:pos)
-    if {$extraL_Priv_iterate($var:pos)==$extraL_Priv_iterate($var:len)} {
-        unset extraL_Priv_iterate($var:list)
-        unset extraL_Priv_iterate($var:len)
-        unset extraL_Priv_iterate($var:pos)
+    incr extraL__Priv_iterate($var:pos)
+    if {$extraL__Priv_iterate($var:pos)==$extraL__Priv_iterate($var:len)} {
+        unset extraL__Priv_iterate($var:list)
+        unset extraL__Priv_iterate($var:len)
+        unset extraL__Priv_iterate($var:pos)
         unset ref
     } else {
-        set ref [lindex $extraL_Priv_iterate($var:list) $extraL_Priv_iterate($var:pos)]
+        set ref [lindex $extraL__Priv_iterate($var:list) $extraL__Priv_iterate($var:pos)]
     }
 }
 
-# Code to use structures in Tcl
+# Code to use references and structures in Tcl
 # The example creates, prints and destroys a simple linked list
 # =============================================================
+
+proc new {} {
+    global extraL__Priv
+    if ![info exists extraL__Priv(pointernr)] {
+	    set extraL__Priv(pointernr) 1
+    }
+    incr extraL__Priv(pointernr)
+    uplevel global extraL__Priv__Pointer$extraL__Priv(pointernr)
+    return extraL__Priv__Pointer$extraL__Priv(pointernr)
+}
 
 proc example {} {
     set pointer [examplecreate]
@@ -106,197 +117,113 @@ proc examplecreate {} {
     set current [struct new]
     set root $current
     foreach value {a b c d} {
-        struct set current->value $value
-        array set [struct var current->array] {a 1 b 2 c 3}
-        struct set current->next [struct new]
+        struct set $current->value $value
+#        struct arrayset $current->array {a b c} {1 2 3}
+        struct set $current->next [struct new]
         set keep $current
-        set current [struct value current->next]
+        set current [struct value $current->next]
     }
-    struct set keep->next ""
+    struct set $keep->next ""
     return $root
 }
 
 proc exampleread {current} {
     while 1 {
-        puts stdout [struct value current->value]
-        puts [array get [struct var current->array]]
-        if {[struct value current->next] == ""} {break}
+        puts stdout [struct value $current->value]
+        puts [struct arrayget $current->array]
+        if {[struct value $current->next] == ""} {break}
         set keep $current
-        set current [struct value current->next]
+        set current [struct value $current->next]
     }
 }
 
 proc exampledestruct {current} {
     while 1 {
-        if {[struct value current->next] == ""} {break}
+        if {[struct value $current->next] == ""} {break}
         set keep $current
-        set current [struct value current->next]
-        struct unset keep
+        set current [struct value $current->next]
+        struct unset $keep
     }
 }
 
-
-proc ref {} {
-    global extral__Priv
-    if ![info exists extral__Priv(pointernr)] {
-	    set extral__Priv(pointernr) 1
-    }
-    incr extral__Priv(pointernr)
-    uplevel global extral__Priv__Pointer$extral__Priv(pointernr)
-    return extral__Priv__Pointer$extral__Priv(pointernr)
+proc structvar {} {
+    global extraL__Struct
 }
 
-proc struc {option var args} {
+proc struct {option args} {
+    global extraL__Struct
+
+    if [string match $option new] {
+	if ![string match $args ""] {
+	    error "wrong # args: should be \"struct new\""
+	}
+	if ![info exists extraL__Struct(pointernr)] {
+		set extraL__Struct(pointernr) 1
+	}
+	incr extraL__Struct(pointernr)
+	return Struct$extraL__Struct(pointernr)
+    }
+    set var [lindex $args 0]
     switch $option {
-        new {
-            if ![string match $args ""] {
-                error "wrong # args: should be \"struct new\""
-            }
-            global extral__Priv
-            if ![info exists extral__Priv(pointernr)] {
-        	    set extral__Priv(pointernr) 1
-            }
-            incr extral__Priv(pointernr)
-            uplevel global extral__Priv__Pointer$extral__Priv(pointernr)
-            return extral__Priv__Pointer$extral__Priv(pointernr)
-        }
         set {
             if {[llength $args]!=2} {
                 error "wrong # args: should be \"struct set struct value\""
             }
-            if ![regexp {^(.+)->(.+)$} [lindex $args 0] temp variable field] {
-	        error "No field specified"
-	    }
-            set pointer [uplevel set $variable]->$field
-            regsub {\([^()]*\)$} $pointer {} gpointer
-            global $gpointer
-            if [catch {set $pointer [lindex $args 1]} result] {
-	        regsub {extral__Priv__Pointer[0-9]+} $result $variable error
-                error $error
-            }
-            return $result
+            set extraL__Struct($var) [lindex $args 1]
         }
         unset {
             if {[llength $args]!=1} {
                 error "wrong # args: should be \"struct unset struct\""
             }
-            if [regexp {^(.+)->(.+)$} [lindex $args 0] temp variable field] {
-                set pointer [uplevel set $variable]->$field
-                regsub {\([^()]*\)$} $pointer {} gpointer
-		global $gpointer
-		eval unset $pointer
-	    } else {
-		set pointer [uplevel set [lindex $args 0]]
-		set vars [uplevel #0 info vars $pointer->*]
-		catch {eval global $vars}
-		catch {eval unset $vars}
+	    if [regexp -- {->} $var] {
+	        set list [array names extraL__Struct "$var\(*"]
+                catch {unset extraL__Struct($var)}
+                catch {eval unset [lregsub {^(.+)$} $list {extraL__Struct(\1)}]}
+            } else {
+                set list [array names extraL__Struct "$var->*"]
+                catch {eval unset [lregsub {^(.+)$} $list {extraL__Struct(\1)}]}
             }
         }
 	value {
             if {[llength $args]!=1} {
                 error "wrong # args: should be \"struct value struct\""
             }
-            if ![regexp {^(.+)->(.+)$} [lindex $args 0] temp variable field] {
-	        error "No field specified"
-	    }
-            set pointer [uplevel set $variable]->$field
-            regsub {\([^()]*\)$} $pointer {} gpointer
-            global $gpointer
-            if [catch {set $pointer} result] {
-	        regsub {extral__Priv__Pointer[0-9]+} $result $variable error
-                error $error
-            }
-            return $result
+            return $extraL__Struct($var)
 	}
 	var {
             if {[llength $args]!=1} {
                 error "wrong # args: should be \"struct var struct\""
             }
-            if ![regexp {^(.+)->(.+)$} [lindex $args 0] temp variable field] {
-	        error "No field specified"
-	    }
-            set pointer [uplevel set $variable]->$field
-            uplevel "global $pointer"
-            return $pointer
+            return extraL__Struct($var)
 	}
-        default {
-            error "bad option \"$option\": should be new, set, value, var, unset"
+        arrayset {
+            if {[llength $args]!=3} {
+                error "wrong # args: should be \"struct arrayset struct items values\""
+            }
+	    set items [lregsub {^(.+)$} [lindex $args 1] "$var\(\\1\)"]
+            array set extraL__Struct [lmanip join [lmanip merge $items [lindex $args 2]] { } all]
         }
-    }
-}
-
-proc structold {option args} {
-    switch $option {
-        new {
-            if ![string match $args ""] {
-                error "wrong # args: should be \"struct new\""
-            }
-            global extral__Priv
-            if ![info exists extral__Priv(pointernr)] {
-        	    set extral__Priv(pointernr) 1
-            }
-            incr extral__Priv(pointernr)
-            return extral__Priv__Pointer$extral__Priv(pointernr)
-        }
-        set {
-            if {[llength $args]!=2} {
-                error "wrong # args: should be \"struct set struct value\""
-            }
-            if ![regexp {^(.+)->(.+)$} [lindex $args 0] temp variable field] {
-	        error "No field specified"
-	    }
-            set pointer [uplevel set $variable]->$field
-            regsub {\([^()]*\)$} $pointer {} gpointer
-            global $gpointer
-            if [catch {set $pointer [lindex $args 1]} result] {
-	        regsub {extral__Priv__Pointer[0-9]+} $result $variable error
-                error $error
-            }
-            return $result
-        }
-        unset {
+        arrayget {
             if {[llength $args]!=1} {
-                error "wrong # args: should be \"struct unset struct\""
+                error "wrong # args: should be \"struct arrayget struct\""
             }
-            if [regexp {^(.+)->(.+)$} [lindex $args 0] temp variable field] {
-                set pointer [uplevel set $variable]->$field
-                regsub {\([^()]*\)$} $pointer {} gpointer
-		global $gpointer
-		eval unset $pointer
-	    } else {
-		set pointer [uplevel set [lindex $args 0]]
-		set vars [uplevel #0 info vars $pointer->*]
-		catch {eval global $vars}
-		catch {eval unset $vars}
-            }
+	    set list [array get extraL__Struct "$var\(*"]
+            return [lregsub "^$var\\((.*)\\)\$" $list {\1}]
         }
-	value {
+        arraynames {
             if {[llength $args]!=1} {
-                error "wrong # args: should be \"struct value struct\""
+                error "wrong # args: should be \"struct arrayget struct\""
             }
-            if ![regexp {^(.+)->(.+)$} [lindex $args 0] temp variable field] {
-	        error "No field specified"
-	    }
-            set pointer [uplevel set $variable]->$field
-            regsub {\([^()]*\)$} $pointer {} gpointer
-            global $gpointer
-            if [catch {set $pointer} result] {
-	        regsub {extral__Priv__Pointer[0-9]+} $result $variable error
-                error $error
-            }
-            return $result
-	}
-	var {
+	    set list [array names extraL__Struct "$var\(*"]
+            return [lregsub "^$var\\((.*)\\)\$" $list {\1}]
+        }
+        arraysize {
             if {[llength $args]!=1} {
-                error "wrong # args: should be \"struct var struct\""
+                error "wrong # args: should be \"struct arraysize struct\""
             }
-            if ![regexp {^(.+)->(.+)$} [lindex $args 0] temp variable field] {
-	        error "No field specified"
-	    }
-            set pointer [uplevel set $variable]->$field
-            uplevel "global $pointer"
-            return $pointer
-	}
+	    set list [array names extraL__Struct "$var\(*"]
+            return [llength $list]
+        }
         default {
             error "bad option \"$option\": should be new, set, value, var, unset"
         }

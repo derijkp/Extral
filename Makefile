@@ -2,18 +2,27 @@
 VERSION=0.9
 
 # The directory containing the Tcl sources and headers
-TCL_DIR =	../tcl7.4
+# To build against Tcl7.4
+# TCL_DIR =	../tcl7.4
+# TCL_DIR2 =	../tcl7.4
+# To build against Tcl7.5
+TCL_DIR =	../tcl7.5a2/generic
+TCL_DIR2 =	../tcl7.5a2/unix
 
 # compiler flags: -KPICT is to create position independed code, this might be
 # different for your compiler
-CFLAGS = -O2 -fpic -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -Dvfork=fork
+# Linux
+# CFLAGS = -O2 -fpic -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -Dvfork=fork
+# IRIX 5.3
+CFLAGS = -O2 -KPIC 
+
 
 # Some versions of make, like SGI's, use the following variable to
 # determine which shell to use for executing commands:
 SHELL =		/bin/sh
 
 CC =		cc
-CC_SWITCHES =	${CFLAGS} -I./ -I${TCL_DIR}
+CC_SWITCHES =	${CFLAGS} -I./ -I${TCL_DIR} -I${TCL_DIR2}
 
 all: libextral.so.$(VERSION)
 

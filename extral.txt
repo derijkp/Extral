@@ -1,0 +1,185 @@
+ExtraL Commands
+===============  extra list manipulation commands for Tcl
+                 by Peter De Rijk (Universiteit Antwerpen) 
+
+lregsub ?switches? exp list subSpec
+    does a regsub for each element in the list, and returns the resulting list.
+    eg.
+	% lregsub {c$} {afdsg asdc sfgh {dfgh shgfc} dfhg} {!}
+	afdsg asd! sfgh {dfgh shgf!} dfhg
+	% lregsub {^([^.]+)\.([^.]+)$} {start.sh help.ps h.sh} {\2 \1}
+	{sh start} {ps help} {sh h}
+
+lfind <mode> list pattern
+    returns a list of all indices which match a pattern.
+    <mode> can be -exact, -glob, or -regexp
+    eg.
+	% lfind -regexp {Ape Ball Field {Antwerp city} Egg} {^A}
+	0 3
+
+lsub list ?-exclude? [index list]
+    create a sublist from a set of indices
+    When -exclude is specified, the elements of which the indexes are not in the list 
+    will be given.
+	eg.
+	    % lsub {Ape Ball Field {Antwerp city} Egg} {0 3}
+	    Ape {Antwerp city}
+	    % lsub {Ape Ball Field {Antwerp city} Egg} -exclude {0 3}
+	    Ball Field Egg
+
+lcor <referencelist> <list>
+    gives the positions of the elements in list in the reference list. If an element is not
+    found in the reference list, it returns -1. Elements are matched only once.
+	% lcor {a b c d e f} {d b}
+	3 1
+	% lcor {a b c d e f} {b d d}
+	1 3 -1
+
+lload <filename>
+    returns all lines in the specified files as a list 
+
+lwrite ?file? ?list?
+    writes a list to a file
+
+lmanip subindex ?list? ?pos?
+    returns a list of the 'pos' element in each of the elements of the given list
+	eg.
+	% lmanip subindex {{a 1} {b 2} {c 3}} 1
+	1 2 3
+
+lmanip merge ?list1? ?list2?
+    merge two lists into one
+	eg.
+	% lmanip merge {a b c} {1 2 3}
+	{a 1} {b 2} {c 3}
+
+lmanip extract ?list? ?expression?
+    tries to match each element in a list; if the element matches, it extracts the 
+    parenthesised part. It returns a list of all extracted parts. If there was no match,
+    an empty element is put in the list.
+	eg. 
+	% lmanip extract {Results {A: 50%} {B: 25%} {C: 25%}} { ([0-9+]+)\%}
+        {} 50 25 25
+
+lmanip remdup ?list?
+    removes duplicates from list
+	eg.
+	% lmanip remdup {a b c a b d}
+	a b c d
+
+lmanip split ?list? -before/-after/-outside ?positions?
+    splits a list at positions into sublists
+	eg.
+	% lmanip split {a b c d e} -before {1 3}
+	a {b c} {d e}
+
+lmanip join ?list? ?join string? ?position list?
+    joins list elements at positions given in the ?position list?. When you
+    specify all, all elements will be joined.
+	eg.
+	% lmanip join {a b c {a d} e} { } {0 2}
+        {a b} {c a d} e
+	% lmanip join {a b c {a d} e} {} {0 2}
+        ab {ca d} e
+	% lmanip join {a b c {a d} e} {} all
+	abca de
+
+lmanip lengths ?list?
+    returns a list with the lengths of the elements
+	eg.
+	% lmanip lengths {abc abcdef}
+	3 6
+
+lmanip fill ?size? ?start? ??incr??
+    fills a list of ?size? elements with ?start?; if ?incr? is given and ?size? is an integer, each element in the list will be the former incremented with ?incr?
+	eg.
+	% lmanip fill 4 "Hello world"
+	{Hello world} {Hello world} {Hello world} {Hello world}
+	% lmanip fill 5 2 2
+	2 4 6 8 10
+	% lmanip fill 5 10 -2
+	10 8 6 4 2
+
+Commands in
+-----------
+There are also some extra listprocessing commands written in tcl in the 
+package. Some use the commands written in C:
+
+lpop listName
+    returns the last element from a list, thereby removing it from the list.
+
+lpush listName ?item?
+    for completeness, it is actually the same command as lappend.
+
+lshift listName
+    returns the first element from a list, thereby removing it from the list.
+
+lunshift listName ?item?
+    prepends ?item? to the list.
+
+leor list1 list2
+    returns the elements that are not shared between both lists
+
+lremove listName ?item? ...
+    removes the items from the list
+
+literate variableName list
+    debugging tool: to interactively iterate a variable over a list. literate
+    is used to initialise and it puts the first element of the list into the
+    variable. Every 'lnext variableName' will puts the next element into the 
+    variable.
+
+struct
+------
+    This code emulates structures in a way. all data is acutally stored in 
+    one global array extraL__Struct. You cannot use the generic array command 
+    on structure structure members
+Commands are:
+struct new
+    returns an unused pointer to a structure.
+    eg.
+        set current [struct new]
+
+struct set struct->member value
+    sets the value of a member
+    eg.
+        struct set $current->field Test
+        struct set $current->data(a) 1
+    
+struct value struct->member
+    returns the value of a member
+    eg.
+        struct value $current->field
+        struct value $current->data(a)
+
+struct unset struct?->member?
+    unsets a member or the entire struct
+    eg.
+        struct unset $current->field
+        struct unset $current
+
+struct var struct?->member?
+    gives the actual variable name where the member is stored (global): 
+    This can be used in -textvariable options etc.
+    eg.
+        entry .try -textvariable [struct var $current->field]
+        pack .try
+
+struct arrayset struct->member items values
+    sets values in an array member
+    eg.
+        % struct arrayset $current->value {a b c} {1 2 3}
+        % struct value $current->value(b)
+        2
+
+struct arrayget struct->member
+        % struct arrayget $current->value
+	b 2 a 1 c 3
+
+struct arraynames struct->member
+        % struct arraynames $current->value
+	b a c
+
+struct arraysize struct->member
+        % struct arraysize $current->value
+	3

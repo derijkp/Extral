@@ -1,26 +1,13 @@
-/*
-    ####      ###    ####   ######     Dedicated
-    #   #    #   #  #    #  #          Comparative
-    #    #  #       #       #          Sequence
-    #    #  #        ####   ###        Editor
-    #    #  #            #  #          _____________________________________
-    #   #    #   #  #    #  #                        
-    ####      ###    ####   ######                   Peter De Rijk
-    ________________________________________________________________________
+/*  
+ *   File:    extral.c
+ *   Purpose: extraL extension to Tcl
+ *   Author:  Copyright (c) 1995 Peter De Rijk
+ *   See the file "README" for information on usage and redistribution
+ *   of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+ */
 
-    File:    extral.c
-    Author:  Copyright © 1993 Peter De Rijk
-    Purpose: extraL extension to Tcl
-*/
-/*
- #include "general.h"
- #include "filing.h"
-*/
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <limits.h>
+#include "tclInt.h"
+#include "tclPort.h"
 #include "tclRegexp.h"
   typedef enum {false,true,other} PBOOL;
 
@@ -1017,6 +1004,7 @@ ExtraL_LmanipCmd(notUsed, interp, argc, argv)
         Tcl_DString element;
         char savedChar, *first, *last;
         PBOOL before;
+	char *string;
         int *list;
         int number, nr;
         int i;
@@ -1038,7 +1026,6 @@ ExtraL_LmanipCmd(notUsed, interp, argc, argv)
 
         nr=0;
         Tcl_DStringInit(&element);
-        Tcl_DStringAppend(&element, listArgv[nr++], -1);
         while(nr<listArgc) {
             i=0;
             while(i<number) {
@@ -1048,20 +1035,17 @@ ExtraL_LmanipCmd(notUsed, interp, argc, argv)
             if (i<number) {
                 if (before==true) {
         	    Tcl_AppendElement(interp, Tcl_DStringValue(&element));
-        	    Tcl_DStringFree(&element);
-        	    Tcl_DStringInit(&element);
+        	    Tcl_DStringSetLength(&element, 0);
                     Tcl_DStringAppendElement(&element, listArgv[nr]);
         	} else if (before==false) {
                     Tcl_DStringAppendElement(&element, listArgv[nr]);
         	    Tcl_AppendElement(interp, Tcl_DStringValue(&element));
-        	    Tcl_DStringFree(&element);
-        	    Tcl_DStringInit(&element);
+        	    Tcl_DStringSetLength(&element, 0);
         	    nr++;
         	    if (nr<listArgc) Tcl_DStringAppendElement(&element, listArgv[nr]);
         	} else {
         	    Tcl_AppendElement(interp, Tcl_DStringValue(&element));
-        	    Tcl_DStringFree(&element);
-        	    Tcl_DStringInit(&element);
+        	    Tcl_DStringSetLength(&element, 0);
         	    nr++;
         	    if (nr<listArgc) Tcl_DStringAppendElement(&element, listArgv[nr]);
         	}
@@ -1070,16 +1054,19 @@ ExtraL_LmanipCmd(notUsed, interp, argc, argv)
             }
             nr++;
         }
-        Tcl_AppendElement(interp, Tcl_DStringValue(&element));
+	string = Tcl_DStringValue(&element);
+	if (string[0] != 0) {
+	    Tcl_AppendElement(interp, string);
+	}
         Tcl_DStringFree(&element);
         ckfree((char *) listArgv);
     } else if ((c == 'j')&&(strncmp(argv[1], "join",len) == 0)) {
         Tcl_DString element;
         char savedChar, *first, *last;
         PBOOL before;
-        char *join;
+	char *string, *join;
         int *list;
-        int number=1;
+        int number=1, elements=0;
         int nr;
         int i;
     
@@ -1106,10 +1093,6 @@ ExtraL_LmanipCmd(notUsed, interp, argc, argv)
         nr=0;
         Tcl_DStringInit(&element);
         
-        if (list != NULL) {
-            Tcl_DStringStartSublist(&element);
-        }
-
         i=0;
         while(nr<listArgc) {
             Tcl_DStringAppend(&element, listArgv[nr], -1);
@@ -1124,18 +1107,18 @@ ExtraL_LmanipCmd(notUsed, interp, argc, argv)
             }
             nr++;
             if (i>=number) {
-                Tcl_DStringEndSublist(&element);
-                  if (nr!=listArgc) {
-                      Tcl_DStringStartSublist(&element);
-                  }
-            } else if (nr!=listArgc) {
-                Tcl_DStringAppend(&element, join, -1);
-            }
+                Tcl_AppendElement(interp, Tcl_DStringValue(&element));
+		elements++;
+		Tcl_DStringSetLength(&element, 0);
+            } else {
+		Tcl_DStringAppend(&element, join, -1);
+	    }
         }
-        if (list != NULL) {
-            Tcl_DStringEndSublist(&element);
+	string = Tcl_DStringValue(&element);
+        if (string[0] != 0) {
+	    if (elements!=0) Tcl_AppendElement(interp, string);
+	    else Tcl_DStringResult(interp, &element);
         }
-        Tcl_DStringResult(interp, &element);
         Tcl_DStringFree(&element);
         ckfree((char *) listArgv);
     } else if ((c == 'l')&&(strncmp(argv[1], "lengths",len) == 0)) {
