@@ -1,15 +1,16 @@
 extra list manipulation commands for Tcl
 ----------------------------------------
 
-This package can be build against Tk3.6 or Tk4.0 by copiing the
-appropriate files to extral.c and extraLInit.c, and adjusting the
-appropriate makefile. It should be initialised by calling the function
+This package can be build by adjusting the appropriate Makefile and 
+running make. (In doubt, it's a good bet to copy most options used to 
+compile the Tcl files. It should be initialised by calling the function 
 ExtraL_Init
 
 There is not much documentation unfortunately
 
 Commands
 --------
+lregsub ?switches? exp list subSpec: does a regsub for each element in the list, and returns the resulting list
 lfind <mode> list pattern: returns a list of all indices which match a pattern
 lsub list <mode> [index list]: create a sublist from a set of indices
 lcor <referencelist> <list>: gives the positions of the elements in list in the reference list 
@@ -20,10 +21,6 @@ lmanip merge ?list1? ?list2?: merge two lists into one
 lmanip extract ?list? ?expression?: extracts matches to expression from a list, and returns a list of them.
 lmanip remdup ?list?: removes duplicates from list
 lmanip split ?list? -before/-after/-outside ?positions?: splits a list at positions into sublists
+lmanip join ?list? ?join string? ?positions?: joins list elements at positions (may be all)
 lmanip lengths ?list?: returns a list with the lengths of the elements
-lmanip toarray ?list? ?variable?: sets an array acoording to values in a paired list:
-    lmanip toarray {{a 1} {b 2} {c 3}} try
-    equals:
-    set try(a) 1
-    set try(b) 2
-    set try(c) 3
+lmanip fill ?size? ?start? ??incr??: fills a list of ?size? elements with ?start?; if ?incr? is given and ?size? is an integer, each element in the list will be the former incremented with ?incr?

@@ -27,20 +27,20 @@
 extern Tcl_RegExp Tcl_RegExpCompile(Tcl_Interp *interp,char *string);
 
 typedef struct {
-	int number;
-	long *list;
+        int number;
+        long *list;
 } INDEX;
 
 typedef struct {
-	FILE *file;
-  	INDEX index;
-	char *sep;
-	PBOOL before;
+        FILE *file;
+          INDEX index;
+        char *sep;
+        PBOOL before;
 } Lfile_index;
 
 typedef struct {
-	int line;
-	int begin,end;
+        int line;
+        int begin,end;
         regexp *regexpPtr;
 } Lposition;
 
@@ -100,7 +100,7 @@ int *get_intlist(Tcl_Interp *interp, char *string, int *number)
     int temp;
 
     if (Tcl_SplitList(interp, string, &listArgc, &listArgv) != TCL_OK) {
-	return(NULL);
+        return(NULL);
     }
 
     /*---- get index list ----*/
@@ -108,24 +108,24 @@ int *get_intlist(Tcl_Interp *interp, char *string, int *number)
     list=(int *)malloc(listArgc*sizeof(int));
     if (list==NULL) {
         ckfree((char *) listArgv);
-	Tcl_AppendResult(interp, "Couldn't allocate memory", (char *) NULL);
-	return(NULL);
+        Tcl_AppendResult(interp, "Couldn't allocate memory", (char *) NULL);
+        return(NULL);
     }
     i=0;
     while(i<listArgc) {
-	if (Tcl_GetInt(interp, listArgv[i], &temp) != TCL_OK) {
+        if (Tcl_GetInt(interp, listArgv[i], &temp) != TCL_OK) {
             ckfree((char *) listArgv);
-	    free(list);
-	    return(NULL);
-	}
-	if (temp<0) {
+            free(list);
+            return(NULL);
+        }
+        if (temp<0) {
             ckfree((char *) listArgv);
-	    free(list);
-	    Tcl_AppendResult(interp, "negative index present!", (char *) NULL);
-	    return(NULL);
-	}
-	list[i]=temp;
-	i++;
+            free(list);
+            Tcl_AppendResult(interp, "negative index present!", (char *) NULL);
+            return(NULL);
+        }
+        list[i]=temp;
+        i++;
     }
     ckfree((char *) listArgv);
     return(list);
@@ -198,7 +198,7 @@ int Lfile_ObjectCmd(ClientData clientData, Tcl_Interp *interp, int argc, char *a
     c=argv[1][0];
     if ((c == 'n') && (strcmp(argv[1], "number") == 0)) {
         sprintf(resultstring,"%d",LfilePtr->index.number);
-	Tcl_AppendResult(interp, resultstring, (char *) NULL);
+        Tcl_AppendResult(interp, resultstring, (char *) NULL);
         return TCL_OK;
     } else if ((c == 'c')&&(strcmp(argv[1], "close") == 0)) {
         Tcl_DeleteCommand(interp, argv[0]);
@@ -209,10 +209,10 @@ int Lfile_ObjectCmd(ClientData clientData, Tcl_Interp *interp, int argc, char *a
         INDEX ind_ref;
         PBOOL all=true;
         FILE *file;
-	int *list;
-	int rnumber,number,org,temp,begin;
-	int i;
-	
+        int *list;
+        int rnumber,number,org,temp,begin;
+        int i;
+        
         ind_ref=LfilePtr->index;
         if ((argc != 4)&&(argc != 5)) {
             Tcl_AppendResult(interp, "wrong # args: should be \"",
@@ -220,50 +220,50 @@ int Lfile_ObjectCmd(ClientData clientData, Tcl_Interp *interp, int argc, char *a
             return TCL_ERROR;
         }
 
-	all=find_bool(argv[3],"-all","-exclude");
-	if (all==other) {begin=3;} else {begin=4;}
-	if (all!=true) {
-	    list=get_intlist(interp, argv[begin], &number);
-	    if (list==NULL) {
-		return TCL_ERROR;
-	    }
-	}
-	
-	if (Compile_L_pos(interp,&L_pos, argv[2])==false) {return TCL_ERROR;}
-	if (all==other) {
-	    i=0;
-	    while(i<number) {
-	        if (get_L_field(interp,LfilePtr,&L_pos,list[i])==false) {
-		    free(list);
-		    return TCL_ERROR;
-	        }
-	        i++;
-	    }
-	} else {
-	    rnumber=ind_ref.number;
-	    org=0;
-	    while (org<rnumber) {
-	        if (all==false) {
-		    i=0;
-		    while(i<number) {
-			if (org==list[i]) break;
-			i++;
-		    }
-		    if (i<number) {org++;continue;}
-		}
-	        if (get_L_field(interp,LfilePtr,&L_pos,org)==false) {
-		    free(list);
-		    return TCL_ERROR;
-	        }
-		org++;
-	    }
-	}
-	if (all!=true) free(list);
+        all=find_bool(argv[3],"-all","-exclude");
+        if (all==other) {begin=3;} else {begin=4;}
+        if (all!=true) {
+            list=get_intlist(interp, argv[begin], &number);
+            if (list==NULL) {
+                return TCL_ERROR;
+            }
+        }
+        
+        if (Compile_L_pos(interp,&L_pos, argv[2])==false) {return TCL_ERROR;}
+        if (all==other) {
+            i=0;
+            while(i<number) {
+                if (get_L_field(interp,LfilePtr,&L_pos,list[i])==false) {
+                    free(list);
+                    return TCL_ERROR;
+                }
+                i++;
+            }
+        } else {
+            rnumber=ind_ref.number;
+            org=0;
+            while (org<rnumber) {
+                if (all==false) {
+                    i=0;
+                    while(i<number) {
+                        if (org==list[i]) break;
+                        i++;
+                    }
+                    if (i<number) {org++;continue;}
+                }
+                if (get_L_field(interp,LfilePtr,&L_pos,org)==false) {
+                    free(list);
+                    return TCL_ERROR;
+                }
+                org++;
+            }
+        }
+        if (all!=true) free(list);
         return TCL_OK;
     } else {
-	Tcl_AppendResult(interp, "wrong option: should be:",
-	           "number, get, close", (char *) NULL);
-	return TCL_ERROR;
+        Tcl_AppendResult(interp, "wrong option: should be:",
+                   "number, get, close", (char *) NULL);
+        return TCL_ERROR;
     }
 }
 /*------------------------------------------------------------------*/
@@ -278,36 +278,36 @@ int Lfile_ObjectCmd(ClientData clientData, Tcl_Interp *interp, int argc, char *a
   index->list[0]=ftell(file);
   if (sep==NULL) {
       while (1) {
-	ch=fgetc(file);
-	if (ch==EOF) break;
-	if (ch=='\n') {
-	  ind=ftell(file);
-	  index->list=(long *)realloc(index->list,(index->number+1)*sizeof(long));
-	  if (index->list==NULL) {return(false);}
-	  index->list[index->number]=ind;
-	  index->number++;
-	  }
-	}
+        ch=fgetc(file);
+        if (ch==EOF) break;
+        if (ch=='\n') {
+          ind=ftell(file);
+          index->list=(long *)realloc(index->list,(index->number+1)*sizeof(long));
+          if (index->list==NULL) {return(false);}
+          index->list[index->number]=ind;
+          index->number++;
+          }
+        }
       index->number--;
   } else {
       char *line;
       while (1) {
         if (before==true) {ind=ftell(file);}
-	line=read_line(file);
-	if (line==NULL) break;
-	if (Tcl_RegExpMatch(interp, line, sep)==1) {
-	  if (before==false) {ind=ftell(file);}
-	  index->list=(long *)realloc(index->list,(index->number+1)*sizeof(long));
-	  if (index->list==NULL) {return(false);}
-	  index->list[index->number]=ind;
-	  index->number++;
-	  }
-	}
+        line=read_line(file);
+        if (line==NULL) break;
+        if (Tcl_RegExpMatch(interp, line, sep)==1) {
+          if (before==false) {ind=ftell(file);}
+          index->list=(long *)realloc(index->list,(index->number+1)*sizeof(long));
+          if (index->list==NULL) {return(false);}
+          index->list[index->number]=ind;
+          index->number++;
+          }
+        }
   }
   return(true);
   }
 /*------------------------------------------------------------------*/
-int Dcse_LfileCmd(ClientData clientData, Tcl_Interp *interp, int argc, char *argv[]) {
+int ExtraL_LfileCmd(ClientData clientData, Tcl_Interp *interp, int argc, char *argv[]) {
     Lfile_index *LfilePtr;
 
     if ((argc != 3)&&(argc != 5)) {
@@ -324,12 +324,12 @@ int Dcse_LfileCmd(ClientData clientData, Tcl_Interp *interp, int argc, char *arg
     LfilePtr=(Lfile_index *)malloc(sizeof(Lfile_index));
     LfilePtr->sep=NULL;
     if (argc==5) {
-	LfilePtr->before=find_bool(argv[3],"-before","-after");
-	if (LfilePtr->before==other) {
-	    Tcl_AppendResult(interp, "option should be -before or -after", (char *) NULL);
-	    return TCL_ERROR;
-	}
-	LfilePtr->sep=strdup(argv[4]);
+        LfilePtr->before=find_bool(argv[3],"-before","-after");
+        if (LfilePtr->before==other) {
+            Tcl_AppendResult(interp, "option should be -before or -after", (char *) NULL);
+            return TCL_ERROR;
+        }
+        LfilePtr->sep=strdup(argv[4]);
     }
 
     LfilePtr->file=fopen(argv[2],"r");
@@ -365,15 +365,15 @@ int Dcse_LfileCmd(ClientData clientData, Tcl_Interp *interp, int argc, char *arg
 
   pos=strtok(positions,":-,");
   if (pos==NULL) {
-	Tcl_AppendResult(interp, "error in line specifier", (char *) NULL);
-	return(false);
+        Tcl_AppendResult(interp, "error in line specifier", (char *) NULL);
+        return(false);
   }
   L_pos->line=atol(pos);
 
   pos=strtok(NULL,":-,");
   if (pos==NULL) {
-	Tcl_AppendResult(interp, "error in begin specifier", (char *) NULL);
-	return(false);
+        Tcl_AppendResult(interp, "error in begin specifier", (char *) NULL);
+        return(false);
   }
   L_pos->begin=atol(pos);
 
@@ -393,8 +393,8 @@ int Dcse_LfileCmd(ClientData clientData, Tcl_Interp *interp, int argc, char *arg
   } else {
       L_pos->regexpPtr = (regexp *)Tcl_RegExpCompile(interp, regpattern);
       if (L_pos->regexpPtr == NULL) {
-	  Tcl_AppendResult(interp, "error in regexp specifier", (char *) NULL);
-	  return(false);
+          Tcl_AppendResult(interp, "error in regexp specifier", (char *) NULL);
+          return(false);
       }
   }
   return(true);
@@ -412,16 +412,16 @@ int Dcse_LfileCmd(ClientData clientData, Tcl_Interp *interp, int argc, char *arg
   int i;
 
   if ((org<0)||(org>=ind_ref.number)) {
-	Tcl_AppendElement(interp, "number out of range");
-	return(false);
+        Tcl_AppendElement(interp, "number out of range");
+        return(false);
   }
 
   fseek(f_ref,ind_ref.list[org],SEEK_SET);
   skip_lines(LfilePtr->file,L_pos->line);
   tline=read_line(f_ref);
   if (tline==NULL) {
-	Tcl_AppendElement(interp, "beyond EOF");
-	return(false);
+        Tcl_AppendElement(interp, "beyond EOF");
+        return(false);
   }
 
   begin=L_pos->begin;
@@ -440,38 +440,38 @@ int Dcse_LfileCmd(ClientData clientData, Tcl_Interp *interp, int argc, char *arg
   } else {
       match = Tcl_RegExpExec(interp,(Tcl_RegExp)regexpPtr, result, result);
       if (match == -1) {
-	  return(false);
+          return(false);
       }
       if (!match) {
           Tcl_AppendElement(interp, "");
-	  return(true);
+          return(true);
       } else {
           Tcl_DString element;
-	  char savedChar, *first, *last;
-	  if (regexpPtr->startp[1]==NULL) {
-	      Tcl_AppendElement(interp,result);
+          char savedChar, *first, *last;
+          if (regexpPtr->startp[1]==NULL) {
+              Tcl_AppendElement(interp,result);
           } else if (regexpPtr->startp[2]==NULL) {
-	      first = regexpPtr->startp[1];
-	      last = regexpPtr->endp[1];
-	      savedChar = *last;
-	      *last = '\0';
-	      Tcl_AppendElement(interp, first);
+              first = regexpPtr->startp[1];
+              last = regexpPtr->endp[1];
+              savedChar = *last;
+              *last = '\0';
+              Tcl_AppendElement(interp, first);
               *last = savedChar;
-	  } else {
-	      Tcl_DStringInit(&element);
-	      i=1;
-	      while (regexpPtr->startp[i]!=NULL) {
-		  first = regexpPtr->startp[i];
-		  last = regexpPtr->endp[i];
-		  savedChar = *last;
-		  *last = '\0';
-		  Tcl_DStringAppendElement(&element, first);
-		  *last = savedChar;
-		  i++;
-	      }
-	      Tcl_AppendElement(interp, Tcl_DStringValue(&element));
-	      Tcl_DStringFree(&element);
-	  }
+          } else {
+              Tcl_DStringInit(&element);
+              i=1;
+              while (regexpPtr->startp[i]!=NULL) {
+                  first = regexpPtr->startp[i];
+                  last = regexpPtr->endp[i];
+                  savedChar = *last;
+                  *last = '\0';
+                  Tcl_DStringAppendElement(&element, first);
+                  *last = savedChar;
+                  i++;
+              }
+              Tcl_AppendElement(interp, Tcl_DStringValue(&element));
+              Tcl_DStringFree(&element);
+          }
       }
   }
   free(tline);
@@ -481,30 +481,30 @@ int Dcse_LfileCmd(ClientData clientData, Tcl_Interp *interp, int argc, char *arg
 /*
  *----------------------------------------------------------------------
  *
- * Dcse_LfindCmd --
+ * ExtraL_LfindCmd --
  *
- *	This procedure is invoked to process the "lfind" command.
+ *        This procedure is invoked to process the "lfind" command.
  *      It finds all occurences of a pattern in a list, and returns
  *      their indexes as a list.
  *
  * Results:
- *	A standard Tcl result.
+ *        A standard Tcl result.
  *
  *
  *----------------------------------------------------------------------
  */
 
-	/* ARGSUSED */
+        /* ARGSUSED */
 int
-Dcse_LfindCmd(notUsed, interp, argc, argv)
-    ClientData notUsed;			/* Not used. */
-    Tcl_Interp *interp;			/* Current interpreter. */
-    int argc;				/* Number of arguments. */
-    char **argv;			/* Argument strings. */
+ExtraL_LfindCmd(notUsed, interp, argc, argv)
+    ClientData notUsed;                        /* Not used. */
+    Tcl_Interp *interp;                        /* Current interpreter. */
+    int argc;                                /* Number of arguments. */
+    char **argv;                        /* Argument strings. */
 {
-#define EXACT	0
-#define GLOB	1
-#define REGEXP	2
+#define EXACT        0
+#define GLOB        1
+#define REGEXP        2
     int listArgc;
     char **listArgv;
     char *line=NULL;
@@ -512,48 +512,48 @@ Dcse_LfindCmd(notUsed, interp, argc, argv)
 
     mode = GLOB;
     if (argc == 4) {
-	if (strcmp(argv[1], "-exact") == 0) {
-	    mode = EXACT;
-	} else if (strcmp(argv[1], "-glob") == 0) {
-	    mode = GLOB;
-	} else if (strcmp(argv[1], "-regexp") == 0) {
-	    mode = REGEXP;
-	} else {
-	    Tcl_AppendResult(interp, "bad search mode \"", argv[1],
-		    "\": must be -exact, -glob, or -regexp", (char *) NULL);
-	    return TCL_ERROR;
-	}
+        if (strcmp(argv[1], "-exact") == 0) {
+            mode = EXACT;
+        } else if (strcmp(argv[1], "-glob") == 0) {
+            mode = GLOB;
+        } else if (strcmp(argv[1], "-regexp") == 0) {
+            mode = REGEXP;
+        } else {
+            Tcl_AppendResult(interp, "bad search mode \"", argv[1],
+                    "\": must be -exact, -glob, or -regexp", (char *) NULL);
+            return TCL_ERROR;
+        }
     } else if (argc != 3) {
-	Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-		" ?mode? list pattern\"", (char *) NULL);
-	return TCL_ERROR;
+        Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
+                " ?mode? list pattern\"", (char *) NULL);
+        return TCL_ERROR;
     }
     if (Tcl_SplitList(interp, argv[argc-2], &listArgc, &listArgv) != TCL_OK) {
-	return TCL_ERROR;
+        return TCL_ERROR;
     }
     index = -1;
     for (i = 0; i < listArgc; i++) {
-	match = 0;
-	switch (mode) {
-	    case EXACT:
-		match = (strcmp(listArgv[i], argv[argc-1]) == 0);
-		break;
-	    case GLOB:
-		match = Tcl_StringMatch(listArgv[i], argv[argc-1]);
-		break;
-	    case REGEXP:
-		match = Tcl_RegExpMatch(interp, listArgv[i], argv[argc-1]);
-		if (match < 0) {
-		    ckfree((char *) listArgv);
-		    return TCL_ERROR;
-		}
-		break;
-	}
-	if (match) {
-	    line=numstr(i);
-	    Tcl_AppendElement(interp, line);
-	    free(line);
-	}
+        match = 0;
+        switch (mode) {
+            case EXACT:
+                match = (strcmp(listArgv[i], argv[argc-1]) == 0);
+                break;
+            case GLOB:
+                match = Tcl_StringMatch(listArgv[i], argv[argc-1]);
+                break;
+            case REGEXP:
+                match = Tcl_RegExpMatch(interp, listArgv[i], argv[argc-1]);
+                if (match < 0) {
+                    ckfree((char *) listArgv);
+                    return TCL_ERROR;
+                }
+                break;
+        }
+        if (match) {
+            line=numstr(i);
+            Tcl_AppendElement(interp, line);
+            free(line);
+        }
     }
     ckfree((char *) listArgv);
     return TCL_OK;
@@ -561,28 +561,28 @@ Dcse_LfindCmd(notUsed, interp, argc, argv)
 /*
  *----------------------------------------------------------------------
  *
- * Dcse_LsubCmd --
+ * ExtraL_LsubCmd --
  *
- *	This procedure is invoked to process the "lsub" command.
+ *        This procedure is invoked to process the "lsub" command.
  *      It creates a subset of a list
  *
  * Results:
- *	A standard Tcl result.
+ *        A standard Tcl result.
  *
  *
  *----------------------------------------------------------------------
  */
 
-	/* ARGSUSED */
+        /* ARGSUSED */
 int
-Dcse_LsubCmd(notUsed, interp, argc, argv)
-    ClientData notUsed;			/* Not used. */
-    Tcl_Interp *interp;			/* Current interpreter. */
-    int argc;				/* Number of arguments. */
-    char **argv;			/* Argument strings. */
+ExtraL_LsubCmd(notUsed, interp, argc, argv)
+    ClientData notUsed;                 /* Not used. */
+    Tcl_Interp *interp;                 /* Current interpreter. */
+    int argc;                           /* Number of arguments. */
+    char **argv;                       /* Argument strings. */
 {
-#define INCLUDE	0
-#define EXCLUDE	1
+#define INCLUDE        0
+#define EXCLUDE        1
     int *get_intlist(Tcl_Interp *interp, char *string, int *number);
     int listArgc;
     char **listArgv;
@@ -592,56 +592,56 @@ Dcse_LsubCmd(notUsed, interp, argc, argv)
     int i,j;
 
     if ((argc != 3)&&(argc != 4)) {
-	Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-		" list ?-exclude? indexlist\"", (char *) NULL);
-	return TCL_ERROR;
+        Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
+              " list ?-exclude? indexlist\"", (char *) NULL);
+        return TCL_ERROR;
     }
 
     mode = INCLUDE;
     if (strcmp(argv[2], "-exclude") == 0) {
-	mode = EXCLUDE;
-	begin=3;
+        mode = EXCLUDE;
+        begin=3;
     } else {
-	begin=2;
+        begin=2;
     }
 
     list=get_intlist(interp, argv[begin], &number);
     if (list==NULL) {
-	return TCL_ERROR;
+        return TCL_ERROR;
     }
 
     /*---- do the extraction ----*/
     if (Tcl_SplitList(interp, argv[1], &listArgc, &listArgv) != TCL_OK) {
-	return TCL_ERROR;
+        return TCL_ERROR;
     }
 
     if (mode==INCLUDE) {
         for(i=0;i<number;i++) {
-	    if (list[i]>=listArgc) {
-		ckfree((char *) listArgv);
-		free(list);
-		Tcl_AppendElement(interp, "index out of range!");
-		return TCL_ERROR;
-	    }
-	    Tcl_AppendElement(interp, listArgv[list[i]]);
-	}
+            if (list[i]>=listArgc) {
+                ckfree((char *) listArgv);
+                free(list);
+                Tcl_AppendElement(interp, "index out of range!");
+                return TCL_ERROR;
+            }
+            Tcl_AppendElement(interp, listArgv[list[i]]);
+        }
     } else {
-	index = -1;
-	for (i = 0; i < listArgc; i++) {
-	    match = 1;
+        index = -1;
+        for (i = 0; i < listArgc; i++) {
+            match = 1;
             for(j=0;j<number;j++) {
-		if (list[j]>=listArgc) {
-		    ckfree((char *) listArgv);
-		    free(list);
-		    Tcl_AppendElement(interp, "index out of range!");
-		    return TCL_ERROR;
-		}
-	        if (i==list[j]) {match=0;break;}
-	    }
-	    if (match) {
-		Tcl_AppendElement(interp, listArgv[i]);
-	    }
-	}
+                if (list[j]>=listArgc) {
+                    ckfree((char *) listArgv);
+                    free(list);
+                    Tcl_AppendElement(interp, "index out of range!");
+                    return TCL_ERROR;
+                }
+                if (i==list[j]) {match=0;break;}
+            }
+            if (match) {
+                Tcl_AppendElement(interp, listArgv[i]);
+            }
+        }
     }
     free(list);
     ckfree((char *) listArgv);
@@ -650,28 +650,28 @@ Dcse_LsubCmd(notUsed, interp, argc, argv)
 /*
  *----------------------------------------------------------------------
  *
- * Dcse_LcorCmd --
+ * ExtraL_LcorCmd --
  *
- *	This procedure is invoked to process the "lcor" command.
+ *        This procedure is invoked to process the "lcor" command.
  *      It creates a subset of a list
  *
  * Results:
- *	A standard Tcl result.
+ *        A standard Tcl result.
  *
  *
  *----------------------------------------------------------------------
  */
 
-	/* ARGSUSED */
+        /* ARGSUSED */
 int
-Dcse_LcorCmd(notUsed, interp, argc, argv)
-    ClientData notUsed;			/* Not used. */
-    Tcl_Interp *interp;			/* Current interpreter. */
-    int argc;				/* Number of arguments. */
-    char **argv;			/* Argument strings. */
+ExtraL_LcorCmd(notUsed, interp, argc, argv)
+    ClientData notUsed;                 /* Not used. */
+    Tcl_Interp *interp;        	        /* Current interpreter. */
+    int argc;        	        	/* Number of arguments. */
+    char **argv;        	        /* Argument strings. */
 {
-#define INCLUDE	0
-#define EXCLUDE	1
+#define INCLUDE        0
+#define EXCLUDE        1
     int refArgc;
     char **refArgv;
     int listArgc;
@@ -682,31 +682,31 @@ Dcse_LcorCmd(notUsed, interp, argc, argv)
     int i;
 
     if (argc != 3) {
-	Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-		" referencelist list\"", (char *) NULL);
-	return TCL_ERROR;
+        Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
+               " referencelist list\"", (char *) NULL);
+        return TCL_ERROR;
     }
 
     if (Tcl_SplitList(interp, argv[1], &refArgc, &refArgv) != TCL_OK) {
-	return TCL_ERROR;
+        return TCL_ERROR;
     }
 
     if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
         ckfree((char *) refArgv);
-	return TCL_ERROR;
+        return TCL_ERROR;
     }
 
     item=listArgv;
     for(pos=0;pos<listArgc;pos++) {
         for(i=0;i<refArgc;i++) {
-	    if ((refArgv[i]!=NULL)&&(strcmp(refArgv[i],*item)==0)) {
-		sprintf(res, "%d", i);
-	        Tcl_AppendElement(interp,res);
-		refArgv[i]=NULL;
-		break;
-	    }
-	}
-	if (i==refArgc) Tcl_AppendElement(interp,"-1");
+            if ((refArgv[i]!=NULL)&&(strcmp(refArgv[i],*item)==0)) {
+        	sprintf(res, "%d", i);
+                Tcl_AppendElement(interp,res);
+        	refArgv[i]=NULL;
+        	break;
+            }
+        }
+        if (i==refArgc) Tcl_AppendElement(interp,"-1");
         item++;
     }
 
@@ -717,25 +717,25 @@ Dcse_LcorCmd(notUsed, interp, argc, argv)
 /*
  *----------------------------------------------------------------------
  *
- * Dcse_LloadCmd --
+ * ExtraL_LloadCmd --
  *
- *	This procedure is invoked to process the "lload" command.
+ *        This procedure is invoked to process the "lload" command.
  *      It creates a list from a file
  *      lload ?file?  ??nosep??
  *
  * Results:
- *	A standard Tcl result.
+ *        A standard Tcl result.
  *
  *
  *----------------------------------------------------------------------
  */
 
 int
-Dcse_LloadCmd(notUsed, interp, argc, argv)
-    ClientData notUsed;			/* Not used. */
-    Tcl_Interp *interp;			/* Current interpreter. */
-    int argc;				/* Number of arguments. */
-    char **argv;			/* Argument strings. */
+ExtraL_LloadCmd(notUsed, interp, argc, argv)
+    ClientData notUsed;        	        /* Not used. */
+    Tcl_Interp *interp;        	        /* Current interpreter. */
+    int argc;        	        	/* Number of arguments. */
+    char **argv;        	        /* Argument strings. */
 {
     FILE *file;
     char *string=NULL;
@@ -743,34 +743,34 @@ Dcse_LloadCmd(notUsed, interp, argc, argv)
     int i;
 
     if ((argc != 2)&&(argc != 3)) {
-	Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-		" ?file? ??nosep??\"", (char *) NULL);
-	return TCL_ERROR;
+        Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
+        	" ?file? ??nosep??\"", (char *) NULL);
+        return TCL_ERROR;
     }
 
     file=fopen(argv[1],"r");
     if (file==NULL) {
-	Tcl_AppendResult(interp, "Couldn't open file ", argv[1], (char *) NULL);
-	return TCL_ERROR;
+        Tcl_AppendResult(interp, "Couldn't open file ", argv[1], (char *) NULL);
+        return TCL_ERROR;
     }
     if (argc==2) {
-	while(1) {
-	    string=read_line(file);
-	    if (string==NULL) break;
-	    Tcl_AppendElement(interp,string);
-	    free(string);
-	}
+        while(1) {
+            string=read_line(file);
+            if (string==NULL) break;
+            Tcl_AppendElement(interp,string);
+            free(string);
+        }
     } else {
-	if (strcmp(argv[2], "nosep") != 0) {
-	    Tcl_AppendResult(interp, "wrong argument ",  argv[2] , (char *) NULL);
-	    return TCL_ERROR;
-	}
-	while(1) {
-	    string=read_line(file);
-	    if (string==NULL) break;
-	    Tcl_AppendResult(interp,string,NULL);
-	    free(string);
-	}
+        if (strcmp(argv[2], "nosep") != 0) {
+            Tcl_AppendResult(interp, "wrong argument ",  argv[2] , (char *) NULL);
+            return TCL_ERROR;
+        }
+        while(1) {
+            string=read_line(file);
+            if (string==NULL) break;
+            Tcl_AppendResult(interp,string,NULL);
+            free(string);
+        }
     }
     fclose(file);
     return TCL_OK;
@@ -778,25 +778,25 @@ Dcse_LloadCmd(notUsed, interp, argc, argv)
 /*
  *----------------------------------------------------------------------
  *
- * Dcse_LwriteCmd --
+ * ExtraL_LwriteCmd --
  *
- *	This procedure is invoked to process the "lwrite" command.
+ *        This procedure is invoked to process the "lwrite" command.
  *      It creates a file from a list
  *      lwrite ?file? ?list?
  *
  * Results:
- *	A standard Tcl result.
+ *        A standard Tcl result.
  *
  *
  *----------------------------------------------------------------------
  */
 
 int
-Dcse_LwriteCmd(notUsed, interp, argc, argv)
-    ClientData notUsed;			/* Not used. */
-    Tcl_Interp *interp;			/* Current interpreter. */
-    int argc;				/* Number of arguments. */
-    char **argv;			/* Argument strings. */
+ExtraL_LwriteCmd(notUsed, interp, argc, argv)
+    ClientData notUsed;        	        /* Not used. */
+    Tcl_Interp *interp;        	        /* Current interpreter. */
+    int argc;        	        	/* Number of arguments. */
+    char **argv;        	        /* Argument strings. */
 {
     FILE *file;
     int listArgc;
@@ -805,18 +805,18 @@ Dcse_LwriteCmd(notUsed, interp, argc, argv)
     int i;
 
     if (argc != 3) {
-	Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-		" ?file? ?list?\"", (char *) NULL);
-	return TCL_ERROR;
+        Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
+        	" ?file? ?list?\"", (char *) NULL);
+        return TCL_ERROR;
     }
 
     file=fopen(argv[1],"a");
     if (file==NULL) {
-	Tcl_AppendResult(interp, "Couldn't open file ",argv[1], (char *) NULL);
-	return TCL_ERROR;
+        Tcl_AppendResult(interp, "Couldn't open file ",argv[1], (char *) NULL);
+        return TCL_ERROR;
     }
     if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
-	return TCL_ERROR;
+        return TCL_ERROR;
     }
     index = -1;
     for (i = 0; i < listArgc; i++) {
@@ -830,25 +830,25 @@ Dcse_LwriteCmd(notUsed, interp, argc, argv)
 /*
  *----------------------------------------------------------------------
  *
- * Dcse_LmanipCmd --
+ * ExtraL_LmanipCmd --
  *
- *	This procedure is invoked to process the "lmanip" command.
+ *        This procedure is invoked to process the "lmanip" command.
  *      It manipulates lists in all kinds of ways
  *      lmanip ?option? ?list? ?arg? ...
  *
  * Results:
- *	A standard Tcl result.
+ *        A standard Tcl result.
  *
  *
  *----------------------------------------------------------------------
  */
 
 int
-Dcse_LmanipCmd(notUsed, interp, argc, argv)
-    ClientData notUsed;			/* Not used. */
-    Tcl_Interp *interp;			/* Current interpreter. */
-    int argc;				/* Number of arguments. */
-    char **argv;			/* Argument strings. */
+ExtraL_LmanipCmd(notUsed, interp, argc, argv)
+    ClientData notUsed;        	        /* Not used. */
+    Tcl_Interp *interp;        	        /* Current interpreter. */
+    int argc;        	        	/* Number of arguments. */
+    char **argv;        	        /* Argument strings. */
 {
     int *get_intlist(Tcl_Interp *interp, char *string, int *number);
     int listArgc;
@@ -858,345 +858,341 @@ Dcse_LmanipCmd(notUsed, interp, argc, argv)
     int c,len;
     int i;
 
-    if (argc < 3) {
-	Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-		" ?option? ?list? ??arg?? ...\"", (char *) NULL);
-	return TCL_ERROR;
+    if (argc < 2) {
+        Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
+        	" ?option? ??arg?? ...\"", (char *) NULL);
+        return TCL_ERROR;
     }
     c=argv[1][0];
     len=strlen(argv[1]);
     if ((c == 's')&&(strncmp(argv[1], "subindex",len) == 0)) {
         int listArgcres;
         char **listArgvres;
-	int pos;
+        int pos;
     
-	if (argc != 4) {
-	    Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-		    " subindex ?list? ??pos??\"", (char *) NULL);
-	    return TCL_ERROR;
-	}
-	if (Tcl_GetInt(interp, argv[3], &pos) != TCL_OK) {
-	    return TCL_ERROR;
-	}
-	if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
-	    return TCL_ERROR;
-	}
+        if (argc != 4) {
+            Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
+        	    " subindex ?list? ??pos??\"", (char *) NULL);
+            return TCL_ERROR;
+        }
+        if (Tcl_GetInt(interp, argv[3], &pos) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
+            return TCL_ERROR;
+        }
 
         i=0;
-	while(i<listArgc) {
-	    line=listArgv[i];
-	    if (Tcl_SplitList(interp, line, &listArgcres, &listArgvres) != TCL_OK) {
-		return TCL_ERROR;
-	    }
-	    if (pos<listArgcres) {Tcl_AppendElement(interp, listArgvres[pos]);}
-	    else {Tcl_AppendElement(interp, "");}
-	    ckfree((char *) listArgvres);
-	    i++;
-	}
-	ckfree((char *) listArgv);
+        while(i<listArgc) {
+            line=listArgv[i];
+            if (Tcl_SplitList(interp, line, &listArgcres, &listArgvres) != TCL_OK) {
+        	return TCL_ERROR;
+            }
+            if (pos<listArgcres) {Tcl_AppendElement(interp, listArgvres[pos]);}
+            else {Tcl_AppendElement(interp, "");}
+            ckfree((char *) listArgvres);
+            i++;
+        }
+        ckfree((char *) listArgv);
     } else if ((c == 'm')&&(strncmp(argv[1], "merge",len) == 0)) {
         int listArgc2;
         char **listArgv2;
         Tcl_DString element;
-	int i;
+        int i;
     
-	if (argc != 4) {
-	    Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-		    " merge ?list1? ?list2?\"", (char *) NULL);
-	    return TCL_ERROR;
-	}
-	if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
-	    return TCL_ERROR;
-	}
-	if (Tcl_SplitList(interp, argv[3], &listArgc2, &listArgv2) != TCL_OK) {
-	    return TCL_ERROR;
-	}
+        if (argc != 4) {
+            Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
+        	    " merge ?list1? ?list2?\"", (char *) NULL);
+            return TCL_ERROR;
+        }
+        if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        if (Tcl_SplitList(interp, argv[3], &listArgc2, &listArgv2) != TCL_OK) {
+            return TCL_ERROR;
+        }
 
-	i=0;
-	while(i<listArgc) {
-	    Tcl_DStringInit(&element);
-	    Tcl_DStringAppend(&element, listArgv[i],-1);
-	    if (i<listArgc2) {
-	        Tcl_DStringAppend(&element, " ",-1);
-	        Tcl_DStringAppend(&element, listArgv2[i],-1);
-	    }
-	    Tcl_AppendElement(interp, Tcl_DStringValue(&element));
-	    Tcl_DStringFree(&element);
-	    i++;
-	}
-	ckfree((char *) listArgv);
-	ckfree((char *) listArgv2);
+        Tcl_DStringInit(&element);
+        i=0;
+        while(i<listArgc) {
+            Tcl_DStringStartSublist(&element);
+            Tcl_DStringAppendElement(&element, listArgv[i]);
+            if (i<listArgc2) {
+                Tcl_DStringAppendElement(&element, listArgv2[i]);
+            }
+            Tcl_DStringEndSublist(&element);
+            i++;
+        }
+        ckfree((char *) listArgv);
+        ckfree((char *) listArgv2);
+        Tcl_DStringResult(interp,&element);
+        Tcl_DStringFree(&element);
+        return TCL_OK;
     } else if ((c == 'e')&&(strncmp(argv[1], "extract",len) == 0)) {
         regexp *regexpPtr;
         Tcl_DString element;
-	char savedChar, *first, *last;
+        char savedChar, *first, *last;
         int match = 0;
-	int nr;
-	int i;
+        int nr;
+        int i;
     
-	if (argc != 4) {
-	    Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-		    " extract ?list? ?expression?\"", (char *) NULL);
-	    return TCL_ERROR;
-	}
+        if (argc != 4) {
+            Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
+        	    " extract ?list? ?expression?\"", (char *) NULL);
+            return TCL_ERROR;
+        }
        regexpPtr = (regexp *)Tcl_RegExpCompile(interp, argv[3]);
-       	if (regexpPtr==NULL) {
-	    Tcl_AppendResult(interp, "error in regexp expression", (char *) NULL);
-	    return TCL_ERROR;
-	}
-	if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
-	    return TCL_ERROR;
-	}
-
-	nr=0;
-	while(nr<listArgc) {
-	    line=listArgv[nr];
-	    match = Tcl_RegExpExec(interp,(Tcl_RegExp)regexpPtr, line, line);
-	    if (match == -1) {
-	        return TCL_ERROR;
-	    }
-	    if (!match) {
-	        Tcl_AppendElement(interp, "");
-	    } else {
-		if (regexpPtr->startp[1]==NULL) {
-		    Tcl_AppendElement(interp,line);
-		} else if (regexpPtr->startp[2]==NULL) {
-		    first = regexpPtr->startp[1];
-		    last = regexpPtr->endp[1];
-		    savedChar = *last;
-		    *last = '\0';
-		    Tcl_AppendElement(interp, first);
-		    *last = savedChar;
-		} else {
-		    Tcl_DStringInit(&element);
-		    i=1;
-		    while (regexpPtr->startp[i]!=NULL) {
-			first = regexpPtr->startp[i];
-			last = regexpPtr->endp[i];
-			savedChar = *last;
-			*last = '\0';
-			Tcl_DStringAppendElement(&element, first);
-			*last = savedChar;
-			i++;
-		    }
-		    Tcl_AppendElement(interp, Tcl_DStringValue(&element));
-		    Tcl_DStringFree(&element);
-		}
-	    }
-	    nr++;
-	}
-	ckfree((char *) listArgv);
-    } else if ((c == 'r')&&(strncmp(argv[1], "remdup",len) == 0)) {
-	int i, j, dble;
-    
-	if (argc != 3) {
-	    Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-		    " remdup ?list?\"\n - returns the list in which duplicates are removed", (char *) NULL);
-	    return TCL_ERROR;
-	}
-	if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
-	    return TCL_ERROR;
-	}
-
-        i=0;
-	while(i<listArgc) {
-	    line=listArgv[i];
-            dble=0;
-	    j=0;
-	    while(j<i) {
-	        if (strcmp(line, listArgv[j])==0) dble=1;
-		j++;
-	    }
-	    if (dble==0) {Tcl_AppendElement(interp, line);}
-	    i++;
-	}
-	ckfree((char *) listArgv);
-    } else if ((c == 's')&&(strncmp(argv[1], "split",len) == 0)) {
-        Tcl_DString element;
-	char savedChar, *first, *last;
-	PBOOL before;
-	int *list;
-	int number, nr;
-	int i;
-    
-	if (argc != 5) {
-	    Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-		    " split ?list? -before/-after/-outside ?positions?\"", (char *) NULL);
-	    return TCL_ERROR;
-	}
-	before=find_bool(argv[3],"-before","-after");
-	list=get_intlist(interp, argv[4], &number);
-	if (list==NULL) {
-	    return TCL_ERROR;
-	}
-
-	if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
-	    return TCL_ERROR;
-	}
-
-	nr=0;
-        Tcl_DStringInit(&element);
-	Tcl_DStringAppend(&element, listArgv[nr++], -1);
-	while(nr<listArgc) {
-	    i=0;
-	    while(i<number) {
-		if (nr==list[i]) break;
-		i++;
-	    }
-	    if (i<number) {
-	        if (before==true) {
-		    Tcl_AppendElement(interp, Tcl_DStringValue(&element));
-		    Tcl_DStringFree(&element);
-		    Tcl_DStringInit(&element);
-	            Tcl_DStringAppendElement(&element, listArgv[nr]);
-		} else if (before==false) {
-	            Tcl_DStringAppendElement(&element, listArgv[nr]);
-		    Tcl_AppendElement(interp, Tcl_DStringValue(&element));
-		    Tcl_DStringFree(&element);
-		    Tcl_DStringInit(&element);
-		    nr++;
-		    if (nr<listArgc) Tcl_DStringAppendElement(&element, listArgv[nr]);
-		} else {
-		    Tcl_AppendElement(interp, Tcl_DStringValue(&element));
-		    Tcl_DStringFree(&element);
-		    Tcl_DStringInit(&element);
-		    nr++;
-		    if (nr<listArgc) Tcl_DStringAppendElement(&element, listArgv[nr]);
-		}
-	    } else {
-	        Tcl_DStringAppendElement(&element, listArgv[nr]);
-	    }
-	    nr++;
-	}
-	Tcl_AppendElement(interp, Tcl_DStringValue(&element));
-	Tcl_DStringFree(&element);
-	ckfree((char *) listArgv);
-    } else if ((c == 'j')&&(strncmp(argv[1], "join",len) == 0)) {
-        Tcl_DString element;
-	char savedChar, *first, *last;
-	PBOOL before;
-	int *list;
-	int number, nr;
-	int i;
-    
-	if (argc != 5) {
-	    Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-		    " join ?list? -before/-after ?positions?\"", (char *) NULL);
-	    return TCL_ERROR;
-	}
-	before=find_bool(argv[3],"-before","-after");
-        if (strcmp(argv[4], "all") == 0) {
-	    list=NULL;
-	    before=true;
-	} else {
-	    list=get_intlist(interp, argv[4], &number);
-	    if (list==NULL) {
-		return TCL_ERROR;
-	    }
-	}
-
-	if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
-	    return TCL_ERROR;
-	}
-
-	nr=0;
-        Tcl_DStringInit(&element);
-	if (before==true) {
-	    Tcl_DStringAppend(&element, listArgv[nr++], -1);
+               if (regexpPtr==NULL) {
+            Tcl_AppendResult(interp, "error in regexp expression", (char *) NULL);
+            return TCL_ERROR;
+        }
+        if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
+            return TCL_ERROR;
         }
 
-	i=0;
-	while(nr<listArgc) {
-	    if (list!=NULL) {
-		i=0;
-		while(i<number) {
-		    if (nr==list[i]) break;
-		    i++;
-		}
-	    }
-	    if (i<number) {
-	        Tcl_DStringAppend(&element, listArgv[nr], strlen(listArgv[nr]));
-	    } else {
-	        if (before==false) {
-		    Tcl_DStringAppend(&element, listArgv[nr], strlen(listArgv[nr]));
-		    Tcl_AppendElement(interp, Tcl_DStringValue(&element));
-		    Tcl_DStringFree(&element);
-		    Tcl_DStringInit(&element);
-		} else {
-		    Tcl_AppendElement(interp, Tcl_DStringValue(&element));
-		    Tcl_DStringFree(&element);
-		    Tcl_DStringInit(&element);
-		    Tcl_DStringAppend(&element, listArgv[nr], strlen(listArgv[nr]));
-		}
-	    }
-	    nr++;
-	}
-
-	if (before==true) {
-	    Tcl_AppendElement(interp, Tcl_DStringValue(&element));
-	}
-
-	Tcl_DStringFree(&element);
-	ckfree((char *) listArgv);
-    } else if ((c == 't')&&(strncmp(argv[1], "toarray",len) == 0)) {
-	int list2Argc;
-	char **list2Argv;
-        Tcl_DString element;
-	char savedChar, *first, *last;
-	int number, nr;
-	int i;
-    
-	if (argc != 4) {
-	    Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-		    " toarray ?list? ?variable?\"", (char *) NULL);
-	    return TCL_ERROR;
-	}
-
-	if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
-	    return TCL_ERROR;
-	}
-
-	nr=0;
-	while(nr<listArgc) {
-	    if (Tcl_SplitList(interp, listArgv[nr], &list2Argc, &list2Argv) != TCL_OK) {
-	        ckfree((char *) listArgv);
-		return TCL_ERROR;
-	    }
-	    if (list2Argc<2) {
-		Tcl_AppendResult(interp, "Some elements contain lest then 2 elements", (char *) NULL);
-	        ckfree((char *) listArgv);
-		return TCL_ERROR;
-	    } else {
-	        Tcl_SetVar2(interp, argv[3], list2Argv[0], list2Argv[1], TCL_LEAVE_ERR_MSG);
+        nr=0;
+        while(nr<listArgc) {
+            line=listArgv[nr];
+            match = Tcl_RegExpExec(interp,(Tcl_RegExp)regexpPtr, line, line);
+            if (match == -1) {
+                return TCL_ERROR;
             }
-            ckfree((char *) list2Argv);
-	    nr++;
-	}
-	ckfree((char *) listArgv);
-    } else if ((c == 'l')&&(strncmp(argv[1], "lengths",len) == 0)) {
-	int i;
-	char val[30];
+            if (!match) {
+                Tcl_AppendElement(interp, "");
+            } else {
+        	if (regexpPtr->startp[1]==NULL) {
+        	    Tcl_AppendElement(interp,line);
+        	} else if (regexpPtr->startp[2]==NULL) {
+        	    first = regexpPtr->startp[1];
+        	    last = regexpPtr->endp[1];
+        	    savedChar = *last;
+        	    *last = '\0';
+        	    Tcl_AppendElement(interp, first);
+        	    *last = savedChar;
+        	} else {
+        	    Tcl_DStringInit(&element);
+        	    i=1;
+        	    while (regexpPtr->startp[i]!=NULL) {
+        	        first = regexpPtr->startp[i];
+        	        last = regexpPtr->endp[i];
+        	        savedChar = *last;
+        	        *last = '\0';
+        	        Tcl_DStringAppendElement(&element, first);
+        	        *last = savedChar;
+        	        i++;
+        	    }
+        	    Tcl_AppendElement(interp, Tcl_DStringValue(&element));
+        	    Tcl_DStringFree(&element);
+        	}
+            }
+            nr++;
+        }
+        ckfree((char *) listArgv);
+    } else if ((c == 'r')&&(strncmp(argv[1], "remdup",len) == 0)) {
+        int i, j, dble;
     
-	if (argc != 3) {
-	    Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-		    " lengths ?list?\"\n - returns a list of the lengths", (char *) NULL);
-	    return TCL_ERROR;
-	}
-	if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
-	    return TCL_ERROR;
-	}
+        if (argc != 3) {
+            Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
+        	    " remdup ?list?\"\n - returns the list in which duplicates are removed", (char *) NULL);
+            return TCL_ERROR;
+        }
+        if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
+            return TCL_ERROR;
+        }
 
         i=0;
-	while(i<listArgc) {
-	    sprintf(val, "%d", strlen(listArgv[i]));
-	    Tcl_AppendElement(interp, val);
-	    i++;
-	}
-	ckfree((char *) listArgv);
+        while(i<listArgc) {
+            line=listArgv[i];
+            dble=0;
+            j=0;
+            while(j<i) {
+                if (strcmp(line, listArgv[j])==0) dble=1;
+        	j++;
+            }
+            if (dble==0) {Tcl_AppendElement(interp, line);}
+            i++;
+        }
+        ckfree((char *) listArgv);
+    } else if ((c == 's')&&(strncmp(argv[1], "split",len) == 0)) {
+        Tcl_DString element;
+        char savedChar, *first, *last;
+        PBOOL before;
+        int *list;
+        int number, nr;
+        int i;
+    
+        if (argc != 5) {
+            Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
+        	    " split ?list? -before/-after/-outside ?positions?\"", (char *) NULL);
+            return TCL_ERROR;
+        }
+        before=find_bool(argv[3],"-before","-after");
+        list=get_intlist(interp, argv[4], &number);
+        if (list==NULL) {
+            return TCL_ERROR;
+        }
+
+        if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
+            return TCL_ERROR;
+        }
+
+        nr=0;
+        Tcl_DStringInit(&element);
+        Tcl_DStringAppend(&element, listArgv[nr++], -1);
+        while(nr<listArgc) {
+            i=0;
+            while(i<number) {
+        	if (nr==list[i]) break;
+        	i++;
+            }
+            if (i<number) {
+                if (before==true) {
+        	    Tcl_AppendElement(interp, Tcl_DStringValue(&element));
+        	    Tcl_DStringFree(&element);
+        	    Tcl_DStringInit(&element);
+                    Tcl_DStringAppendElement(&element, listArgv[nr]);
+        	} else if (before==false) {
+                    Tcl_DStringAppendElement(&element, listArgv[nr]);
+        	    Tcl_AppendElement(interp, Tcl_DStringValue(&element));
+        	    Tcl_DStringFree(&element);
+        	    Tcl_DStringInit(&element);
+        	    nr++;
+        	    if (nr<listArgc) Tcl_DStringAppendElement(&element, listArgv[nr]);
+        	} else {
+        	    Tcl_AppendElement(interp, Tcl_DStringValue(&element));
+        	    Tcl_DStringFree(&element);
+        	    Tcl_DStringInit(&element);
+        	    nr++;
+        	    if (nr<listArgc) Tcl_DStringAppendElement(&element, listArgv[nr]);
+        	}
+            } else {
+                Tcl_DStringAppendElement(&element, listArgv[nr]);
+            }
+            nr++;
+        }
+        Tcl_AppendElement(interp, Tcl_DStringValue(&element));
+        Tcl_DStringFree(&element);
+        ckfree((char *) listArgv);
+    } else if ((c == 'j')&&(strncmp(argv[1], "join",len) == 0)) {
+        Tcl_DString element;
+        char savedChar, *first, *last;
+        PBOOL before;
+        char *join;
+        int *list;
+        int number=1;
+        int nr;
+        int i;
+    
+        if (argc != 5) {
+            Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
+        	    " join ?list? ?join string? ?positions?\"", (char *) NULL);
+            return TCL_ERROR;
+        }
+        join=argv[3];
+        if (strcmp(argv[4], "all") == 0) {
+            list=NULL;
+            before=true;
+        } else {
+            list=get_intlist(interp, argv[4], &number);
+            if (list==NULL) {
+        	return TCL_ERROR;
+            }
+        }
+
+        if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        
+        nr=0;
+        Tcl_DStringInit(&element);
+        
+        if (list != NULL) {
+            Tcl_DStringStartSublist(&element);
+        }
+
+        i=0;
+        while(nr<listArgc) {
+            Tcl_DStringAppend(&element, listArgv[nr], -1);
+            if (list!=NULL) {
+        	i=0;
+        	while(i<number) {
+        	    if (nr==list[i]) break;
+        	    i++;
+        	}
+            } else {
+                i=0;
+            }
+            nr++;
+            if (i>=number) {
+                Tcl_DStringEndSublist(&element);
+                  if (nr!=listArgc) {
+                      Tcl_DStringStartSublist(&element);
+                  }
+            } else if (nr!=listArgc) {
+                Tcl_DStringAppend(&element, join, -1);
+            }
+        }
+        if (list != NULL) {
+            Tcl_DStringEndSublist(&element);
+        }
+        Tcl_DStringResult(interp, &element);
+        Tcl_DStringFree(&element);
+        ckfree((char *) listArgv);
+    } else if ((c == 'l')&&(strncmp(argv[1], "lengths",len) == 0)) {
+        int i;
+        char val[30];
+    
+        if (argc != 3) {
+            Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
+        	    " lengths ?list?\"\n - returns a list of the lengths", (char *) NULL);
+            return TCL_ERROR;
+        }
+        if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
+            return TCL_ERROR;
+        }
+
+        i=0;
+        while(i<listArgc) {
+            sprintf(val, "%d", strlen(listArgv[i]));
+            Tcl_AppendElement(interp, val);
+            i++;
+        }
+        ckfree((char *) listArgv);
+    } else if ((c == 'f')&&(strncmp(argv[1], "fill",len) == 0)) {
+        char var[30];
+        int size,start,incr;
+        int i;
+        
+        if ((argc != 4)&&(argc != 5)) {
+            Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
+        	    " fill ?size? ?start? ??incr??\"\n", (char *) NULL);
+            return TCL_ERROR;
+        }
+        if (Tcl_GetInt(interp, argv[2], &size) != TCL_OK) {
+    	    return TCL_ERROR;
+        }
+        if ((argc==4)||(strlen(argv[4])==0)) {
+            for(i=0;i<size;i++) {
+                Tcl_AppendElement(interp, argv[3]);
+            }
+        }else {
+            if (Tcl_GetInt(interp, argv[3], &start) != TCL_OK) {
+        	    return TCL_ERROR;
+            }
+            if (Tcl_GetInt(interp, argv[4], &incr) != TCL_OK) {
+        	    return TCL_ERROR;
+            }
+            for(i=0;i<size;i++) {
+                sprintf(var,"%d",start);
+                Tcl_AppendElement(interp, var);
+                start+=incr;
+            }
+        }
+        return TCL_OK;
     } else {
-	Tcl_AppendResult(interp, "wrong option: should be:",
-	           "subindex, merge, extract, remdup, split, join, lengths", (char *) NULL);
-	return TCL_ERROR;
+        Tcl_AppendResult(interp, "wrong option: should be:",
+                   "subindex, merge, extract, remdup, split, join, lengths, fill", (char *) NULL);
+        return TCL_ERROR;
     }
     return TCL_OK;
 }
@@ -1221,25 +1217,25 @@ lmanip remdup {aa bc aa b d b}
 /*
  *----------------------------------------------------------------------
  *
- * Dcse_LmathCmd --
+ * ExtraL_LmathCmd --
  *
- *	This procedure is invoked to process the "lmath" command.
+ *        This procedure is invoked to process the "lmath" command.
  *      It calculates things from lists in all kinds of ways
  *      lmath ?option? ?list? ?arg? ...
  *
  * Results:
- *	A standard Tcl result.
+ *        A standard Tcl result.
  *
  *
  *----------------------------------------------------------------------
  */
 
 int
-Dcse_LmathCmd(notUsed, interp, argc, argv)
-    ClientData notUsed;			/* Not used. */
-    Tcl_Interp *interp;			/* Current interpreter. */
-    int argc;				/* Number of arguments. */
-    char **argv;			/* Argument strings. */
+ExtraL_LmathCmd(notUsed, interp, argc, argv)
+    ClientData notUsed;        	        /* Not used. */
+    Tcl_Interp *interp;        	        /* Current interpreter. */
+    int argc;        	        	/* Number of arguments. */
+    char **argv;        	        /* Argument strings. */
 {
     int *get_intlist(Tcl_Interp *interp, char *string, int *number);
     int listArgc;
@@ -1250,157 +1246,424 @@ Dcse_LmathCmd(notUsed, interp, argc, argv)
     int i;
 
     if (argc < 3) {
-	Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-		" ?option? ?list? ??arg?? ...\"", (char *) NULL);
-	return TCL_ERROR;
+        Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
+        	" ?option? ?list? ??arg?? ...\"", (char *) NULL);
+        return TCL_ERROR;
     }
     c=argv[1][0];
     len=strlen(argv[1]);
     if ((c == 's')&&(strncmp(argv[1], "sum",len) == 0)) {
         int listArgcres;
         char **listArgvres;
-	int value, sum=0;
+        int value, sum=0;
     
-	if (argc != 3) {
-	    Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-		    " sum ?list?\"", (char *) NULL);
-	    return TCL_ERROR;
-	}
-	if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
-	    return TCL_ERROR;
-	}
+        if (argc != 3) {
+            Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
+        	    " sum ?list?\"", (char *) NULL);
+            return TCL_ERROR;
+        }
+        if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
+            return TCL_ERROR;
+        }
 
         i=0;
-	while(i<listArgc) {
-	    if (Tcl_GetInt(interp, listArgv[i], &value) != TCL_OK) {
-		return TCL_ERROR;
-	    }
-	    sum+=value;
-	    i++;
-	}
-	Tcl_ResetResult(interp);
-	result=numstr(sum);
-	Tcl_AppendResult(interp, result, (char *) NULL);
-	free(result);
-	ckfree((char *) listArgv);
+        while(i<listArgc) {
+            if (Tcl_GetInt(interp, listArgv[i], &value) != TCL_OK) {
+        	return TCL_ERROR;
+            }
+            sum+=value;
+            i++;
+        }
+        Tcl_ResetResult(interp);
+        result=numstr(sum);
+        Tcl_AppendResult(interp, result, (char *) NULL);
+        free(result);
+        ckfree((char *) listArgv);
     } else if ((c == 'm')&&(strncmp(argv[1], "max",len) == 0)) {
         int listArgcres;
         char **listArgvres;
-	int value, max;
+        int value, max;
     
-	if (argc != 3) {
-	    Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-		    " max ?list?\"", (char *) NULL);
-	    return TCL_ERROR;
-	}
-	if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
-	    return TCL_ERROR;
-	}
+        if (argc != 3) {
+            Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
+        	    " max ?list?\"", (char *) NULL);
+            return TCL_ERROR;
+        }
+        if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
+            return TCL_ERROR;
+        }
 
         i=0;
-	if (Tcl_GetInt(interp, listArgv[i], &max) != TCL_OK) {
-	    return TCL_ERROR;
-	}
-	while(i<listArgc) {
-	    if (Tcl_GetInt(interp, listArgv[i], &value) != TCL_OK) {
-		return TCL_ERROR;
-	    }
-	    if (value>max) max=value;
-	    i++;
-	}
-	Tcl_ResetResult(interp);
-	result=numstr(max);
-	Tcl_AppendResult(interp, result, (char *) NULL);
-	free(result);
-	ckfree((char *) listArgv);
+        if (Tcl_GetInt(interp, listArgv[i], &max) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        while(i<listArgc) {
+            if (Tcl_GetInt(interp, listArgv[i], &value) != TCL_OK) {
+        	return TCL_ERROR;
+            }
+            if (value>max) max=value;
+            i++;
+        }
+        Tcl_ResetResult(interp);
+        result=numstr(max);
+        Tcl_AppendResult(interp, result, (char *) NULL);
+        free(result);
+        ckfree((char *) listArgv);
     } else if ((c == 'm')&&(strncmp(argv[1], "min",len) == 0)) {
         int listArgcres;
         char **listArgvres;
-	int value, min;
+        int value, min;
     
-	if (argc != 3) {
-	    Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-		    " min ?list?\"", (char *) NULL);
-	    return TCL_ERROR;
-	}
-	if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
-	    return TCL_ERROR;
-	}
+        if (argc != 3) {
+            Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
+        	    " min ?list?\"", (char *) NULL);
+            return TCL_ERROR;
+        }
+        if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
+            return TCL_ERROR;
+        }
 
         i=0;
-	if (Tcl_GetInt(interp, listArgv[i], &min) != TCL_OK) {
-	    return TCL_ERROR;
-	}
-	while(i<listArgc) {
-	    if (Tcl_GetInt(interp, listArgv[i], &value) != TCL_OK) {
-		return TCL_ERROR;
-	    }
-	    if (value<min) min=value;
-	    i++;
-	}
-	Tcl_ResetResult(interp);
-	result=numstr(min);
-	Tcl_AppendResult(interp, result, (char *) NULL);
-	free(result);
-	ckfree((char *) listArgv);
+        if (Tcl_GetInt(interp, listArgv[i], &min) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        while(i<listArgc) {
+            if (Tcl_GetInt(interp, listArgv[i], &value) != TCL_OK) {
+        	return TCL_ERROR;
+            }
+            if (value<min) min=value;
+            i++;
+        }
+        Tcl_ResetResult(interp);
+        result=numstr(min);
+        Tcl_AppendResult(interp, result, (char *) NULL);
+        free(result);
+        ckfree((char *) listArgv);
     } else if ((c == 'c')&&(strncmp(argv[1], "cumul",len) == 0)) {
         int listArgcres;
         char **listArgvres;
-	int value, current=0;
-	char val[30];
+        int value, current=0;
+        char val[30];
     
-	if (argc != 3) {
-	    Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-		    " cumul ?list?\"", (char *) NULL);
-	    return TCL_ERROR;
-	}
-	if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
-	    return TCL_ERROR;
-	}
+        if (argc != 3) {
+            Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
+        	    " cumul ?list?\"", (char *) NULL);
+            return TCL_ERROR;
+        }
+        if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
+            return TCL_ERROR;
+        }
 
         i=0;
-	if (Tcl_GetInt(interp, listArgv[i], &value) != TCL_OK) {
-	    return TCL_ERROR;
-	}
-	while(i<listArgc) {
-	    if (Tcl_GetInt(interp, listArgv[i], &value) != TCL_OK) {
-		return TCL_ERROR;
-	    }
-	    current+=value;
-	    sprintf(val, "%d", current);
-	    Tcl_AppendElement(interp, val);
-	    i++;
-	}
-	ckfree((char *) listArgv);
+        if (Tcl_GetInt(interp, listArgv[i], &value) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        while(i<listArgc) {
+            if (Tcl_GetInt(interp, listArgv[i], &value) != TCL_OK) {
+        	return TCL_ERROR;
+            }
+            current+=value;
+            sprintf(val, "%d", current);
+            Tcl_AppendElement(interp, val);
+            i++;
+        }
+        ckfree((char *) listArgv);
+    } else if ((c == 'i')&&(strncmp(argv[1], "incr", len) == 0)) {
+        int listArgcres;
+        char **listArgvres;
+        int value, incr=0;
+        char val[30];
+    
+        if (argc != 4) {
+            Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
+        	    " incr ?list? ?value?\"", (char *) NULL);
+            return TCL_ERROR;
+        }
+        if (Tcl_GetInt(interp, argv[3], &incr) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        if (Tcl_SplitList(interp, argv[2], &listArgc, &listArgv) != TCL_OK) {
+            return TCL_ERROR;
+        }
+
+        i=0;
+        if (Tcl_GetInt(interp, listArgv[i], &value) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        while(i<listArgc) {
+            if (Tcl_GetInt(interp, listArgv[i], &value) != TCL_OK) {
+        	return TCL_ERROR;
+            }
+            value+=incr;
+            sprintf(val, "%d", value);
+            Tcl_AppendElement(interp, val);
+            i++;
+        }
+        ckfree((char *) listArgv);
     } else {
-	Tcl_AppendResult(interp, "wrong option: should be:",
-	           "sum, min, max, cumul", (char *) NULL);
-	return TCL_ERROR;
+        Tcl_AppendResult(interp, "wrong option: should be:",
+                   "sum, min, max, cumul, incr", (char *) NULL);
+        return TCL_ERROR;
     }
     return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ExtraL_LregsubCmd --
+ *
+ *        This procedure is invoked to process the "lregsub" Tcl command.
+ *
+ * Results:
+ *        A standard Tcl result.
+ *
+ * Side effects:
+ *        See the user documentation.
+ *
+ * lregsub {c$} {abc acb dc} {e} 
+ * lregsub {^a$} {g u k fsgh aasdf a fgh daa a} {}
+ * lregsub {\.exe$} {a.try help.exe dd.txt dd.exe} {.sh}
+ * lregsub {^([^ ]+) ([^ ]+)$} {{a 1} {b 2} {c 3}} {\1->\2}
+ *
+ *----------------------------------------------------------------------
+ */
+
+        /* ARGSUSED */
+int
+ExtraL_LregsubCmd(dummy, interp, argc, argv)
+    ClientData dummy;        	        /* Not used. */
+    Tcl_Interp *interp;        	        /* Current interpreter. */
+    int argc;        	        	/* Number of arguments. */
+    char **argv;        	        /* Argument strings. */
+{
+    int listArgc;
+    char **listArgv;
+    int noCase = 0, all = 0;
+    Tcl_RegExp regExpr;
+    char *fullstring, *string, *pattern, *p, *firstChar, *newValue, **argPtr;
+    int match, flags, code=TCL_OK, numMatches;
+    char *start, *end, *subStart, *subEnd;
+    register char *src, c;
+    Tcl_DString stringDString, patternDString, resultDString;
+    int i;
+
+    if (argc < 4) {
+        wrongNumArgs:
+        Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
+        	" ?switches? exp list subSpec\"", (char *) NULL);
+        return TCL_ERROR;
+    }
+    argPtr = argv+1;
+    argc--;
+    while (argPtr[0][0] == '-') {
+        if (strcmp(argPtr[0], "-nocase") == 0) {
+            noCase = 1;
+        } else if (strcmp(argPtr[0], "-all") == 0) {
+            all = 1;
+        } else if (strcmp(argPtr[0], "--") == 0) {
+            argPtr++;
+            argc--;
+            break;
+        } else {
+            Tcl_AppendResult(interp, "bad switch \"", argPtr[0],
+        	    "\": must be -all, -nocase, or --", (char *) NULL);
+            return TCL_ERROR;
+        }
+        argPtr++;
+        argc--;
+    }
+    if (argc != 3) {
+        goto wrongNumArgs;
+    }
+
+    /*
+     * Convert the string and pattern to lower case, if desired.
+     */
+
+    if (noCase) {
+        Tcl_DStringInit(&patternDString);
+        Tcl_DStringAppend(&patternDString, argPtr[0], -1);
+        pattern = Tcl_DStringValue(&patternDString);
+        for (p = pattern; *p != 0; p++) {
+            if (isupper(UCHAR(*p))) {
+        	*p = tolower(*p);
+            }
+        }
+        Tcl_DStringInit(&stringDString);
+        Tcl_DStringAppend(&stringDString, argPtr[1], -1);
+        fullstring = Tcl_DStringValue(&stringDString);
+        for (p = fullstring; *p != 0; p++) {
+            if (isupper(UCHAR(*p))) {
+        	*p = tolower(*p);
+            }
+        }
+    } else {
+        pattern = argPtr[0];
+        fullstring = argPtr[1];
+    }
+    if (Tcl_SplitList(interp, fullstring, &listArgc, &listArgv) != TCL_OK) {
+        return TCL_ERROR;
+    }
+    Tcl_DStringInit(&resultDString);
+
+    regExpr = Tcl_RegExpCompile(interp, pattern);
+    if (regExpr == NULL) {
+        code = TCL_ERROR;
+        goto enddone;
+    }
+
+    for (i = 0; i < listArgc; i++) {
+        Tcl_DStringSetLength(&resultDString,0);
+        string=listArgv[i];
+        /*
+         * The following loop is to handle multiple matches within the
+         * same source string;  each iteration handles one match and its
+         * corresponding substitution.  If "-all" hasn't been specified
+         * then the loop body only gets executed once.
+         */
+
+        flags = 0;
+        numMatches = 0;
+        for (p = string; *p != 0; ) {
+            match = Tcl_RegExpExec(interp, regExpr, p, string);
+            if (match < 0) {
+                code = TCL_ERROR;
+                goto done;
+            }
+            if (!match) {
+                break;
+            }
+            numMatches += 1;
+
+            /*
+             * Copy the portion of the source string before the match to the
+             * result variable.
+             */
+
+            Tcl_RegExpRange(regExpr, 0, &start, &end);
+            src = listArgv[i] + (start - string);
+            c = *src;
+            *src = 0;
+            Tcl_DStringAppend(&resultDString, listArgv[i] + (p - string), -1);
+            *src = c;
+            flags = TCL_APPEND_VALUE;
+        
+            /*
+             * Append the subSpec argument to the variable, making appropriate
+             * substitutions.  This code is a bit hairy because of the backslash
+             * conventions and because the code saves up ranges of characters in
+             * subSpec to reduce the number of calls to Tcl_SetVar.
+             */
+        
+            for (src = firstChar = argPtr[2], c = *src; c != 0; src++, c = *src) {
+                int index;
+        
+                if (c == '&') {
+                    index = 0;
+                } else if (c == '\\') {
+                    c = src[1];
+                    if ((c >= '0') && (c <= '9')) {
+                        index = c - '0';
+                    } else if ((c == '\\') || (c == '&')) {
+                        *src = c;
+                        src[1] = 0;
+                        Tcl_DStringAppend(&resultDString, firstChar, -1);
+                        *src = '\\';
+                        src[1] = c;
+                        firstChar = src+2;
+                        src++;
+                        continue;
+                    } else {
+                        continue;
+                    }
+                } else {
+                    continue;
+                }
+                if (firstChar != src) {
+                    c = *src;
+                    *src = 0;
+                    Tcl_DStringAppend(&resultDString, firstChar, -1);
+                    *src = c;
+                }
+                Tcl_RegExpRange(regExpr, index, &subStart, &subEnd);
+                if ((subStart != NULL) && (subEnd != NULL)) {
+                    char *first, *last, saved;
+        
+                    first = listArgv[i] + (subStart - string);
+                    last = listArgv[i] + (subEnd - string);
+                    saved = *last;
+                    *last = 0;
+                    Tcl_DStringAppend(&resultDString, first, -1);
+                    *last = saved;
+                }
+                if (*src == '\\') {
+                    src++;
+                }
+                firstChar = src+1;
+            }
+            if (firstChar != src) {
+                Tcl_DStringAppend(&resultDString, firstChar, -1);
+            }
+            if (end == p) {
+                char tmp[2];
+
+                /*
+                 * Always consume at least one character of the input string
+                 * in order to prevent infinite loops.
+                 */
+
+                tmp[0] = listArgv[i][p - string];
+                tmp[1] = 0;
+                Tcl_DStringAppend(&resultDString, tmp, -1);
+                p = end + 1;
+            } else {
+                p = end;
+            }
+            if (!all) {
+                break;
+            }
+        }
+
+        /*
+         * Copy the portion of the source string after the last match to the
+         * result variable.
+         */
+
+        if ((*p != 0) || (numMatches == 0)) {
+            Tcl_DStringAppend(&resultDString, listArgv[i] + (p - string), -1);
+        }
+        done:
+        Tcl_AppendElement(interp,Tcl_DStringValue(&resultDString));
+    }
+
+    enddone:
+    if (noCase) {
+        Tcl_DStringFree(&stringDString);
+        Tcl_DStringFree(&patternDString);
+    }
+    Tcl_DStringFree(&resultDString);
+    ckfree((char *) listArgv);
+    return code;
 }
 /*
  *----------------------------------------------------------------------
  *
- * Dcse_RandomCmd --
- *
- *	This procedure is invoked to process the "lload" command.
- *      It creates a list from a file
- *      lload ?file? ?variable? ??match?? ??variable2?? ...
+ * ExtraL_RandomCmd --
  *
  * Results:
- *	A standard Tcl result.
+ *        A standard Tcl result.
  *
  *
  *----------------------------------------------------------------------
  */
 
 int
-Dcse_RandomCmd(notUsed, interp, argc, argv)
-    ClientData notUsed;			/* Not used. */
-    Tcl_Interp *interp;			/* Current interpreter. */
-    int argc;				/* Number of arguments. */
-    char **argv;			/* Argument strings. */
+ExtraL_RandomCmd(notUsed, interp, argc, argv)
+    ClientData notUsed;        	        /* Not used. */
+    Tcl_Interp *interp;        	        /* Current interpreter. */
+    int argc;        	        	/* Number of arguments. */
+    char **argv;        	        /* Argument strings. */
 {
     FILE *file;
     char *string=NULL;
@@ -1411,35 +1674,36 @@ Dcse_RandomCmd(notUsed, interp, argc, argv)
     char *resultstring;
 
     if (argc != 3) {
-	Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-		" ?min? ?max?\"", (char *) NULL);
-	return TCL_ERROR;
+        Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
+        	" ?min? ?max?\"", (char *) NULL);
+        return TCL_ERROR;
     }
     if (Tcl_GetInt(interp, argv[1], &min) != TCL_OK) {
-	return TCL_ERROR;
+        return TCL_ERROR;
     }
     if (Tcl_GetInt(interp, argv[2], &max) != TCL_OK) {
-	return TCL_ERROR;
+        return TCL_ERROR;
     }
     if (max<=min) {
-	Tcl_AppendResult(interp, "wrong arguments", (char *) NULL);
-	return TCL_ERROR;
+        Tcl_AppendResult(interp, "wrong arguments", (char *) NULL);
+        return TCL_ERROR;
     }
     number=rand();
     deler=SHRT_MAX/(max-min);
     result=number/deler;
     if (result<min) {
-	Tcl_AppendResult(interp, "Something fishy: Result too small", (char *) NULL);
-	return TCL_ERROR;
+        Tcl_AppendResult(interp, "Something strange happened: Result too small", (char *) NULL);
+        return TCL_ERROR;
     }
     if (result>max) {
-	Tcl_AppendResult(interp, "Something fishy: Result too big", (char *) NULL);
-	return TCL_ERROR;
+        Tcl_AppendResult(interp, "Something strange happened: Result too big", (char *) NULL);
+        return TCL_ERROR;
     }
     resultstring=numstr(result+min);
     Tcl_AppendResult(interp, resultstring, (char *) NULL);
     free(resultstring);
     return TCL_OK;
 }
+
 
 

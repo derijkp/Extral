@@ -6,7 +6,7 @@ TCL_DIR =	../tcl7.4
 
 # compiler flags: -KPICT is to create position independed code, this might be
 # different for your compiler
-CFLAGS = -O2 -fpic
+CFLAGS = -O2 -fpic -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -Dvfork=fork
 
 # Some versions of make, like SGI's, use the following variable to
 # determine which shell to use for executing commands:

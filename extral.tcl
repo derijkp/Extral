@@ -50,6 +50,10 @@ proc lremove {listref args} {
     }
 }
 
+proc larrayset {array varlist valuelist} {
+    uplevel "array set $array \[lmanip join \[lmanip merge [list $varlist] [list $valuelist]\] \{ \} all\]"
+}
+
 # Remark: does nothing
 # I use this to put some example or testing code in a program
 # without all the #'s
@@ -103,6 +107,7 @@ proc examplecreate {} {
     set root $current
     foreach value {a b c d} {
         struct set current->value $value
+        array set [struct var current->array] {a 1 b 2 c 3}
         struct set current->next [struct new]
         set keep $current
         set current [struct value current->next]
@@ -114,6 +119,7 @@ proc examplecreate {} {
 proc exampleread {current} {
     while 1 {
         puts stdout [struct value current->value]
+        puts [array get [struct var current->array]]
         if {[struct value current->next] == ""} {break}
         set keep $current
         set current [struct value current->next]
@@ -129,7 +135,97 @@ proc exampledestruct {current} {
     }
 }
 
-proc struct {option args} {
+
+proc ref {} {
+    global extral__Priv
+    if ![info exists extral__Priv(pointernr)] {
+	    set extral__Priv(pointernr) 1
+    }
+    incr extral__Priv(pointernr)
+    uplevel global extral__Priv__Pointer$extral__Priv(pointernr)
+    return extral__Priv__Pointer$extral__Priv(pointernr)
+}
+
+proc struc {option var args} {
+    switch $option {
+        new {
+            if ![string match $args ""] {
+                error "wrong # args: should be \"struct new\""
+            }
+            global extral__Priv
+            if ![info exists extral__Priv(pointernr)] {
+        	    set extral__Priv(pointernr) 1
+            }
+            incr extral__Priv(pointernr)
+            uplevel global extral__Priv__Pointer$extral__Priv(pointernr)
+            return extral__Priv__Pointer$extral__Priv(pointernr)
+        }
+        set {
+            if {[llength $args]!=2} {
+                error "wrong # args: should be \"struct set struct value\""
+            }
+            if ![regexp {^(.+)->(.+)$} [lindex $args 0] temp variable field] {
+	        error "No field specified"
+	    }
+            set pointer [uplevel set $variable]->$field
+            regsub {\([^()]*\)$} $pointer {} gpointer
+            global $gpointer
+            if [catch {set $pointer [lindex $args 1]} result] {
+	        regsub {extral__Priv__Pointer[0-9]+} $result $variable error
+                error $error
+            }
+            return $result
+        }
+        unset {
+            if {[llength $args]!=1} {
+                error "wrong # args: should be \"struct unset struct\""
+            }
+            if [regexp {^(.+)->(.+)$} [lindex $args 0] temp variable field] {
+                set pointer [uplevel set $variable]->$field
+                regsub {\([^()]*\)$} $pointer {} gpointer
+		global $gpointer
+		eval unset $pointer
+	    } else {
+		set pointer [uplevel set [lindex $args 0]]
+		set vars [uplevel #0 info vars $pointer->*]
+		catch {eval global $vars}
+		catch {eval unset $vars}
+            }
+        }
+	value {
+            if {[llength $args]!=1} {
+                error "wrong # args: should be \"struct value struct\""
+            }
+            if ![regexp {^(.+)->(.+)$} [lindex $args 0] temp variable field] {
+	        error "No field specified"
+	    }
+            set pointer [uplevel set $variable]->$field
+            regsub {\([^()]*\)$} $pointer {} gpointer
+            global $gpointer
+            if [catch {set $pointer} result] {
+	        regsub {extral__Priv__Pointer[0-9]+} $result $variable error
+                error $error
+            }
+            return $result
+	}
+	var {
+            if {[llength $args]!=1} {
+                error "wrong # args: should be \"struct var struct\""
+            }
+            if ![regexp {^(.+)->(.+)$} [lindex $args 0] temp variable field] {
+	        error "No field specified"
+	    }
+            set pointer [uplevel set $variable]->$field
+            uplevel "global $pointer"
+            return $pointer
+	}
+        default {
+            error "bad option \"$option\": should be new, set, value, var, unset"
+        }
+    }
+}
+
+proc structold {option args} {
     switch $option {
         new {
             if ![string match $args ""] {
@@ -198,6 +294,7 @@ proc struct {option args} {
 	        error "No field specified"
 	    }
             set pointer [uplevel set $variable]->$field
+            uplevel "global $pointer"
             return $pointer
 	}
         default {
