@@ -7,26 +7,10 @@
 # actual Makefile.
 #
 
-PROJECT = extral
-
-# Definitions: comment second line instead of first to compile with debugging information
-#CFLAGS = -g -Wall -Wno-implicit-int 
-CFLAGS = -O -D__NO_STRING_INLINES -D__NO_MATH_INLINES -Wall -Wno-implicit-int
-
-# Definitions: comment second line instead of first to compile with debugging information
-#LDFLAGS = 
-LDFLAGS = 
-
-# Libraries to use when linking: comment second line instead of first to compile without stubs
-LIBS = -L/opt/tcltk/lib -ltcl8.3${TCL_DBGX} -ldl  -lieee -lm -lc
-#LIBS = -L/opt/tcltk/lib -ltclstub8.3${TCL_DBGX} -ldl  -lieee -lm -lc
-
-# Definitions: comment second line instead of first to compile without stubs
-DEFS =  -DHAVE_UNISTD_H=1 -DHAVE_LIMITS_H=1 -DHAVE_GETCWD=1 -DHAVE_OPENDIR=1 -DHAVE_STRSTR=1 -DHAVE_STRTOL=1 -DHAVE_TMPNAM=1 -DHAVE_WAITPID=1 -DHAVE_UNISTD_H=1 -DHAVE_SYS_PARAM_H=1 -DUSE_TERMIOS=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 -DHAVE_TM_ZONE=1 -DHAVE_TM_GMTOFF=1 -DHAVE_TIMEZONE_VAR=1 -DHAVE_ST_BLKSIZE=1 -DSTDC_HEADERS=1 -DNEED_MATHERR=1 -DHAVE_SIGNED_CHAR=1 -DHAVE_SYS_IOCTL_H=1 
-#DEFS =  -DHAVE_UNISTD_H=1 -DHAVE_LIMITS_H=1 -DHAVE_GETCWD=1 -DHAVE_OPENDIR=1 -DHAVE_STRSTR=1 -DHAVE_STRTOL=1 -DHAVE_TMPNAM=1 -DHAVE_WAITPID=1 -DHAVE_UNISTD_H=1 -DHAVE_SYS_PARAM_H=1 -DUSE_TERMIOS=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 -DHAVE_TM_ZONE=1 -DHAVE_TM_GMTOFF=1 -DHAVE_TIMEZONE_VAR=1 -DHAVE_ST_BLKSIZE=1 -DSTDC_HEADERS=1 -DNEED_MATHERR=1 -DHAVE_SIGNED_CHAR=1 -DHAVE_SYS_IOCTL_H=1  -DUSE_TCL_STUBS
-
-# Includes
-INCLUDES = -I/opt/tcltk/include
+# set to yes to compile with debugging information
+DEBUG=no
+# set to no to compile without stubs support
+USE_STUBS=no
 
 #----------------------------------------------------------------
 # The information below is modified by the configure script when
@@ -34,40 +18,61 @@ INCLUDES = -I/opt/tcltk/include
 # modify any of this stuff by hand.
 #----------------------------------------------------------------
 
-CC = cc
-SHLIB_CFLAGS =		-fPIC ${DEFS}
-SHLIB_LD =		cc -shared
-SHLIB_SUFFIX =		.so
-SHLIB_VERSION =		
-SRC_DIR =		.
-
-CC_SWITCHES = $(INCLUDES) $(CFLAGS) $(SHLIB_CFLAGS)
-
+PROJECT = extral
+TCLEXE = extratcl
 OBJECTS = extralInit.o extral.o list_pop.o string.o array.o supersort.o general.o \
 			structl.o structltypes.o date.o
+
+ifeq ($(DEBUG),yes)
+	CFLAGS = -g  
+else
+	CFLAGS = -O 
+endif
+
+ifeq ($(USE_STUBS),yes)
+	LD_LIBS =  ${LIBS}
+	DEFS =  -DHAVE_GETCWD=1 -DHAVE_UNISTD_H=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 -DHAVE_TM_ZONE=1 -DHAVE_TM_GMTOFF=1 -DHAVE_TIMEZONE_VAR=1 -DHAVE_ST_BLKSIZE=1 -DSTDC_HEADERS=1 -DNEED_MATHERR=1 -DRETSIGTYPE=void -DHAVE_SIGNED_CHAR=1 -DHAVE_SYS_IOCTL_H=1  -DUSE_TCL_STUBS
+else
+	LD_LIBS = -L/usr/lib -ltcl8.0${TCL_DBGX} ${LIBS}
+	LD_LIBS = ${LIBS}
+	DEFS =  -DHAVE_GETCWD=1 -DHAVE_UNISTD_H=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 -DHAVE_TM_ZONE=1 -DHAVE_TM_GMTOFF=1 -DHAVE_TIMEZONE_VAR=1 -DHAVE_ST_BLKSIZE=1 -DSTDC_HEADERS=1 -DNEED_MATHERR=1 -DRETSIGTYPE=void -DHAVE_SIGNED_CHAR=1 -DHAVE_SYS_IOCTL_H=1 
+endif
+
+INCLUDES = -I/usr/include
+CC = gcc -pipe
+SHLIB_LD =		gcc -pipe -shared
+SHLIB_SUFFIX =		.so
+
+CC_SWITCHES = $(INCLUDES) $(CFLAGS)	-fPIC $(DEFS)
+TCL_LD_LIBS = -L/usr/lib -ltcl8.0${TCL_DBGX} ${LIBS} -ldl  -lm
+
+# --------------------------- Rules -----------------------------
 
 all: $(PROJECT)${SHLIB_SUFFIX}
 
 $(PROJECT)${SHLIB_SUFFIX}: $(OBJECTS)
-	${SHLIB_LD} $(OBJECTS) -o ../$(PROJECT)${SHLIB_SUFFIX} ${LIBS}
+	${SHLIB_LD} $(OBJECTS) -o ../$(PROJECT)$(SHLIB_SUFFIX) $(LD_LIBS)
 
-extratcl: tclAppInit.o $(OBJECTS)
-	$(CC) $(CFLAGS) $(TCL_LD_FLAGS) -o extratcl tclAppInit.o $(OBJECTS) ${LIBS} ${TCL_DL_LIBS}
+$(TCLEXE): tclAppInit.o $(OBJECTS)
+	${CC} tclAppInit.o $(OBJECTS) -o $(TCLEXE) $(TCL_LD_LIBS)
+
+install: 
+	../makedoc.tcl
+	../makedist.tcl /usr/lib
 
 clean:
 	rm -f *.o *${SHLIB_SUFFIX} config.cache config.log lib.exp
 	rm -f core ../core extratcl
 	rm -f ../*.so ../*.dll ./*.so ./*.dll ../win/tmp/*.obj ../win/*.csm
 
-install: 
-	../makedoc.tcl
-	../makedist.tcl /opt/tcltk/lib
+distclean: clean
+	rm -f Makefile
 
 Makefile: Makefile.in
 	./config.status
 
-distclean: clean
-	rm -f Makefile
+depend:
+	makedepend -- $(CC_SWITCHES) -- $(SRCS)
 
 .c.o:
 	$(CC) -c $(CC_SWITCHES) $<

@@ -17,6 +17,8 @@ DIR"
 ac_help="$ac_help
   --with-installdir=DIR		directory in which to put Tcl extensions
 DIR"
+ac_help="$ac_help
+  --enable-stubs         enable stub support"
 
 # Initialize some variables set by options.
 # The variables have the same names as the options, with
@@ -563,14 +565,18 @@ else
 fi
 
 
+# Check whether --enable-stubs or --disable-stubs was given.
+if test "${enable_stubs+set}" = set; then
+  enableval="$enable_stubs"
+  USE_STUBS=$enableval
+else
+  USE_STUBS=no
+fi
+
+
 CC=$TCL_CC
-SHLIB_CFLAGS=$TCL_SHLIB_CFLAGS
-SHLIB_LD=$TCL_SHLIB_LD
-SHLIB_LD_LIBS=$TCL_SHLIB_LD_LIBS
-SHLIB_SUFFIX=$TCL_SHLIB_SUFFIX
-SHLIB_VERSION=$TCL_SHLIB_VERSION
-TCL_LIBS=$TCL_LIBS
-TCL_VERSION=$TCL_VERSION
+
+
 
 
 
@@ -752,8 +758,10 @@ s%@includedir@%$includedir%g
 s%@oldincludedir@%$oldincludedir%g
 s%@infodir@%$infodir%g
 s%@mandir@%$mandir%g
+s%@USE_STUBS@%$USE_STUBS%g
 s%@CC@%$CC%g
-s%@SHLIB_CFLAGS@%$SHLIB_CFLAGS%g
+s%@TCL_CC@%$TCL_CC%g
+s%@TCL_SHLIB_CFLAGS@%$TCL_SHLIB_CFLAGS%g
 s%@SHLIB_LD@%$SHLIB_LD%g
 s%@SHLIB_LD_LIBS@%$SHLIB_LD_LIBS%g
 s%@SHLIB_SUFFIX@%$SHLIB_SUFFIX%g
@@ -770,7 +778,7 @@ s%@TCL_CFLAGS_WARNING@%$TCL_CFLAGS_WARNING%g
 s%@TCL_CFLAGS_OPTIMIZE@%$TCL_CFLAGS_OPTIMIZE%g
 s%@TCL_LDFLAGS_DEBUG@%$TCL_LDFLAGS_DEBUG%g
 s%@TCL_LDFLAGS_OPTIMIZE@%$TCL_LDFLAGS_OPTIMIZE%g
-s%@TCL_CC@%$TCL_CC%g
+s%@TCL_SHLIB_LD_LIBS@%$TCL_SHLIB_LD_LIBS%g
 s%@TCL_SHLIB_LD@%$TCL_SHLIB_LD%g
 s%@TCL_SHLIB_SUFFIX@%$TCL_SHLIB_SUFFIX%g
 s%@TCL_STUB_LIB_SPEC@%$TCL_STUB_LIB_SPEC%g
