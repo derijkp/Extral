@@ -1,16 +1,12 @@
 # The directory containing the Tcl sources and headers appropriate
 # for this version of Tk ("." will be replaced or has already
 # been replaced by the configure script):
-TCL_DIR =	/usr/people/peter/tcl/tcl7.3
+TCL_DIR =	/usr/people/peter/tcl/tk4/tcl7.4b3
 
 # The directory containing the Tk sources and headers appropriate
 # for this version of Tk ("." will be replaced or has already
 # been replaced by the configure script):
-TK_DIR =	/usr/people/peter/tcl/tk3.6
-
-# The directory containing the Tcl library archive file appropriate
-# for this version of Tk:
-TCL_DIR =	/usr/people/peter/tcl/tcl7.3
+TK_DIR =	/usr/people/peter/tcl/tk4/tk4.0b3
 
 CFLAGS = -O2 -KPICT
 

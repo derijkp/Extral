@@ -1,0 +1,29 @@
+extra list manipulation commands for Tcl
+----------------------------------------
+
+This package can be build against Tk3.6 or Tk4.0 by copiing the
+appropriate files to extral.c and extraLInit.c, and adjusting the
+appropriate makefile. It should be initialised by calling the function
+ExtraL_Init
+
+There is not much documentation unfortunately
+
+Commands
+--------
+lfind <mode> list pattern: returns a list of all indices which match a pattern
+lsub list <mode> [index list]: create a sublist from a set of indices
+lcor <referencelist> <list>: gives the positions of the elements in list in the reference list 
+lload <filename>: returns all lines in the specified files as a list 
+lwrite ?file? ?list?: writes a list to a file
+lmanip subindex ?list? ?pos?: returns a list of the 'pos' element in each of the elements of the given list
+lmanip merge ?list1? ?list2?: merge two lists into one
+lmanip extract ?list? ?expression?: extracts matches to expression from a list, and returns a list of them.
+lmanip remdup ?list?: removes duplicates from list
+lmanip split ?list? -before/-after/-outside ?positions?: splits a list at positions into sublists
+lmanip lengths ?list?: returns a list with the lengths of the elements
+lmanip toarray ?list? ?variable?: sets an array acoording to values in a paired list:
+    lmanip toarray {{a 1} {b 2} {c 3}} try
+    equals:
+    set try(a) 1
+    set try(b) 2
+    set try(c) 3
