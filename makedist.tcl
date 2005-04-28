@@ -12,7 +12,7 @@ if {[llength $argv] == 0} {
 }
 
 # $Format: "set version $ProjectMajorVersion$.$ProjectMinorVersion$"$
-set version 2
+set version 2.0
 # $Format: "set minorversion $ProjectMinorVersion$"$
 set minorversion 0
 
