@@ -325,3 +325,96 @@ ExtraL_Lmath_calcObjCmd(notUsed, interp, objc, objv)
 	return TCL_OK;
 }
 
+int ExtraL_vectorFromObj(Tcl_Interp *interp,Tcl_Obj *objv,double **resultPtr, int *resultlen) {
+	Tcl_Obj **listobjv;
+	double *result,el;
+	int error, len, i;
+	error = Tcl_ListObjGetElements(interp, objv, &len, &listobjv);
+	if (error) {return error;}
+	result = (double *)Tcl_Alloc(len*sizeof(double));
+	if (result == NULL) {return TCL_ERROR;}
+	for (i = 0; i < len ; i++) {
+		error = Tcl_GetDoubleFromObj(interp,listobjv[i],&el);
+		if (error) {return error;}
+		result[i] = el;
+	}
+	*resultlen = len;
+	*resultPtr = result;
+	return TCL_OK;
+}
+
+
+int
+ExtraL_Lmath_filterObjCmd(notUsed, interp, objc, objv)
+	ClientData notUsed;				 /* Not used. */
+	Tcl_Interp *interp;					/* Current interpreter. */
+	int objc;						/* Number of arguments. */
+	Tcl_Obj *CONST objv[];	/* Argument objects. */
+{
+	int len,flen,useunfilteredvalue = 0;
+	Tcl_Obj *unfilteredvalue = NULL, *result,*resultEl;
+	double *list = NULL,*filter = NULL, el;
+	int filterpos;
+	int i,j,error,end, pos;
+	if ((objc < 3) || (objc > 5)) {
+		Tcl_WrongNumArgs(interp, 1, objv, "list filter ?filterpos? ?unfilteredvalue?");
+		return TCL_ERROR;
+	}
+	error = ExtraL_vectorFromObj(interp, objv[1], &list, &len);
+	if (error) {return error;}
+	error = ExtraL_vectorFromObj(interp, objv[2], &filter, &flen);
+	if (error) {goto error;}
+	if (objc > 3) {
+		error = Tcl_GetIntFromObj(interp,objv[3],&filterpos);
+		if (error) {goto error;}
+	} else {
+		filterpos = (int)floor(flen/2);
+	}
+	if (objc > 4) {
+		unfilteredvalue = objv[4];
+		useunfilteredvalue = 1;
+	}
+	/* start processing */
+	result = Tcl_NewListObj(0,NULL);
+	if (!useunfilteredvalue) {
+		el  = 0.0;
+		for (j = 0; j < flen ; j++) {
+			el += list[j]*filter[j];
+		}
+		resultEl = Tcl_NewDoubleObj(el);
+	} else {
+		resultEl = unfilteredvalue;
+	}
+	for (j = 0; j < filterpos ; j++) {
+		error = Tcl_ListObjAppendElement(interp,result,resultEl);
+		if (error) {goto error;}
+	}
+	/* main loop */
+	end  = len - flen + 1;
+	for (pos = 0 ; pos < end ; pos++) {
+		el  = 0.0;
+		for (j = 0; j < flen ; j++) {
+			el += list[pos+j]*filter[j];
+		}
+		resultEl = Tcl_NewDoubleObj(el);
+		error = Tcl_ListObjAppendElement(interp,result,resultEl);
+		if (error) {goto error;}
+	}
+	if (useunfilteredvalue) {
+		resultEl = unfilteredvalue;
+	}
+	end = flen - filterpos - 1;
+	for (j = 0; j < end ; j++) {
+		error = Tcl_ListObjAppendElement(interp,result,resultEl);
+		if (error) {goto error;}
+	}
+	Tcl_SetObjResult(interp,result);
+	if (list != NULL) {Tcl_Free((char *)list);}
+	if (filter != NULL) {Tcl_Free((char *)filter);}
+	return TCL_OK;
+	error:
+		if (list != NULL) {Tcl_Free((char *)list);}
+		if (filter != NULL) {Tcl_Free((char *)filter);}
+		return TCL_ERROR;
+}
+

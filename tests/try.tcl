@@ -1,12 +1,3 @@
-set ext_path {/home/peter/build/Linux-i686/exts /home/peter/bin/tcl}
-source /home/peter/dev/dirtcl/extension.tcl
-extension require Extral
-
-parray ext::loaded
-
-
-package require Extral
-
 source tools.tcl
 
 set value {

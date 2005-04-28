@@ -128,3 +128,54 @@ proc lmath_max {args} {
 	return $result
 }
 
+#doc {lmath lmath_filter} cmd {
+#	lmath_filter list filter ?filterpos? ?unfilteredvalue?
+#} descr {
+#	applies the filter by sliding it over the list, multiplying all elements of the filter with 
+#	the current elements in the list, and changing the list element in the middle of the 
+#	filter (or at filterpos) with the sum of the products.
+#	The numbers at the beginning and end of the list that are not covered by the filter, are given the value
+#	of the first, respectively last element that can be calculated, unless a value for these is
+#	explicitly given (unfilteredvalue)
+#	returns the filtered list
+#}
+proc lmath_filter {list filter {filterpos {}} {unfilteredvalue {}}} {
+	set len [llength $list]
+	set flen [llength $filter]
+	if {![isint $filterpos]} {
+		set filterpos [expr {$flen/2}]
+	}
+	if {($filterpos < 0) || ($filterpos >= $flen)} {
+		error "filterpos outside of filter"
+	}
+	if {$unfilteredvalue eq ""} {
+		set useunfilteredvalue 0
+	} else {
+		set useunfilteredvalue 1
+	}
+	if {!$useunfilteredvalue} {
+		set el 0.0
+		foreach f $filter v [lrange $list 0 [expr {$flen - 1}]] {
+			set el [expr {$el+$f*$v}]
+		}
+		#set result [lrange $list 0 [expr {$filterpos - 1}]]
+		set result [list_fill $filterpos $el]
+	} else {
+		set result [list_fill $filterpos $unfilteredvalue]
+	}
+	set end [expr {$len - $flen+1}]
+	for {set pos 0} {$pos < $end} {incr pos} {
+		set el 0.0
+		foreach f $filter v [lrange $list $pos [expr {$pos+$flen-1}]] {
+			set el [expr {$el+$f*$v}]
+		}
+		lappend result $el
+	}
+	if {!$useunfilteredvalue} {
+		#eval lappend result [lrange $list end-[expr {$len-$filterpos-2}] end]
+		eval lappend result [list_fill [expr {$flen-$filterpos-1}] $el]
+	} else {
+		eval lappend result [list_fill [expr {$flen-$filterpos-1}] $unfilteredvalue]
+	}
+	return $result
+}

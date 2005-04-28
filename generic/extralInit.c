@@ -16,6 +16,9 @@ extern int ExtraL_List_concatObjCmd _ANSI_ARGS_((ClientData clientData,
 extern int ExtraL_Lmath_calcObjCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int objc, Tcl_Obj *argv[]));
 
+extern int ExtraL_Lmath_filterObjCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int objc, Tcl_Obj *argv[]));
+
 extern int ExtraL_Lmath_sumObjCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int objc, Tcl_Obj *argv[]));
 
@@ -173,6 +176,7 @@ Extral_Init(interp)
 	Tcl_CreateObjCommand(interp,"lmath_max",(Tcl_ObjCmdProc *)ExtraL_Lmath_maxObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"lmath_sum",(Tcl_ObjCmdProc *)ExtraL_Lmath_sumObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"lmath_calc",(Tcl_ObjCmdProc *)ExtraL_Lmath_calcObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"lmath_filter",(Tcl_ObjCmdProc *)ExtraL_Lmath_filterObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 
 	ExtraL_MapInit(interp);
 	return TCL_OK;
