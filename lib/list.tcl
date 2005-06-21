@@ -31,7 +31,7 @@ proc list_remove {list args} {
 	return $result
 }
 
-if ![get noc 0] {
+if {![get Extral::noc 0]} {
 	proc list_remove {list args} {
 		if {"$args"==""} {
 			return $list
