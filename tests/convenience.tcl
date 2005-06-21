@@ -42,7 +42,7 @@ test aproc {basic} {
 
 test aproc {error} {
 	[aproc {a} {list $a $args}] 1 2 3
-} {called "::Extral::aproc2" with too many arguments} 1
+} {wrong # args: should be "::Extral::aproc2 a"} 1
 
 test aproc {more} {
 	[aproc {a args} {list $a $args}] 1 2 3
