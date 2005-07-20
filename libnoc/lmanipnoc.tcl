@@ -31,3 +31,29 @@ proc list_fill {args} {
 }
 
 interp alias {} list_ffill {} list_fill 
+
+#doc {listcommands list_subindex} cmd {
+#list_subindex ?list? ?pos? ...
+#} descr {
+#	returns a list of the 'pos' element in each of the elements of the given list
+#} example {
+#	% list_subindex {{a 1} {b 2} {c 3}} 1
+#	1 2 3
+#}
+proc list_subindex {args} {
+	if {[llength $args] < 2} {
+		error "wrong # args: should be \"list_subindex list pos ?pos ...?\""
+	}
+	set result ""
+	set index [lrange $args 1 end]
+	if {[llength $index] == 1} {
+		foreach elem [lindex $args 0] {
+			lappend result [lindex $elem $index]
+		}
+	} else {
+		foreach elem [lindex $args 0] {
+			lappend result [list_sub $elem $index]
+		}
+	}
+	return $result
+}

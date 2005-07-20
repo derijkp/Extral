@@ -4,25 +4,6 @@
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
 # =============================================================
-#doc {listcommands list_subindex} cmd {
-#list_subindex ?list? ?pos?
-#} descr {
-#	returns a list of the 'pos' element in each of the elements of the given list
-#} example {
-#	% list_subindex {{a 1} {b 2} {c 3}} 1
-#	1 2 3
-#}
-proc list_subindex {args} {
-	if {[llength $args]!=2} {
-		error "wrong # args: should be \"list_subindex list ?pos?\""
-	}
-	set result ""
-	set index [lindex $args 1]
-	foreach elem [lindex $args 0] {
-		lappend result [lindex $elem $index]
-	}
-	return $result
-}
 
 #doc {listcommands list_mangle} cmd {
 #list_mangle ?list1? ?list2?
@@ -156,7 +137,7 @@ proc list_lengths {args} {
 }
 
 #doc {listcommands list_select} cmd {
-#list_subindex ?list? ?pos?
+#list_select ?mode? list pattern
 #} descr {
 #	selects all elements of a list that match a certain pattern. Default mode is -glob
 #} example {

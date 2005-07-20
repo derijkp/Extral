@@ -978,3 +978,87 @@ ExtraL_List_inlistObjCmd(dummy, interp, objc, objv)
 	}
 	return TCL_OK;
 }
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ExtraL_List_subindexCmd --
+ *
+ *		This procedure is invoked to process the "list_subindex" command.
+ *		It creates a subset of a list
+ *
+ * Results:
+ *		A standard Tcl result.
+ *
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+ExtraL_List_subindexObjCmd(dummy, interp, objc, objv)
+	ClientData dummy;		/* Not used. */
+	Tcl_Interp *interp;		/* Current interpreter. */
+	int objc;			/* Number of arguments. */
+	Tcl_Obj *CONST objv[];	/* Argument objects. */
+{
+	Tcl_Obj **listPtr,**linePtr;
+	Tcl_Obj *tempObj,*nullObj = NULL;
+	Tcl_Obj *resultObj, *indexObj;
+	int listLen, lineLen, index, error;
+	int i,j,*pos = NULL,posLen;
+	if (objc < 3) {
+		Tcl_WrongNumArgs(interp, 1, objv, "list pos ?pos ...?");
+		return TCL_ERROR;
+	}
+	/*
+	 * Convert the first argument to a list if necessary.
+	 */
+	error = Tcl_ListObjGetElements(interp, objv[1], &listLen, &listPtr);
+	if (error) {return error;}
+	posLen = objc-2;
+	pos = (int *)Tcl_Alloc(posLen*sizeof(int));
+	for (i = 2 ; i < objc ; i++) {
+		error = Tcl_GetIntFromObj(interp,objv[i],pos+i-2);
+		if (error) {goto error;}
+	}
+	/* Initialise result */
+	Tcl_ResetResult(interp);
+	resultObj = Tcl_GetObjResult(interp);
+	nullObj = Tcl_NewObj();
+	Tcl_IncrRefCount(nullObj);
+	for(i = 0 ; i < listLen ; i++) {
+		error = Tcl_ListObjGetElements(interp, listPtr[i], &lineLen, &linePtr);
+		if (error) {goto error;}
+		if (objc == 3) {
+			if (pos[0] < lineLen) {
+				tempObj = linePtr[pos[0]];
+			} else {
+				tempObj = nullObj;
+			}
+		} else {
+			tempObj = Tcl_NewListObj(0,NULL);
+			if (tempObj == NULL) {goto error;}
+			for (j = 0; j < posLen ; j++) {
+				if (pos[j] < lineLen) {
+					error = Tcl_ListObjAppendElement(interp,tempObj,linePtr[pos[j]]);
+				} else {
+					error = Tcl_ListObjAppendElement(interp,tempObj,nullObj);
+				}
+				if (error) {goto error;}
+			}
+
+		}
+		error = Tcl_ListObjAppendElement(interp,resultObj,tempObj);
+		if (error) {goto error;}
+		tempObj = NULL;
+	}
+	Tcl_DecrRefCount(nullObj);
+	Tcl_Free((char *)pos);
+	return TCL_OK;
+	error:
+		if (pos != NULL) {Tcl_Free((char *)pos);}
+		if (tempObj != NULL) {Tcl_DecrRefCount(tempObj);}
+		if (nullObj != NULL) {Tcl_DecrRefCount(nullObj);}
+		return TCL_ERROR;
+}
+

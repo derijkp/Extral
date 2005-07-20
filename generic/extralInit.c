@@ -40,6 +40,9 @@ extern int ExtraL_List_findObjCmd _ANSI_ARGS_((ClientData clientData,
 extern int ExtraL_List_subObjCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int objc, Tcl_Obj *argv[]));
 
+extern int ExtraL_List_subindexObjCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int objc, Tcl_Obj *argv[]));
+
 extern int ExtraL_List_remdupObjCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int objc, Tcl_Obj *argv[]));
 
@@ -149,6 +152,7 @@ Extral_Init(interp)
 	Tcl_CreateObjCommand(interp,"list_shift",(Tcl_ObjCmdProc *)ExtraL_List_shiftObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"list_find",(Tcl_ObjCmdProc *)ExtraL_List_findObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"list_sub",(Tcl_ObjCmdProc *)ExtraL_List_subObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"list_subindex",(Tcl_ObjCmdProc *)ExtraL_List_subindexObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"list_cor",(Tcl_ObjCmdProc *)ExtraL_List_corObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"list_remdup",(Tcl_ObjCmdProc *)ExtraL_List_remdupObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"list_lremove",(Tcl_ObjCmdProc *)ExtraL_List_lremoveObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);

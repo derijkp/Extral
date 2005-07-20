@@ -5,8 +5,20 @@ exec tclsh "$0" "$@"
 source tools.tcl
 
 test lmanip {subindex} {
-	list_subindex {{a 1} {b 2} {c 3}} 1
-} {1 2 3}
+	list_subindex {{a 1} {b {2 2}} {c 3}} 1
+} {1 {2 2} 3}
+
+test lmanip {subindex missing value} {
+	list_subindex {{a 1} {b} {c 3}} 1
+} {1 {} 3}
+
+test lmanip {subindex multiple positions} {
+	list_subindex {{A a 1} {{B B} b 2} {C c}} 2 0 1
+} {{1 A a} {2 {B B} b} {{} C c}}
+
+test lmanip {subindex error in pos} {
+	list_subindex {{A a 1} {{B B} b 2} {C c}} {2 0 1}
+} {expected integer but got "2 0 1"} 1
 
 test lmanip {mangle} {
 	list_mangle {a b c} {1 2 3}
