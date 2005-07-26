@@ -118,6 +118,14 @@ ExtraL_String_ReplaceObjCmd(notUsed, interp, objc, objv)
 	if (error) {return error;}
 	error = Tcl_GetIntFromObj(interp, objv[3], &last);
 	if (error) {return error;}
+	if (first < 0) {
+		Tcl_AppendResult(interp,"first position < 0",NULL);
+		return TCL_ERROR;
+	}
+	if (last < 0) {
+		Tcl_AppendResult(interp,"last position < 0",NULL);
+		return TCL_ERROR;
+	}
 	last++;
 	replacement = Tcl_GetStringFromObj(objv[4],&rlen);
 	string = Tcl_GetStringFromObj(objv[1],&slen);
