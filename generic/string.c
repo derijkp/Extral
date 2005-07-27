@@ -122,16 +122,16 @@ ExtraL_String_ReplaceObjCmd(notUsed, interp, objc, objv)
 		Tcl_AppendResult(interp,"first position < 0",NULL);
 		return TCL_ERROR;
 	}
-	if (last < 0) {
-		Tcl_AppendResult(interp,"last position < 0",NULL);
-		return TCL_ERROR;
+	if (last < first) {
+		last = first;
+	} else {
+		last++;
 	}
-	last++;
 	replacement = Tcl_GetStringFromObj(objv[4],&rlen);
 	string = Tcl_GetStringFromObj(objv[1],&slen);
 	result = Tcl_NewStringObj("",0);
 	if (first < slen) {
-		if (first+rlen < slen) {
+		if (last < slen) {
 			Tcl_AppendToObj(result, string, first);
 			Tcl_AppendToObj(result, replacement, rlen);
 			Tcl_AppendToObj(result, string+last, slen-last);

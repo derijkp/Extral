@@ -112,6 +112,17 @@ test string_replace {negative index} {
 	string_replace "abcdefgh" -10 -10 23
 } {first position < 0} 1
 
+test string_replace {insert} {
+	string_replace ABCDEFG 5 -1 ----
+} ABCDE----FG
+
+test string_replace {insert before} {
+	string_replace ABCDEFG 0 -1 ----
+} ----ABCDEFG
+
+test string_replace {insert after} {
+	string_replace ABCDEFG 10 -1 ----
+} {ABCDEFG  ----}
 
 test string_fill {basic} {
 	string_fill ab 5
