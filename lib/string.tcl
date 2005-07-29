@@ -57,6 +57,12 @@ proc string_equal {s1 s2} {
 #}
 proc string_fill {string number} {
 	set result ""
+	if {![isint $number]} {
+		error "$number is not an integer"
+	}
+	if {$number < 0} {
+		return {}
+	}
 	for {set i 0} {$i < $number} {incr i} {
 		append result $string
 	}

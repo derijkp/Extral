@@ -128,6 +128,14 @@ test string_fill {basic} {
 	string_fill ab 5
 } ababababab
 
+test string_fill {error} {
+	string_fill 5 a
+} {a is not an integer} 1
+
+test string_fill {< 0} {
+	string_fill a -1
+} {}
+
 test string_equal {basic} {
 	string_equal ab ab
 } 1
