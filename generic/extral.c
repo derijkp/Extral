@@ -16,6 +16,51 @@
 #define GLOB		1
 #define REGEXP		2
 
+int
+Extral_inlist(Tcl_Interp *interp, Tcl_Obj *listObj, Tcl_Obj *testObj,int *result)
+{
+	Tcl_Obj **listobjv;
+	char *teststring,*string;
+	int testlen, len, listobjc,j,error;
+	teststring = Tcl_GetStringFromObj(testObj, &testlen);
+	error = Tcl_ListObjGetElements(interp, listObj, &listobjc, &listobjv);
+	if (error != TCL_OK) {return error;}
+	for ( j = 0 ; j < listobjc ; j++ ) {
+		string = Tcl_GetStringFromObj(listobjv[j],&len);
+		if ((len == testlen) && (strncmp(string,teststring,len) == 0)) {
+			*result = 1;
+			return TCL_OK;
+		}
+	}
+	*result = 0;
+	return TCL_OK;
+}
+
+int
+Extral_lcommon(Tcl_Interp *interp, Tcl_Obj *listObj, Tcl_Obj *testObj,int *result)
+{
+	Tcl_Obj **listobjv,**testobjv;
+	char *teststring,*string;
+	int testlen, len, listobjc,testobjc,i,j,error;
+	error = Tcl_ListObjGetElements(interp, listObj, &listobjc, &listobjv);
+	if (error != TCL_OK) {return error;}
+	error = Tcl_ListObjGetElements(interp, testObj, &testobjc, &testobjv);
+	if (error != TCL_OK) {return error;}
+
+	for ( j = 0 ; j < listobjc ; j++ ) {
+		for ( i = 0 ; i < testobjc ; i++ ) {
+			teststring = Tcl_GetStringFromObj(testobjv[i], &testlen);
+			string = Tcl_GetStringFromObj(listobjv[j],&len);
+			if ((len == testlen) && (strncmp(string,teststring,len) == 0)) {
+				*result = 1;
+				return TCL_OK;
+			}
+		}
+	}
+	*result = 0;
+	return TCL_OK;
+}
+
 /*
  *----------------------------------------------------------------------
  *
@@ -42,12 +87,14 @@ ExtraL_List_findObjCmd(clientData, interp, objc, objv)
 #define EXACT	0
 #define GLOB	1
 #define REGEXP	2
+#define INLIST	3
+#define LCOMMON	4
 	char *bytes, *patternBytes;
-	int i, match, mode, result, listLen, length, elemLen;
+	int i, j, match, mode, result, listLen, length, elemLen;
 	Tcl_Obj **elemPtrs;
 	Tcl_Obj *indexObj, *resultObj;
 	static char *switches[] =
-		{"-exact", "-glob", "-regexp", (char *) NULL};
+		{"-exact", "-glob", "-regexp", "-inlist", "-lcommon", (char *) NULL};
 
 	mode = EXACT;
 	if (objc == 4) {
@@ -98,6 +145,14 @@ ExtraL_List_findObjCmd(clientData, interp, objc, objv)
 				if (match < 0) {
 					return TCL_ERROR;
 				}
+				break;
+			case INLIST:
+				result = Extral_inlist(interp,elemPtrs[i],objv[objc-1],&match);
+				if (result != TCL_OK) {return result;}
+				break;
+			case LCOMMON:
+				result = Extral_lcommon(interp,elemPtrs[i],objv[objc-1],&match);
+				if (result != TCL_OK) {return result;}
 				break;
 		}
 		if (match) {
@@ -1020,6 +1075,10 @@ ExtraL_List_subindexObjCmd(dummy, interp, objc, objv)
 	for (i = 2 ; i < objc ; i++) {
 		error = Tcl_GetIntFromObj(interp,objv[i],pos+i-2);
 		if (error) {goto error;}
+		if (pos[i-2] < 0) {
+			Tcl_AppendResult(interp, "negative index not allowed", (char *) NULL);
+			return TCL_ERROR;
+		}
 	}
 	/* Initialise result */
 	Tcl_ResetResult(interp);

@@ -31,6 +31,15 @@ test lmanip {subindex} {
 	list_subindex {{A a 1} {{B B} b 2} {c 3}} 2 0 1
 } {{1 A a} {2 {B B} b} {3 C c}}
 
+test lmanip {subindex negtive subindex} {
+	list_subindex {{A a 1} {B b 2} {C c 3}} -1
+} {{1 A a} {2 {B B} b} {3 C c}}
+
+test lmanip {subindex large subindex} {
+	list_subindex {{A a 1} {B b 2} {C c 3}} 100
+} {{1 A a} {2 {B B} b} {3 C c}}
+
+
 
 set value {
 SPTREMBL; Q37382; Q37382.

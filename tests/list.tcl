@@ -16,6 +16,14 @@ test list_find {} {
 	list_find -regexp {Ape Ball Field {Antwerp city} Egg} {^A}
 } {0 3}
 
+test list_find {} {
+	list_find -inlist {Ape Ball Field {Antwerp city} Egg} {Antwerp}
+} {3}
+
+test list_find {} {
+	list_find -lcommon {Ape Ball Field {Antwerp city} Egg} {Antwerp Egg}
+} {3 4}
+
 test list_sub {} {
 	list_sub {Ape Ball Field {Antwerp city} Egg} {0 3}
 } {Ape {Antwerp city}}
