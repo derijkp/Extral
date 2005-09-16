@@ -52,6 +52,10 @@ test list_sub {problem} {
 	set rest [list_sub $findex -exclude $poss]
 } {{Thecel.AEU: Thermococcus celer}}
 
+test list_sub {bugfix: -exclude assumed positions are sorted} {
+	list_sub {a b c d} -exclude {3 0}
+} {b c}
+
 test list_cor {} {
 	list_cor {a b c d e f} {d b}
 } {3 1}

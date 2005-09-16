@@ -241,27 +241,28 @@ ExtraL_List_subObjCmd(dummy, interp, objc, objv)
 		}
 	} else {
 		int curindex=0;
+		char *map = NULL;
+		map = Tcl_Alloc(listLen*sizeof(char));
+		memset(map,0,listLen);
 		if (indexlistLen==0) {
 			Tcl_SetObjResult(interp, listPtr);
-			return TCL_OK;
+			Tcl_Free(map);return TCL_OK;
 		}
-		index=-1;
-		while ((index<0)&&(curindex<indexlistLen)) {
-			result=Tcl_GetIntFromObj(interp,indexelemPtrs[curindex++],&index);
-			if (result!=TCL_OK) {return result;}
-		}
-		for(i=0;i<listLen;i++) {
-			if (i==index)	{
-				index=-1;
-				while ((index < 1)&&(curindex < indexlistLen)) {
-					result=Tcl_GetIntFromObj(interp,indexelemPtrs[curindex++],&index);
-					if (result!=TCL_OK) {return result;}
-				}
-			} else {
-				result=Tcl_ListObjAppendElement(interp,resultObj,elemPtrs[i]);
-				if (result!=TCL_OK) {return result;}
+		for(i=0;i<indexlistLen;i++) {
+			result=Tcl_GetIntFromObj(interp,indexelemPtrs[i],&index);
+			if (result!=TCL_OK) {Tcl_Free(map);return result;}
+			if ((index >= 0) && (index < listLen)) {
+				map[index] = 1;
 			}
 		}
+		for(i=0;i<listLen;i++) {
+
+			if (map[i] == 0) {
+				result=Tcl_ListObjAppendElement(interp,resultObj,elemPtrs[i]);
+				if (result!=TCL_OK) {Tcl_Free(map);return result;}
+			}
+		}
+		Tcl_Free(map);
 	}
 	return TCL_OK;
 }
