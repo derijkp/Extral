@@ -88,5 +88,20 @@ test csv_parse {empty at the end} {
 	lindex [csv_parse $data \t] 0
 } {test {}}
 
+test csv_parse {1," o, ""a"" ,b ", 3, linecmd} {
+	set result {}
+	csv_parse {
+		1," o, ""a"" ,b ", 3
+		2,2
+	} , {lappend result $line}
+	set result
+} {{} {{		1} { o, "a" ,b } { 3}} {{		2} 2} {{	}}}
+
+test csv_file {basic} {
+	set f [open test.csv] 
+	set result [csv_file $f \t]
+	close $f
+	set result
+} {{a 1} {b 2} {{C c} 3}}
 
 testsummarize
