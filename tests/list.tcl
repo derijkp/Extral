@@ -21,6 +21,10 @@ test list_find {} {
 } {3}
 
 test list_find {} {
+	list_find -oflist {Ape Ball Field Egg {Antwerp city} Egg} {Ape Egg}
+} {0 3 5}
+
+test list_find {} {
 	list_find -lcommon {Ape Ball Field {Antwerp city} Egg} {Antwerp Egg}
 } {3 4}
 

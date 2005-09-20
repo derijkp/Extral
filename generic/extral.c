@@ -88,13 +88,14 @@ ExtraL_List_findObjCmd(clientData, interp, objc, objv)
 #define GLOB	1
 #define REGEXP	2
 #define INLIST	3
-#define LCOMMON	4
+#define OFLIST	4
+#define LCOMMON	5
 	char *bytes, *patternBytes;
 	int i, j, match, mode, result, listLen, length, elemLen;
 	Tcl_Obj **elemPtrs;
 	Tcl_Obj *indexObj, *resultObj;
 	static char *switches[] =
-		{"-exact", "-glob", "-regexp", "-inlist", "-lcommon", (char *) NULL};
+		{"-exact", "-glob", "-regexp", "-inlist", "-oflist", "-lcommon", (char *) NULL};
 
 	mode = EXACT;
 	if (objc == 4) {
@@ -148,6 +149,10 @@ ExtraL_List_findObjCmd(clientData, interp, objc, objv)
 				break;
 			case INLIST:
 				result = Extral_inlist(interp,elemPtrs[i],objv[objc-1],&match);
+				if (result != TCL_OK) {return result;}
+				break;
+			case OFLIST:
+				result = Extral_inlist(interp,objv[objc-1],elemPtrs[i],&match);
 				if (result != TCL_OK) {return result;}
 				break;
 			case LCOMMON:
