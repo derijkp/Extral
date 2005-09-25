@@ -41,7 +41,7 @@ proc aproc {args body} {
 # ? expr truevalue falsevalue
 #}
 proc ? {expr truevalue falsevalue} {
-	if {[uplevel expr $expr]} {
+	if {[uplevel [list expr $expr]]} {
 		return $truevalue
 	} else {
 		return $falsevalue
