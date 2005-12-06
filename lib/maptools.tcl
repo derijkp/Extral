@@ -15,6 +15,7 @@
 #} example {
 #}
 proc map_xml {xml} {
+	regsub -all {<!--[^>]*>} $xml {} xml
 	regsub -all "\[ \t\n\]\[ \t\n\]+" $xml { } xmllist
 	regsub -all < $xmllist <\7 xmllist
 	set xmllist [split $xmllist <>]
@@ -35,7 +36,7 @@ proc map_xml {xml} {
 		if {"$ch" == "\7"} {
 			set ch [string index $el 1]
 			if {"$ch" == "?"} {
-				if [regexp {^([^=]+)="(.*)"\?$} [string range $el 2 end] temp key value] {
+				if {[regexp {^([^=]+)="(.*)"\?$} [string range $el 2 end] temp key value]} {
 					set result [map_set $result $key $value]
 				}
 			} elseif {"$ch" == "!"} {
