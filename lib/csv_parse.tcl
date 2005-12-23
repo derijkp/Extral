@@ -3,6 +3,7 @@ proc csv_parse {data {sep ,} {linecmd {}}} {
 	set resultline {}
 	set newline 0
 	regsub -all \r\n $data \n data
+	set data [string trimright $data \n]
 	set data [split $data \n]
 	if {[info exists quotedstring]} {unset quotedstring}
 	set quotereplace {{""} {"}}
@@ -14,11 +15,13 @@ proc csv_parse {data {sep ,} {linecmd {}}} {
 				if {[string equal [string index $el 0] \"]} {
 					# check if the el is the proper ending of a quoted string
 					if {[string equal $el \"\"] || [regexp {([^"]|\A)("")*"$} $el]} {
+						set el [string trim $el]
 						lappend resultline [string map $quotereplace [string range $el 1 end-1]]
 					} else {
 						set quotedstring [string range $el 1 end]
 					}
 				} else {
+					set el [string trim $el]
 					lappend resultline $el
 				}
 			} else {
@@ -64,11 +67,13 @@ proc csv_file {f {sep ,} {linecmd {}}} {
 				if {[string equal [string index $el 0] \"]} {
 					# check if the el is the proper ending of a quoted string
 					if {[string equal $el \"\"] || [regexp {([^"]|\A)("")*"$} $el]} {
+						set el [string trim $el]
 						lappend resultline [string map $quotereplace [string range $el 1 end-1]]
 					} else {
 						set quotedstring [string range $el 1 end]
 					}
 				} else {
+					set el [string trim $el]
 					lappend resultline $el
 				}
 			} else {
@@ -85,6 +90,7 @@ proc csv_file {f {sep ,} {linecmd {}}} {
 		}
 		if {![info exists quotedstring]} {
 			if {$linecmd eq ""} {
+				if {[eof $f] && ![llength $resultline]} break
 				lappend result $resultline
 			} else {
 				uplevel [list set line $resultline]
@@ -129,4 +135,18 @@ proc csv_split {line {sep ,}} {
 		}
 	}
 	return $resultline
+}
+
+proc csv_write {f data {sep ,}} {
+	set quotereplace {{"} {""}}
+	foreach line $data {
+		set resultline {}
+		foreach el $line {
+			if {[regexp "\[ ${sep}\"\]" $el]} {
+				set el \"[string map $quotereplace $el]\"
+			}
+			lappend resultline $el
+		}
+		puts $f [join $resultline $sep]
+	}
 }
