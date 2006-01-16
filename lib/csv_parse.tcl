@@ -142,7 +142,7 @@ proc csv_write {f data {sep ,}} {
 	foreach line $data {
 		set resultline {}
 		foreach el $line {
-			if {[regexp "\[ ${sep}\"\]" $el]} {
+			if {[regexp "\[ ${sep}\n\"\]" $el]} {
 				set el \"[string map $quotereplace $el]\"
 			}
 			lappend resultline $el
