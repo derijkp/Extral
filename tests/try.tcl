@@ -32,3 +32,5 @@ test list_sub {-exclude assumes positions are sorted} {
 	list_sub {a b c d} -exclude {3 0}
 } {b c}
 
+rm -rf /home/peter/build/tca/Windows-intel/exts/Extral2.0.4/lib
+cp -r /home/peter/build/tca/Linux-i686/exts/Extral2.0.4/lib /home/peter/build/tca/Windows-intel/exts/Extral2.0.4/
