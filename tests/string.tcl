@@ -176,4 +176,36 @@ test string_foreach {mix} {
 	set temp
 } {{a 1} {a 2} {b 1} {b 2}}
 
+test string_sounds {De Rijk} {
+	string_sounds "De Rijk"
+} drg
+
+test string_sounds {DeReyck} {
+	string_sounds "DeReyck"
+} drg
+
+test string_sounds {Smith} {
+	string_sounds "Smith"
+} snd
+
+test string_sounds {jerome} {
+	string_sounds "jerome"
+} grn
+
+test string_sounds {jan} {
+	string_sounds "jan"
+} gn
+
+test string_sounds {sam} {
+	string_sounds "sam"
+} sn
+
+test string_sounds {fil%} {
+	string_sounds "fil%"
+} bl
+
+test string_sounds {filip} {
+	string_sounds "filip"
+} blb
+
 testsummarize

@@ -69,3 +69,23 @@ proc string_fill {string number} {
 	return $result
 }
 
+#doc {stringcommands string_sounds} cmd {
+#string_sounds string
+#} descr {
+# This is an alteration of the soundex algorithm, some changes are:
+#   sz seperated from gkqc, c differs depending on next
+#}
+proc string_sounds {string} {
+	set string [string tolower $string]
+	regsub -all {[^a-z]} $string {} string
+	set string [string_change $string {ch 7 a {} b b c g d d e {} f b g g h {} i {} j g k g l l m n n n o {} p b q g r r s s t d u {} v b w b x g y {} z s}]
+	set result {}
+	set prev {}
+	foreach el [split $string {}] {
+		if {$el eq $prev} continue
+		append result $el
+		set prev $el
+	}
+	return $result
+}
+
