@@ -219,6 +219,8 @@ Tcl_Obj *ExtraL_docalc(calc,t1,el1i,el1d,t2,el2i,el2d)
 			resultEl = Tcl_NewIntObj(el1i * el2i);
 		} else if (calc == '/') {
 			resultEl = Tcl_NewIntObj(el1i / el2i);
+		} else if (calc == '|') {
+			resultEl = Tcl_NewIntObj(el1i | el2i);
 		}
 	} else if ((t1 == 'i') && (t2 == 'd')) {
 		if (calc == '+') {
@@ -229,6 +231,8 @@ Tcl_Obj *ExtraL_docalc(calc,t1,el1i,el1d,t2,el2i,el2d)
 			resultEl = Tcl_NewDoubleObj(el1i * el2d);
 		} else if (calc == '/') {
 			resultEl = Tcl_NewDoubleObj(el1i / el2d);
+		} else if (calc == '|') {
+			resultEl = Tcl_NewIntObj(el1i | el2i);
 		}
 	} else if ((t1 == 'd') && (t2 == 'i')) {
 		if (calc == '+') {
@@ -239,6 +243,8 @@ Tcl_Obj *ExtraL_docalc(calc,t1,el1i,el1d,t2,el2i,el2d)
 			resultEl = Tcl_NewDoubleObj(el1d * el2i);
 		} else if (calc == '/') {
 			resultEl = Tcl_NewDoubleObj(el1d / el2i);
+		} else if (calc == '|') {
+			resultEl = Tcl_NewIntObj(el1i | el2i);
 		}
 	} else {
 		if (calc == '+') {
@@ -249,6 +255,8 @@ Tcl_Obj *ExtraL_docalc(calc,t1,el1i,el1d,t2,el2i,el2d)
 			resultEl = Tcl_NewDoubleObj(el1d * el2d);
 		} else if (calc == '/') {
 			resultEl = Tcl_NewDoubleObj(el1d / el2d);
+		} else if (calc == '|') {
+			resultEl = Tcl_NewIntObj(el1i | el2i);
 		}
 	}
 	return resultEl;
@@ -272,8 +280,8 @@ ExtraL_Lmath_calcObjCmd(notUsed, interp, objc, objv)
 		return TCL_ERROR;
 	}
 	string = Tcl_GetStringFromObj(objv[2],&len);
-	if ((len != 1) || (string[0] != '+' && string[0] != '-' && string[0] != '*' && string[0] != '/')) {
-		Tcl_AppendResult(interp,"action must be one of +,-,*,/");
+	if ((len != 1) || (string[0] != '+' && string[0] != '-' && string[0] != '*' && string[0] != '/' && string[0] != '|')) {
+		Tcl_AppendResult(interp,"action must be one of +,-,*,/,|");
 		return TCL_ERROR;
 	}
 	if (Tcl_ListObjGetElements(interp, objv[1], &listobjc1, &listobjv1) != TCL_OK) {
