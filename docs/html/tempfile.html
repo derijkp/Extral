@@ -5,11 +5,12 @@
 <h1>tempfile</h1>
 
 <dl><b><dt>
-tempfile ?get?
+tempfile ?get? ?file|dir?
 </b><dd>
 	creates an (empty) temporary file and returns its name. You should remove
 	the temporary file when not used any longer. However, leftover temporary 
 	files will be removed by an atexit handler
+	The last parameter (file or dir) determines whether a file or directory is created   
 
 <b><dt>
 tempfile clean

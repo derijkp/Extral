@@ -17,7 +17,7 @@ set ::Extral::patchlevel 4
 package provide Extral $::Extral::version
 
 package require pkgtools
-pkgtools::init $Extral::dir Extral list_pop [file join $Extral::dir libnoc]
+pkgtools::init $Extral::dir Extral list_pop [file join $Extral::dir libnoc usenoc.tcl]
 set Extral::noc [get noc 0]
 
 #

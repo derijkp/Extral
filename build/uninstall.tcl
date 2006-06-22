@@ -2,6 +2,9 @@
 # the next line restarts using tclsh \
 exec tclsh "$0" "$@"
 
+package require pkgtools
+cd [pkgtools::startdir]
+
 # settings
 # --------
 
@@ -12,5 +15,4 @@ set binaries {}
 
 # standard
 # --------
-source [file join [file dir [info script]] buildtools.tcl]
-uninstall $argv
+pkgtools::uninstall $argv

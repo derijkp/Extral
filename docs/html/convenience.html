@@ -5,6 +5,19 @@
 <h1>Convenience functions</h1>
 
 <dl><b><dt>
+varsubst string varlist valuelist
+</b><dd>
+	substitutes only the variables in varlist for their content
+	in the given string
+<br>eg.:<pre>
+	% set try {try it}
+	try it
+	% varsubst {try} {
+		puts [list $try $try2]
+	}
+		puts [list {try it} $try2]
+</pre>
+<b><dt>
 invoke vars cmd ...
 </b><dd>
  invoke simply evals $cmd in a private space. This eg. allows using
@@ -103,16 +116,11 @@ set variable2 value2
  returns current time in astronomical format: "%Y-%m-%d %H:%M:%S"
 
 <b><dt>
-varsubst string varlist valuelist
+get varName ?default?
 </b><dd>
-	substitutes only the variables in varlist for their content
-	in the given string
-<br>eg.:<pre>
-	% set try {try it}
-	try it
-	% varsubst {try} {
-		puts [list $try $try2]
-	}
-		puts [list {try it} $try2]
-</pre>
+ get returns the value of the variable given by varName if it exists.
+ If the variable does not exists, it returns an empty string, or
+ value given by $default if present
+ 
+
 </body>

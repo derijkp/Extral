@@ -22,4 +22,43 @@ string_fill string number
 </b><dd>
  returns a string consisting of the argument string number times repeated
 
+<b><dt>
+string_sounds string
+</b><dd>
+ This is an alteration of the soundex algorithm, some changes are:
+   sz seperated from gkqc, c differs depending on next
+
+<b><dt>
+string_change string changelist
+</b><dd>
+ change some parts of a string<br>
+ changelist gives alternating a substring to be changed, and what it should be changed into.
+ The command returns a string that is the given string where each occurence of the
+ substrings in the changelist have been changed.
+
+<b><dt>
+string_reverse list
+</b><dd>
+ returns the reverse of list.
+
+<b><dt>
+string_find mode list pattern
+</b><dd>
+	returns a list of all indices which match a pattern.
+	mode can be -exact, -glob, or -regexp
+	The default mode is -exact
+<br>eg.:<pre>
+	% string_find -regexp {Ape Ball Field {Antwerp city} Egg} {^A}
+	0 16
+</pre>
+<b><dt>
+string_replace string first last replacement
+</b><dd>
+ replace a part of a string
+
+<b><dt>
+string_foreach varList string ?varList string ...? command
+</b><dd>
+ loop over the characters from a string, follows the same syntax as foreach for lists
+
 </body>

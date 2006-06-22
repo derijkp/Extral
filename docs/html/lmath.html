@@ -22,8 +22,65 @@
 	Any value lower than the minimum is changed to the minimum.
 
 <b><dt>
-	lmath_stdev ?list?
+	lmath_stdev ?list? ??main??
 </b><dd>
 	returns the standard deviation of the numbers in the list.
+
+<b><dt>
+	lmath_majority ?list?
+</b><dd>
+	returns the most representative of the numbers in the list.
+	This calculated by using gravity scoring: Each number in the list
+	adds to the score depending on the distance to the supported number
+	The number with the most support is returned.
+	Where more than one number gets the same amount of support (e.g. evenly spaced)
+	The average of the best supported numbers is returned
+
+<b><dt>
+	lmath_majoritydev ?list? ?majority?
+</b><dd>
+	returns the most representative deviation of values in list 
+	from the given ?majority? number
+
+<b><dt>
+	lmath_calc ?list1? ?action? ?list2?
+</b><dd>
+	makes calculations on lists. Action can be one of +, -, * or /
+	list2 may also be a single number, in which case
+	this number will be used for all elements in list1
+<br>eg.:<pre>
+	% lmath_calc {1 2 3.2 4} + {1 2 3.2 4}
+	2.0 4.0 6.4 8.0
+</pre>
+<b><dt>
+	lmath_sum ?list?
+</b><dd>
+	returns the sum of the numbers in the list
+
+<b><dt>
+	lmath_between ?list?
+</b><dd>
+	returns the average of the numbers in the list.
+
+<b><dt>
+	lmath_min ?list?
+</b><dd>
+	returns the minimum of the numbers in the list
+
+<b><dt>
+	lmath_max ?list?
+</b><dd>
+	returns the maximum of the numbers in the list
+
+<b><dt>
+	lmath_filter list filter ?filterpos? ?unfilteredvalue?
+</b><dd>
+	applies the filter by sliding it over the list, multiplying all elements of the filter with 
+	the current elements in the list, and changing the list element in the middle of the 
+	filter (or at filterpos) with the sum of the products.
+	The numbers at the beginning and end of the list that are not covered by the filter, are given the value
+	of the first, respectively last element that can be calculated, unless a value for these is
+	explicitly given (unfilteredvalue)
+	returns the filtered list
 
 </body>
