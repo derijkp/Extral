@@ -113,6 +113,7 @@ proc lmath_max {args} {
 		error "wrong # args: should be \"lmath_max list\""
 	}
 	set list [lindex $args 0]
+	if {![llength $list]} {return {}}
 	set result [lindex $list 0]
 	if {![isdouble $result]} {
 		error "expected floating-point number but got \"$result\""
@@ -139,7 +140,7 @@ proc lmath_max {args} {
 #	explicitly given (unfilteredvalue)
 #	returns the filtered list
 #}
-proc lmath_filter {list filter {filterpos {}} {unfilteredvalue {}}} {
+proc lmath_filter {list filter {filterpos {}} args} {
 	set len [llength $list]
 	set flen [llength $filter]
 	if {![isint $filterpos]} {
@@ -148,10 +149,13 @@ proc lmath_filter {list filter {filterpos {}} {unfilteredvalue {}}} {
 	if {($filterpos < 0) || ($filterpos >= $flen)} {
 		error "filterpos outside of filter"
 	}
-	if {$unfilteredvalue eq ""} {
-		set useunfilteredvalue 0
-	} else {
+	if {[llength $args] > 1} {
+		error "wrong # args: should be \"lmath_filter list filter ?filterpos? ?unfilteredvalue?\""
+	} elseif {[llength $args] == 1} {
+		set unfilteredvalue [lindex $args 0]
 		set useunfilteredvalue 1
+	} else {
+		set useunfilteredvalue 0
 	}
 	if {!$useunfilteredvalue} {
 		set el 0.0

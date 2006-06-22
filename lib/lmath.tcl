@@ -118,7 +118,7 @@ proc lmath_majority {list} {
 	set hlist $cur
 	set num 0
 	foreach n $list {
-		if {$n != $cur} {
+		if {[expr {abs($n - $cur)}] > 0.001} {
 			lappend hlist $num
 			lappend hlist $n
 			set cur $n
@@ -139,7 +139,7 @@ proc lmath_majority {list} {
 		set score 0.0
 		foreach {tv num} $hlist {
 			set x [expr {abs($tv-$v)}]
-			if {$x < $mindif} {set x $mindif}
+			if {$x <= $mindif} {set x $mindif}
 			set score [expr {$score+$num/pow($x,2)}]
 #puts "$tv $x ($num) -> [expr {$num/pow($x,2)}]"
 		}

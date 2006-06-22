@@ -36,7 +36,7 @@ proc ssort {args} {
 	set pos [lsearch $args -reflist]
 	if {$pos==-1} {
 		if [catch {eval lsort $args {$list}} result] {
-			regsub -- {-integer, or -real} $result {-integer, -real, or -reflist} result
+			regsub -- {-real, or -unique} $result {-real, or -reflist} result
 			return -code error $result
 		} else {
 			return $result

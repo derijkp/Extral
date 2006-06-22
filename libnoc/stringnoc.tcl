@@ -7,50 +7,9 @@
 # substrings in the changelist have been changed.
 #}
 proc string_change {string changelist} {
-	array set translate $changelist
-	foreach {from to} $changelist {
-		if [string_equal $from {}] {
-			error "changelist for string_change cannot contain empty keys"
-		}
-		lappend index([string index $from 0]) $from
-		set length($from) [string length $from]
+	if {[expr {[llength $changelist]%2}]} {
+		error "changelist does not have an even number of elements"
 	}
-	set len [string length $string]	
-	set prevpos 0
-	set pos 0
-	set result ""
-	while {$pos < $len} {
-		set first [string index $string $pos]
-		if [info exists index($first)] {
-			foreach name $index($first) {
-				set temppos $pos
-				for {set i 0} {$i < $length($name)} {incr i} {
-					if {"[string index $string $temppos]" != "[string index $name $i]"} {
-						break
-					}
-					incr temppos
-				}
-				if {$i == $length($name)} {
-					if {$pos != $prevpos} {
-						append result [string range $string $prevpos [expr {$pos-1}]]
-					}
-					append result $translate($name)
-					incr pos $i
-					set prevpos $pos
-					break
-				}
-			}
-		} else {
-			incr pos
-		}
-	}
-	if {$pos != $prevpos} {
-		append result [string range $string $prevpos [expr {$pos-1}]]
-	}
-	return $result
-}
-
-proc string_change {string changelist} {
 	array set translate $changelist
 	foreach {from to} $changelist {
 		if [string_equal $from {}] {
@@ -166,6 +125,9 @@ proc string_replace {string first last replacement} {
 		set last $first
 	} else {
 		incr last 1
+	}
+	if {$first < 0} {
+		error "first position < 0"
 	}
 	incr first -1
 	set diff [expr {$first - [string length $string]}]

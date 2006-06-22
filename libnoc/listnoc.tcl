@@ -73,8 +73,11 @@ proc list_sub {list args} {
 #list_find mode list pattern
 #} descr {
 #	returns a list of all indices which match a pattern.
-#	mode can be -exact, -glob, or -regexp
+#	mode can be -exact, -glob, -regexp, -inlist, -oflist or -lcommon
 #	The default mode is -exact
+#	-inlist matches when the element at the index is a list that (exactly) contains the query as alist element
+#	-oflist matches when the element at the index (exactly) matches one of the elements in the query (which is regarded as alist)
+#	-lcommon both list elements and query are regarded as lists; they match if these lists have an element in common
 #} example {
 #	% list_find -regexp {Ape Ball Field {Antwerp city} Egg} {^A}
 #	0 3
@@ -96,19 +99,37 @@ proc list_find {args} {
 	switch -- $mode {
 		{-exact} {
 			foreach el $list {
-				if {"$el"=="$pattern"} {lappend result $pos}
+				if {"$el" eq "$pattern"} {lappend result $pos}
 				incr pos
 			}
 		}
 		{-glob} {
 			foreach el $list {
-				if [string match $pattern $el] {lappend result $pos}
+				if {[string match $pattern $el]} {lappend result $pos}
 				incr pos
 			}
 		}
 		{-regexp} {
 			foreach el $list {
-				if [regexp $pattern $el] {lappend result $pos}
+				if {[regexp $pattern $el]} {lappend result $pos}
+				incr pos
+			}
+		}
+		{-inlist} {
+			foreach el $list {
+				if {[inlist $el $pattern]} {lappend result $pos}
+				incr pos
+			}
+		}
+		{-oflist} {
+			foreach el $list {
+				if {[inlist $pattern $el]} {lappend result $pos}
+				incr pos
+			}
+		}
+		{-lcommon} {
+			foreach el $list {
+				if {[llength [list_common $pattern $el]]} {lappend result $pos}
 				incr pos
 			}
 		}

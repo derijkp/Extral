@@ -601,7 +601,7 @@ test map_get-list {list test type, 1 to end} {
 test map_get-list {list test type, 1 to end} {
 	set struct {a {*list {*int ?}}}
 	set try {a {1 2 3 4}}
-	map_get -map $struct $try {a {0 end {lmath_sum}}}
+	expr {double([map_get -map $struct $try {a {0 end {lmath_sum}}}])}
 } {10.0}
 
 test map_get-list {list test type, 1 to end} {

@@ -52,3 +52,4 @@ cross-bconfigure.sh --prefix=/home/peter/tcl/win-dirtcl/dirtcl-build
 cross-make.sh
 rm -rf /home/peter/build/tca/Windows-intel/exts/Extral2.0.4
 wine /home/peter/build/tca/Windows-intel/tclsh84.exe L:/dev/Extral/build/install.tcl L:/build/tca/Windows-intel/exts
+

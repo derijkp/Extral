@@ -1063,7 +1063,7 @@ ExtraL_List_subindexObjCmd(dummy, interp, objc, objv)
 	Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
 	Tcl_Obj **listPtr,**linePtr;
-	Tcl_Obj *tempObj,*nullObj = NULL;
+	Tcl_Obj *tempObj = NULL,*nullObj = NULL;
 	Tcl_Obj *resultObj, *indexObj;
 	int listLen, lineLen, index, error;
 	int i,j,*pos = NULL,posLen;

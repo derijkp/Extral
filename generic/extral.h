@@ -17,6 +17,8 @@
 #define TCL_STORAGE_CLASS DLLEXPORT
 #endif /* BUILD_Extral */
 
+#define EXTERN 
+
 /*
  * format- and scantime functions and definitions
  */

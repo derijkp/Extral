@@ -22,6 +22,9 @@ proc list_fill {args} {
 			lappend result $start
 		}
 	} else {
+		if {![isint $incr]} {
+			set start [expr {double($start)}]
+		}
 		for {set i 0} {$i<$size} {incr i} {
 			lappend result $start
 			set start [expr {$start + $incr}]
@@ -47,12 +50,20 @@ proc list_subindex {args} {
 	set result ""
 	set index [lrange $args 1 end]
 	if {[llength $index] == 1} {
+		if {![isint $index]} {error "expected integer but got \"[lindex $index 0]\""}
 		foreach elem [lindex $args 0] {
 			lappend result [lindex $elem $index]
 		}
 	} else {
+		foreach pos $index {
+			if {![isint $pos]} {error "expected integer but got \"$pos\""}
+		}
 		foreach elem [lindex $args 0] {
-			lappend result [list_sub $elem $index]
+			set temp {}
+			foreach pos $index {
+				lappend temp [lindex $elem $pos]
+			}
+			lappend result $temp
 		}
 	}
 	return $result
