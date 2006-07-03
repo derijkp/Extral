@@ -98,7 +98,7 @@ test string_replace {replace by none} {
 
 test string_replace {replace after end} {
 	string_replace "abcde" 10 10 23
-} {abcde    23}
+} {abcde     23}
 
 test string_replace {replace over end} {
 	string_replace "abcde" 4 5 23
@@ -122,7 +122,7 @@ test string_replace {insert before} {
 
 test string_replace {insert after} {
 	string_replace ABCDEFG 10 -1 ----
-} {ABCDEFG  ----}
+} {ABCDEFG   ----}
 
 test string_fill {basic} {
 	string_fill ab 5

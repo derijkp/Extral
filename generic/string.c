@@ -141,7 +141,7 @@ ExtraL_String_ReplaceObjCmd(notUsed, interp, objc, objv)
 		}
 	} else {
 		Tcl_AppendToObj(result, string, slen);
-		for (i = slen + 1 ; i < first ; i++) {Tcl_AppendToObj(result, " ", 1);}
+		for (i = slen + 1 ; i <= first ; i++) {Tcl_AppendToObj(result, " ", 1);}
 		Tcl_AppendToObj(result, replacement, rlen);
 	}
 	Tcl_SetObjResult(interp,result);

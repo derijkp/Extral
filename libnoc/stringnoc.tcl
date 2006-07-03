@@ -132,7 +132,7 @@ proc string_replace {string first last replacement} {
 	incr first -1
 	set diff [expr {$first - [string length $string]}]
 	if {$diff > 0} {
-		for {set i 0} {$i < $diff} {incr i} {append string " "}
+		for {set i 0} {$i <= $diff} {incr i} {append string " "}
 	}
 	return [string range $string 0 $first]$replacement[string range $string $last end]
 }
