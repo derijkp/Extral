@@ -469,8 +469,12 @@ proc inlist {list value} {
 #list_concat list ?list? ?list ...?
 #} descr {
 #	This  command  treats each argument as a list and concatenates them into a single list
+#	If a single list is given, each element in this list is treated a a list, and concatenated
 #}
 proc list_concat {args} {
+	if {[llength $args] == 1} {
+		set args [lindex $args 0]
+	}
 	set list [lindex $args 0]
 	foreach arg [lrange $args 1 end] {
 		foreach el $arg {

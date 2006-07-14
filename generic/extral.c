@@ -982,11 +982,20 @@ ExtraL_List_concatObjCmd(dummy, interp, objc, objv)
 	int objc;			/* Number of arguments. */
 	Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
-	Tcl_Obj *result;
-	int i,error;
+	Tcl_Obj *result,**listobjv;
+	int i,error,listobjc;
+	if (objc == 2) {
+		error = Tcl_ListObjGetElements(interp,objv[1],&listobjc,&listobjv);
+		if (error) {return error;}
+		i = 0;
+	} else {
+		listobjc = objc;
+		listobjv = objv;
+		i = 1;
+	}
 	result = Tcl_NewListObj(0,NULL);
-	for (i = 1 ; i < objc ; i++) {
-		error = Tcl_ListObjAppendList(interp,result,objv[i]);
+	for (; i < listobjc ; i++) {
+		error = Tcl_ListObjAppendList(interp,result,listobjv[i]);
 		if (error) {Tcl_DecrRefCount(result);return error;}
 	}
 	Tcl_SetObjResult(interp,result);

@@ -403,6 +403,10 @@ test list_concat {3} {
 	list_concat {a b c} {d e f} {1 2 3}
 } {a b c d e f 1 2 3}
 
+test list_concat {1} {
+	list_concat {{a b c} {1 2 3}}
+} {a b c 1 2 3}
+
 test inlist {true} {
 	inlist {a b c} b
 } 1
