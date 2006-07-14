@@ -8,7 +8,7 @@ cd [pkgtools::startdir]
 # settings
 # --------
 
-set libfiles {lib README pkgIndex.tcl init.tcl DESCRIPTION.txt}
+set libfiles {lib libnoc README pkgIndex.tcl init.tcl DESCRIPTION.txt}
 set shareddatafiles README
 set headers {}
 set libbinaries [::pkgtools::findlib [file dir [pkgtools::startdir]] Extral]
