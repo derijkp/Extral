@@ -60,4 +60,18 @@ test aproc {get variable with space} {
 	list [get "a a" ?] [get "b b" ?]
 } {1 ?}
 
+test Extral::event {basic test} {
+	set ::a {}
+	Extral::event clear
+	Extral::event listen peter testevent "lappend ::a peter"
+	Extral::event generate testevent a 1
+	lappend ::a -
+	Extral::event listen other testevent "lappend ::a other"
+	Extral::event generate testevent b 2
+	lappend ::a -
+	Extral::event remove peter testevent
+	Extral::event generate testevent c 3
+	set a
+} {peter a 1 - peter b 2 other b 2 - other c 3}
+
 testsummarize

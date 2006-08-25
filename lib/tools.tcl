@@ -217,6 +217,47 @@ proc Extral::scriptdir {} {
 	}
 }
 
+#doc {convenience Extral::event} cmd {
+#Extral::event listen listener event command
+#Extral::event remove listener event
+#Extral::event generate event ?data? ...
+#Extral::event events
+#Extral::event listeners event
+#} descr {
+# When an event is generated (using Extral::event generate) the commands previously defined
+# and attched to the event by one or more listeners will invoked
+# The command will be executed in global scope with the data (if any) given by the
+# generate command appended
+#}
+proc Extral::event {option args} {
+	upvar #0 Extral::events events
+	switch $option {
+		listen {
+			foreach {listener event command} $args break
+			set events($event) [map_set [get events($event) ""] $listener $command]
+		}
+		remove {
+			foreach {listener event} $args break
+			set events($event) [map_unset [get events($event) ""] $listener]
+		}
+		generate {
+			set event [list_shift args]
+			foreach {listener command} $events($event) {
+				uplevel #0 $command $args
+			}
+		}
+		events {
+			return [array names events]
+		}
+		listeners {
+			return $events($event)
+		}
+		clear {
+			unset -nocomplain events
+		}
+	}
+}
+
 proc Extral::tracecommands_cmd {commandstring op} {
 	trace remove execution uplevel enter Extral::tracecommands_cmd
 	trace remove execution info enter Extral::tracecommands_cmd
