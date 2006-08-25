@@ -216,3 +216,37 @@ proc Extral::scriptdir {} {
 		return [file dir $script]
 	}
 }
+
+proc Extral::tracecommands_cmd {commandstring op} {
+	trace remove execution uplevel enter Extral::tracecommands_cmd
+	trace remove execution info enter Extral::tracecommands_cmd
+	trace remove execution puts enter Extral::tracecommands_cmd
+	puts "[uplevel info level] $commandstring"
+	trace add execution uplevel enter Extral::tracecommands_cmd
+	trace add execution info enter Extral::tracecommands_cmd
+	trace add execution puts enter Extral::tracecommands_cmd
+}
+
+proc Extral::tracecommands {args} {
+	if {$args eq ""} {
+		foreach cmd [info commands] {
+			if {![catch {info body $cmd}]} {
+				lappend args $cmd
+			}
+		}
+	}
+	set args [list_remove $args Extral::tracecommands_cmd trace history]
+	foreach cmd $args {
+		trace add execution $cmd enter Extral::tracecommands_cmd
+	}
+	trace remove execution Extral::tracecommands_cmd enter Extral::tracecommands_cmd
+}
+
+proc Extral::tracecommands_rem {args} {
+	if {$args eq ""} {
+		set args [info commands]
+	}
+	foreach cmd $args {
+		trace remove execution $cmd enter Extral::tracecommands_cmd
+	}
+}
