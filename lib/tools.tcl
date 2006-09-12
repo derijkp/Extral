@@ -259,13 +259,12 @@ proc Extral::event {option args} {
 }
 
 proc Extral::tracecommands_cmd {commandstring op} {
-	trace remove execution uplevel enter Extral::tracecommands_cmd
-	trace remove execution info enter Extral::tracecommands_cmd
-	trace remove execution puts enter Extral::tracecommands_cmd
-	puts "[uplevel info level] $commandstring"
-	trace add execution uplevel enter Extral::tracecommands_cmd
-	trace add execution info enter Extral::tracecommands_cmd
-	trace add execution puts enter Extral::tracecommands_cmd
+	if {[info exists ::Extral::tracing]} return
+	set ::Extral::tracing 1
+	catch {
+		puts "[uplevel info level] $commandstring $op"
+	}
+	unset ::Extral::tracing
 }
 
 proc Extral::tracecommands {args} {
