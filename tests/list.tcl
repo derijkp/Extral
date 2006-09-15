@@ -415,6 +415,18 @@ test inlist {false} {
 	inlist {a b c} d
 } 0
 
+test list_foreach {basic} {
+	set result {}
+	list_foreach {a b} {{1 2} {3 4}} {lappend result $a,$b}
+	set result
+} {1,2 3,4}
+
+test list_foreach {different lengths} {
+	set result {}
+	list_foreach {a b} {{1 2 3} {4}} {lappend result $a,$b}
+	set result
+} {1,2 4,}
+
 # no test yet for
 # list_load <filename>
 # list_write ?file? ?list?

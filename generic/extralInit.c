@@ -64,7 +64,10 @@ extern int ExtraL_List_changeObjCmd _ANSI_ARGS_((ClientData clientData,
 extern int ExtraL_List_mergeObjCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int objc, Tcl_Obj *argv[]));
 
-extern int ExtraL_Array_lgetObjCmd _ANSI_ARGS_((ClientData clientData,
+extern int ExtraL_List_subindexObjCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int objc, Tcl_Obj *argv[]));
+
+extern int Extral_List_ForeachObjCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
 
 extern int ExtraL_Array_lappendObjCmd _ANSI_ARGS_((ClientData clientData,
@@ -111,6 +114,11 @@ extern int ExtraL_List_fillObjCmd _ANSI_ARGS_((ClientData clientData,
 
 extern int ExtraL_Lmath_averageObjCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char *argv[]));
+
+extern int ExtraL_Array_lgetObjCmd _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, int argc, char *argv[]));
+
+
 
 #ifdef windows
 /*
@@ -163,6 +171,7 @@ Extral_Init(interp)
 	Tcl_CreateObjCommand(interp,"list_fill",(Tcl_ObjCmdProc *)ExtraL_List_fillObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"list_ffill",(Tcl_ObjCmdProc *)ExtraL_List_fillObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"list_concat",(Tcl_ObjCmdProc *)ExtraL_List_concatObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,"list_foreach",(Tcl_ObjCmdProc *)Extral_List_ForeachObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"inlist",(Tcl_ObjCmdProc *)ExtraL_List_inlistObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"string_change",(Tcl_ObjCmdProc *)ExtraL_String_ChangeObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);
 	Tcl_CreateObjCommand(interp,"string_replace",(Tcl_ObjCmdProc *)ExtraL_String_ReplaceObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);

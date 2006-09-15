@@ -483,3 +483,32 @@ proc list_concat {args} {
 	}
 	return $list
 }
+
+#doc {listcommands list_foreach} cmd {
+#list_foreach varlist1 list1 ?varlist2 list2 ...? body
+#} descr {
+#	acts like foreach, except that list1, ... are treated as a list of lists
+#	and each iteration the next sublist is taken to fill the variables in varlist1, ...
+#} example {
+#   % list_foreach {a b} {{1 2} {3 4}} {puts $a,$b}
+#   1,2
+#   3,4
+#   % list_foreach {a b} {{1 2 3} 4} {puts $a,$b}
+#   1,2
+#   4,
+#}
+proc list_foreach {args} {
+	set body [list_pop args]
+	set max 0
+	foreach {vars valuelist} $args {
+		set len [llength $valuelist]
+		if {$len > $max} {set max $len}
+	}
+	for {set pos 0} {$pos < $max} {incr pos} {
+		foreach {vars valuelist} $args {
+			set values [lindex $valuelist $pos]
+			uplevel [list foreach $vars $values break]
+		}
+		set result [uplevel $body]
+	}
+}

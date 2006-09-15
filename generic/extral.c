@@ -912,7 +912,7 @@ ExtraL_List_fillObjCmd(dummy, interp, objc, objv)
 {
 	Tcl_Obj *result,el;
 	double start,incr;
-	int size, error, error2, i, type, starti,incri;
+	int size, error, error2, i, starti,incri;
 	if ((objc != 3) && (objc != 4)) {
 		Tcl_WrongNumArgs(interp, 1, objv, "size start ?incr?");
 		return TCL_ERROR;
@@ -1028,7 +1028,7 @@ ExtraL_List_inlistObjCmd(dummy, interp, objc, objv)
 	int listobjc;
 	Tcl_Obj **listobjv;
 	char *string1,*string;
-	int i,error,len1,len;
+	int i,len1,len;
 	if (objc != 3) {
 		Tcl_WrongNumArgs(interp, 1, objv, "list value");
 		return TCL_ERROR;
@@ -1073,8 +1073,8 @@ ExtraL_List_subindexObjCmd(dummy, interp, objc, objv)
 {
 	Tcl_Obj **listPtr,**linePtr;
 	Tcl_Obj *tempObj = NULL,*nullObj = NULL;
-	Tcl_Obj *resultObj, *indexObj;
-	int listLen, lineLen, index, error;
+	Tcl_Obj *resultObj;
+	int listLen, lineLen, error;
 	int i,j,*pos = NULL,posLen;
 	if (objc < 3) {
 		Tcl_WrongNumArgs(interp, 1, objv, "list pos ?pos ...?");
@@ -1136,3 +1136,228 @@ ExtraL_List_subindexObjCmd(dummy, interp, objc, objv)
 		return TCL_ERROR;
 }
 
+/*
+ *----------------------------------------------------------------------
+ *
+ * Extral_List_ForeachObjCmd --
+ *   based on Tcl code under BSD license
+ *     Copyright (c) 1987-1993 The Regents of the University of California.
+ *     Copyright (c) 1994-1997 Sun Microsystems, Inc.
+ *
+ *	This object-based procedure is invoked to process the "list_foreach" Tcl
+ *	command.  See the user documentation for details on what it does.
+ *
+ * Results:
+ *	A standard Tcl object result.
+ *
+ * Side effects:
+ *	See the user documentation.
+ *
+ *----------------------------------------------------------------------
+ */
+
+	/* ARGSUSED */
+int
+Extral_List_ForeachObjCmd(dummy, interp, objc, objv)
+    ClientData dummy;		/* Not used. */
+    Tcl_Interp *interp;		/* Current interpreter. */
+    int objc;			/* Number of arguments. */
+    Tcl_Obj *CONST objv[];	/* Argument objects. */
+{
+    int result = TCL_OK;
+    int i;			/* i selects a value list */
+    int j, maxj;		/* Number of loop iterations */
+    int v;			/* v selects a loop variable */
+    int numLists;		/* Count of value lists */
+    Tcl_Obj *bodyPtr;
+
+    /*
+     * We copy the argument object pointers into a local array to avoid
+     * the problem that "objv" might become invalid. It is a pointer into
+     * the evaluation stack and that stack might be grown and reallocated
+     * if the loop body requires a large amount of stack space.
+     */
+    
+#define NUM_ARGS 9
+    Tcl_Obj *(argObjStorage[NUM_ARGS]);
+    Tcl_Obj **argObjv = argObjStorage;
+    
+#define STATIC_LIST_SIZE 4
+    int varcListArray[STATIC_LIST_SIZE];
+    Tcl_Obj **varvListArray[STATIC_LIST_SIZE];
+    int argcListArray[STATIC_LIST_SIZE];
+    Tcl_Obj **argvListArray[STATIC_LIST_SIZE];
+
+    int *varcList = varcListArray;	   /* # loop variables per list */
+    Tcl_Obj ***varvList = varvListArray;   /* Array of var name lists */
+    int *argcList = argcListArray;	   /* Array of value list sizes */
+    Tcl_Obj ***argvList = argvListArray;   /* Array of value lists */
+
+    int tempobjc;
+    Tcl_Obj **tempobjv;
+
+    if (objc < 4 || (objc%2 != 0)) {
+	Tcl_WrongNumArgs(interp, 1, objv,
+		"varList list ?varList list ...? command");
+	return TCL_ERROR;
+    }
+
+    /*
+     * Create the object argument array "argObjv". Make sure argObjv is
+     * large enough to hold the objc arguments.
+     */
+
+    if (objc > NUM_ARGS) {
+	argObjv = (Tcl_Obj **) ckalloc(objc * sizeof(Tcl_Obj *));
+    }
+    for (i = 0;  i < objc;  i++) {
+	argObjv[i] = objv[i];
+    }
+
+    /*
+     * Manage numList parallel value lists.
+     * argvList[i] is a value list counted by argcList[i]
+     * varvList[i] is the list of variables associated with the value list
+     * varcList[i] is the number of variables associated with the value list
+     */
+
+    numLists = (objc-2)/2;
+    if (numLists > STATIC_LIST_SIZE) {
+	varcList = (int *) ckalloc(numLists * sizeof(int));
+	varvList = (Tcl_Obj ***) ckalloc(numLists * sizeof(Tcl_Obj **));
+	argcList = (int *) ckalloc(numLists * sizeof(int));
+	argvList = (Tcl_Obj ***) ckalloc(numLists * sizeof(Tcl_Obj **));
+    }
+    for (i = 0;  i < numLists;  i++) {
+	varcList[i] = 0;
+	varvList[i] = (Tcl_Obj **) NULL;
+	argcList[i] = 0;
+	argvList[i] = (Tcl_Obj **) NULL;
+    }
+
+    /*
+     * Break up the value lists and variable lists into elements
+     */
+
+    maxj = 0;
+    for (i = 0;  i < numLists;  i++) {
+	result = Tcl_ListObjGetElements(interp, argObjv[1+i*2],
+	        &varcList[i], &varvList[i]);
+	if (result != TCL_OK) {
+	    goto done;
+	}
+	if (varcList[i] < 1) {
+	    Tcl_AppendToObj(Tcl_GetObjResult(interp),
+	            "foreach varlist is empty", -1);
+	    result = TCL_ERROR;
+	    goto done;
+	}
+	
+	result = Tcl_ListObjGetElements(interp, argObjv[2+i*2],
+	        &argcList[i], &argvList[i]);
+	if (result != TCL_OK) {
+	    goto done;
+	}
+	
+	j = argcList[i];
+	if (j > maxj) {
+	    maxj = j;
+	}
+    }
+
+    /*
+     * Iterate maxj times through the lists in parallel
+     * If some value lists run out of values, set loop vars to ""
+     */
+    
+    bodyPtr = argObjv[objc-1];
+    for (j = 0;  j < maxj;  j++) {
+	for (i = 0;  i < numLists;  i++) {
+	    /*
+	     * Refetch the list members; we assume that the sizes are
+	     * the same, but the array of elements might be different
+	     * if the internal rep of the objects has been lost and
+	     * recreated (it is too difficult to accurately tell when
+	     * this happens, which can lead to some wierd crashes,
+	     * like Bug #494348...)
+	     */
+
+	    result = Tcl_ListObjGetElements(interp, argObjv[1+i*2],
+		    &varcList[i], &varvList[i]);
+	    if (result != TCL_OK) {
+		panic("Tcl_ForeachObjCmd: could not reconvert variable list %d to a list object\n", i);
+	    }
+	    result = Tcl_ListObjGetElements(interp, argObjv[2+i*2],
+		    &argcList[i], &argvList[i]);
+	    if (result != TCL_OK) {
+		panic("Tcl_ForeachObjCmd: could not reconvert value list %d to a list object\n", i);
+	    }
+            
+	    result = Tcl_ListObjGetElements(interp, argvList[i][j], &tempobjc, &tempobjv);
+	    if (result != TCL_OK) {
+		panic("Tcl_ForeachObjCmd: could not reconvert value list %d to a list object\n", i);
+	    }
+	    for (v = 0;  v < varcList[i];  v++) {
+		Tcl_Obj *valuePtr, *varValuePtr;
+		int isEmptyObj = 0;
+		
+		if (v < tempobjc) {
+		    valuePtr = tempobjv[v];
+		} else {
+		    valuePtr = Tcl_NewObj(); /* empty string */
+		    isEmptyObj = 1;
+		}
+		varValuePtr = Tcl_ObjSetVar2(interp, varvList[i][v],
+			NULL, valuePtr, 0);
+		if (varValuePtr == NULL) {
+		    if (isEmptyObj) {
+			Tcl_DecrRefCount(valuePtr);
+		    }
+		    Tcl_ResetResult(interp);
+		    Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
+			"couldn't set loop variable: \"",
+			Tcl_GetString(varvList[i][v]), "\"", (char *) NULL);
+		    result = TCL_ERROR;
+		    goto done;
+		}
+
+	    }
+	}
+
+	result = Tcl_EvalObjEx(interp, bodyPtr, 0);
+	if (result != TCL_OK) {
+	    if (result == TCL_CONTINUE) {
+		result = TCL_OK;
+	    } else if (result == TCL_BREAK) {
+		result = TCL_OK;
+		break;
+	    } else if (result == TCL_ERROR) {
+                char msg[32 + TCL_INTEGER_SPACE];
+
+		sprintf(msg, "\n    (\"foreach\" body line %d)",
+			interp->errorLine);
+		Tcl_AddObjErrorInfo(interp, msg, -1);
+		break;
+	    } else {
+		break;
+	    }
+	}
+    }
+    if (result == TCL_OK) {
+	Tcl_ResetResult(interp);
+    }
+
+    done:
+    if (numLists > STATIC_LIST_SIZE) {
+	ckfree((char *) varcList);
+	ckfree((char *) argcList);
+	ckfree((char *) varvList);
+	ckfree((char *) argvList);
+    }
+    if (argObjv != argObjStorage) {
+	ckfree((char *) argObjv);
+    }
+    return result;
+#undef STATIC_LIST_SIZE
+#undef NUM_ARGS
+}
