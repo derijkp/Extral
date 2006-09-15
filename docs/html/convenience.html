@@ -116,6 +116,18 @@ set variable2 value2
  returns current time in astronomical format: "%Y-%m-%d %H:%M:%S"
 
 <b><dt>
+Extral::event listen listener event command
+Extral::event remove listener event
+Extral::event generate event ?data? ...
+Extral::event events
+Extral::event listeners event
+</b><dd>
+ When an event is generated (using Extral::event generate) the commands previously defined
+ and attched to the event by one or more listeners will invoked
+ The command will be executed in global scope with the data (if any) given by the
+ generate command appended
+
+<b><dt>
 get varName ?default?
 </b><dd>
  get returns the value of the variable given by varName if it exists.

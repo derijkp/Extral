@@ -242,7 +242,7 @@ proc Extral::event {option args} {
 		}
 		generate {
 			set event [list_shift args]
-			foreach {listener command} $events($event) {
+			foreach {listener command} [get events($event) ""] {
 				uplevel #0 $command $args
 			}
 		}
@@ -250,7 +250,8 @@ proc Extral::event {option args} {
 			return [array names events]
 		}
 		listeners {
-			return $events($event)
+			foreach event $args break
+			return [get events($event) ""]
 		}
 		clear {
 			unset -nocomplain events
