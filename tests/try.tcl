@@ -40,7 +40,7 @@ cp -r /home/peter/build/tca/Linux-i686/exts/Extral2.0.4/lib /home/peter/build/tc
 # full compile and install linux
 cd /home/peter/dev/Extral/Linux-i686
 make distclean
-../configure --prefix=/home/peter/tcl/dirtcl/dirtcl-build
+../configure --prefix=/home/peter/tcl/dirtcl
 make
 rm -rf /home/peter/build/tca/Linux-i686/exts/Extral2.0.4
 /home/peter/dev/Extral/build/install.tcl /home/peter/build/tca/Linux-i686/exts
@@ -48,7 +48,7 @@ rm -rf /home/peter/build/tca/Linux-i686/exts/Extral2.0.4
 # full cross-compile and install windows
 cd /home/peter/dev/Extral/windows-intel
 make distclean
-cross-bconfigure.sh --prefix=/home/peter/tcl/win-dirtcl/dirtcl-build
+cross-bconfigure.sh --prefix=/home/peter/tcl/win-dirtcl
 cross-make.sh
 rm -rf /home/peter/build/tca/Windows-intel/exts/Extral2.0.4
 wine /home/peter/build/tca/Windows-intel/tclsh84.exe /home/peter/dev/Extral/build/install.tcl /home/peter/build/tca/Windows-intel/exts
