@@ -1073,9 +1073,10 @@ ExtraL_List_subindexObjCmd(dummy, interp, objc, objv)
 {
 	Tcl_Obj **listPtr,**linePtr;
 	Tcl_Obj *tempObj = NULL,*nullObj = NULL;
+	Tcl_Obj **indexelemPtrs;
 	Tcl_Obj *resultObj;
 	int listLen, lineLen, error;
-	int i,j,*pos = NULL,posLen;
+	int i,j,*pos = NULL,posLen,result;
 	if (objc < 3) {
 		Tcl_WrongNumArgs(interp, 1, objv, "list pos ?pos ...?");
 		return TCL_ERROR;
@@ -1086,11 +1087,19 @@ ExtraL_List_subindexObjCmd(dummy, interp, objc, objv)
 	error = Tcl_ListObjGetElements(interp, objv[1], &listLen, &listPtr);
 	if (error) {return error;}
 	posLen = objc-2;
+	if (posLen == 1) {
+		result = Tcl_ListObjGetElements(interp, objv[2], &posLen, &indexelemPtrs);
+		if (result != TCL_OK) {
+			return result;
+		}
+	} else {
+		indexelemPtrs = objv+2;
+	}
 	pos = (int *)Tcl_Alloc(posLen*sizeof(int));
-	for (i = 2 ; i < objc ; i++) {
-		error = Tcl_GetIntFromObj(interp,objv[i],pos+i-2);
+	for (i = 0 ; i < posLen ; i++) {
+		error = Tcl_GetIntFromObj(interp,indexelemPtrs[i],pos+i);
 		if (error) {goto error;}
-		if (pos[i-2] < 0) {
+		if (pos[i] < 0) {
 			Tcl_AppendResult(interp, "negative index not allowed", (char *) NULL);
 			return TCL_ERROR;
 		}
@@ -1103,7 +1112,7 @@ ExtraL_List_subindexObjCmd(dummy, interp, objc, objv)
 	for(i = 0 ; i < listLen ; i++) {
 		error = Tcl_ListObjGetElements(interp, listPtr[i], &lineLen, &linePtr);
 		if (error) {goto error;}
-		if (objc == 3) {
+		if (posLen == 1) {
 			if (pos[0] < lineLen) {
 				tempObj = linePtr[pos[0]];
 			} else {
