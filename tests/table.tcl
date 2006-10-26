@@ -65,6 +65,12 @@ test table {table_set and table_get} {
 	table_get $table 1 id a b c
 } {b a1 b2 {}}
 
+test table {table_set on non existing field} {
+	set table [table_fromlist {id a b c} {{a 1 2 3} {b 4 5}}]
+	table_set table 1 d 1
+	table_get $table 1 d
+} {Field d not present in table} 1
+
 test table {table_getid} {
 	set table [table_fromlist {id a b c} {{a 1 2 3} {b 4 5}}]
 	table_getid $table b
@@ -103,6 +109,12 @@ test table {table_setid new empty table} {
 	table_setid table c a 7 b 8 c 9
 	table_getid $table c id a b c
 } {c 7 8 9}
+
+test table {table_setid with space} {
+	set table [table_fromlist {id a b c} {}]
+	table_setid table {id 1} a 1 b 2
+	table_getid $table {id 1} id a
+} {{id 1} 1}
 
 test table {table_delete} {
 	set table [table_fromlist {id a b c} {{a 1 2 3} {b 4 5} {c 7 8 9} {d d1 d2 d3}}]
@@ -181,6 +193,13 @@ test table {table_addfield with def} {
 	table_addfield table extra N
 	list [table_fields $table] [table_tolist $table]
 } {{id a b c extra} {{a 1 2 3 N} {b 4 5 {} N} {c 7 8 9 N} {d d1 5 d3 N}}}
+
+test table {table_addfield and set} {
+	set table [table_fromlist {id a b c} {{a 1 2 3} {b 4 5} {c 7 8 9} {d d1 5 d3}}]
+	table_addfield table extra
+	table_set table 3 extra extra
+	table_get $table 3
+} {id d a d1 b 5 c d3 extra extra}
 
 test table {table_delfield} {
 	set table [table_fromlist {id a b c} {{a 1 2 3} {b 4 5} {c 7 8 9} {d d1 5 d3}}]

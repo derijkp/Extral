@@ -232,9 +232,16 @@ proc table_find {table field operator pattern args} {
 proc table_set {tableVar pos args} {
 	upvar $tableVar table
 	if {[llength $args] == 1} {set args [lindex $args 0]}
+	set fieldposs {}
 	foreach {field value} $args {
-		catch {set index [dict get $table index_$field]}
 		set fieldpos [table_fieldpos $table $field]
+		if {$fieldpos == -1} {
+			error "Field $field not present in table"
+		}
+		lappend fieldposs $fieldpos
+	}
+	foreach {field value} $args fieldpos $fieldposs {
+		catch {set index [dict get $table index_$field]}
 		if {[info exists index]} {
 			set oldvalue [lindex [dict get $table data] $fieldpos $pos]
 			if {![catch {dict get $index $oldvalue} list]} {
