@@ -256,6 +256,9 @@ proc Extral::event {option args} {
 		clear {
 			unset -nocomplain events
 		}
+		default {
+			error "unknown option \"$option\", should be one of: listen, remove, generate, events, listeners, clear"
+		}
 	}
 }
 
