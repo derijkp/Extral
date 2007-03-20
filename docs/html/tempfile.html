@@ -7,10 +7,9 @@
 <dl><b><dt>
 tempfile ?get? ?file|dir?
 </b><dd>
-	creates an (empty) temporary file and returns its name. You should remove
-	the temporary file when not used any longer. However, leftover temporary 
-	files will be removed by an atexit handler
-	The last parameter (file or dir) determines whether a file or directory is created   
+	Creates a temporary directory (using tempdir) if needed, and returns unique filenames
+	in this directory for use as temporary files. The temporary directory is deleted when
+	the program exits
 
 <b><dt>
 tempfile clean

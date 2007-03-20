@@ -13,7 +13,7 @@
 <li><a href="stringcommands.html">Extra string manipulation commands</a>
 <li><a href="cmd.html">Command manipulation commands</a>
 <li><a href="tempfile.html">tempfile</a>:  get names for temporary files
-<li><a href="tempdir.html">tempdir</a>:  returns a directory in which temporary files can be stored. This directory is specific to one proces: no other processes will (should) write in this directory. Subsequent calls to the function within one process will allways be the same directory, The program has to take care not to overwrite its own files 
+<li><a href="tempdir.html">tempdir</a>:  returns a directory in which temporary files can be stored. This directory is specific to one proces: no other processes will (should) write in this directory. Subsequent calls to the function within one process will allways be the same directory, The program has to take care not to overwrite its own files Temporary files returned by tempfile are also in this directory (named like _Extral_temp_1.tmp) The program should also not overwrite these The temporary directory is deleted when the program exits by an atexit handler 
 <li><a href="map.html">Maps</a>: store structured data in lists
 <li><a href="struct.html">Structures</a>
 <li><a href="time.html">Date and time</a>:  extra commands for handling dates
