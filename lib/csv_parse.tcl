@@ -150,3 +150,11 @@ proc csv_write {f data {sep ,}} {
 		puts $f [join $resultline $sep]
 	}
 }
+
+proc csv_getsep {line {list {\t , " "}}} {
+	foreach sep $list {
+		set fields [csv_split $line $sep]
+		if {[llength $fields] >= 2} break
+	}
+	return $sep
+}
