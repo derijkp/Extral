@@ -91,16 +91,15 @@ ExtraL_List_findObjCmd(clientData, interp, objc, objv)
 #define OFLIST	4
 #define LCOMMON	5
 	char *bytes, *patternBytes;
-	int i, j, match, mode, result, listLen, length, elemLen;
+	int i, match, mode, result, listLen, length, elemLen;
 	Tcl_Obj **elemPtrs;
 	Tcl_Obj *indexObj, *resultObj;
-	static char *switches[] =
+	static CONST char *switches[] =
 		{"-exact", "-glob", "-regexp", "-inlist", "-oflist", "-lcommon", (char *) NULL};
 
 	mode = EXACT;
 	if (objc == 4) {
-		if (Tcl_GetIndexFromObj(interp, objv[1], switches,
-			"search mode", 0, &mode) != TCL_OK) {
+		if (Tcl_GetIndexFromObj(interp, objv[1], switches,"search mode", 0, &mode) != TCL_OK) {
 			return TCL_ERROR;
 		}
 	} else if (objc != 3) {
@@ -245,7 +244,6 @@ ExtraL_List_subObjCmd(dummy, interp, objc, objv)
 			if (result!=TCL_OK) {return result;}
 		}
 	} else {
-		int curindex=0;
 		char *map = NULL;
 		map = Tcl_Alloc(listLen*sizeof(char));
 		memset(map,0,listLen);
@@ -910,7 +908,7 @@ ExtraL_List_fillObjCmd(dummy, interp, objc, objv)
 	int objc;			/* Number of arguments. */
 	Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
-	Tcl_Obj *result,el;
+	Tcl_Obj *result;
 	double start,incr;
 	int size, error, error2, i, starti,incri;
 	if ((objc != 3) && (objc != 4)) {
@@ -990,7 +988,7 @@ ExtraL_List_concatObjCmd(dummy, interp, objc, objv)
 		i = 0;
 	} else {
 		listobjc = objc;
-		listobjv = objv;
+		listobjv = (Tcl_Obj **)objv;
 		i = 1;
 	}
 	result = Tcl_NewListObj(0,NULL);
@@ -1093,7 +1091,7 @@ ExtraL_List_subindexObjCmd(dummy, interp, objc, objv)
 			return result;
 		}
 	} else {
-		indexelemPtrs = objv+2;
+		indexelemPtrs = (Tcl_Obj **)objv+2;
 	}
 	pos = (int *)Tcl_Alloc(posLen*sizeof(int));
 	for (i = 0 ; i < posLen ; i++) {

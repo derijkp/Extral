@@ -213,7 +213,7 @@ ExtraL_String_FindObjCmd(clientData, interp, objc, objv)
 	char *bytes, *patternBytes;
 	int i, match, mode, result, length, stringlen;
 	Tcl_Obj *indexObj, *resultObj;
-	static char *switches[] =
+	static CONST char *switches[] =
 		{"-exact", "-glob", "-regexp", (char *) NULL};
 	mode = EXACT;
 	if (objc == 4) {

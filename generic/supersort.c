@@ -15,6 +15,7 @@
 */
 #define UCHAR(c) ((unsigned char) (c))
 #include <ctype.h>
+#include <string.h>
 #include "tcl.h"
 
 /*
@@ -112,60 +113,6 @@ static int		SortCompare _ANSI_ARGS_((Tcl_Obj *firstPtr,
  *
  *----------------------------------------------------------------------
  */
-
-int
-Extral_TclGetIntForIndex(interp, objPtr, endValue, indexPtr)
-    Tcl_Interp *interp;		/* Interpreter to use for error reporting. 
-				 * If NULL, then no error message is left
-				 * after errors. */
-    Tcl_Obj *objPtr;		/* Points to an object containing either
-				 * "end" or an integer. */
-    int endValue;		/* The value to be stored at "indexPtr" if
-				 * "objPtr" holds "end". */
-    int *indexPtr;		/* Location filled in with an integer
-				 * representing an index. */
-{
-    char *bytes;
-    int length, offset;
-
-    if (objPtr->typePtr == Tcl_GetObjType("int")) {
-	*indexPtr = (int)objPtr->internalRep.longValue;
-	return TCL_OK;
-    }
-
-    bytes = Tcl_GetStringFromObj(objPtr, &length);
-
-    if ((*bytes != 'e') || (strncmp(bytes, "end",
-	    (size_t)((length > 3) ? 3 : length)) != 0)) {
-	if (Tcl_GetIntFromObj(NULL, objPtr, &offset) != TCL_OK) {
-	    goto intforindex_error;
-	}
-	*indexPtr = offset;
-	return TCL_OK;
-    }
-
-    if (length <= 3) {
-	*indexPtr = endValue;
-    } else if (bytes[3] == '-') {
-	/*
-	 * This is our limited string expression evaluator
-	 */
-	if (Tcl_GetInt(interp, bytes+3, &offset) != TCL_OK) {
-	    return TCL_ERROR;
-	}
-	*indexPtr = endValue + offset;
-    } else {
-		intforindex_error:
-		if (interp != NULL) {
-		    Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
-			    "bad index \"", bytes,
-			    "\": must be integer or end?-integer?", (char *) NULL);
-		    Extral_TclCheckBadOctal(interp, bytes);
-		}
-		return TCL_ERROR;
-    }
-    return TCL_OK;
-}
 
 /*
  *----------------------------------------------------------------------
@@ -312,7 +259,7 @@ ExtraL_SSortObjCmd(clientData, interp, objc, objv)
     SortInfo sortInfo;                  /* Information about this sort that
                                          * needs to be passed to the 
                                          * comparison function */
-    static char *switches[] =
+    static CONST char *switches[] =
 	    {"-ascii", "-command", "-decreasing", "-dictionary",
 	    "-increasing", "-index", "-integer", "-real", "-reflist", (char *) NULL};
 

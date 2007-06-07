@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <malloc.h>
+#include <math.h>
 #include "tcl.h"
 #include "general.h"
 #define UCHAR(c) ((unsigned char) (c))
@@ -209,7 +210,7 @@ Tcl_Obj *ExtraL_docalc(calc,t1,el1i,el1d,t2,el2i,el2d)
 	double el1d;
 	double el2d;
 {
-	Tcl_Obj *resultEl;
+	Tcl_Obj *resultEl = NULL;
 	if ((t1 == 'i') && (t2 == 'i')) {
 		if (calc == '+') {
 			resultEl = Tcl_NewIntObj(el1i + el2i);
@@ -363,7 +364,7 @@ ExtraL_Lmath_filterObjCmd(notUsed, interp, objc, objv)
 	Tcl_Obj *unfilteredvalue = NULL, *result,*resultEl;
 	double *list = NULL,*filter = NULL, el;
 	int filterpos;
-	int i,j,error,end, pos;
+	int j,error,end, pos;
 	if ((objc < 3) || (objc > 5)) {
 		Tcl_WrongNumArgs(interp, 1, objv, "list filter ?filterpos? ?unfilteredvalue?");
 		return TCL_ERROR;

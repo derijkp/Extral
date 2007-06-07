@@ -342,7 +342,6 @@ int ExtraL_MapGetDate(interp,map,data,tagsc,tagsv,value)
 	Tcl_Obj **tagsv;
 	Tcl_Obj **value;
 {
-	double time;
 	char *result;
 	int error;
 	int len;
