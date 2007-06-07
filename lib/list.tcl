@@ -195,8 +195,8 @@ proc list_write {filename list} {
 #} example {
 #   % set list {1 2 3}
 #   1 2 3
-#	% list_append list {3 4} {5 6}
-#	% set list
+#   % list_append list {3 4} {5 6}
+#   % set list
 #   1 2 3 4 5 6
 #}
 proc list_append {listName args} {
@@ -205,3 +205,27 @@ proc list_append {listName args} {
 		eval lappend list $alist
 	}
 }
+
+#doc {listcommands list_lappend} cmd {
+#list_lappend list ?index...? ?list1? ...
+#} descr {
+#	appends one element to the sublist of list indicated by index
+#} example {
+#   % set list {{a 1} {b 2}}
+#   1 2 3
+#   % list_lappend list 1 c
+#   % set list
+#   {a 1} {b 2 c}
+#   % list_lappend list 0 1 d
+#   % set list
+#   {a {1 d}} {b 2 c}
+#}
+proc list_lappend {varName args} {
+	upvar $varName var
+	set val [list_pop args]
+	set temp [eval {lindex $var} $args]
+	lappend temp $val
+	eval lset var $args {$temp}
+	return $var
+}
+

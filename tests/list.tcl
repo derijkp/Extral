@@ -427,6 +427,26 @@ test list_foreach {different lengths} {
 	set result
 } {1,2 4,}
 
+test list_lappend {basic} {
+	set list {{a 1} {b 2}}
+	list_lappend list 1 c
+} {{a 1} {b 2 c}}
+
+test list_lappend {no index} {
+	set list {{a 1} {b 2}}
+	list_lappend list c
+} {{a 1} {b 2} c}
+
+test list_lappend {2 index levels} {
+	set list {{a 1} {b 2}}
+	list_lappend list 0 1 c
+} {{a {1 c}} {b 2}}
+
+test list_lappend {index end} {
+	set list {{a 1} {b 2}}
+	list_lappend list end c
+} {{a 1} {b 2 c}}
+
 # no test yet for
 # list_load <filename>
 # list_write ?file? ?list?

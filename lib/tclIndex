@@ -99,6 +99,7 @@ set auto_index(inlist) [list source [file join $dir list.tcl]]
 set auto_index(list_load) [list source [file join $dir list.tcl]]
 set auto_index(list_write) [list source [file join $dir list.tcl]]
 set auto_index(list_append) [list source [file join $dir list.tcl]]
+set auto_index(list_lappend) [list source [file join $dir list.tcl]]
 set auto_index(list_regsub) [list source [file join $dir list_regsub.tcl]]
 set auto_index(::Extral::makedoc) [list source [file join $dir doc.tcl]]
 set auto_index(::Extral::outputdoc) [list source [file join $dir doc.tcl]]
@@ -170,5 +171,3 @@ set auto_index(table_delfield) [list source [file join $dir table.tcl]]
 set auto_index(table_renamefield) [list source [file join $dir table.tcl]]
 set auto_index(table_reorderfields) [list source [file join $dir table.tcl]]
 set auto_index(table_foreach) [list source [file join $dir table.tcl]]
-
-# Addition of ClassyTcl classes defined in the directory

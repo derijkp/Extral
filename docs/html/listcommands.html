@@ -73,9 +73,23 @@ list_append list ?list1? ...
 <br>eg.:<pre>
    % set list {1 2 3}
    1 2 3
-	% list_append list {3 4} {5 6}
-	% set list
+   % list_append list {3 4} {5 6}
+   % set list
    1 2 3 4 5 6
+</pre>
+<b><dt>
+list_lappend list ?index...? ?list1? ...
+</b><dd>
+	appends one element to the sublist of list indicated by index
+<br>eg.:<pre>
+   % set list {{a 1} {b 2}}
+   1 2 3
+   % list_lappend list 1 c
+   % set list
+   {a 1} {b 2 c}
+   % list_lappend list 0 1 d
+   % set list
+   {a {1 d}} {b 2 c}
 </pre>
 <b><dt>
 list_regsub ?switches? exp list subSpec
