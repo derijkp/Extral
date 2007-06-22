@@ -180,13 +180,13 @@ proc cmd_load {filename} {
 #	parses the arguments given to a command, deals with options and optional arguments.
 #	Options are stored in the array opt, values in the variables given.
 #	the list of possible options consists of alternatingly the option
-#	and a specification, which is a list of type and description
+#	and a specification, which is a list of type and description, and optionally a default value
 #	variables in the variable list enclosed in questionmarks are optional.
 #	?...? will take all possible extra arguments at that position (if present), and store them in the
 #	variable args.
 #} example {
 #	cmd_args test {
-#		-test {any "test value"}
+#		-test {any "test value" defvalue}
 #		-b {switch "true or false"}
 #		-o {{oneof a b c} "a, b or c"}
 #	} {?nrruns? file} {-b -test try -o b 1 testfile}
@@ -196,6 +196,11 @@ proc cmd_args {cmd options vars arg} {
 	set pos 0
 	if [llength $options] {
 		upvar opt opt
+		foreach {key def} $options {
+			if {[llength $def] > 2} {
+				set opt($key) [lindex $def 2]
+			}
+		}
 		array set op $options
 		while 1 {
 			set curopt [lindex $arg $pos]

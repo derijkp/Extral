@@ -193,4 +193,16 @@ test cmd_args {empty vars} {
 	set a 1
 } 1
 
+test cmd_args {defaults} {
+	catch {unset opt}
+	catch {unset a}
+	catch {unset b}
+	cmd_args test {
+		-test {any "test value" defvalue}
+		-b {switch "true or false"}
+		-o {{oneof a b c} "a, b or c"}
+	} {?a? b} {1 2}
+	list $opt(-test) [info exists opt(-b)]
+} {defvalue 0}
+
 testsummarize
