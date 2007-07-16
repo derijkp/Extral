@@ -125,4 +125,14 @@ John,"Doe ""Who""","100 some st.","somewhere,
 somehow",B,2980
 }
 
+test csv_parse {\n\n in field} {
+	set data "a\t\"b\n\n2\"\tc"
+	lindex [csv_parse $data \t] 0 1
+} "b\n\n2"
+
+test csv_parse {\n\n\n in field} {
+	set data "a\t\"b\n\n2\"\tc"
+	lindex [csv_parse $data \t] 0 1
+} "b\n\n2"
+
 testsummarize

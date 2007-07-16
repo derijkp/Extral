@@ -45,6 +45,7 @@ proc csv_parse {data {sep ,} {linecmd {}}} {
 			}
 			set resultline ""
 		} else {
+			if {![llength $line]} {append quotedstring \n}
 			set quoteconnect \n
 		}
 	}
