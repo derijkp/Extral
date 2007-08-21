@@ -13,8 +13,10 @@ proc csv_parse {data {sep ,} {linecmd {}}} {
 		foreach el $line {
 			if {![info exists quotedstring]} {
 				if {[string equal [string index $el 0] \"]} {
-					# check if the el is the proper ending of a quoted string
-					if {[string equal $el \"\"] || [regexp {([^"]|\A)("")*"$} $el]} {
+					if {[string equal $el \"]} {
+						set quotedstring ""
+					} elseif {[string equal $el \"\"] || [regexp {([^"]|\A)("")*"$} $el]} {
+						# if the end of el is the proper ending of a quoted string
 						set el [string trim $el]
 						lappend resultline [string map $quotereplace [string range $el 1 end-1]]
 					} else {
@@ -66,8 +68,10 @@ proc csv_file {f {sep ,} {linecmd {}}} {
 		foreach el $line {
 			if {![info exists quotedstring]} {
 				if {[string equal [string index $el 0] \"]} {
-					# check if the el is the proper ending of a quoted string
-					if {[string equal $el \"\"] || [regexp {([^"]|\A)("")*"$} $el]} {
+					if {[string equal $el \"]} {
+						set quotedstring ""
+					} elseif {[string equal $el \"\"] || [regexp {([^"]|\A)("")*"$} $el]} {
+						# if the end of el is the proper ending of a quoted string
 						set el [string trim $el]
 						lappend resultline [string map $quotereplace [string range $el 1 end-1]]
 					} else {
@@ -99,6 +103,7 @@ proc csv_file {f {sep ,} {linecmd {}}} {
 			}
 			set resultline ""
 		} else {
+			if {![llength $line]} {append quotedstring \n}
 			set quoteconnect \n
 		}
 	}

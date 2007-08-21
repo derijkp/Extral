@@ -135,4 +135,21 @@ test csv_parse {\n\n\n in field} {
 	lindex [csv_parse $data \t] 0 1
 } "b\n\n2"
 
+test csv_parse {\n\n in start of field} {
+	set data "\"\n\na\"\tb"
+	lindex [csv_parse $data \t] 0 0
+} "\n\na"
+
+test csv_parse {\n\n\t\n\n} {
+	set data "\"a\n\n\"\t\"\n\nb\""
+	lindex [csv_parse $data \t] 0 
+} "\"a\"\nb"
+
+test csv_parse {complex quotes} {
+	set f1 {"""a""}
+	append f1 \nb\"
+	set data [join [list $f1 c] \t]
+	lindex [csv_parse $data \t] 0 0
+} "\"a\"\nb"
+
 testsummarize
