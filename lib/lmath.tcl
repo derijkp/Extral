@@ -110,7 +110,8 @@ proc lmath_majority {list} {
 		return [lmath_average $list]
 	}
 	set list [lsort -real $list]
-	if {[lindex $list 0] == [lindex $list end]} {
+	# check if first is equal to last, but take into account floating point generated differences
+	if {[expr {abs([lindex $list 0] - [lindex $list end])}] < 0.001} {
 		return [lindex $list 0]
 	}
 	# make histogram first
