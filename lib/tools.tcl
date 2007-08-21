@@ -223,12 +223,14 @@ proc Extral::scriptdir {} {
 #Extral::event generate event ?data? ...
 #Extral::event events
 #Extral::event listeners event
+#Extral::event debug command
 #} descr {
 # When an event is generated (using Extral::event generate) the commands previously defined
 # and attched to the event by one or more listeners will invoked
 # The command will be executed in global scope with the data (if any) given by the
 # generate command appended
 #}
+set ::Extral::eventdebug {}
 proc Extral::event {option args} {
 	upvar #0 Extral::events events
 	switch $option {
@@ -245,6 +247,9 @@ proc Extral::event {option args} {
 			foreach {listener command} [get events($event) ""] {
 				uplevel #0 $command $args
 			}
+			if {$::Extral::eventdebug ne ""} {
+				uplevel #0 [list $::Extral::eventdebug [list *event* $event $args -> [list_unmerge [get events($event) ""]]]]
+			}
 		}
 		events {
 			return [array names events]
@@ -255,6 +260,9 @@ proc Extral::event {option args} {
 		}
 		clear {
 			unset -nocomplain events
+		}
+		debug {
+			set ::Extral::eventdebug $args
 		}
 		default {
 			error "unknown option \"$option\", should be one of: listen, remove, generate, events, listeners, clear"

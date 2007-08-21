@@ -62,6 +62,7 @@ test aproc {get variable with space} {
 
 test Extral::event {basic test} {
 	set ::a {}
+	Extral::event debug puts
 	Extral::event clear
 	Extral::event listen peter testevent "lappend ::a peter"
 	Extral::event generate testevent a 1
