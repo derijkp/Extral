@@ -24,8 +24,12 @@
 #	0
 #}
 proc isint {value} {
-	if [catch {expr {1 >> $value}}] {
-		return 0
+	if [catch {expr {1 >> $value}} e] {
+		if {$e eq "negative shift argument"} {
+			return 1
+		} else {
+			return 0
+		}
 	} else {
 		return 1
 	}

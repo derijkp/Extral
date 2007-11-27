@@ -35,3 +35,4 @@ alltest map.tcl
 alltest map-map.tcl
 alltest maptypes.tcl
 alltest ssort.tcl
+alltest is.tcl
