@@ -152,7 +152,7 @@ proc putsvars {args} {
 # Preserved information will be restored with the command error_restore
 #}
 proc error_preserve {} {
-	upvar ::Classy::error_preserve keep
+	upvar ::Extral::error_preserve keep
 	set keep(Info) $::errorInfo
 	set keep(Code) $::errorCode
 }
@@ -167,7 +167,7 @@ proc today {} {
 }
 
 proc error_restore {} {
-	upvar ::Classy::error_preserve keep
+	upvar ::Extral::error_preserve keep
 	set ::errorInfo $keep(Info)
 	set ::errorCode $keep(Code)
 }
@@ -302,3 +302,41 @@ proc Extral::tracecommands_rem {args} {
 		trace remove execution $cmd enter Extral::tracecommands_cmd
 	}
 }
+
+proc Extral::exec-get {o} {
+	global Extral::exec-done Extral::exec-result
+	set line [gets $o]
+	if {[eof $o]} {
+		set Extral::exec-done 1
+	} else {
+		append Extral::exec-result $line\n
+	}
+}
+
+proc Extral::bgexec {args} {
+	global Extral::exec-done Extral::exec-result
+	if {[lindex $args 0] eq "-timeout"} {
+		set timeout [lindex $args 1]
+		set args [lrange $args 2 end]
+		if {![isint $timeout]} {error "-timeout must be a number"}
+	} else {
+		set timeout 0
+	}
+	set o [open "| [join $args " "]"]
+	fconfigure $o -blocking 0
+	set Extral::exec-result {}
+	fileevent $o readable [list Extral::exec-get $o]
+	set Extral::exec-done 0
+	if {$timeout > 0} {
+		after $timeout set ::Extral::exec-done 1
+	}
+	vwait ::Extral::exec-done
+	if {![eof $o]} {
+		set pid [pid $o]
+		catch {exec kill $pid}
+	}
+	catch {close $o}
+	after cancel set ::Extral::exec-done 1
+	return ${Extral::exec-result}
+}
+

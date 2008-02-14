@@ -75,4 +75,10 @@ test Extral::event {basic test} {
 	set a
 } {peter a 1 - peter b 2 other b 2 - other c 3}
 
+if 0 {
+	Extral::exec lpstat -s
+	Extral::exec -timeout 500 lpstat -s
+	set args {-timeout 500 lpstat -s}
+}
+
 testsummarize
