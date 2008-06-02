@@ -5,44 +5,6 @@
 <h1>Convenience functions</h1>
 
 <dl><b><dt>
-varsubst string varlist valuelist
-</b><dd>
-	substitutes only the variables in varlist for their content
-	in the given string
-<br>eg.:<pre>
-	% set try {try it}
-	try it
-	% varsubst {try} {
-		puts [list $try $try2]
-	}
-		puts [list {try it} $try2]
-</pre>
-<b><dt>
-invoke vars cmd ...
-</b><dd>
- invoke simply evals $cmd in a private space. This eg. allows using
- temporary variables in bindings without creating these in global scope.
- It is also very convenient to use values appended to a command given
- to a binding:
- Further arguments (when given) are parameters that will be available in the
- variables given in vars. If more parameters are supplied than vars are given,
- the remaining parameters will be stored in the variable args.
-
-<b><dt>
-	list_iterate variableName list
-</b><dd>
-	debugging tool to interactively iterate a variable over a list. list_iterate
-	is used to initialise and it sets the variable to the first element of 
-	the list. Every 'list_next variableName' will puts the next element into the 
-	variable.
-
-<b><dt>
-	list_next variableName
-</b><dd>
-	complement to list_iterate. sets the variable to the next element of the list 
-	first given by list_iterate.
-
-<b><dt>
 aproc args body
 </b><dd>
  aproc creates an 'anonymous' procedure; this means you don't have to provide a name. It
@@ -121,11 +83,50 @@ Extral::event remove listener event
 Extral::event generate event ?data? ...
 Extral::event events
 Extral::event listeners event
+Extral::event debug command
 </b><dd>
  When an event is generated (using Extral::event generate) the commands previously defined
  and attched to the event by one or more listeners will invoked
  The command will be executed in global scope with the data (if any) given by the
  generate command appended
+
+<b><dt>
+varsubst string varlist valuelist
+</b><dd>
+	substitutes only the variables in varlist for their content
+	in the given string
+<br>eg.:<pre>
+	% set try {try it}
+	try it
+	% varsubst {try} {
+		puts [list $try $try2]
+	}
+		puts [list {try it} $try2]
+</pre>
+<b><dt>
+	list_iterate variableName list
+</b><dd>
+	debugging tool to interactively iterate a variable over a list. list_iterate
+	is used to initialise and it sets the variable to the first element of 
+	the list. Every 'list_next variableName' will puts the next element into the 
+	variable.
+
+<b><dt>
+	list_next variableName
+</b><dd>
+	complement to list_iterate. sets the variable to the next element of the list 
+	first given by list_iterate.
+
+<b><dt>
+invoke vars cmd ...
+</b><dd>
+ invoke simply evals $cmd in a private space. This eg. allows using
+ temporary variables in bindings without creating these in global scope.
+ It is also very convenient to use values appended to a command given
+ to a binding:
+ Further arguments (when given) are parameters that will be available in the
+ variables given in vars. If more parameters are supplied than vars are given,
+ the remaining parameters will be stored in the variable args.
 
 <b><dt>
 get varName ?default?

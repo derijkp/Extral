@@ -37,6 +37,13 @@ However, maps have some advantages to arrays:
  map_get will return the long form.
 
 <dl><b><dt>
+map_xml xml
+</b><dd>
+ puts the information in xml into a map
+ data (not in tags) will be placed in the map with the tag "_"
+<br>eg.:<pre>
+</pre>
+<b><dt>
 map_set ?-map schema? ?-data clientdata? list field value ?field value ...?
 </b><dd>
  set the value of a field in the map. The -data option can be used to
@@ -106,11 +113,4 @@ map_fields list field ?valueVar?
 </b><dd>
 returns the fields present in the map list
 
-<b><dt>
-map_xml xml
-</b><dd>
- puts the information in xml into a map
- data (not in tags) will be placed in the map with the tag "_"
-<br>eg.:<pre>
-</pre>
 </body>

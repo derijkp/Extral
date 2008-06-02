@@ -5,6 +5,12 @@
 <h1>Command manipulation commands</h1>
 
 <dl><b><dt>
+	args_parse format vars args
+</b><dd>
+	parses the arguments given to a command, deals with options and optional arguments
+	
+
+<b><dt>
 	cmd_get channelId
 </b><dd>
 	get one complete Tcl command, in the sense of having no unclosed quotes, 
@@ -48,10 +54,4 @@
 		-o {{oneof a b c} "a, b or c"}
 	} {?nrruns? file} {-b -test try -o b 1 testfile}
 </pre>
-<b><dt>
-	args_parse format vars args
-</b><dd>
-	parses the arguments given to a command, deals with options and optional arguments
-	
-
 </body>

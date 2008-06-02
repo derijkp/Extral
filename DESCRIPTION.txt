@@ -1,5 +1,5 @@
 Identifier: Extral
-Version: 2.0.4
+Version: 2.1.0
 Title: ExtraL
 Creator: Peter De Rijk <Peter.DeRijk@ua.ac.be>
 Description: extra (list and other) commands for Tcl.

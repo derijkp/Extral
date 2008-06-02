@@ -8,7 +8,7 @@
 # full path name of this file's directory.
 
 # $Format: "package ifneeded Extral $ProjectMajorVersion$.$ProjectMinorVersion$ \\"$
-package ifneeded Extral 2.0 \
+package ifneeded Extral 2.1 \
 [subst -nocommands {
 	namespace eval ::Extral {}
 	set ::Extral::dir [list $dir]
