@@ -389,7 +389,7 @@ ExtraL_String_ForeachCmd(dummy, interp, objc, objv)
 				result = Tcl_ListObjGetElements(interp, argObjv[1+i*2],
 						&varcList[i], &varvList[i]);
 				if (result != TCL_OK) {
-					panic("Tcl_ForeachObjCmd: could not reconvert variable list %d to a list object\n", i);
+					panic("Extral_String_ForeachObjCmd: could not reconvert variable list %d to a list object\n", i);
 				}
 			}
 			argvList[i] = Tcl_GetStringFromObj(argObjv[2+i*2],&argcList[i]);

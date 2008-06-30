@@ -427,6 +427,16 @@ test list_foreach {different lengths} {
 	set result
 } {1,2 4,}
 
+test list_foreach {different number of entries in separate lists} {
+	set result {}
+	set alist 3
+	set blist {}
+	list_foreach a $alist {b1 b2} $blist {
+		lappend result $a $b1 $b2
+	}
+	set result
+} {3 {} {}}
+
 test list_lappend {basic} {
 	set list {{a 1} {b 2}}
 	list_lappend list 1 c

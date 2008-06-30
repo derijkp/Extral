@@ -1255,7 +1255,7 @@ Extral_List_ForeachObjCmd(dummy, interp, objc, objv)
 	}
 	if (varcList[i] < 1) {
 	    Tcl_AppendToObj(Tcl_GetObjResult(interp),
-	            "foreach varlist is empty", -1);
+	            "list_foreach varlist is empty", -1);
 	    result = TCL_ERROR;
 	    goto done;
 	}
@@ -1292,17 +1292,20 @@ Extral_List_ForeachObjCmd(dummy, interp, objc, objv)
 	    result = Tcl_ListObjGetElements(interp, argObjv[1+i*2],
 		    &varcList[i], &varvList[i]);
 	    if (result != TCL_OK) {
-		panic("Tcl_ForeachObjCmd: could not reconvert variable list %d to a list object\n", i);
+		panic("Extral_List_ForeachObjCmd: could not reconvert variable list %d to a list object\n", i);
 	    }
 	    result = Tcl_ListObjGetElements(interp, argObjv[2+i*2],
 		    &argcList[i], &argvList[i]);
 	    if (result != TCL_OK) {
-		panic("Tcl_ForeachObjCmd: could not reconvert value list %d to a list object\n", i);
+		panic("Extral_List_ForeachObjCmd: could not reconvert value list %d to a list object\n", i);
 	    }
-            
-	    result = Tcl_ListObjGetElements(interp, argvList[i][j], &tempobjc, &tempobjv);
-	    if (result != TCL_OK) {
-		panic("Tcl_ForeachObjCmd: could not reconvert value list %d to a list object\n", i);
+            if (j < argcList[i]) {
+		    result = Tcl_ListObjGetElements(interp, argvList[i][j], &tempobjc, &tempobjv);
+		    if (result != TCL_OK) {
+			panic("Extral_List_ForeachObjCmd: could not reconvert value list %d to a list object\n", i);
+		    }
+	    } else {
+		    tempobjc = 0;
 	    }
 	    for (v = 0;  v < varcList[i];  v++) {
 		Tcl_Obj *valuePtr, *varValuePtr;
@@ -1341,7 +1344,7 @@ Extral_List_ForeachObjCmd(dummy, interp, objc, objv)
 	    } else if (result == TCL_ERROR) {
                 char msg[32 + TCL_INTEGER_SPACE];
 
-		sprintf(msg, "\n    (\"foreach\" body line %d)",
+		sprintf(msg, "\n    (\"list_foreach\" body line %d)",
 			interp->errorLine);
 		Tcl_AddObjErrorInfo(interp, msg, -1);
 		break;
