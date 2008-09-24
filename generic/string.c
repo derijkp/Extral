@@ -183,6 +183,7 @@ ExtraL_String_reverseObjCmd(notUsed, interp, objc, objv)
 		*pos++ = string[i];
 	}
 	Tcl_SetObjResult(interp,Tcl_NewStringObj(result,stringlen));
+	Tcl_Free(result);
 	return TCL_OK;
 }
 

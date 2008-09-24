@@ -15,6 +15,10 @@ test string_change {basic} {
 	string_change "abc%Wefg" {%% % %W $w}
 } {abc$wefg}
 
+test string_change {longer} {
+	string range [string_change [string_fill abcdefghijklmnopqrstuvwxyz 100] {b 2 d 4}] 0 25
+} {a2c4efghijklmnopqrstuvwxyz}
+
 test string_change {basic} {
 	string_change "%W %%%W" {%% % %W $w}
 } {$w %$w}
@@ -67,6 +71,10 @@ string_change $value "\; {} \n {}"
 test string_reverse {basic} {
 	string_reverse {abc def}
 } {fed cba}
+
+test string_reverse {longer} {
+	string range [string_reverse [string_fill abcdefghijklmnopqrstuvwxyz 100]] 0 25
+} {zyxwvutsrqponmlkjihgfedcba}
 
 test string_find {exact} {
 	string_find {abc adef} a
