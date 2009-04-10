@@ -137,7 +137,7 @@ proc random {min max} {
 #}
 proc putsvars {args} {
 	foreach var $args {
-		if {[catch {uplevel set $var} value]} {
+		if {[catch {uplevel [list set $var]} value]} {
 			puts [list unset $var]
 		} else {
 			puts [list set $var $value]
