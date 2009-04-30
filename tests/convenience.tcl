@@ -72,7 +72,7 @@ test Extral::event {basic test} {
 	lappend ::a -
 	Extral::event remove peter testevent
 	Extral::event generate testevent c 3
-	set a
+	set ::a
 } {peter a 1 - peter b 2 other b 2 - other c 3}
 
 test Extral::event {Extral::bgexec} {
