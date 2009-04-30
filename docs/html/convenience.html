@@ -91,6 +91,34 @@ Extral::event debug command
  generate command appended
 
 <b><dt>
+Extral::bgexec ?options? arg ?arg ...?
+</b><dd>
+ Without the -command option, this command works like exec does, but runs the executed 
+ processes in background. While the command will wait until the process is finished and returns the
+ results, events will still be processed while the process is running; the bgexec
+ does e.g. not block the interface from redisplaying when needed.<br>
+ The command supports the folowing options
+<dl>
+<dt>-command ?command?</dt>
+<dd>
+ With the -command option, bgerror does not wait for the process to finish. Instead, when the 
+ process is finished, the command in the option will be run (toplevel scope) with the result appended.
+ In plain Tcl, the event loop must be running. More than one background jobs can be run at the same time 
+ using the -command option. The command supports the folowing options:
+</dd>
+<dt>-timeout number</dt>
+<dd>After the given number of miliseconds the process is stopped</dd>
+<dt>-progresscommand command</dt>
+<dd>This option is used to execute a command each time new data arrives. command is used as a prefix to run with the new data appended</dd>
+<dt>-pidvar varName</dt>
+<dd>store the pid of the process in the variable varName</dd>
+</dl>
+<br>eg.:<pre>
+ Extral::bgexec ./testcmd_bgexec.tcl
+ Extral::bgexec -command {set v} ./testcmd_bgexec.tcl 2
+ vwait ::v
+</pre>
+<b><dt>
 varsubst string varlist valuelist
 </b><dd>
 	substitutes only the variables in varlist for their content

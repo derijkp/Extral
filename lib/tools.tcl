@@ -304,39 +304,104 @@ proc Extral::tracecommands_rem {args} {
 }
 
 proc Extral::exec-get {o} {
-	global Extral::exec-done Extral::exec-result
+	global Extral::exec
 	set line [gets $o]
 	if {[eof $o]} {
-		set Extral::exec-done 1
+		set Extral::exec(done,$o) 1
+		if {[info exists Extral::exec(cmd,$o)]} {
+			foreach {result err} [Extral::exec-close $o] break
+			set cmd $Extral::exec(cmd,$o)
+			unset Extral::exec(cmd,$o)
+			uplevel #0 $cmd [list $result]
+		}
 	} else {
-		append Extral::exec-result $line\n
+		append Extral::exec(result,$o) $line\n
+		if {$Extral::exec(progress,$o) ne ""} {
+			catch {uplevel #0 $Extral::exec(progress,$o) [list $line]}
+		}
 	}
 }
 
-proc Extral::bgexec {args} {
-	global Extral::exec-done Extral::exec-result
-	if {[lindex $args 0] eq "-timeout"} {
-		set timeout [lindex $args 1]
-		set args [lrange $args 2 end]
-		if {![isint $timeout]} {error "-timeout must be a number"}
-	} else {
-		set timeout 0
-	}
-	set o [open "| [join $args " "]"]
-	fconfigure $o -blocking 0
-	set Extral::exec-result {}
-	fileevent $o readable [list Extral::exec-get $o]
-	set Extral::exec-done 0
-	if {$timeout > 0} {
-		after $timeout set ::Extral::exec-done 1
-	}
-	vwait ::Extral::exec-done
+proc Extral::exec-close {o} {
+	global Extral::exec
 	if {![eof $o]} {
 		set pid [pid $o]
 		catch {exec kill $pid}
 	}
 	catch {close $o}
-	after cancel set ::Extral::exec-done 1
-	return ${Extral::exec-result}
+	after cancel set Extral::exec(done,$o) 1
+	set result $Extral::exec(result,$o)
+	set err [file_read $Extral::exec(err,$o)]
+	unset Extral::exec(result,$o)
+	unset Extral::exec(err,$o)
+	unset Extral::exec(done,$o)
+	unset Extral::exec(progress,$o)
+	if {$err ne ""} {
+		return -code error $err
+	}
+	return [list $result $err]
 }
 
+#doc {convenience Extral::bgexec} cmd {
+#Extral::bgexec ?options? arg ?arg ...?
+#} descr {
+# Without the -command option, this command works like exec does, but runs the executed 
+# processes in background. While the command will wait until the process is finished and returns the
+# results, events will still be processed while the process is running; the bgexec
+# does e.g. not block the interface from redisplaying when needed.<br>
+# The command supports the folowing options
+#<dl>
+#<dt>-command ?command?</dt>
+#<dd>
+# With the -command option, bgerror does not wait for the process to finish. Instead, when the 
+# process is finished, the command in the option will be run (toplevel scope) with the result appended.
+# In plain Tcl, the event loop must be running. More than one background jobs can be run at the same time 
+# using the -command option. The command supports the folowing options:
+#</dd>
+#<dt>-timeout number</dt>
+#<dd>After the given number of miliseconds the process is stopped</dd>
+#<dt>-progresscommand command</dt>
+#<dd>This option is used to execute a command each time new data arrives. command is used as a prefix to run with the new data appended</dd>
+#<dt>-pidvar varName</dt>
+#<dd>store the pid of the process in the variable varName</dd>
+#</dl>
+#} example {
+# Extral::bgexec ./testcmd_bgexec.tcl
+# Extral::bgexec -command {set v} ./testcmd_bgexec.tcl 2
+# vwait ::v
+#}
+proc Extral::bgexec {args} {
+	global Extral::exec
+	cmd_args Extral::bgexec {
+		-timeout {int "number of miliseconds after which to stop background process" {}}
+		-progresscommand {any "code to call when new data arrives from background process, newly arrived data is added as an argument" ""}
+		-command {any "code to call when new process is finished, the resulting data is added as an argument, bgexec will not wait till finished" ""}
+		-pidvar {any "name of a (global) variable to which the pid of the proces started wil be saved" ""}
+	} {cmd ?...?} $args
+	set tempstderr [tempfile]
+	set o [open "| $cmd [join $args " "] 2>>$tempstderr"]
+	fconfigure $o -blocking 0
+	set Extral::exec(err,$o) $tempstderr
+	set Extral::exec(progress,$o) $opt(-progresscommand)
+	if {$opt(-pidvar) ne ""} {
+		upvar #0 $opt(-pidvar) pid
+		set pid [pid $o]
+	}
+	set Extral::exec(result,$o) {}
+	fileevent $o readable [list Extral::exec-get $o]
+	set Extral::exec(done,$o) 0
+	if {[isint $opt(-timeout)]} {
+		after $opt(-timeout) set Extral::exec(done,$o) 1
+	}
+	if {$opt(-command) eq ""} {
+		vwait Extral::exec(done,$o)
+		foreach {result err} [Extral::exec-close $o] break
+		if {$err ne ""} {
+			return -code error $err
+		} else {
+			return $result
+		}
+	} else {
+		set Extral::exec(cmd,$o) $opt(-command)
+	}
+}

@@ -75,9 +75,69 @@ test Extral::event {basic test} {
 	set a
 } {peter a 1 - peter b 2 other b 2 - other c 3}
 
+test Extral::event {Extral::bgexec} {
+	Extral::bgexec ./testcmd_bgexec.tcl
+} {1
+2
+3
+}
+
+test Extral::event {Extral::bgexec parameters} {
+	Extral::bgexec ./testcmd_bgexec.tcl 2
+} {1
+2
+}
+
+test Extral::event {Extral::bgexec error} {
+	Extral::bgexec ./testcmd_bgexec.tcl bla
+} {arg must be an integer
+} 1
+
+test Extral::event {Extral::bgexec -timeout} {
+	Extral::bgexec -timeout 500 ./testcmd_bgexec.tcl
+} {1
+}
+
+test Extral::event {Extral::bgexec -pidvar and kill process} {
+	after 500 {exec kill $::pid}
+	Extral::bgexec -pidvar pid ./testcmd_bgexec.tcl
+} {1
+}
+
+test Extral::event {Extral::bgexec -progresscommand} {
+	set ::r {}
+	Extral::bgexec -progresscommand {lappend r} ./testcmd_bgexec.tcl 2
+	set ::r
+} {1 2}
+
+test Extral::event {Extral::bgexec error in -progresscommand} {
+	unset -nocomplain ::r
+	set ::r() {}
+	Extral::bgexec -progresscommand {lappend r} ./testcmd_bgexec.tcl 2
+	lindex [split $::errorInfo \n] 0
+} {can't set "r": variable is array}
+
+test Extral::event {Extral::bgexec -command} {
+	unset -nocomplain ::v
+	Extral::bgexec -command {set v} ./testcmd_bgexec.tcl 2
+	vwait ::v
+	set ::v
+} {1
+2
+}
+
+test Extral::event {Extral::bgexec -command 2 together} {
+	unset -nocomplain ::v
+	unset -nocomplain ::w
+	Extral::bgexec -command {set v} ./testcmd_bgexec.tcl 2
+	Extral::bgexec -command {set w} ./testcmd_bgexec.tcl 3
+	vwait ::w
+	list [split $::v \n] [split $::w \n]
+} {{1 2 {}} {1 2 3 {}}}
+
 if 0 {
-	Extral::exec lpstat -s
-	Extral::exec -timeout 500 lpstat -s
+	Extral::bgexec lpstat -s
+	Extral::bgexec -timeout 500 lpstat -s
 	set args {-timeout 500 lpstat -s}
 }
 
