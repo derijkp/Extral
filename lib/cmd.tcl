@@ -194,7 +194,7 @@ proc cmd_load {filename} {
 proc cmd_args {cmd options vars arg} {
 	# Handle options
 	set pos 0
-	if [llength $options] {
+	if {[llength $options]} {
 		upvar opt opt
 		foreach {key def} $options {
 			if {[llength $def] > 2} {
@@ -204,13 +204,13 @@ proc cmd_args {cmd options vars arg} {
 		array set op $options
 		while 1 {
 			set curopt [lindex $arg $pos]
-			if [string_equal $curopt --] {
+			if {[string_equal $curopt --]} {
 				incr pos
 				break
 			}
-			if ![info exists op($curopt)] break
+			if {![info exists op($curopt)]} break
 			set type [lindex $op($curopt) 0]
-			if [string_equal [lindex $type 0] switch] {
+			if {[string_equal [lindex $type 0] switch]} {
 				set value 1
 				incr pos
 			} else {
@@ -220,17 +220,17 @@ proc cmd_args {cmd options vars arg} {
 				incr pos
 				switch [lindex $type 0] {
 					int {
-						if ![isint $value] {
+						if {![isint $value]} {
 							return -code error "invalid value \"$value\" for option $curopt: should be an integer"
 						}
 					}
 					double {
-						if ![isdouble $value] {
+						if {![isdouble $value]} {
 							return -code error "invalid value \"$value\" for option $curopt: should be a double number"
 						}
 					}
 					oneof {
-						if ![inlist [lrange $type 1 end] $value] {
+						if {![inlist [lrange $type 1 end] $value]} {
 							return -code error "invalid value \"$value\" for option $curopt: should be one of: [lrange $type 1 end]"
 						}
 					}
@@ -252,7 +252,7 @@ proc cmd_args {cmd options vars arg} {
 		set pos 0
 		foreach var $vars {
 			set value [lindex $arg $pos]
-			if $range {
+			if {$range} {
 				if !$vartodo {
 					set error 1
 					break
@@ -268,8 +268,8 @@ proc cmd_args {cmd options vars arg} {
 				incr pos			
 			} elseif {"[string index $var 0]" == "?"} {
 				if {"[string index $var [expr {[string length $var]-1}]]" == "?"} {
-					if [string_equal $var ?...?] {
-						if $vartodo {
+					if {[string_equal $var ?...?]} {
+						if {$vartodo} {
 							set pos2 [expr {$pos+$vartodo-1}]
 							lappend dovar args
 							lappend doval [lrange $arg $pos $pos2]
@@ -277,7 +277,7 @@ proc cmd_args {cmd options vars arg} {
 							set pos [expr {$pos2+1}]
 						}
 					} else {
-						if $vartodo {
+						if {$vartodo} {
 							lappend dovar [string trimleft [string trimright $var ?] ?]
 							lappend doval $value
 							incr vartodo -1
@@ -285,7 +285,7 @@ proc cmd_args {cmd options vars arg} {
 						}
 					}
 				} else {
-					if $vartodo {
+					if {$vartodo} {
 						lappend dovar [string trimleft $var ?]
 						lappend doval $value
 						incr vartodo -1
@@ -300,12 +300,12 @@ proc cmd_args {cmd options vars arg} {
 			}
 		}
 	}
-	if ($error||$vartodo) {
-		if [llength $options] {
+	if {$error||$vartodo} {
+		if {[llength $options]} {
 			set format "$cmd ?options? $vars"
 			set opterror "\nPossible options are:"
 			foreach {option descr} $options {
-				if [string_equal [lindex $descr 0] switch] {
+				if {[string_equal [lindex $descr 0] switch]} {
 					append opterror "\n\t$option \"[lindex $descr end]\""
 				} else {
 					append opterror "\n\t$option $descr"
@@ -315,13 +315,17 @@ proc cmd_args {cmd options vars arg} {
 			set format "$cmd $vars"
 			set opterror ""
 		}
-		if [regexp ^- [lindex $arg 0]] {
+		if {[regexp ^- [lindex $arg 0]]} {
 			return -code error "bad option \"[lindex $arg 0]\":$opterror"			
 		} else {
 			return -code error "wrong # of args: should be \"$format\"$opterror"
 		}
 	}
-	if [info exists dovar] {
+	if {[lsearch $vars ?...?] != -1} {
+		upvar args args
+		set args {}
+	}
+	if {[info exists dovar]} {
 		uplevel [list foreach $dovar $doval break]
 	}
 }
