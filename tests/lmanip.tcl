@@ -20,10 +20,6 @@ test lmanip {subindex multiple positions in list} {
 	list_subindex {{A a 1} {{B B} b 2} {C c}} {2 0 1}
 } {{1 A a} {2 {B B} b} {{} C c}}
 
-test lmanip {subindex error in pos} {
-	list_subindex {{A a 1} {{B B} b 2} {C c}} {2 0 1}
-} {expected integer but got "2 0 1"} 1
-
 test lmanip {subindex error in 2 pos} {
 	list_subindex {{A a 1} {{B B} b 2} {C c}} 1 {2 0 1}
 } {expected integer but got "2 0 1"} 1
