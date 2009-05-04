@@ -46,11 +46,11 @@ test map_set {set multi multiple levels} {
 
 test map_set {check uneven} {
 	map_set {a 1 bb 2 ccc} dddd 4
-} {error: "a 1 bb 2 ccc" does not have an even number of elements} 1
+} {error: "a 1 bb 2 ccc" does not have an even number of elements} error
 
 test map_set {check uneven, 2 tags} {
 	map_set {a 1 b 2 c {a 1 b}} {c a} 4
-} {error: "a 1 b" does not have an even number of elements} 1
+} {error: "a 1 b" does not have an even number of elements} error
 
 test map_set {empty list} {
 	map_set {} a 1
@@ -96,15 +96,15 @@ test map_get {with larger map} {
 
 test map_get {tag not present} {
 	map_get {a 1 bb 2 ccc 3} e
-} {tag "e" not found} 1
+} {tag "e" not found} error
 
 test map_get {field larger than map} {
 	map_get {a 1 bb 2 ccc 3} {a b}
-} {error: list "1" does not have an even number of elements} 1
+} {error: list "1" does not have an even number of elements} error
 
 test map_get {field in struct not present} {
 	map_get {a {a 1 b 2} bb 2 ccc 3} {a c}
-} {tag "c" not found} 1
+} {tag "c" not found} error
 
 test map_get {get partial} {
 	map_get {a {a 1 b 2} bb 2 ccc 3} a
@@ -112,7 +112,7 @@ test map_get {get partial} {
 
 test map_get {check uneven} {
 	map_get {a 1 bb 2 ccc} bb
-} {error: list "a 1 bb 2 ccc" does not have an even number of elements} 1
+} {error: list "a 1 bb 2 ccc" does not have an even number of elements} error
 
 test map_get {def} {
 	map_get {a 1 b 2} b a
@@ -120,7 +120,7 @@ test map_get {def} {
 
 test map_get {not found} {
 	map_get {a 1} b
-} {tag "b" not found} 1
+} {tag "b" not found} error
 
 test map_unset {} {
 	map_unset {a 1 bb 2 ccc 3} bb
@@ -136,7 +136,7 @@ test map_unset {unset 2} {
 
 test map_unset {check uneven} {
 	map_unset {a 1 bb 2 ccc} bb
-} {error: list "a 1 bb 2 ccc" does not have an even number of elements} 1
+} {error: list "a 1 bb 2 ccc" does not have an even number of elements} error
 
 test map_unset {present, 2 tags} {
 	map_unset {a 1 b 2 c {a 1 b 2}} {c a}
@@ -169,7 +169,7 @@ test map_fields {see values} {
 
 test map_fields {check uneven} {
 	map_fields {a 1 bb 2 ccc}
-} {error: list "a 1 bb 2 ccc" does not have an even number of elements} 1
+} {error: list "a 1 bb 2 ccc" does not have an even number of elements} error
 
 test map_find {present} {
 	map_find {a try1 bb try2 ccc try3} bb

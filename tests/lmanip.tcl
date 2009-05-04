@@ -22,7 +22,7 @@ test lmanip {subindex multiple positions in list} {
 
 test lmanip {subindex error in 2 pos} {
 	list_subindex {{A a 1} {{B B} b 2} {C c}} 1 {2 0 1}
-} {expected integer but got "2 0 1"} 1
+} {expected integer but got "2 0 1"} error
 
 test lmanip {mangle} {
 	list_mangle {a b c} {1 2 3}
@@ -73,12 +73,12 @@ test lmanip {fill} {
 } {0.0 0.0 0.0}
 
 test lmanip {ffill negative counting} {
-	list_fill 5 10.2 -2
-} {10.2 8.2 6.2 4.2 2.2}
+	testfloats [list_fill 5 10.2 -2] {10.2 8.2 6.2 4.2 2.2}
+} 1
 
 test lmanip {ffill counting} {
-	list_fill 5 10 0.1
-} {10.0 10.1 10.2 10.3 10.4}
+	testfloats [list_fill 5 10 0.1] {10.0 10.1 10.2 10.3 10.4}
+} 1
 
 testsummarize
 

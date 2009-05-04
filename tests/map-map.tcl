@@ -90,41 +90,41 @@ test map_set-map {basic long format error} {
 	set map {? {*int ?}}
 	set try {}
 	map_set -map $map $try aa 10
-} {error: tag "aa" not present in map "? {*int ?}"} 1
+} {error: tag "aa" not present in map "? {*int ?}"} error
 
 test map_set-map {basic: error} {
 	set map {a {a {*int ?}}}
 	set try {}
 	map_set -map $map $try a 10
-} {error: incorrect value trying to assign "10" to map "a {*int ?}" at field "a"} 1
+} {error: incorrect value trying to assign "10" to map "a {*int ?}" at field "a"} error
 
 test map_set-map {basic cmd error} {
 	set map {a {*int ?}}
 	set try {}
 	map_set -map $map $try a
-} {wrong # args: should be "map_set ?-map schema? ?-data clientdata? list field value ?field value ...?"} 1
+} {wrong # args: should be "map_set ?-map schema? ?-data clientdata? list field value ?field value ...?"} error
 
 test map_set-map {basic: error too much tags} {
 	set map {a {a {*int ?}}}
 	set try {}
 	map_set -map $map $try {a a a} 10
-} {error: field "a" not present in map "*int ?" at field "a" at field "a"} 1
+} {error: field "a" not present in map "*int ?" at field "a" at field "a"} error
 
 test map_set-map {basic: error with *named} {
 	set map {a {*named {*int ?} {}}}
 	set try {}
 	map_set -map $map $try a 10
-} {error: "10" does not have an even number of elements at field "a"} 1
+} {error: "10" does not have an even number of elements at field "a"} error
 
 test map_set-map {empty -map: set} {
 	set try {}
 	map_set -map {} $try a 10
-} {error: tag "a" not present in map ""} 1
+} {error: tag "a" not present in map ""} error
 
 test map_get-map {empty -map: get} {
 	set try {}
 	map_get -map {} $try a
-} {error: tag "a" not present in map ""} 1
+} {error: tag "a" not present in map ""} error
 
 test map_set-map {basic: set one by value} {
 	set map {a {a {*int ?}}}
@@ -227,17 +227,17 @@ test map_get-map {basic: long format error} {
 	set map {? {*int ?}}
 	set try {a {a 10}}
 	map_get -map $map $try aa
-} {error: tag "aa" not present in map "? {*int ?}"} 1
+} {error: tag "aa" not present in map "? {*int ?}"} error
 
 test map_get-map {check for error: map not even} {
 	set map accn
 	map_get -map $map {} {}
-} {error: map "accn" does not have an even number of elements} 1
+} {error: map "accn" does not have an even number of elements} error
 
 test map_get-map {check for error} {
 	set map {accn {*a} {*a} {}}
 	map_get -map $map {} {}
-} {invalid command name "::Extral::geta"} 1
+} {invalid command name "::Extral::geta"} error
 
 test map_set-map {named by field} {
 	set map {
@@ -270,19 +270,19 @@ test map_set-map {named no name: not even} {
 	}
 	set try {a {s {Some Street} n 10}}
 	map_set -map $map $try {} try
-} {error: "try" does not have an even number of elements} 1
+} {error: "try" does not have an even number of elements} error
 
 test map_set-map {named no name} {
 	set map {*named {a {*int ?}} {}}
 	set try {}
 	map_set -map $map $try {} {try 1}
-} {error: incorrect value trying to assign "1" to map "a {*int ?}" in named "try"} 1
+} {error: incorrect value trying to assign "1" to map "a {*int ?}" in named "try"} error
 
 test map_set-map {named no name} {
 	set map {*named {a {*int ?}} {}}
 	set try {}
 	map_set -map $map $try {} {try {a a}}
-} {expected integer but got "a" at field "a" in named "try"} 1
+} {expected integer but got "a" at field "a" in named "try"} error
 
 test map_get-map {named by value} {
 	set map {
@@ -440,12 +440,12 @@ test map_unset-map {one not present} {
 	set map {a {*list {a {*any ?}}} b {*int ?}}
 	set try {a {{a a} {a b}} b 2}
 	map_unset -map $map $try {a 0 a} d
-} {error: tag "d" not present in map "a {*list {a {*any ?}}} b {*int ?}"} 1
+} {error: tag "d" not present in map "a {*list {a {*any ?}}} b {*int ?}"} error
 
 test map_set-map {parameters} {
 	set map {*any {}}
 	map_set -map $map {}
-} {wrong # args: should be "map_set ?-map schema? ?-data clientdata? list field value ?field value ...?"} 1
+} {wrong # args: should be "map_set ?-map schema? ?-data clientdata? list field value ?field value ...?"} error
 
 testsummarize
 

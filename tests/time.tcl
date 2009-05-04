@@ -44,7 +44,7 @@ test time_format {format: {-1 0}} {
 
 test time_scan {error: 1 Jan 0000} {
 	time_scan {1 Jan 0000}
-} {error while parsing date in "1 Jan 0000": (unfortunately) there is no year 0} 1
+} {error while parsing date in "1 Jan 0000": (unfortunately) there is no year 0} error
 
 test time_scan {scan and format: 1 Feb 0001} {
 	time_format [time_scan {1 Feb 0001}]
@@ -116,7 +116,7 @@ test time_scan {time} {
 
 test time_scan {hour error} {
 	time_scan {40:30:40} time
-} {error while parsing time in "40:30:40": invalid hour} 1
+} {error while parsing time in "40:30:40": invalid hour} error
 
 test time_scan {date: check endspace} {
 	time_format [time_scan {5/20/1995 }]
@@ -124,15 +124,15 @@ test time_scan {date: check endspace} {
 
 test time_scan {month error} {
 	time_scan {15/4/1994}
-} {error while parsing date in "15/4/1994": invalid month} 1
+} {error while parsing date in "15/4/1994": invalid month} error
 
 test time_scan {day error} {
 	time_scan {1/40/1994}
-} {error while parsing date in "1/40/1994": invalid day} 1
+} {error while parsing date in "1/40/1994": invalid day} error
 
 test time_scan {date: schrikkeljaar 1997 error} {
 	time_scan {29 Feb 1997}
-} {error while parsing date in "29 Feb 1997": invalid day} 1
+} {error while parsing date in "29 Feb 1997": invalid day} error
 
 test time_scan {date: schrikkeljaar 2000} {
 	time_format [time_scan {29 Feb 2000}]
@@ -140,7 +140,7 @@ test time_scan {date: schrikkeljaar 2000} {
 
 test time_scan {date: schrikkeljaar 1900 error} {
 	time_scan {29 Feb 1900}
-} {error while parsing date in "29 Feb 1900": invalid day} 1
+} {error while parsing date in "29 Feb 1900": invalid day} error
 
 test time_scan {} {
 	time_format [time_scan {1-01-1500 bc}]

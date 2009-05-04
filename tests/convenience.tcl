@@ -42,7 +42,7 @@ test aproc {basic} {
 
 test aproc {error} {
 	[aproc {a} {list $a $args}] 1 2 3
-} {wrong # args: should be "::Extral::aproc2 a"} 1
+} {wrong # args: should be "::Extral::aproc2 a"} error
 
 test aproc {more} {
 	[aproc {a args} {list $a $args}] 1 2 3
@@ -91,7 +91,7 @@ test Extral::event {Extral::bgexec parameters} {
 test Extral::event {Extral::bgexec error} {
 	Extral::bgexec ./testcmd_bgexec.tcl bla
 } {arg must be an integer
-} 1
+} error
 
 test Extral::event {Extral::bgexec -timeout} {
 	Extral::bgexec -timeout 500 ./testcmd_bgexec.tcl

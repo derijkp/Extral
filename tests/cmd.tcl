@@ -69,7 +69,7 @@ test cmd_args {optional range with error} {
 	catch {unset c}
 	catch {unset d}
 	cmd_args test {} {?a b? c d} {1 2 3}
-} {wrong # of args: should be "test ?a b? c d"} 1
+} {wrong # of args: should be "test ?a b? c d"} error
 
 test cmd_args {multiple optional not used} {
 	catch {unset a}
@@ -99,13 +99,13 @@ test cmd_args {error} {
 	catch {unset a}
 	catch {unset b}
 	cmd_args test {} {?a? b} {}
-} {wrong # of args: should be "test ?a? b"} 1
+} {wrong # of args: should be "test ?a? b"} error
 
 test cmd_args {error} {
 	catch {unset a}
 	catch {unset b}
 	cmd_args test {} {?a? b} {1 2 3}
-} {wrong # of args: should be "test ?a? b"} 1
+} {wrong # of args: should be "test ?a? b"} error
 
 test cmd_args {options, none given} {
 	catch {unset opt}
@@ -144,7 +144,7 @@ test cmd_args {options} {
 Possible options are:
 	-test any "test value"
 	-b "true or false"
-	-o {oneof a b c} "a, b or c"} 1
+	-o {oneof a b c} "a, b or c"} error
 
 test cmd_args {options: wrong value oneof} {
 	catch {unset opt}
@@ -155,7 +155,7 @@ test cmd_args {options: wrong value oneof} {
 		-b {switch "true or false"}
 		-o {{oneof a b c} "a, b or c"}
 	} {?a? b} {-o d 1 2}
-} {invalid value "d" for option -o: should be one of: a b c} 1
+} {invalid value "d" for option -o: should be one of: a b c} error
 
 test cmd_args {options: wrong value int} {
 	catch {unset opt}
@@ -164,7 +164,7 @@ test cmd_args {options: wrong value int} {
 	cmd_args test {
 		-test {int "test value"}
 	} {?a? b} {-test try 1 2}
-} {invalid value "try" for option -test: should be an integer} 1
+} {invalid value "try" for option -test: should be an integer} error
 
 test cmd_args {options} {
 	catch {unset opt}
@@ -173,7 +173,7 @@ test cmd_args {options} {
 	cmd_args test {
 		-test {int "test value"}
 	} {?a? b} {-test try 1 2}
-} {invalid value "try" for option -test: should be an integer} 1
+} {invalid value "try" for option -test: should be an integer} error
 
 test cmd_args {test} {
 	cmd_args test {

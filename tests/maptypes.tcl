@@ -23,19 +23,19 @@ test map_set-types {int error: give string} {
 	set struct {a {*int ?}}
 	set try {}
 	map_set -map $struct $try a try
-} {expected integer but got "try" at field "a"} 1
+} {expected integer but got "try" at field "a"} error
 
 test map_set-types {int error in subfield} {
 	set struct {a {a {*int ?}}}
 	set try {}
 	map_set -map $struct $try a {a try}
-} {expected integer but got "try" at field "a" at field "a"} 1
+} {expected integer but got "try" at field "a" at field "a"} error
 
 test map_set-types {int error: give double} {
 	set struct {a {*int ?}}
 	set try {}
 	map_set -map $struct $try a 10.2
-} {expected integer but got "10.2" at field "a"} 1
+} {expected integer but got "10.2" at field "a"} error
 
 test map_set-types {double} {
 	set struct {a {*double ?}}
@@ -53,7 +53,7 @@ test map_set-types {double error: give string} {
 	set struct {a {*double ?}}
 	set try {}
 	map_set -map $struct $try a try
-} {expected floating-point number but got "try" at field "a"} 1
+} {expected floating-point number but got "try" at field "a"} error
 
 test map_set-types {bool} {
 	set struct {a {*bool ?}}
@@ -71,7 +71,7 @@ test map_set-types {bool error} {
 	set struct {a {*bool ?}}
 	set try {}
 	map_set -map $struct $try a try
-} {expected boolean value but got "try" at field "a"} 1
+} {expected boolean value but got "try" at field "a"} error
 
 test map_set-types {regexp} {
 	set struct {a {*regexp ^a "does not start with an a" ?}}
@@ -83,7 +83,7 @@ test map_set-types {regexp error} {
 	set struct {a {*regexp ^a "does not start with an a" ?}}
 	set try {}
 	map_set -map $struct $try a b10
-} {error: "b10" does not start with an a at field "a"} 1
+} {error: "b10" does not start with an a at field "a"} error
 
 test map_set-types {regexp: one of} {
 	set struct {a {*regexp ^try|any|yes|no$ "is not one of try, any, yes or no" ?}}
@@ -95,13 +95,13 @@ test map_set-types {regexp: one of error} {
 	set struct {a {*regexp ^try|any|yes|no$ "is not one of try, any, yes or no" ?}}
 	set try {}
 	map_set -map $struct $try a test
-} {error: "test" is not one of try, any, yes or no at field "a"} 1
+} {error: "test" is not one of try, any, yes or no at field "a"} error
 
 test map_set-types {regexp: not enough arguments} {
 	set struct {a {*regexp}}
 	set try {}
 	map_set -map $struct $try a try
-} {error: wrong number of arguments in map "*regexp": should be "*regexp pattern errormsg default" at field "a"} 1
+} {error: wrong number of arguments in map "*regexp": should be "*regexp pattern errormsg default" at field "a"} error
 
 test map_set-types {between: ok} {
 	set struct {a {*between 0 10 ?}}
@@ -125,19 +125,19 @@ test map_set-types {between: too low} {
 	set struct {a {*between 0 10 ?}}
 	set try {}
 	map_set -map $struct $try a -1
-} {error: -1 is not between 0 and 10 at field "a"} 1
+} {error: -1 is not between 0 and 10 at field "a"} error
 
 test map_set-types {between: too high} {
 	set struct {a {*between 0 10 ?}}
 	set try {}
 	map_set -map $struct $try a 11
-} {error: 11 is not between 0 and 10 at field "a"} 1
+} {error: 11 is not between 0 and 10 at field "a"} error
 
 test map_set-types {between: error} {
 	set struct {a {*between}}
 	set try {}
 	map_set -map $struct $try a 5
-} {error: wrong number of arguments in map "*between" at field "a"} 1
+} {error: wrong number of arguments in map "*between" at field "a"} error
 
 test map_set-types {dbetween: ok} {
 	set struct {a {*dbetween 0.5 1.8 ?}}
@@ -161,13 +161,13 @@ test map_set-types {dbetween: too low} {
 	set struct {a {*dbetween 0.5 1.8 ?}}
 	set try {}
 	map_set -map $struct $try a 0
-} {error: 0 is not between 0.5 and 1.8 at field "a"} 1
+} {error: 0 is not between 0.5 and 1.8 at field "a"} error
 
 test map_set-types {dbetween: too high} {
 	set struct {a {*dbetween 0.5 1.8 ?}}
 	set try {}
 	map_set -map $struct $try a 11
-} {error: 11 is not between 0.5 and 1.8 at field "a"} 1
+} {error: 11 is not between 0.5 and 1.8 at field "a"} error
 
 test map_set-types {proc} {
 	namespace eval ::Extral {
@@ -433,7 +433,7 @@ test map_set-list {list parameter: non existing num} {
 	set struct {a {*list {*int ?}}}
 	set try {}
 	map_set -map $struct $try {a 2} 4
-} {empty list at field "a"} 1
+} {empty list at field "a"} error
 
 test map_set-list {list parameter end} {
 	set struct {a {*list {*int ?}}}
@@ -445,7 +445,7 @@ test map_set-list {list error} {
 	set struct {a {*list {*int ?}}}
 	set try {}
 	map_set -map $struct $try a {1 2 c}
-} {expected integer but got "c" at field "a"} 1
+} {expected integer but got "c" at field "a"} error
 
 test map_set-list {struct in list: simple} {
 	set struct {
@@ -492,7 +492,7 @@ test map_set-list {struct in list error} {
 	}}}
 	set try {}
 	map_set -map $struct $try {a "" b} {1 c 3}
-} {expected integer but got "c" at field "b" at field "a"} 1
+} {expected integer but got "c" at field "b" at field "a"} error
 
 #	list unset
 #
@@ -620,7 +620,7 @@ test map_get-list {list index error: invalid command} {
 	set struct {a {*list {*int ?}}}
 	set try [map_set -map $struct {} a {1 2 4}]
 	map_get -map $struct $try {a {1 2 3}}
-} {invalid command name "3"} 1
+} {invalid command name "3"} error
 
 test map_get-list {list index out of range} {
 	set struct {a {*list {*date ?}}}
@@ -650,7 +650,7 @@ test map_set-list {list regexp} {
 	set struct {{? parts pts} {*list {*regexp ^a "does not start with an a" ?}}}
 	set try {}
 	map_set -map $struct $try pts {b}
-} {error: "b" does not start with an a at field "pts"} 1
+} {error: "b" does not start with an a at field "pts"} error
 
 test map_set-list {set empty list sub element} {
 	set dbstruct {*list {a {*any {}}}}

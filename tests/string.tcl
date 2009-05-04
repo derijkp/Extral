@@ -66,7 +66,7 @@ SWISS-PROT; P46753; RT02_ACACA.
 SWISS-PROT; P46754; RT03_ACACA.
 }
 string_change $value "\; {} \n {}"
-} {changelist does not have an even number of elements} 1
+} {changelist does not have an even number of elements} error
 
 test string_reverse {basic} {
 	string_reverse {abc def}
@@ -118,7 +118,7 @@ test string_replace {insert} {
 
 test string_replace {negative index} {
 	string_replace "abcdefgh" -10 -10 23
-} {first position < 0} 1
+} {first position < 0} error
 
 test string_replace {insert} {
 	string_replace ABCDEFG 5 -1 ----
@@ -138,7 +138,7 @@ test string_fill {basic} {
 
 test string_fill {error} {
 	string_fill 5 a
-} {a is not an integer} 1
+} {a is not an integer} error
 
 test string_fill {< 0} {
 	string_fill a -1

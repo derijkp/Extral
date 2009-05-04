@@ -37,7 +37,7 @@ test struct {unset element} {
 	struct set $pointer->a 1
 	struct unset $pointer->a
 	struct set $pointer->a
-} {can't read "Struct1->a": no such variable} 1
+} {can't read "Struct1->a": no such variable} error
 
 test struct {unset element, check other} {
 	set pointer [struct new]
@@ -54,6 +54,6 @@ test struct {unset struct} {
 	struct set $pointer->b 2
 	struct unset $pointer
 	struct set $pointer->a
-} {can't read "Struct1->a": no such variable} 1
+} {can't read "Struct1->a": no such variable} error
 
 testsummarize

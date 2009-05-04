@@ -18,7 +18,7 @@ test ssort {-reflist} {
 
 test ssort {error in option} {
 	ssort -abc {b c a d} {1 2 3 4}
-} {bad option "-abc": must be -ascii, -command, -decreasing, -dictionary, -increasing, -index, -integer, -real, or -reflist} 1
+} {bad option "-abc": must be -ascii, -command, -decreasing, -dictionary, -increasing, -index, -integer, -real, or -reflist} error
 
 testsummarize
 

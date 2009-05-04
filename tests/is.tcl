@@ -4,6 +4,8 @@ exec tclsh "$0" "$@"
 
 source tools.tcl
 
+unset -nocomplain v r
+
 foreach {v r} {
 	2 1 a 0 1.8 0 1.0 0 -1 1
 } {
