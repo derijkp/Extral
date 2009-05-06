@@ -2,6 +2,9 @@
 # the next line restarts using wish \
 exec tclsh "$0" "$@"
 
+# This is work in progress, and the api is not stable yet. Especially do not rely on the
+# string representation to stay the same
+
 source tools.tcl
 
 test table {fromlist} {
@@ -273,6 +276,16 @@ test table {empty table from list} {
 	set table [table_fromlist {id a b c} {}]
 	table_size $table
 } 0
+
+test table {empty table from list} {
+	set table [table_fromlist {id a b c} {{a 5 2 3} {b 3 5 4} {c 8 8 9} {d 8 5 8}}]
+	table_tolist [table_sort $table {a c}]
+} {{b 3 5 4} {a 5 2 3} {d 8 5 8} {c 8 8 9}}
+
+test table {empty table from list} {
+	set table [table_fromlist {id a b c} {{a 5 2 3} {b 3 5 4} {c 8 8 9} {d 8 5 8}}]
+	table_tolist [table_sort $table {a c} -decreasing]
+} {{c 8 8 9} {d 8 5 8} {a 5 2 3} {b 3 5 4}}
 
 if 0 {
 	set file /data/peter/molgen-project/maaike/skea.csv

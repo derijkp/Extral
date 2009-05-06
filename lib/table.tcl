@@ -1,5 +1,8 @@
 package require dict
 
+# This is work in progress, and the api is not stable yet. Especially do not rely on the
+# string representation to stay the same
+
 proc table_update {tableVar} {
 	upvar $tableVar table
 	set fields [dict get $table fields]
@@ -397,4 +400,19 @@ proc table_foreach {tableVar fields command {poss {}}} {
 		append code " \{$command\}"
 	}
 	uplevel $code
+}
+
+proc table_sort {table fields args} {
+	set s [table_tolist $table $fields]
+	set r [list_fill [llength $s] 0 1]
+	set s [eval {ssort -reflist $s} $args {$r}]
+	set data [dict get $table data]
+	set newdata {}
+	foreach col $data {
+		lappend newdata [list_sub $col $s]
+	}
+	set newtable $table
+	dict set newtable data $newdata
+	table_update newtable
+	return $newtable
 }
