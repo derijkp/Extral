@@ -118,6 +118,7 @@ set auto_index(::Extral::tracecommands_cmd) [list source [file join $dir tools.t
 set auto_index(::Extral::tracecommands) [list source [file join $dir tools.tcl]]
 set auto_index(::Extral::tracecommands_rem) [list source [file join $dir tools.tcl]]
 set auto_index(::Extral::exec-get) [list source [file join $dir tools.tcl]]
+set auto_index(::Extral::exec-close) [list source [file join $dir tools.tcl]]
 set auto_index(::Extral::bgexec) [list source [file join $dir tools.tcl]]
 set auto_index(varsubst) [list source [file join $dir varsubst.tcl]]
 set auto_index(list_regsub) [list source [file join $dir list_regsub.tcl]]
