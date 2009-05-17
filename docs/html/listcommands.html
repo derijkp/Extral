@@ -5,16 +5,6 @@
 <h1>Extra list manipulation commands</h1>
 
 <dl><b><dt>
-list_regsub ?switches? exp list subSpec
-</b><dd>
-	does a regsub for each element in the list, and returns the resulting list.
-<br>eg.:<pre>
-	% list_regsub {c$} {afdsg asdc sfgh {dfgh shgfc} dfhg} {!}
-	afdsg asd! sfgh {dfgh shgf!} dfhg
-	% list_regsub {^([^.]+)\.([^.]+)$} {start.sh help.ps h.sh} {\2 \1}
-	{sh start} {ps help} {sh h}
-</pre>
-<b><dt>
 list_remove listName ?item? ...
 </b><dd>
 removes the items from the list
@@ -102,6 +92,16 @@ list_lappend list ?index...? ?list1? ...
    {a {1 d}} {b 2 c}
 </pre>
 <b><dt>
+list_regsub ?switches? exp list subSpec
+</b><dd>
+	does a regsub for each element in the list, and returns the resulting list.
+<br>eg.:<pre>
+	% list_regsub {c$} {afdsg asdc sfgh {dfgh shgfc} dfhg} {!}
+	afdsg asd! sfgh {dfgh shgf!} dfhg
+	% list_regsub {^([^.]+)\.([^.]+)$} {start.sh help.ps h.sh} {\2 \1}
+	{sh start} {ps help} {sh h}
+</pre>
+<b><dt>
 list_mangle ?list1? ?list2?
 </b><dd>
 	mangles two lists into one
@@ -157,6 +157,27 @@ list_select ?mode? list pattern
 	a ab
 	% list_select -regexp {a ab aa bc} {^[ab]*$}
 	a ab aa
+</pre>
+<b><dt>
+list_fill ?size? ?start? ??incr??
+</b><dd>
+	fills a list of ?size? elements with ?start?; if ?incr? is given and ?size? is a number, each element in the list will be the former incremented with ?incr?
+   This works for integers or strings
+<br>eg.:<pre>
+	% list_fill 4 "Hello world"
+	{Hello world} {Hello world} {Hello world} {Hello world}
+	% list_fill 5 2 2
+	2 4 6 8 10
+	% list_fill 5 10 -2
+	10 8 6 4 2
+</pre>
+<b><dt>
+list_subindex ?list? ?pos? ...
+</b><dd>
+	returns a list of the 'pos' element in each of the elements of the given list
+<br>eg.:<pre>
+	% list_subindex {{a 1} {b 2} {c 3}} 1
+	1 2 3
 </pre>
 <b><dt>
 list_pop listName ?pos?
@@ -274,26 +295,5 @@ list_foreach varlist1 list1 ?varlist2 list2 ...? body
    % list_foreach {a b} {{1 2 3} 4} {puts $a,$b}
    1,2
    4,
-</pre>
-<b><dt>
-list_fill ?size? ?start? ??incr??
-</b><dd>
-	fills a list of ?size? elements with ?start?; if ?incr? is given and ?size? is a number, each element in the list will be the former incremented with ?incr?
-   This works for integers or strings
-<br>eg.:<pre>
-	% list_fill 4 "Hello world"
-	{Hello world} {Hello world} {Hello world} {Hello world}
-	% list_fill 5 2 2
-	2 4 6 8 10
-	% list_fill 5 10 -2
-	10 8 6 4 2
-</pre>
-<b><dt>
-list_subindex ?list? ?pos? ...
-</b><dd>
-	returns a list of the 'pos' element in each of the elements of the given list
-<br>eg.:<pre>
-	% list_subindex {{a 1} {b 2} {c 3}} 1
-	1 2 3
 </pre>
 </body>
