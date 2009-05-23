@@ -125,7 +125,7 @@ int ExtraL_ScanTime(interp,musthavedate,musthavetime,dateObj,resultObj)
 						temp[i] = '\0';
 					}
 					error = Tcl_GetInt(interp, start, &year);
-					if (error != TCL_OK) {return error;}
+					/* do not check error: this might be e.g. a CEST that we want to ignore */
 				}
 			} else if (isalpha(temp[0])) {
 				if (strncmp(temp,"jan",3)==0) {month = 1;}

@@ -186,6 +186,14 @@ test time_format {miliseconds 999} {
 	time_format [time_scan {9 May 1997 12:30:24.999}] "%% %Y %d %e %j %m %b %B %H %M %S %s"
 } {% 1997 09 9 129 05 May May 12 30 24 999}
 
+test time_format {CES} {
+	time_format [time_scan {16 Apr 23:30:30 CEST 2009}] "%e %b %Y %H:%M:%S"
+} {16 Apr 2009 23:30:30}
+
+test time_format {CES} {
+	time_format [time_scan {Wed Apr  8 02:12:55 CEST 2009}] "%e %b %Y %H:%M:%S"
+} {8 Apr 2009 02:12:55}
+
 testtime {1 Jan 0001BC 00:00:00}
 testtime {5 Jan 0001BC 00:00:00}
 testtime {1 Jan 0001 00:00:00}
@@ -197,6 +205,7 @@ testtime {1 Apr 0050BC 23:59:59}
 testtime {18 Mar 15000BC 15:00:00}
 testtime {18 Mar 15000 15:00:00}
 testtime {1 Jun 0003 00:00:00}
+testtime {9 May 1997 12:30:24}
 testtime {9 May 1997 12:30:24}
 testtime {9 May 1997 12:30:24}
 

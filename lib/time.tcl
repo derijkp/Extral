@@ -82,10 +82,8 @@ proc time_scan {time {musthave date}} {
 				set bc 1
 			}
 			default {
-				set i 1
-				foreach m {Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec} {
-					if {"$item" == "$m"} {set month $i}
-					incr i
+				if {$month == -1} {
+					set month [lsearch {{} Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec} $item]
 				}
 			}
 		}
