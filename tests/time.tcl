@@ -194,6 +194,10 @@ test time_format {CES} {
 	time_format [time_scan {Wed Apr  8 02:12:55 CEST 2009}] "%e %b %Y %H:%M:%S"
 } {8 Apr 2009 02:12:55}
 
+test time_format {dutch} {
+	time_format [time_scan {Wed Sep 16 01:11:08 Romance (standaardtijd) 2009}] "%e %b %Y %H:%M:%S"
+} {16 Sep 2009 01:11:08}
+
 testtime {1 Jan 0001BC 00:00:00}
 testtime {5 Jan 0001BC 00:00:00}
 testtime {1 Jan 0001 00:00:00}
@@ -208,5 +212,7 @@ testtime {1 Jun 0003 00:00:00}
 testtime {9 May 1997 12:30:24}
 testtime {9 May 1997 12:30:24}
 testtime {9 May 1997 12:30:24}
+
+testtime {Wed Sep 16 01:11:08 Romance (standaardtijd) 2009}
 
 testsummarize

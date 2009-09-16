@@ -160,14 +160,10 @@ int ExtraL_ScanTime(interp,musthavedate,musthavetime,dateObj,resultObj)
 			}
 			temppos = 0;
 		} else {
-			temp[temppos++] = tolower(ch);
-			if (temppos == 8) {
-				temp[5]='\0';
+			if (temppos == 7) {
 				temppos = 0;
-				Tcl_ResetResult(interp);
-				Tcl_AppendResult(interp,"error while parsing date \"",date, "\": part \"",temp,"\"... too big \"",(char *)NULL);
-				return TCL_ERROR;
 			}
+			temp[temppos++] = tolower(ch);
 		}
 		i++;
 	}
