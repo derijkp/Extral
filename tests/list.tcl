@@ -137,6 +137,13 @@ test list_merge {first too long, spacing 2} {
 	list_merge {a b c d e f} {1 2} 2
 } {a b 1 c d 2 e f {}}
 
+test list_merge {two empty} {
+	lappend list [list_merge {} {}]
+	lappend list [list_merge {a b} {}]
+	lappend list [list_merge {} {a b}]
+	set list
+} {{} {a {} b {}} {}}
+
 test list_unmerge {} {
 	list_unmerge {a 1 b 2 c 3}
 } {a b c}

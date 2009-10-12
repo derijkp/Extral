@@ -700,6 +700,7 @@ ExtraL_List_mergeObjCmd(notUsed, interp, objc, objv)
 	}
 	/* Initialise result */
 	Tcl_ResetResult(interp);
+	if (list1Argc == 0) {return TCL_OK;}
 	resultObj = Tcl_GetObjResult(interp);
 	pos=0;
 	pos2=0;
