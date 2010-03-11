@@ -100,6 +100,10 @@ test lmath {filter Savitsky-Golay 2-2 2d deriv} {
 	testfloats $r $e
 } 1
 
+test lmath {filter error} {
+	lmath_filter {1 1} {0.25 0.25 0.25 0.25}
+} {filter longer than list} error
+
 test lmath {lmath_majority} {
 	set list {10 5 10 10000 8 9 10010 5 7}
 	lmath_majority $list

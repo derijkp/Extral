@@ -157,6 +157,9 @@ proc lmath_filter {list filter {filterpos {}} args} {
 	} else {
 		set useunfilteredvalue 0
 	}
+	if {[llength $filter] > [llength $list]} {
+		error "filter longer than list"
+	}
 	if {!$useunfilteredvalue} {
 		set el 0.0
 		foreach f $filter v [lrange $list 0 [expr {$flen - 1}]] {

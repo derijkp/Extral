@@ -373,6 +373,10 @@ ExtraL_Lmath_filterObjCmd(notUsed, interp, objc, objv)
 	if (error) {return error;}
 	error = ExtraL_vectorFromObj(interp, objv[2], &filter, &flen);
 	if (error) {goto error;}
+	if (flen > len) {
+		Tcl_AppendResult(interp,"filter longer than list",(char *)NULL);
+		return TCL_ERROR;
+	}
 	if (objc > 3) {
 		error = Tcl_GetIntFromObj(interp,objv[3],&filterpos);
 		if (error) {goto error;}
