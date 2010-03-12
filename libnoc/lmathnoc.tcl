@@ -16,33 +16,42 @@
 #	2.0 4.0 6.4 8.0
 #}
 proc lmath_calc {args} {
-	if {[llength $args]!=3} {
-		error "wrong # args: should be \"lmath_calc list1 action list2\""
+	if {([llength $args] != 3) && ([llength $args] != 4)} {
+		error "wrong # args: should be \"lmath_calc list1 action list2 ?startpos?\""
 	}
 	set result ""
-	set l1 [lindex $args 0]
+	foreach {l1 calc l2 startpos} $args break
 	set len1 [llength $l1]
-	set calc [lindex $args 1]
-	set l2 [lindex $args 2]
 	set len2 [llength $l2]
-	if {$len1 == 1} {
-		set e1 [lindex $l1 0]
+	if {[isint $startpos]} {
 		foreach e2 $l2 {
-			lappend result [expr $e1 $calc $e2]
+			set e1 [lindex $l1 $startpos]
+			if {![isdouble $e1]} break
+			set val [expr $e1 $calc $e2]
+			lset l1 $startpos $val
+			incr startpos
 		}
-	} elseif {$len2 == 1} {
-		set e2 [lindex $l2 0]
-		foreach e1 $l1 {
-			lappend result [expr $e1 $calc $e2]
-		}
+		return $l1
 	} else {
-		if {$len2 > $len1} {set l2 [lrange $l2 0 [expr {$len1-1}]]}
-		if {$len1 > $len2} {set l1 [lrange $l1 0 [expr {$len2-1}]]}
-		foreach e1 $l1 e2 $l2 {
-			lappend result [expr $e1 $calc $e2]
+		if {$len1 == 1} {
+			set e1 [lindex $l1 0]
+			foreach e2 $l2 {
+				lappend result [expr $e1 $calc $e2]
+			}
+		} elseif {$len2 == 1} {
+			set e2 [lindex $l2 0]
+			foreach e1 $l1 {
+				lappend result [expr $e1 $calc $e2]
+			}
+		} else {
+			if {$len2 > $len1} {set l2 [lrange $l2 0 [expr {$len1-1}]]}
+			if {$len1 > $len2} {set l1 [lrange $l1 0 [expr {$len2-1}]]}
+			foreach e1 $l1 e2 $l2 {
+				lappend result [expr $e1 $calc $e2]
+			}
 		}
+		return $result
 	}
-	return $result
 }
 
 #doc {lmath lmath_sum} cmd {

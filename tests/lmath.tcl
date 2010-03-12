@@ -28,6 +28,14 @@ test lmath {lmath_calc with |} {
 	lmath_calc {1 1 2 2 3 3 4} | {1 2 1 2 1 2 1}
 } {1 3 3 2 3 3 5}
 
+test lmath {lmath_calc startpos} {
+	lmath_calc {1 1 2 2 3 3} + {1 2} 2
+} {1 1 3 4 3 3}
+
+test lmath {lmath_calc startpos and too long} {
+	lmath_calc {1 1 2 2} + {1 2 3} 2
+} {1 1 3 4}
+
 test lmath {sum} {
 	expr {round([lmath_sum {1 4 5}])}
 } {10}
