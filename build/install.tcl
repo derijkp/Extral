@@ -9,7 +9,7 @@ cd [pkgtools::startdir]
 # --------
 
 set libfiles {lib README pkgIndex.tcl init.tcl DESCRIPTION.txt}
-set shareddatafiles README
+set shareddatafiles {}
 set headers {}
 set libbinaries [::pkgtools::findlib [file dir [pkgtools::startdir]] Extral]
 puts "libbinaries: $libbinaries pkgtools::startdir:[pkgtools::startdir]"
