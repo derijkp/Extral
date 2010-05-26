@@ -238,9 +238,10 @@ ExtraL_List_subObjCmd(dummy, interp, objc, objv)
 			if (result!=TCL_OK) {return result;}
 			result=Tcl_ListObjIndex(interp,listPtr,index,&indexObj);
 			if (result!=TCL_OK) {return result;}
-			if (indexObj!=NULL)	{
-				result=Tcl_ListObjAppendElement(interp,resultObj,indexObj);
+			if (indexObj==NULL)	{
+				indexObj = Tcl_NewObj();
 			}
+			result=Tcl_ListObjAppendElement(interp,resultObj,indexObj);
 			if (result!=TCL_OK) {return result;}
 		}
 	} else {
@@ -259,7 +260,6 @@ ExtraL_List_subObjCmd(dummy, interp, objc, objv)
 			}
 		}
 		for(i=0;i<listLen;i++) {
-
 			if (map[i] == 0) {
 				result=Tcl_ListObjAppendElement(interp,resultObj,elemPtrs[i]);
 				if (result!=TCL_OK) {Tcl_Free(map);return result;}
@@ -1098,10 +1098,6 @@ ExtraL_List_subindexObjCmd(dummy, interp, objc, objv)
 	for (i = 0 ; i < posLen ; i++) {
 		error = Tcl_GetIntFromObj(interp,indexelemPtrs[i],pos+i);
 		if (error) {goto error;}
-		if (pos[i] < 0) {
-			Tcl_AppendResult(interp, "negative index not allowed", (char *) NULL);
-			return TCL_ERROR;
-		}
 	}
 	/* Initialise result */
 	Tcl_ResetResult(interp);
@@ -1121,7 +1117,7 @@ ExtraL_List_subindexObjCmd(dummy, interp, objc, objv)
 			tempObj = Tcl_NewListObj(0,NULL);
 			if (tempObj == NULL) {goto error;}
 			for (j = 0; j < posLen ; j++) {
-				if (pos[j] < lineLen) {
+				if (pos[j] < lineLen && pos[j] >= 0) {
 					error = Tcl_ListObjAppendElement(interp,tempObj,linePtr[pos[j]]);
 				} else {
 					error = Tcl_ListObjAppendElement(interp,tempObj,nullObj);

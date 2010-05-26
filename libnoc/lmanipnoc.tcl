@@ -48,7 +48,11 @@ proc list_subindex {args} {
 		error "wrong # args: should be \"list_subindex list pos ?pos ...?\""
 	}
 	set result ""
-	set index [lrange $args 1 end]
+	if {[llength $args] == 2} {
+		set index [lindex $args 1]
+	} else {
+		set index [lrange $args 1 end]
+	}
 	if {[llength $index] == 1} {
 		if {![isint $index]} {error "expected integer but got \"[lindex $index 0]\""}
 		foreach elem [lindex $args 0] {

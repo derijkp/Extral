@@ -53,9 +53,7 @@ proc list_sub {list args} {
 		set result ""
 		set len [llength $list]
 		foreach index [lindex $args 0] {
-			if {($index>-1)&&($index<$len)} {
-				lappend result [lindex $list $index]
-			}
+			lappend result [lindex $list $index]
 		}
 		return $result
 	} elseif {($len == 2)&&("[lindex $args 0]"=="-exclude")} {
