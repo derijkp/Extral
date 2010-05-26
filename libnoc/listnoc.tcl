@@ -507,6 +507,10 @@ proc list_foreach {args} {
 	for {set pos 0} {$pos < $max} {incr pos} {
 		foreach {vars valuelist} $args {
 			set values [lindex $valuelist $pos]
+			set len [llength $vars]
+			if {[llength $values] < $len} {
+				for {set i 0} {$i < $len} {incr i} {lappend values {}}
+			}
 			uplevel [list foreach $vars $values break]
 		}
 		set result [uplevel $body]
