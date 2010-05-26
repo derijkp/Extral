@@ -158,7 +158,7 @@ proc list_addnew {listref args} {
 #returns 0 if $value is not an element of list $list
 #}
 proc inlist {list value} {
-	if {[lsearch $list $value]==-1} {
+	if {[lsearch -exact $list $value]==-1} {
 		return 0
 	} else {
 		return 1

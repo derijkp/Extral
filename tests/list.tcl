@@ -422,6 +422,14 @@ test inlist {false} {
 	inlist {a b c} d
 } 0
 
+test inlist {exact search not found} {
+	inlist {a b c} ?
+} 0
+
+test inlist {exact search found} {
+	inlist {a ? c} ?
+} 1
+
 test list_foreach {basic} {
 	set result {}
 	list_foreach {a b} {{1 2} {3 4}} {lappend result $a,$b}
