@@ -331,7 +331,11 @@ proc Extral::exec-close {o} {
 	catch {close $o}
 	after cancel set Extral::exec(done,$o) 1
 	set result $Extral::exec(result,$o)
-	set err [file_read $Extral::exec(err,$o)]
+	if {$Extral::exec(err,$o) ne ""} {
+		set err [file_read $Extral::exec(err,$o)]
+	} else {
+		set err {}
+	}
 	unset Extral::exec(result,$o)
 	unset Extral::exec(err,$o)
 	unset Extral::exec(done,$o)
@@ -364,6 +368,8 @@ proc Extral::exec-close {o} {
 #<dd>This option is used to execute a command each time new data arrives. command is used as a prefix to run with the new data appended</dd>
 #<dt>-pidvar varName</dt>
 #<dd>store the pid of the process in the variable varName</dd>
+#<dt>-no_error_redir</dt>
+#<dd>This option can turn of redirection of stderr; by default, if error output is present, bgexec will stop with an error, and the error output is in the result. Using this option, you can redirect error yourself, eg to stdout using \"2>@ stdput\" on programs where stderr is used for progress reporting</dd>
 #</dl>
 #} example {
 # Extral::bgexec ./testcmd_bgexec.tcl
@@ -377,11 +383,17 @@ proc Extral::bgexec {args} {
 		-progresscommand {any "code to call when new data arrives from background process, newly arrived data is added as an argument" ""}
 		-command {any "code to call when new process is finished, the resulting data is added as an argument, bgexec will not wait till finished" ""}
 		-pidvar {any "name of a (global) variable to which the pid of the proces started wil be saved" ""}
+		-no_error_redir {switch "This option can turn of redirection of stderr; by default, if error output is present, bgexec will stop with an error, and the error output is in the result. Using this option, you can redirect error yourself, eg to stdout using \"2>@ stdput\" on programs where stderr is used for progress reporting" ""}
 	} {cmd ?...?} $args
 	set tempstderr [tempfile]
-	set o [open "| $cmd [join $args " "] 2>>$tempstderr"]
+	if {$opt(-no_error_redir)} {
+		set o [open "| $cmd [join $args " "]"]
+		set Extral::exec(err,$o) {}
+	} else {
+		set o [open "| $cmd [join $args " "] 2>>$tempstderr"]
+		set Extral::exec(err,$o) $tempstderr
+	}
 	fconfigure $o -blocking 0
-	set Extral::exec(err,$o) $tempstderr
 	set Extral::exec(progress,$o) $opt(-progresscommand)
 	if {$opt(-pidvar) ne ""} {
 		upvar #0 $opt(-pidvar) pid
