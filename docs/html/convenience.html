@@ -112,6 +112,8 @@ Extral::bgexec ?options? arg ?arg ...?
 <dd>This option is used to execute a command each time new data arrives. command is used as a prefix to run with the new data appended</dd>
 <dt>-pidvar varName</dt>
 <dd>store the pid of the process in the variable varName</dd>
+<dt>-no_error_redir</dt>
+<dd>This option can turn of redirection of stderr; by default, if error output is present, bgexec will stop with an error, and the error output is in the result. Using this option, you can redirect error yourself, eg to stdout using \"2>@ stdput\" on programs where stderr is used for progress reporting</dd>
 </dl>
 <br>eg.:<pre>
  Extral::bgexec ./testcmd_bgexec.tcl

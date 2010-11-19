@@ -75,49 +75,49 @@ test Extral::event {basic test} {
 	set ::a
 } {peter a 1 - peter b 2 other b 2 - other c 3}
 
-test Extral::event {Extral::bgexec} {
+test Extral::bgexec {Extral::bgexec} {
 	Extral::bgexec ./testcmd_bgexec.tcl
 } {1
 2
 3
 }
 
-test Extral::event {Extral::bgexec parameters} {
+test Extral::bgexec {Extral::bgexec parameters} {
 	Extral::bgexec ./testcmd_bgexec.tcl 2
 } {1
 2
 }
 
-test Extral::event {Extral::bgexec error} {
+test Extral::bgexec {Extral::bgexec error} {
 	Extral::bgexec ./testcmd_bgexec.tcl bla
 } {arg must be an integer
 } error
 
-test Extral::event {Extral::bgexec -timeout} {
+test Extral::bgexec {Extral::bgexec -timeout} {
 	Extral::bgexec -timeout 500 ./testcmd_bgexec.tcl
 } {1
 }
 
-test Extral::event {Extral::bgexec -pidvar and kill process} {
+test Extral::bgexec {Extral::bgexec -pidvar and kill process} {
 	after 500 {exec kill $::pid}
 	Extral::bgexec -pidvar pid ./testcmd_bgexec.tcl
 } {1
 }
 
-test Extral::event {Extral::bgexec -progresscommand} {
+test Extral::bgexec {Extral::bgexec -progresscommand} {
 	set ::r {}
 	Extral::bgexec -progresscommand {lappend r} ./testcmd_bgexec.tcl 2
 	set ::r
 } {1 2}
 
-test Extral::event {Extral::bgexec error in -progresscommand} {
+test Extral::bgexec {Extral::bgexec error in -progresscommand} {
 	unset -nocomplain ::r
 	set ::r() {}
 	Extral::bgexec -progresscommand {lappend r} ./testcmd_bgexec.tcl 2
 	lindex [split $::errorInfo \n] 0
 } {can't set "r": variable is array}
 
-test Extral::event {Extral::bgexec -command} {
+test Extral::bgexec {Extral::bgexec -command} {
 	unset -nocomplain ::v
 	Extral::bgexec -command {set v} ./testcmd_bgexec.tcl 2
 	vwait ::v
@@ -126,7 +126,7 @@ test Extral::event {Extral::bgexec -command} {
 2
 }
 
-test Extral::event {Extral::bgexec -command 2 together} {
+test Extral::bgexec {Extral::bgexec -command 2 together} {
 	unset -nocomplain ::v
 	unset -nocomplain ::w
 	Extral::bgexec -command {set v} ./testcmd_bgexec.tcl 2
@@ -134,6 +134,24 @@ test Extral::event {Extral::bgexec -command 2 together} {
 	vwait ::w
 	list [split $::v \n] [split $::w \n]
 } {{1 2 {}} {1 2 3 {}}}
+
+test Extral::bgexec {Extral::bgexec_cancel} {
+	after 1500 {Extral::bgexec_cancel $bgo}
+	Extral::bgexec -channelvar bgo ./testcmd_bgexec.tcl
+} {Action canceled} error
+
+test Extral::bgexec {Extral::bgexec_cancel -command} {
+	after 1500 {Extral::bgexec_cancel $bgo}
+	Extral::bgexec -channelvar bgo -command {set w} ./testcmd_bgexec.tcl
+	vwait ::w
+	set ::w
+} {}
+
+test Extral::bgexec {Extral::bgexec cleanup after cancel} {
+	Extral::bgexec ./testcmd_bgexec.tcl 2
+} {1
+2
+}
 
 if 0 {
 	Extral::bgexec lpstat -s
