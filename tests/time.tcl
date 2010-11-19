@@ -213,6 +213,6 @@ testtime {9 May 1997 12:30:24}
 testtime {9 May 1997 12:30:24}
 testtime {9 May 1997 12:30:24}
 
-testtime {Wed Sep 16 01:11:08 Romance (standaardtijd) 2009}
+testtime {16 Sep 2009 01:11:08}
 
 testsummarize

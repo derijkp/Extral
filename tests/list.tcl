@@ -44,9 +44,13 @@ test list_sub {list_sub with {}} {
 	list_sub {Ape Ball Field} {}
 } {}
 
-test list_sub {negative index} {
-	list_sub {Ape Ball Field} {1 -1 100}
-} {Ball}
+test list_sub {out of bounds indices} {
+	list_sub {Ape Ball Field} {-1 1 100}
+} {{} Ball {}}
+
+test list_sub {out of bounds indices} {
+	list_sub {Ape Ball Field} -1
+} {{}}
 
 test list_sub {problem} {
 	set findex {{Acibri.ACR: Acidianus brierleyi} {Aciinf.ACR: Acidianus infernus} {Desmob.ACR: Desulfurococcus mobilis} {Thecel.AEU: Thermococcus celer}}

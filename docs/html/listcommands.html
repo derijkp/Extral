@@ -159,27 +159,6 @@ list_select ?mode? list pattern
 	a ab aa
 </pre>
 <b><dt>
-list_fill ?size? ?start? ??incr??
-</b><dd>
-	fills a list of ?size? elements with ?start?; if ?incr? is given and ?size? is a number, each element in the list will be the former incremented with ?incr?
-   This works for integers or strings
-<br>eg.:<pre>
-	% list_fill 4 "Hello world"
-	{Hello world} {Hello world} {Hello world} {Hello world}
-	% list_fill 5 2 2
-	2 4 6 8 10
-	% list_fill 5 10 -2
-	10 8 6 4 2
-</pre>
-<b><dt>
-list_subindex ?list? ?pos? ...
-</b><dd>
-	returns a list of the 'pos' element in each of the elements of the given list
-<br>eg.:<pre>
-	% list_subindex {{a 1} {b 2} {c 3}} 1
-	1 2 3
-</pre>
-<b><dt>
 list_pop listName ?pos?
 </b><dd>
 	returns the last element from a list, thereby removing it from the list.
@@ -295,5 +274,26 @@ list_foreach varlist1 list1 ?varlist2 list2 ...? body
    % list_foreach {a b} {{1 2 3} 4} {puts $a,$b}
    1,2
    4,
+</pre>
+<b><dt>
+list_fill ?size? ?start? ??incr??
+</b><dd>
+	fills a list of ?size? elements with ?start?; if ?incr? is given and ?size? is a number, each element in the list will be the former incremented with ?incr?
+   This works for integers or strings
+<br>eg.:<pre>
+	% list_fill 4 "Hello world"
+	{Hello world} {Hello world} {Hello world} {Hello world}
+	% list_fill 5 2 2
+	2 4 6 8 10
+	% list_fill 5 10 -2
+	10 8 6 4 2
+</pre>
+<b><dt>
+list_subindex ?list? ?pos? ...
+</b><dd>
+	returns a list of the 'pos' element in each of the elements of the given list
+<br>eg.:<pre>
+	% list_subindex {{a 1} {b 2} {c 3}} 1
+	1 2 3
 </pre>
 </body>

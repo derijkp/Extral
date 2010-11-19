@@ -5,6 +5,31 @@
 <h1>Convenience functions</h1>
 
 <dl><b><dt>
+invoke vars cmd ...
+</b><dd>
+ invoke simply evals $cmd in a private space. This eg. allows using
+ temporary variables in bindings without creating these in global scope.
+ It is also very convenient to use values appended to a command given
+ to a binding:
+ Further arguments (when given) are parameters that will be available in the
+ variables given in vars. If more parameters are supplied than vars are given,
+ the remaining parameters will be stored in the variable args.
+
+<b><dt>
+	list_iterate variableName list
+</b><dd>
+	debugging tool to interactively iterate a variable over a list. list_iterate
+	is used to initialise and it sets the variable to the first element of 
+	the list. Every 'list_next variableName' will puts the next element into the 
+	variable.
+
+<b><dt>
+	list_next variableName
+</b><dd>
+	complement to list_iterate. sets the variable to the next element of the list 
+	first given by list_iterate.
+
+<b><dt>
 aproc args body
 </b><dd>
  aproc creates an 'anonymous' procedure; this means you don't have to provide a name. It
@@ -121,17 +146,6 @@ Extral::bgexec ?options? arg ?arg ...?
  vwait ::v
 </pre>
 <b><dt>
-invoke vars cmd ...
-</b><dd>
- invoke simply evals $cmd in a private space. This eg. allows using
- temporary variables in bindings without creating these in global scope.
- It is also very convenient to use values appended to a command given
- to a binding:
- Further arguments (when given) are parameters that will be available in the
- variables given in vars. If more parameters are supplied than vars are given,
- the remaining parameters will be stored in the variable args.
-
-<b><dt>
 varsubst string varlist valuelist
 </b><dd>
 	substitutes only the variables in varlist for their content
@@ -144,20 +158,6 @@ varsubst string varlist valuelist
 	}
 		puts [list {try it} $try2]
 </pre>
-<b><dt>
-	list_iterate variableName list
-</b><dd>
-	debugging tool to interactively iterate a variable over a list. list_iterate
-	is used to initialise and it sets the variable to the first element of 
-	the list. Every 'list_next variableName' will puts the next element into the 
-	variable.
-
-<b><dt>
-	list_next variableName
-</b><dd>
-	complement to list_iterate. sets the variable to the next element of the list 
-	first given by list_iterate.
-
 <b><dt>
 get varName ?default?
 </b><dd>
