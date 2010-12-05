@@ -71,7 +71,7 @@ proc tempfile {{action {get}} {type file}} {
 		}
 		clean {
 			set tempdir [tempdir]
-			file delete -force $tempdir
+			catch {file delete -force $tempdir}
 			unset ::Extral::tempdir
 		}
 		cleanall {
