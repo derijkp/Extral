@@ -13,15 +13,15 @@
 #}
 
 rename exit ::Extral::exit
-	proc exit {{returnCode 0}} {
-		global Extral::atexit
-		if [info exists Extral::atexit] {
-			foreach command $Extral::atexit {
-				eval $command
-			}
+proc exit {{returnCode 0}} {
+	global Extral::atexit
+	if [info exists Extral::atexit] {
+		foreach command $Extral::atexit {
+			eval $command
 		}
-		Extral::exit $returnCode
 	}
+	Extral::exit $returnCode
+}
 
 
 #doc {atexit atexit} cmd {
@@ -38,7 +38,7 @@ proc atexit {action {command {}}} {
 	switch $action {
 		add {
 			if {[lsearch $::Extral::atexit $command] == -1} {
-				lappend ::Extral::atexit $command
+				list_unshift ::Extral::atexit $command
 			}
 		}
 		remove {
