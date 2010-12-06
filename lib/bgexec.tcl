@@ -115,10 +115,10 @@ proc Extral::bgexec {args} {
 	} {cmd ?...?} $args
 	set tempstderr [tempfile]
 	if {[true $opt(-no_error_redir)]} {
-		set o [open "| $cmd [join $args " "]"]
+		set o [open "| [list $cmd] $args"]
 		set Extral::exec(err,$o) {}
 	} else {
-		set o [open "| $cmd [join $args " "] 2>>$tempstderr"]
+		set o [open "| [list $cmd] $args 2>>$tempstderr"]
 		set Extral::exec(err,$o) $tempstderr
 	}
 	fconfigure $o -blocking 0
