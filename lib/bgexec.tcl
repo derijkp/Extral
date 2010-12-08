@@ -23,6 +23,12 @@ proc Extral::exec-get {o} {
 	}
 }
 
+if {[catch {package require kill}]} {
+	proc kill id {
+		catch {exec kill $pid}
+	}
+}
+
 proc Extral::bgexec_close {o} {
 #puts [list Extral::bgexec_close $o]
 	global Extral::exec
@@ -31,7 +37,7 @@ proc Extral::bgexec_close {o} {
 	}
 	if {![eof $o]} {
 		set pid [pid $o]
-		catch {exec kill $pid}
+		catch {kill $pid}
 	}
 	catch {read $o}
 	catch {close $o}
@@ -65,10 +71,9 @@ proc Extral::bgexec_cancel {o} {
 		set cmd $Extral::exec(cmd,$o)
 		unset Extral::exec(cmd,$o)
 		uplevel #0 $cmd {{}}
-	} else {
-		set Extral::exec(cancel,$o) 1
-		set Extral::exec(done,$o) 1
 	}
+	set Extral::exec(cancel,$o) 1
+	set Extral::exec(done,$o) 1
 }
 
 #doc {convenience Extral::bgexec} cmd {
@@ -96,7 +101,7 @@ proc Extral::bgexec_cancel {o} {
 #<dt>-pidvar varName</dt>
 #<dd>store the pid of the process in the variable varName</dd>
 #<dt>-no_error_redir</dt>
-#<dd>This option can turn of redirection of stderr; by default, if error output is present, bgexec will stop with an error, and the error output is in the result. Using this option, you can redirect error yourself, eg to stdout using \"2>@ stdput\" on programs where stderr is used for progress reporting</dd>
+#<dd>This option can turn of redirection of stderr; by default, if error output is present, bgexec will stop with an error, and the error output is in the result. Using this option, you can redirect error yourself, eg to stdout using \"2>@1\" on programs where stderr is used for progress reporting</dd>
 #</dl>
 #} example {
 # Extral::bgexec ./testcmd_bgexec.tcl
@@ -134,13 +139,15 @@ proc Extral::bgexec {args} {
 	set Extral::exec(result,$o) {}
 	fileevent $o readable [list Extral::exec-get $o]
 	set Extral::exec(done,$o) 0
+	unset -nocomplain Extral::exec(cancel,$o)
 	if {[isint $opt(-timeout)]} {
 		after $opt(-timeout) set Extral::exec(done,$o) 1
 	}
 	if {$opt(-command) eq ""} {
 		vwait Extral::exec(done,$o)
+		if {[info exists Extral::exec(cancel,$o)]} {set canceled 1} else {set canceled 0}
 		foreach {result err} [Extral::bgexec_close $o] break
-		if {[info exists Extral::exec(cancel,$o)]} {
+		if {$canceled} {
 			return -code error "Action canceled"
 		} elseif {$err ne ""} {
 			return -code error $err
