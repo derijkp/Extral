@@ -13,10 +13,14 @@ namespace eval Extral {
 	# Make one if one doesn't exist.
 	# 
 	
-	if {[info exists env(TEMPDIR)]} {
+	if {[info exists env(TMPDIR)]} {
+		set temp_dir $env(TMPDIR)
+	} elseif {[info exists env(TEMPDIR)]} {
 		set temp_dir $env(TEMPDIR)
 	} elseif {[info exists env(TEMP)]} {
 		set temp_dir $env(TEMP)
+	} elseif {[info exists env(TMP)]} {
+		set temp_dir $env(TMP)
 	} elseif {[file writable /usr/tmp]} {
 		set temp_dir /usr/tmp
 	} elseif {[info exists env(HOME)]} {
