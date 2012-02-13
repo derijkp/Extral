@@ -1,4 +1,4 @@
-package require dict
+if { ![package vsatisfies [package provide Tcl] 8.5] } {package require dict}
 
 # This is work in progress, and the api is not stable yet. Especially do not rely on the
 # string representation to stay the same
