@@ -16,6 +16,38 @@ invoke vars cmd ...
  the remaining parameters will be stored in the variable args.
 
 <b><dt>
+Extral::bgexec ?options? arg ?arg ...?
+</b><dd>
+ Without the -command option, this command works like exec does, but runs the executed 
+ processes in background. While the command will wait until the process is finished and returns the
+ results, events will still be processed while the process is running; the bgexec
+ does e.g. not block the interface from redisplaying when needed.<br>
+ The command supports the folowing options
+<dl>
+<dt>-command ?command?</dt>
+<dd>
+ With the -command option, bgerror does not wait for the process to finish. Instead, when the 
+ process is finished, the command in the option will be run (toplevel scope) with the result appended.
+ In plain Tcl, the event loop must be running. More than one background jobs can be run at the same time 
+ using the -command option. The command supports the folowing options:
+</dd>
+<dt>-timeout number</dt>
+<dd>After the given number of miliseconds the process is stopped</dd>
+<dt>-progresscommand command</dt>
+<dd>This option is used to execute a command each time new data arrives. command is used as a prefix to run with the new data appended</dd>
+<dt>-channelvar</dt>
+<dd>name of a (global) variable to which the channel controlling the proces started wil be saved, can be used with Extral::bgexec_cancel to cancel running process</dd>
+<dt>-pidvar varName</dt>
+<dd>store the pid of the process in the variable varName</dd>
+<dt>-no_error_redir</dt>
+<dd>This option can turn of redirection of stderr; by default, if error output is present, bgexec will stop with an error, and the error output is in the result. Using this option, you can redirect error yourself, eg to stdout using \"2>@1\" on programs where stderr is used for progress reporting</dd>
+</dl>
+<br>eg.:<pre>
+ Extral::bgexec ./testcmd_bgexec.tcl
+ Extral::bgexec -command {set v} ./testcmd_bgexec.tcl 2
+ vwait ::v
+</pre>
+<b><dt>
 	list_iterate variableName list
 </b><dd>
 	debugging tool to interactively iterate a variable over a list. list_iterate
@@ -115,36 +147,6 @@ Extral::event debug command
  The command will be executed in global scope with the data (if any) given by the
  generate command appended
 
-<b><dt>
-Extral::bgexec ?options? arg ?arg ...?
-</b><dd>
- Without the -command option, this command works like exec does, but runs the executed 
- processes in background. While the command will wait until the process is finished and returns the
- results, events will still be processed while the process is running; the bgexec
- does e.g. not block the interface from redisplaying when needed.<br>
- The command supports the folowing options
-<dl>
-<dt>-command ?command?</dt>
-<dd>
- With the -command option, bgerror does not wait for the process to finish. Instead, when the 
- process is finished, the command in the option will be run (toplevel scope) with the result appended.
- In plain Tcl, the event loop must be running. More than one background jobs can be run at the same time 
- using the -command option. The command supports the folowing options:
-</dd>
-<dt>-timeout number</dt>
-<dd>After the given number of miliseconds the process is stopped</dd>
-<dt>-progresscommand command</dt>
-<dd>This option is used to execute a command each time new data arrives. command is used as a prefix to run with the new data appended</dd>
-<dt>-pidvar varName</dt>
-<dd>store the pid of the process in the variable varName</dd>
-<dt>-no_error_redir</dt>
-<dd>This option can turn of redirection of stderr; by default, if error output is present, bgexec will stop with an error, and the error output is in the result. Using this option, you can redirect error yourself, eg to stdout using \"2>@ stdput\" on programs where stderr is used for progress reporting</dd>
-</dl>
-<br>eg.:<pre>
- Extral::bgexec ./testcmd_bgexec.tcl
- Extral::bgexec -command {set v} ./testcmd_bgexec.tcl 2
- vwait ::v
-</pre>
 <b><dt>
 varsubst string varlist valuelist
 </b><dd>
