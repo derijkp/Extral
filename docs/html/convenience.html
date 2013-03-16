@@ -16,7 +16,10 @@ Extral::bgexec ?options? arg ?arg ...?
 <dt>-command ?command?</dt>
 <dd>
  With the -command option, bgerror does not wait for the process to finish. Instead, when the 
- process is finished, the command in the option will be run (toplevel scope) with the result appended.
+ process is finished, the command in the option will be run (toplevel scope) with the result appended
+ as an argument.
+ If an error occurred in the background process, command will be called with two arguments:
+ an empty result and the error message
  In plain Tcl, the event loop must be running. More than one background jobs can be run at the same time 
  using the -command option. The command supports the folowing options:
 </dd>

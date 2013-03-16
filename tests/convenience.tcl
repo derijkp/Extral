@@ -126,6 +126,25 @@ test Extral::bgexec {Extral::bgexec -command} {
 2
 }
 
+test Extral::bgexec {Extral::bgexec -command using proc} {
+	unset -nocomplain ::v ::e
+	proc bgtest {a {b {}} {c {}}} {set ::v $a; set ::e $b}
+	Extral::bgexec -command bgtest ./testcmd_bgexec.tcl 2
+	vwait ::v
+	list $::v $::e
+} {{1
+2
+} {}}
+
+test Extral::bgexec {Extral::bgexec error -command, error in bg process} {
+	unset -nocomplain ::v ::e
+	proc bgtest {a {b {}}} {set ::v $a; set ::e $b}
+	Extral::bgexec -command bgtest ./testcmd_bgexec.tcl bla
+	vwait ::v
+	list $::v $::e
+} {{} {arg must be an integer
+}}
+
 test Extral::bgexec {Extral::bgexec -command 2 together} {
 	unset -nocomplain ::v
 	unset -nocomplain ::w

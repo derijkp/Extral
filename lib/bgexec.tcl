@@ -1,5 +1,4 @@
 proc Extral::exec-get {o} {
-#puts [list Extral::exec-get $o]
 	global Extral::exec
 	if {![info exists Extral::exec(progress,$o)] || [catch {eof $o} eof]} return
 	if {!$eof} {
@@ -18,7 +17,11 @@ proc Extral::exec-get {o} {
 			foreach {result err} [Extral::bgexec_close $o] break
 			set cmd $Extral::exec(cmd,$o)
 			unset Extral::exec(cmd,$o)
-			uplevel #0 $cmd [list $result]
+			if {$err ne ""} {
+				uplevel #0 $cmd [list $result] [list $err]
+			} else {
+				uplevel #0 $cmd [list $result]
+			}
 		}
 	}
 }
@@ -40,7 +43,7 @@ proc Extral::bgexec_close {o} {
 		catch {kill $pid}
 	}
 	catch {read $o}
-	catch {close $o}
+	set closeerror [catch {close $o} temp]
 	after cancel set Extral::exec(done,$o) 1
 	set result $Extral::exec(result,$o)
 	if {$Extral::exec(err,$o) ne ""} {
@@ -53,8 +56,12 @@ proc Extral::bgexec_close {o} {
 	unset Extral::exec(done,$o)
 	unset Extral::exec(progress,$o)
 	unset -nocomplain Extral::exec(cancel,$o)
-	if {$err ne ""} {
-		return -code error $err
+	if {$closeerror && $err eq ""} {
+		if {$temp ne ""} {
+			set err $temp
+		} else {
+			set err "unknown error closing job"
+		}
 	}
 	return [list $result $err]
 }
@@ -88,7 +95,10 @@ proc Extral::bgexec_cancel {o} {
 #<dt>-command ?command?</dt>
 #<dd>
 # With the -command option, bgerror does not wait for the process to finish. Instead, when the 
-# process is finished, the command in the option will be run (toplevel scope) with the result appended.
+# process is finished, the command in the option will be run (toplevel scope) with the result appended
+# as an argument.
+# If an error occurred in the background process, command will be called with two arguments:
+# an empty result and the error message
 # In plain Tcl, the event loop must be running. More than one background jobs can be run at the same time 
 # using the -command option. The command supports the folowing options:
 #</dd>
