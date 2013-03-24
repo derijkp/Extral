@@ -125,6 +125,32 @@ John,"Doe ""Who""","100 some st.","somewhere,
 somehow",B,2980
 }
 
+test csv_write {tab} {
+	set data {{John Doe {100 some st.} somewhere B 2980} {John {Doe "Who"} {100 some st.} somewhere B 2980} {John {Doe "Who"} {100 some st.} {somewhere,
+somehow} B 2980}}
+	set f [open test3.csv w]
+	csv_write $f $data \t ""
+	close $f
+	file_read test3.csv
+} {John	Doe	100 some st.	somewhere	B	2980
+John	Doe "Who"	100 some st.	somewhere	B	2980
+John	Doe "Who"	100 some st.	somewhere,
+somehow	B	2980
+}
+
+test csv_write {other quoting} {
+	set data {{John Doe {100 some st.} somewhere B 2980} {John {Doe "Who"} {100 some st.} somewhere B 2980} {John {Doe "Who"} {100 some st.} {somewhere,
+somehow} B 2980}}
+	set f [open test3.csv w]
+	csv_write $f $data , \'
+	close $f
+	file_read test3.csv
+} {John,Doe,'100 some st.',somewhere,B,2980
+John,'Doe "Who"','100 some st.',somewhere,B,2980
+John,'Doe "Who"','100 some st.','somewhere,
+somehow',B,2980
+}
+
 test csv_parse {\n\n in field} {
 	set data "a\t\"b\n\n2\"\tc"
 	lindex [csv_parse $data \t] 0 1
@@ -143,7 +169,7 @@ test csv_parse {\n\n in start of field} {
 test csv_parse {\n\n\t\n\n} {
 	set data "\"a\n\n\"\t\"\n\nb\""
 	lindex [csv_parse $data \t] 0 
-} "\"a\"\nb"
+} [list a\n\n \n\nb]
 
 test csv_parse {complex quotes} {
 	set f1 {"""a""}

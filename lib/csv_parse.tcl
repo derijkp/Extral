@@ -143,17 +143,30 @@ proc csv_split {line {sep ,}} {
 	return $resultline
 }
 
-proc csv_write {f data {sep ,}} {
+proc csv_write {f data {sep ,} {quote "\""}} {
 	set quotereplace {{"} {""}}
 	foreach line $data {
 		set resultline {}
-		foreach el $line {
-			if {[regexp "\[ ${sep}\n\"\]" $el]} {
-				set el \"[string map $quotereplace $el]\"
+		if {$quote eq ""} {
+			puts $f [join $line $sep]
+		} elseif {$quote eq "\""} {
+			foreach el $line {
+				if {[regexp "\[ ${sep}\n\"\]" $el]} {
+					set el \"[string map $quotereplace $el]\"
+				}
+				lappend resultline $el
 			}
-			lappend resultline $el
+			puts $f [join $resultline $sep]
+		} else {
+			set replace [list $quote \\$quote]
+			foreach el $line {
+				if {[regexp "\[ ${sep}\n\"\]" $el]} {
+					set el $quote[string map $replace $el]$quote
+				}
+				lappend resultline $el
+			}
+			puts $f [join $resultline $sep]
 		}
-		puts $f [join $resultline $sep]
 	}
 }
 
