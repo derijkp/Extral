@@ -1,16 +1,18 @@
 proc Extral::exec-get {o} {
 	global Extral::exec
-	if {![info exists Extral::exec(progress,$o)] || [catch {eof $o} eof]} return
+	set error [catch {eof $o} eof]
 	if {!$eof} {
-		set line [gets $o]
-		catch {eof $o} eof
-		if {!$eof || ($line ne "")} {
-			append Extral::exec(result,$o) $line\n
+		while {[gets $o line] >= 0} {
 			if {$Extral::exec(progress,$o) ne ""} {
-				catch {uplevel #0 $Extral::exec(progress,$o) [list $line]}
+				if {[catch {uplevel #0 $Extral::exec(progress,$o) [list $line]} error]} {
+					puts "bgexec progress error: $error"
+				}
+			} else {
+				append Extral::exec(result,$o) $line\n
 			}
 		}
 	}
+	set error [catch {eof $o} eof]
 	if {$eof} {
 		set Extral::exec(done,$o) 1
 		if {[info exists Extral::exec(cmd,$o)]} {
@@ -94,24 +96,27 @@ proc Extral::bgexec_cancel {o} {
 #<dl>
 #<dt>-command ?command?</dt>
 #<dd>
-# With the -command option, bgerror does not wait for the process to finish. Instead, when the 
+# With the -command option, bgexec does not wait for the process to finish. Instead, when the 
 # process is finished, the command in the option will be run (toplevel scope) with the result appended
 # as an argument.
 # If an error occurred in the background process, command will be called with two arguments:
 # an empty result and the error message
 # In plain Tcl, the event loop must be running. More than one background jobs can be run at the same time 
-# using the -command option. The command supports the folowing options:
+# using the -command option.
 #</dd>
 #<dt>-timeout number</dt>
 #<dd>After the given number of miliseconds the process is stopped</dd>
 #<dt>-progresscommand command</dt>
-#<dd>This option is used to execute a command each time new data arrives. command is used as a prefix to run with the new data appended</dd>
+#<dd>This option is used to execute a command each time new data arrives. 
+#command is used as a prefix to run with the new data appended.
+#If this option is used, all output will be handles by progresscommand, so the command run after
+#finishing the process will get an empty argument.</dd>
 #<dt>-channelvar</dt>
 #<dd>name of a (global) variable to which the channel controlling the proces started wil be saved, can be used with Extral::bgexec_cancel to cancel running process</dd>
 #<dt>-pidvar varName</dt>
 #<dd>store the pid of the process in the variable varName</dd>
 #<dt>-no_error_redir</dt>
-#<dd>This option can turn of redirection of stderr; by default, if error output is present, bgexec will stop with an error, and the error output is in the result. Using this option, you can redirect error yourself, eg to stdout using \"2>@1\" on programs where stderr is used for progress reporting</dd>
+#<dd>This option can turn off redirection of stderr; by default, if error output is present, bgexec will stop with an error, and the error output is in the result. Using this option, you can redirect error yourself, eg to stdout using \"2>@1\" on programs where stderr is used for progress reporting</dd>
 #</dl>
 #} example {
 # Extral::bgexec ./testcmd_bgexec.tcl

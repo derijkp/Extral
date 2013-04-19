@@ -110,6 +110,18 @@ test Extral::bgexec {Extral::bgexec -progresscommand} {
 	set ::r
 } {1 2}
 
+test Extral::bgexec {Extral::bgexec -command and -progresscommand} {
+	set ::r {}
+	set ::a {}
+	proc endcommand {args} {set ::a $args}
+	Extral::bgexec \
+		-command endcommand \
+		-progresscommand {lappend r} \
+		./testcmd_bgexec.tcl 2
+	vwait ::a
+	list $::r $::a
+} {{1 2} {{}}}
+
 test Extral::bgexec {Extral::bgexec error in -progresscommand} {
 	unset -nocomplain ::r
 	set ::r() {}
