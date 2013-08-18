@@ -1,7 +1,8 @@
 proc Extral::exec-get {o} {
+# puts "Extral::exec-get $o"
 	global Extral::exec
 	set error [catch {eof $o} eof]
-	if {!$eof} {
+	if {!$error && !$eof} {
 		while {[gets $o line] >= 0} {
 			if {$Extral::exec(progress,$o) ne ""} {
 				if {[catch {uplevel #0 $Extral::exec(progress,$o) [list $line]} error]} {
@@ -13,7 +14,8 @@ proc Extral::exec-get {o} {
 		}
 	}
 	set error [catch {eof $o} eof]
-	if {$eof} {
+	if {$error || $eof} {
+		fileevent $o readable {}
 		set Extral::exec(done,$o) 1
 		if {[info exists Extral::exec(cmd,$o)]} {
 			foreach {result err} [Extral::bgexec_close $o] break
@@ -35,7 +37,7 @@ if {[catch {package require kill}]} {
 }
 
 proc Extral::bgexec_close {o} {
-#puts [list Extral::bgexec_close $o]
+# puts [list Extral::bgexec_close $o]
 	global Extral::exec
 	if {![info exists Extral::exec(progress,$o)]} {
 		return {{} {}}
@@ -152,12 +154,13 @@ proc Extral::bgexec {args} {
 		set channelvar $o
 	}
 	set Extral::exec(result,$o) {}
-	fileevent $o readable [list Extral::exec-get $o]
 	set Extral::exec(done,$o) 0
 	unset -nocomplain Extral::exec(cancel,$o)
 	if {[isint $opt(-timeout)]} {
 		after $opt(-timeout) set Extral::exec(done,$o) 1
 	}
+	unset -nocomplain ::Extral::bgexec_result
+	fileevent $o readable [list Extral::exec-get $o]
 	if {$opt(-command) eq ""} {
 		vwait Extral::exec(done,$o)
 		if {[info exists Extral::exec(cancel,$o)]} {set canceled 1} else {set canceled 0}
