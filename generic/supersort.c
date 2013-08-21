@@ -67,6 +67,7 @@ typedef struct SortInfo {
 #define SORTMODE_REAL       2
 #define SORTMODE_COMMAND    3
 #define SORTMODE_DICTIONARY 4
+#define SORTMODE_NATURAL 5
 
 /*
  * Forward declarations for procedures defined in this file:
@@ -260,7 +261,7 @@ ExtraL_SSortObjCmd(clientData, interp, objc, objv)
                                          * needs to be passed to the 
                                          * comparison function */
     static CONST char *switches[] =
-	    {"-ascii", "-command", "-decreasing", "-dictionary",
+	    {"-ascii", "-command", "-decreasing", "-dictionary", "-natural",
 	    "-increasing", "-index", "-integer", "-real", "-reflist", (char *) NULL};
 
     resultPtr = Tcl_GetObjResult(interp);
@@ -305,10 +306,13 @@ ExtraL_SSortObjCmd(clientData, interp, objc, objv)
 		    case 3:			/* -dictionary */
 			sortInfo.sortMode = SORTMODE_DICTIONARY;
 			break;
-		    case 4:			/* -increasing */
+		    case 4:			/* -dictionary */
+			sortInfo.sortMode = SORTMODE_NATURAL;
+			break;
+		    case 5:			/* -increasing */
 			sortInfo.isIncreasing = 1;
 			break;
-		    case 5:			/* -index */
+		    case 6:			/* -index */
 			if (i == (objc-2)) {
 			    Tcl_AppendToObj(resultPtr,
 				    "\"-index\" option must be followed by list index",
@@ -322,12 +326,12 @@ ExtraL_SSortObjCmd(clientData, interp, objc, objv)
 			cmdPtr = objv[i+1];
 			i++;
 			break;
-		    case 6:			/* -integer */
+		    case 7:			/* -integer */
 			sortInfo.sortMode = SORTMODE_INTEGER;
 			break;
-		    case 7:			/* -real */
+		    case 8:			/* -real */
 			sortInfo.sortMode = SORTMODE_REAL;
-		    case 8:			/* -reflist */
+		    case 9:			/* -reflist */
 			if (i == (objc-2)) {
 			    Tcl_AppendToObj(resultPtr,
 				    "\"-reflist\" option must be followed by the reflist",
@@ -533,6 +537,7 @@ MergeLists(leftPtr, rightPtr, infoPtr)
  *
  *----------------------------------------------------------------------
  */
+int naturalcompare (char const *a, char const *b,int alen,int blen);
 
 static int
 SortCompare(objPtr1, objPtr2, infoPtr)
@@ -617,6 +622,12 @@ SortCompare(objPtr1, objPtr2, infoPtr)
 	order = DictionaryCompare(
 		Tcl_GetStringFromObj(objPtr1, &dummy),
 		Tcl_GetStringFromObj(objPtr2, &dummy));
+    } else if (infoPtr->sortMode == SORTMODE_NATURAL) {
+	char *a,*b;
+	int alen,blen;
+	a = Tcl_GetStringFromObj(objPtr1, &alen);
+	b = Tcl_GetStringFromObj(objPtr2, &blen);
+	order = naturalcompare(a,b,alen,blen);
     } else if (infoPtr->sortMode == SORTMODE_INTEGER) {
 	int a, b;
 

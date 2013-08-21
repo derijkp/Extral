@@ -76,7 +76,7 @@ TEA_SETUP_COMPILER
 TEA_ADD_SOURCES([extral.c extralInit.c	general.c
 	array.c supersort.c 
 	time.c map.c maptypes.c 
-	string.c list_pop.c unix.c lmath.c])
+	string.c list_pop.c unix.c lmath.c naturalsort.c])
 TEA_ADD_HEADERS([])
 TEA_ADD_INCLUDES([])
 TEA_ADD_LIBS([])
