@@ -21,6 +21,8 @@ namespace eval Extral {
 		set temp_dir $env(TEMP)
 	} elseif {[info exists env(TMP)]} {
 		set temp_dir $env(TMP)
+	} elseif {[file writable /tmp]} {
+		set temp_dir /tmp
 	} elseif {[file writable /usr/tmp]} {
 		set temp_dir /usr/tmp
 	} elseif {[info exists env(HOME)]} {
