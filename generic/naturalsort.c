@@ -12,7 +12,7 @@
 
 int naturalcompare (char const *a, char const *b,int alen,int blen) {
 	int diff, digitleft,digitright;
-	int secondaryDiff = 0,prezero,invert,comparedigits;
+	int secondaryDiff = 0,prezero,invert,comparedigits,prevdigit=0;
 	char *left=NULL,*right=NULL,*keep=NULL;
 	while (isblank(*a) && alen) {a++; alen--;}
 	while (isblank(*b) && blen) {b++; blen--;}
@@ -63,6 +63,7 @@ int naturalcompare (char const *a, char const *b,int alen,int blen) {
 				}
 			}
 		}
+		prevdigit = NATDIGIT(right);
 		left++; alen--;
 		right++; blen--;
 	}
@@ -70,13 +71,21 @@ int naturalcompare (char const *a, char const *b,int alen,int blen) {
 	digitleft = alen && NATDIGIT(left);
 	if (*left == '-') {
 		if (digitright) {
-			return -1;
+			if (!prevdigit) {
+				return -1;
+			} else {
+				return 1;
+			}
 		} else {
 			return(*left - *right);
 		}
 	} else if (*right == '-' && digitleft) {
 		if (digitleft) {
-			return 1;
+			if (!prevdigit) {
+				return 1;
+			} else {
+				return -1;
+			}
 		} else {
 			return(*left - *right);
 		}
