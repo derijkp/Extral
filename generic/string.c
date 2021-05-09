@@ -430,7 +430,7 @@ ExtraL_String_ForeachCmd(dummy, interp, objc, objv)
 			} else if (result == TCL_ERROR) {
 		 	 	  char msg[32 + TCL_INTEGER_SPACE];
 			sprintf(msg, "\n	(\"foreach\" body line %d)",
-				interp->errorLine);
+				Tcl_GetErrorLine(interp));
 			Tcl_AddObjErrorInfo(interp, msg, -1);
 			break;
 			} else {

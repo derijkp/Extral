@@ -1342,7 +1342,7 @@ Extral_List_ForeachObjCmd(dummy, interp, objc, objv)
                 char msg[32 + TCL_INTEGER_SPACE];
 
 		sprintf(msg, "\n    (\"list_foreach\" body line %d)",
-			interp->errorLine);
+			Tcl_GetErrorLine(interp));
 		Tcl_AddObjErrorInfo(interp, msg, -1);
 		break;
 	    } else {
