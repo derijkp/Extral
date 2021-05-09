@@ -8,6 +8,7 @@ cd [pkgtools::startdir]
 # settings
 # --------
 
+set extname Extral
 set libfiles {lib README pkgIndex.tcl init.tcl DESCRIPTION.txt}
 set shareddatafiles {}
 set headers {}
