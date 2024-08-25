@@ -1,18 +1,19 @@
 ExtraL
-======  extra commands for Tcl
-        by Peter De Rijk (Universiteit Antwerpen) 
+======
+extra commands for Tcl
+by Peter De Rijk (Universiteit Antwerpen) 
 
 What is ExtraL
 --------------
 
 Extral is a generally useful library which extends Tcl with a.o.:
-	- extral list manipulation commands
-	- extra string manipulation commands
-	- array manipulation
-	- map
-	- atexit
-	- tempfile
-	- filing commands
+* extral list manipulation commands
+* extra string manipulation commands
+* array manipulation
+* map
+* atexit
+* tempfile
+* filing commands
 	
 The name comes from the fact that ExtraL originally only contained
 extra list processing commands to overcome some of the performance 
@@ -39,8 +40,8 @@ https://github.com/derijkp/Extral
 
 A portable binary ExtraL package can be "installed" by downloading it from github
 
-* [Extral-2.1.1-Linux-x86_64.tar.gz](https://github.com/derijkp/Extral/releases/download/2.1.1/Extral-2.1.1-Linux-x86_64.tar.gz) (Linux)
-* [Extral-2.1.1-windows-x86_64.tar.gz](https://github.com/derijkp/Extral/releases/download/2.1.1/Extral-2.1.1-windows-x86_64.tar.gz) (Windows)
+* [Extral-2.1.0-Linux-x86_64.tar.gz](https://github.com/derijkp/Extral/releases/download/2.1.0/Extral-2.1.0-Linux-x86_64.tar.gz) (Linux)
+* [Extral-2.1.0-windows-x86_64.tar.gz](https://github.com/derijkp/Extral/releases/download/2.1.0/Extral-2.1.0-windows-x86_64.tar.gz) (Windows)
 
 and unpacking it where Tcl can find it. 
 
