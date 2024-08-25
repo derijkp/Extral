@@ -35,6 +35,6 @@ mkdir /usr/doc/extral-$RPM_PACKAGE_VERSION
 ln -s /usr/lib/Extral2.0/docs /usr/doc/extral-$RPM_PACKAGE_VERSION/docs
 
 %files
-%doc README
+%doc README.md
 /usr/lib/Extral2.0
 /usr/lib/libExtral2.0.so

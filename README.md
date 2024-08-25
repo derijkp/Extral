@@ -18,55 +18,83 @@ The name comes from the fact that ExtraL originally only contained
 extra list processing commands to overcome some of the performance 
 problems in Tcl when processing large lists. Later other commands
 were added. With the advent of the Tcl byte compiler, the 
-performance is not such a great issue any longer, but I still find 
-many of the list manipulation functions very convenient, and some 
+performance is not such a great issue any longer, but many of the list 
+manipulation functions are still very convenient, and some 
 of those that were now rewritten using the object system in C are 
 still faster. 
 Most functions are now also available in Tcl-only form as well. Using 
 the C code just gives a speedup.
 
-You can find a short description of the commands in the files in the 
-docs subdirectory. For some of the commands, you can find out a lot 
-by checking the testing suite in the directory tests.
-
-Changes
--------
-This release contains many changes with regards to previous releases. Many
-commands have been renamed in order to get a more clear and consistent
-naming scheme. There is a small compatibility layer for old releases, but
-it is adviced to use the new command names. leval has been removed.
-The dbm support will be moved to a seperate package.
+Documentation is available on
+[https://derijkp.github.io/Extral/index.html](https://derijkp.github.io/Extral/index.html)
+(and in the docs directory). For some of the commands, you can also find
+out a lot by checking the testing suite in the directory tests.
 
 Installation
 ------------
-You should be able to obtain the latest version of ExtraL via www on url
-http://extral.sourceforge.net/
+You should be able to obtain the latest version of ExtraL on github at
+https://github.com/derijkp/Extral
 
-Binary packages
+### Binary packages
 
-A binary ExtraL package can be "installed" by placing it where Tcl can find
-it. The command 
+A portable binary ExtraL package can be "installed" by downloading it from github
+
+* [Extral-2.1.1-Linux-x86_64.tar.gz](https://github.com/derijkp/Extral/releases/download/2.1.1/Extral-2.1.1-Linux-x86_64.tar.gz) (Linux)
+* [Extral-2.1.1-windows-x86_64.tar.gz](https://github.com/derijkp/Extral/releases/download/2.1.1/Extral-2.1.1-windows-x86_64.tar.gz) (Windows)
+
+and unpacking it where Tcl can find it. 
+
+The command 
+```
 package require Extral
+```
 will load the package. A binary package does not necesarily contains
 compiled code: If no compiled version (.so, .dll) is available, a 
-Tcl-only version will be used.
+Tcl-only version will be used. The compiled version is made in such a way
+that it will also run on older Linux systems.
 
-Sources
+### From source: portable binary
 
-During compilation, the Tcl sources must be availble; if the Tcl source
-directory is not a sibling of the Extral source directory, you will have to
-specify its position by giving a parameter to the ./configure script:
-./configure --with-tcl=DIR (where DIR is the Tcl source tree)
-in the following description.
+Extral includes the build script to create these portable binaries.
+It is based on Holy Build Box (https://github.com/phusion/holy-build-box)
+which uses docker to provide a compatible build environment. Access
+to docker is required for this.
+This build expects a hbb install of dirtcl
+(https://github.com/derijkp/dirtcl) on the system, so this has to be
+installed first.
+Then you can do the install using (in the Extral source directory):
+```
+./build/hbb_build_Extral.sh
+```
 
+You can also build the Windows version on Linux using this script (using crosscompilation):
+```
+./build/hbb_build_Extral.sh -arch win
+```
+
+### From Source: TEA
+
+Extral follows TEA, and can be compiled using the normal configure/make workflow:
 Compiled packages should be created using the following steps in the package directory:
 (You can also build in any other directory, if you change the path to the configure command)
+```
 ./configure
 make
 make install
+```
 
 The configure command has several options that can be examined using
+```
 ./configure --help
+```
+
+During compilation, the Tcl sources must be available; if the Tcl source
+directory is not a sibling of the Extral source directory, you will have to
+specify its position by giving a parameter to the ./configure script:
+```
+./configure --with-tcl=DIR (where DIR is the Tcl source tree)
+```
+in the following description.
 
 How to contact me
 -----------------

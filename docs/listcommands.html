@@ -1,67 +1,23 @@
+
+<HTML>
 <HEAD>
-<TITLE>Extra list manipulation commands</TITLE>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="Author" CONTENT="Peter De Rijk">
+   <TITLE>Extral Documentation</TITLE>
 </HEAD>
-<BODY>
-<h1>Extra list manipulation commands</h1>
+<BODY BGCOLOR="#FEFEFE">
+<CENTER>
+<H1>Extral Extra list manipulation commands</H1>
+</CENTER>
+<CENTER>
+<A HREF="index.html">Documentation index</A>
+&nbsp; &nbsp; &nbsp; &nbsp;
+<A HREF="https://derijkp.github.io/Extral">repo</a> 
+</CENTER>
+<p>
+
 
 <dl><b><dt>
-list_mangle ?list1? ?list2?
-</b><dd>
-	mangles two lists into one
-<br>eg.:<pre>
-	% list_mangle {a b c} {1 2 3}
-	{a 1} {b 2} {c 3}
-</pre>
-<b><dt>
-list_extract ?list? ?expression?
-</b><dd>
-	tries to match each element in a list; if the element matches, it extracts the 
-	parenthesised part. It returns a list of all extracted parts. If there was no match,
-	an empty element is put in the list.
-<br>eg.:<pre> 
-	% list_extract {Results {A: 50%} {B: 25%} {C: 25%}} { ([0-9+]+)\%}
-		{} 50 25 25
-</pre>
-<b><dt>
-list_split ?list? -before/-after/-outside ?positions?
-</b><dd>
-	splits a list at positions into sublists
-<br>eg.:<pre>
-	% list_split {a b c d e} -before {1 3}
-	a {b c} {d e}
-</pre>
-<b><dt>
-list_join ?list? ?join string? ?position list?
-</b><dd>
-	joins list elements at positions given in the ?position list?. When you
-	specify all, all elements will be joined.
-<br>eg.:<pre>
-	% list_join {a b c {a d} e} { } {0 2}
-		{a b} {c a d} e
-	% list_join {a b c {a d} e} {} {0 2}
-		ab {ca d} e
-	% list_join {a b c {a d} e} {} all
-	abca de
-</pre>
-<b><dt>
-list_lengths ?list?
-</b><dd>
-	returns a list with the lengths of the elements
-<br>eg.:<pre>
-	% list_lengths {abc abcdef}
-	3 6
-</pre>
-<b><dt>
-list_select ?mode? list pattern
-</b><dd>
-	selects all elements of a list that match a certain pattern. Default mode is -glob
-<br>eg.:<pre>
-	% list_select {a b ab bc} a*
-	a ab
-	% list_select -regexp {a ab aa bc} {^[ab]*$}
-	a ab aa
-</pre>
-<b><dt>
 list_remove listName ?item? ...
 </b><dd>
 removes the items from the list
@@ -159,25 +115,61 @@ list_regsub ?switches? exp list subSpec
 	{sh start} {ps help} {sh h}
 </pre>
 <b><dt>
-list_fill ?size? ?start? ??incr??
+list_mangle ?list1? ?list2?
 </b><dd>
-	fills a list of ?size? elements with ?start?; if ?incr? is given and ?size? is a number, each element in the list will be the former incremented with ?incr?
-   This works for integers or strings
+	mangles two lists into one
 <br>eg.:<pre>
-	% list_fill 4 "Hello world"
-	{Hello world} {Hello world} {Hello world} {Hello world}
-	% list_fill 5 2 2
-	2 4 6 8 10
-	% list_fill 5 10 -2
-	10 8 6 4 2
+	% list_mangle {a b c} {1 2 3}
+	{a 1} {b 2} {c 3}
 </pre>
 <b><dt>
-list_subindex ?list? ?pos? ...
+list_extract ?list? ?expression?
 </b><dd>
-	returns a list of the 'pos' element in each of the elements of the given list
+	tries to match each element in a list; if the element matches, it extracts the 
+	parenthesised part. It returns a list of all extracted parts. If there was no match,
+	an empty element is put in the list.
+<br>eg.:<pre> 
+	% list_extract {Results {A: 50%} {B: 25%} {C: 25%}} { ([0-9+]+)\%}
+		{} 50 25 25
+</pre>
+<b><dt>
+list_split ?list? -before/-after/-outside ?positions?
+</b><dd>
+	splits a list at positions into sublists
 <br>eg.:<pre>
-	% list_subindex {{a 1} {b 2} {c 3}} 1
-	1 2 3
+	% list_split {a b c d e} -before {1 3}
+	a {b c} {d e}
+</pre>
+<b><dt>
+list_join ?list? ?join string? ?position list?
+</b><dd>
+	joins list elements at positions given in the ?position list?. When you
+	specify all, all elements will be joined.
+<br>eg.:<pre>
+	% list_join {a b c {a d} e} { } {0 2}
+		{a b} {c a d} e
+	% list_join {a b c {a d} e} {} {0 2}
+		ab {ca d} e
+	% list_join {a b c {a d} e} {} all
+	abca de
+</pre>
+<b><dt>
+list_lengths ?list?
+</b><dd>
+	returns a list with the lengths of the elements
+<br>eg.:<pre>
+	% list_lengths {abc abcdef}
+	3 6
+</pre>
+<b><dt>
+list_select ?mode? list pattern
+</b><dd>
+	selects all elements of a list that match a certain pattern. Default mode is -glob
+<br>eg.:<pre>
+	% list_select {a b ab bc} a*
+	a ab
+	% list_select -regexp {a ab aa bc} {^[ab]*$}
+	a ab aa
 </pre>
 <b><dt>
 list_pop listName ?pos?
@@ -296,4 +288,32 @@ list_foreach varlist1 list1 ?varlist2 list2 ...? body
    1,2
    4,
 </pre>
-</body>
+<b><dt>
+list_fill ?size? ?start? ??incr??
+</b><dd>
+	fills a list of ?size? elements with ?start?; if ?incr? is given and ?size? is a number, each element in the list will be the former incremented with ?incr?
+   This works for integers or strings
+<br>eg.:<pre>
+	% list_fill 4 "Hello world"
+	{Hello world} {Hello world} {Hello world} {Hello world}
+	% list_fill 5 2 2
+	2 4 6 8 10
+	% list_fill 5 10 -2
+	10 8 6 4 2
+</pre>
+<b><dt>
+list_subindex ?list? ?pos? ...
+</b><dd>
+	returns a list of the 'pos' element in each of the elements of the given list
+<br>eg.:<pre>
+	% list_subindex {{a 1} {b 2} {c 3}} 1
+	1 2 3
+</pre>
+</ul>
+<HR WIDTH="100%">
+<table width=100%><tr><td>
+</td><td align=right>
+hosted at <a href="https://derijkp.github.io/Extral">https://derijkp.github.io/Extral</a>
+</td></tr><table>
+</BODY>
+</HTML>

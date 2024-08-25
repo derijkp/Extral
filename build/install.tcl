@@ -9,7 +9,7 @@ cd [pkgtools::startdir]
 # --------
 
 set extname Extral
-set libfiles {lib README pkgIndex.tcl init.tcl DESCRIPTION.txt}
+set libfiles {lib README.md pkgIndex.tcl init.tcl DESCRIPTION.txt}
 set shareddatafiles {}
 set headers {}
 set libbinaries [::pkgtools::findlib [file dir [pkgtools::startdir]] Extral]

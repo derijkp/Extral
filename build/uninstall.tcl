@@ -8,7 +8,7 @@ cd [pkgtools::startdir]
 # settings
 # --------
 
-set shareddatafiles README
+set shareddatafiles README.md
 set docs {}
 set headers {}
 set binaries {}

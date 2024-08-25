@@ -1,8 +1,21 @@
+
+<HTML>
 <HEAD>
-<TITLE>Convenience functions</TITLE>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="Author" CONTENT="Peter De Rijk">
+   <TITLE>Extral Documentation</TITLE>
 </HEAD>
-<BODY>
-<h1>Convenience functions</h1>
+<BODY BGCOLOR="#FEFEFE">
+<CENTER>
+<H1>Extral Convenience functions</H1>
+</CENTER>
+<CENTER>
+<A HREF="index.html">Documentation index</A>
+&nbsp; &nbsp; &nbsp; &nbsp;
+<A HREF="https://derijkp.github.io/Extral">repo</a> 
+</CENTER>
+<p>
+
 
 <dl><b><dt>
 Extral::bgexec ?options? arg ?arg ...?
@@ -41,19 +54,6 @@ finishing the process will get an empty argument.</dd>
  Extral::bgexec ./testcmd_bgexec.tcl
  Extral::bgexec -command {set v} ./testcmd_bgexec.tcl 2
  vwait ::v
-</pre>
-<b><dt>
-varsubst string varlist valuelist
-</b><dd>
-	substitutes only the variables in varlist for their content
-	in the given string
-<br>eg.:<pre>
-	% set try {try it}
-	try it
-	% varsubst {try} {
-		puts [list $try $try2]
-	}
-		puts [list {try it} $try2]
 </pre>
 <b><dt>
 invoke vars cmd ...
@@ -153,6 +153,19 @@ Extral::event debug command
  generate command appended
 
 <b><dt>
+varsubst string varlist valuelist
+</b><dd>
+	substitutes only the variables in varlist for their content
+	in the given string
+<br>eg.:<pre>
+	% set try {try it}
+	try it
+	% varsubst {try} {
+		puts [list $try $try2]
+	}
+		puts [list {try it} $try2]
+</pre>
+<b><dt>
 	list_iterate variableName list
 </b><dd>
 	debugging tool to interactively iterate a variable over a list. list_iterate
@@ -174,4 +187,11 @@ get varName ?default?
  value given by $default if present
  
 
-</body>
+</ul>
+<HR WIDTH="100%">
+<table width=100%><tr><td>
+</td><td align=right>
+hosted at <a href="https://derijkp.github.io/Extral">https://derijkp.github.io/Extral</a>
+</td></tr><table>
+</BODY>
+</HTML>
