@@ -1108,7 +1108,7 @@ ExtraL_List_subindexObjCmd(dummy, interp, objc, objv)
 		error = Tcl_ListObjGetElements(interp, listPtr[i], &lineLen, &linePtr);
 		if (error) {goto error;}
 		if (posLen == 1) {
-			if (pos[0] < lineLen) {
+			if (pos[0] < lineLen && pos[0] >= 0) {
 				tempObj = linePtr[pos[0]];
 			} else {
 				tempObj = nullObj;

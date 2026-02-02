@@ -75,6 +75,7 @@ if [[ $arch =~ "linux" ]]; then
 else
 	os="Windows"
 	if [ -d /build/dirtcl$tclversion-$arch ]; then
+		echo "$builddir/dirtcl$tclversion-$arch found"
 	else
 		echo "coud not find dirtcl dirtcl$tclversion-$arch" > stderr
 		exit 1
@@ -100,6 +101,7 @@ $tcl /io/build/makedoc.tcl /io /io
 
 
 if [ -d /build/dirtcl$tclversion-$arch ]; then
+	cd /io
 	dirtcl=/build/dirtcl$tclversion-$arch
 	rm -rf $dirtcl/exts/${name}$version
 	$tcl build/install.tcl $dirtcl/exts

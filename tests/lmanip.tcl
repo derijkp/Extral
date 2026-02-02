@@ -12,6 +12,10 @@ test lmanip {subindex missing value} {
 	list_subindex {{a 1} {b} {c 3}} 1
 } {1 {} 3}
 
+test lmanip {subindex -1} {
+	list_subindex {{a 1} {b {2 2}} {c 3}} -1
+} {{} {} {}}
+
 test lmanip {subindex multiple positions} {
 	list_subindex {{A a 1} {{B B} b 2} {C c}} 2 0 1
 } {{1 A a} {2 {B B} b} {{} C c}}
