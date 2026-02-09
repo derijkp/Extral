@@ -456,6 +456,13 @@ test list_foreach {different number of entries in separate lists} {
 	set result
 } {3 {} {}}
 
+test list_foreach {different number of entries in separate lists} {
+	set list {{1 2} {3 4}}
+	list_foreach {a b} $list {
+		error test
+	}
+} {test} error
+
 test list_lappend {basic} {
 	set list {{a 1} {b 2}}
 	list_lappend list 1 c

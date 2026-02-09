@@ -1277,60 +1277,53 @@ Extral_List_ForeachObjCmd(dummy, interp, objc, objv)
     bodyPtr = argObjv[objc-1];
     for (j = 0;  j < maxj;  j++) {
 	for (i = 0;  i < numLists;  i++) {
-	    /*
-	     * Refetch the list members; we assume that the sizes are
-	     * the same, but the array of elements might be different
-	     * if the internal rep of the objects has been lost and
-	     * recreated (it is too difficult to accurately tell when
-	     * this happens, which can lead to some wierd crashes,
-	     * like Bug #494348...)
-	     */
+		/*
+		 * Refetch the list members; we assume that the sizes are
+		 * the same, but the array of elements might be different
+		 * if the internal rep of the objects has been lost and
+		 * recreated (it is too difficult to accurately tell when
+		 * this happens, which can lead to some wierd crashes,
+		 * like Bug #494348...)
+		 */
 
-	    result = Tcl_ListObjGetElements(interp, argObjv[1+i*2],
-		    &varcList[i], &varvList[i]);
-	    if (result != TCL_OK) {
+		result = Tcl_ListObjGetElements(interp, argObjv[1+i*2],
+			&varcList[i], &varvList[i]);
+		if (result != TCL_OK) {
 		panic("Extral_List_ForeachObjCmd: could not reconvert variable list %d to a list object\n", i);
-	    }
-	    result = Tcl_ListObjGetElements(interp, argObjv[2+i*2],
-		    &argcList[i], &argvList[i]);
-	    if (result != TCL_OK) {
+		}
+		result = Tcl_ListObjGetElements(interp, argObjv[2+i*2],
+			&argcList[i], &argvList[i]);
+		if (result != TCL_OK) {
 		panic("Extral_List_ForeachObjCmd: could not reconvert value list %d to a list object\n", i);
-	    }
-            if (j < argcList[i]) {
-		    result = Tcl_ListObjGetElements(interp, argvList[i][j], &tempobjc, &tempobjv);
-		    if (result != TCL_OK) {
+		}
+	 	   if (j < argcList[i]) {
+			result = Tcl_ListObjGetElements(interp, argvList[i][j], &tempobjc, &tempobjv);
+			if (result != TCL_OK) {
 			panic("Extral_List_ForeachObjCmd: could not reconvert value list %d to a list object\n", i);
-		    }
-	    } else {
-		    tempobjc = 0;
-	    }
-	    for (v = 0;  v < varcList[i];  v++) {
-		Tcl_Obj *valuePtr, *varValuePtr;
-		int isEmptyObj = 0;
-		
-		if (v < tempobjc) {
-		    valuePtr = tempobjv[v];
+			}
 		} else {
-		    valuePtr = Tcl_NewObj(); /* empty string */
-		    isEmptyObj = 1;
+			tempobjc = 0;
 		}
-		varValuePtr = Tcl_ObjSetVar2(interp, varvList[i][v],
-			NULL, valuePtr, 0);
-		if (varValuePtr == NULL) {
-		    if (isEmptyObj) {
-			Tcl_DecrRefCount(valuePtr);
-		    }
-		    Tcl_ResetResult(interp);
-		    Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
-			"couldn't set loop variable: \"",
-			Tcl_GetString(varvList[i][v]), "\"", (char *) NULL);
-		    result = TCL_ERROR;
-		    goto done;
+		for (v = 0;  v < varcList[i];  v++) {
+			Tcl_Obj *valuePtr, *varValuePtr;
+			if (v < tempobjc) {
+				valuePtr = tempobjv[v];
+			} else {
+				valuePtr = Tcl_NewObj(); /* empty string */
+				Tcl_IncrRefCount(valuePtr);
+			}
+			varValuePtr = Tcl_ObjSetVar2(interp, varvList[i][v],
+			 	   NULL, valuePtr, TCL_LEAVE_ERR_MSG);
+			
+			if (v >= tempobjc) {
+				Tcl_DecrRefCount(valuePtr);
+			}
+			if (varValuePtr == NULL) {
+				result = TCL_ERROR;
+				goto done;
+			}
 		}
-
-	    }
 	}
-
 	result = Tcl_EvalObjEx(interp, bodyPtr, 0);
 	if (result != TCL_OK) {
 	    if (result == TCL_CONTINUE) {
@@ -1339,11 +1332,7 @@ Extral_List_ForeachObjCmd(dummy, interp, objc, objv)
 		result = TCL_OK;
 		break;
 	    } else if (result == TCL_ERROR) {
-                char msg[32 + TCL_INTEGER_SPACE];
-
-		sprintf(msg, "\n    (\"list_foreach\" body line %d)",
-			Tcl_GetErrorLine(interp));
-		Tcl_AddObjErrorInfo(interp, msg, -1);
+		Tcl_AddErrorInfo(interp, "\n    (\"list_foreach\" body line)");
 		break;
 	    } else {
 		break;
@@ -1353,7 +1342,6 @@ Extral_List_ForeachObjCmd(dummy, interp, objc, objv)
     if (result == TCL_OK) {
 	Tcl_ResetResult(interp);
     }
-
     done:
     if (numLists > STATIC_LIST_SIZE) {
 	ckfree((char *) varcList);
