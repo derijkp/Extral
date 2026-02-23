@@ -9,6 +9,7 @@
 
 #include "tcl.h"
 #include "extral.h"
+#include "general.h"
 #include <string.h>
 
 extern ExtraL_MapTypeSetProc ExtraL_MapSetDouble;
@@ -118,7 +119,7 @@ int ExtraL_MapsetValidate(interp,submap,data,ctag,clen,oldvalue,tagsc,tagsv,valu
 	} else {
 		Tcl_Obj *cmdObj;
 		Tcl_Obj **listv;
-		int listc;
+		Tcl_Size listc;
 
 		error = Tcl_ListObjGetElements(interp, submap, &listc, &listv);
 		if (error != TCL_OK) {return error;}
@@ -188,7 +189,7 @@ int ExtraL_MapunsetValidate(interp,submap,data,ctag,clen,oldvalue,tagsc,tagsv,re
 	{
 		Tcl_Obj *cmdObj;
 		Tcl_Obj **listv;
-		int listc;
+		Tcl_Size listc;
 
 		error = Tcl_ListObjGetElements(interp, submap, &listc, &listv);
 		if (error != TCL_OK) {return error;}
@@ -238,7 +239,8 @@ int ExtraL_MapgetValidate(interp,submap,data,ctag,clen,tagsc,tagsv,resultPtr)
 	Tcl_HashEntry *entry;
 	struct Type *type;
 	ExtraL_MapTypeGetProc *cmd;
-	int error,i;
+	Tcl_Size i;
+	int error;
 	
 	entry = Tcl_FindHashEntry(&typesTable, ctag);
 	if (entry != NULL) {
@@ -248,7 +250,7 @@ int ExtraL_MapgetValidate(interp,submap,data,ctag,clen,tagsc,tagsv,resultPtr)
 			error = (*cmd)(interp,submap,data,tagsc,tagsv,resultPtr);
 			if (error != TCL_OK) {return error;}
 		} else {
-			int listlen;
+			Tcl_Size listlen;
 			if (*resultPtr != NULL) {Tcl_GetStringFromObj(*resultPtr, &listlen);} else {listlen = 0;}
 			if (listlen == 0) {
 				error = Tcl_ListObjLength(interp, submap, &i);
@@ -264,7 +266,7 @@ int ExtraL_MapgetValidate(interp,submap,data,ctag,clen,tagsc,tagsv,resultPtr)
 	{
 		Tcl_Obj *cmdObj;
 		Tcl_Obj **listv;
-		int listc;
+		Tcl_Size listc;
 
 		error = Tcl_ListObjGetElements(interp, submap, &listc, &listv);
 		if (error != TCL_OK) {return error;}
@@ -301,7 +303,7 @@ int ExtraL_ObjEqual(obj1, obj2)
 	Tcl_Obj *obj2;
 {
 	char *obj1string, *obj2string;
-	int obj1len, obj2len;
+	Tcl_Size obj1len, obj2len;
 	if ((obj1==NULL)||(obj2==NULL)) {return 0;}
 	obj1string=Tcl_GetStringFromObj(obj1,&obj1len);
 	obj2string=Tcl_GetStringFromObj(obj2,&obj2len);
@@ -318,12 +320,12 @@ int ExtraL_MapFindTag(interp, list, tag, taglen, resultPtr, posPtr)
 	char *tag;
 	int taglen;
 	Tcl_Obj **resultPtr;
-	int *posPtr;
+	Tcl_Size *posPtr;
 {
 	Tcl_Obj **listv, *subtag;
-	int listc;
+	Tcl_Size listc,pos,clen;
 	char *ctag;
-	int clen, pos, i, error;
+	int i, error;
 
 	if (list == NULL) {
 		*posPtr = -1;
@@ -408,8 +410,8 @@ extern int ExtraL_MapsetStruct(interp, map, data, list, tagsc, tagsv, value, res
 	Tcl_Obj *temp, *tagObj,*result,*res;
 	char *ctag = NULL,*tag;
 	Tcl_Obj *submap, *sublist, *structtag, *subtag;
-	int sublistpos, structpos;
-	int clen,len;
+	Tcl_Size sublistpos, structpos;
+	Tcl_Size clen, len;
 	int error;
 	int pos;
 
@@ -432,7 +434,7 @@ extern int ExtraL_MapsetStruct(interp, map, data, list, tagsc, tagsv, value, res
 		# Go further down map by value
 		# ----------------------------------
 		*/
-		int tempc;
+		Tcl_Size tempc;
 		Tcl_Obj **tempv;
 		if (Tcl_ListObjGetElements(interp, value, &tempc, &tempv) != TCL_OK) {
 			return TCL_ERROR;
@@ -608,8 +610,9 @@ extern int ExtraL_Mapset(interp, list, tagsc, tagsv, value, resultPtr)
 	Tcl_Obj *res,*result;
 	char *tag;
 	Tcl_Obj *sublist;
-	int sublistpos;
-	int len,i;
+	Tcl_Size sublistpos;
+	Tcl_Size len;
+	int i;
 	int error;
 
 	tag = Tcl_GetStringFromObj(tagsv[0],&len);
@@ -683,8 +686,8 @@ extern int ExtraL_MapunsetStruct(interp, map, data, list, tagsc, tagsv, resultPt
 	Tcl_Obj *temp, *tagObj,*result,*res;
 	char *ctag = NULL,*tag;
 	Tcl_Obj *submap, *sublist, *structtag, *subtag;
-	int sublistpos, structpos;
-	int clen,len;
+	Tcl_Size sublistpos, structpos;
+	Tcl_Size clen,len;
 	int error;
 
 	result = NULL;
@@ -806,11 +809,11 @@ extern int ExtraL_Mapunsetnostruct(interp, list, tagsc, tagsv)
 	int tagsc;
 	Tcl_Obj **tagsv;
 {
-	int workc;
+	Tcl_Size workc;
 	Tcl_Obj **workv;
 	Tcl_Obj *temp;
 	char *ctag,*tag;
-	int clen,len;
+	Tcl_Size clen,len;
 	int result;
 	int pos;
 
@@ -871,9 +874,9 @@ extern int ExtraL_MapgetStruct(interp, map, data, list, tagsc, tagsv, resultPtr)
 {
 	Tcl_Obj *temp, *submap, *sublist, *res;
 	char *ctag,*tag;
-	int clen,len;
+	Tcl_Size clen,len;
 	int error;
-	int pos;
+	Tcl_Size pos;
 
 /*
 printf("struct: %s\n",Tcl_GetStringFromObj(map,&error));
@@ -913,9 +916,9 @@ fflush(stdout);
 	*/
 	if (tagsc == 0) {
 		Tcl_Obj **tempv;
-		int tempc;
+		Tcl_Size tempc;
 		Tcl_Obj *result, *subtag;
-		int i;
+		Tcl_Size i;
 
 		error = Tcl_ListObjGetElements(interp, map, &tempc, &tempv);
 		if (error != TCL_OK) {return error;}
@@ -1022,12 +1025,13 @@ extern int ExtraL_Mapget(interp, list, tags, resultPtr)
 	Tcl_Obj *tags;
 	Tcl_Obj **resultPtr;
 {
-	int listc;
+	Tcl_Size listc;
 	Tcl_Obj **listv,*result;
-	int tagsc;
+	Tcl_Size tagsc;
 	Tcl_Obj **tagsv;
 	char *ctag,*tag;
-	int clen,len,curtag;
+	Tcl_Size clen,len;
+	int curtag;
 	int pos;
 
 	if (Tcl_ListObjGetElements(interp, tags, &tagsc, &tagsv) != TCL_OK) {
@@ -1081,14 +1085,15 @@ int ExtraL_MapsetObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;				 /* Not used. */
 	Tcl_Interp *interp;					/* Current interpreter. */
 	int objc;						/* Number of arguments. */
-	Tcl_Obj *CONST objv[];	/* Argument objects. */
+	Tcl_Obj *const objv[];	/* Argument objects. */
 {
 	Tcl_Obj *current, *res;
 	Tcl_Obj **tagsv;
-	int tagsc;
+	Tcl_Size tagsc;
 	Tcl_Obj *map, *data;
 	char *string;
-	int pos, error, i;
+	Tcl_Size i;
+	int pos, error;
 
 	if (objc < 3) {
 		Tcl_WrongNumArgs(interp, 1, objv, "?-map schema? ?-data clientdata? list field value ?field value ...?");
@@ -1165,14 +1170,15 @@ int ExtraL_MapunsetObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;				 /* Not used. */
 	Tcl_Interp *interp;					/* Current interpreter. */
 	int objc;						/* Number of arguments. */
-	Tcl_Obj *CONST objv[];	/* Argument objects. */
+	Tcl_Obj *const objv[];	/* Argument objects. */
 {
 	Tcl_Obj *current,*res;
 	Tcl_Obj **tagsv;
-	int tagsc;
+	Tcl_Size tagsc;
 	Tcl_Obj *map, *data;
 	char *string;
-	int pos, error, i;
+	Tcl_Size i;
+	int pos, error;
 
 	if (objc < 2) {
 		Tcl_WrongNumArgs(interp, 1, objv, "?-map schema? ?-data clientdata? list field ?field ...?");
@@ -1249,14 +1255,15 @@ int ExtraL_MapgetObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;
 	Tcl_Interp *interp;
 	int objc;
-	Tcl_Obj *CONST objv[];
+	Tcl_Obj *const objv[];
 {
 	Tcl_Obj **tagsv;
-	int tagsc;
+	Tcl_Size tagsc;
 	Tcl_Obj *result;
 	Tcl_Obj *map, *data;
 	char *string;
-	int i, error;
+	Tcl_Size i;
+	int error;
 
 	if (objc < 2) {
 		Tcl_WrongNumArgs(interp, 1, objv, "?-map schema? ?-data clientdata? list field ?field ...?");
@@ -1336,11 +1343,12 @@ int ExtraL_MapfieldsObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;				 /* Not used. */
 	Tcl_Interp *interp;					/* Current interpreter. */
 	int objc;						/* Number of arguments. */
-	Tcl_Obj *CONST objv[];	/* Argument objects. */
+	Tcl_Obj *const objv[];	/* Argument objects. */
 {
-	int listArgc;
+	Tcl_Size listArgc;
 	Tcl_Obj **listArgv, *resultObj, *valueObj, *tags, *subtag, *list;
-	int pos, error, i, clen;
+	Tcl_Size i, clen;
+	int pos, error;
 	char *ctag;
 
 	if ((objc != 2)&&(objc != 3)&&(objc != 4)) {
@@ -1421,15 +1429,15 @@ int ExtraL_MapfindObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;				 /* Not used. */
 	Tcl_Interp *interp;					/* Current interpreter. */
 	int objc;						/* Number of arguments. */
-	Tcl_Obj *CONST objv[];	/* Argument objects. */
+	Tcl_Obj *const objv[];	/* Argument objects. */
 {
-	int listArgc;
+	Tcl_Size listArgc;
 	Tcl_Obj **listArgv;
 	Tcl_Obj *resultObj;
 	char *ctag,*tag;
-	int clen,len;
+	Tcl_Size clen,len;
 	int pos;
-	int i;
+	Tcl_Size i;
 
 	if ((objc != 3)) {
 		Tcl_WrongNumArgs(interp, 1, objv, "list tag");

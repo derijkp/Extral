@@ -41,7 +41,7 @@ char *ExtraL_numstr(int num)
 int *ExtraL_get_intlist(Tcl_Interp *interp, char *string, int *number, int min)
 {
 	int *list;
-	int listArgc;
+	Tcl_Size listArgc;
 	CONST char **listArgv;
 	int i;
 	int temp;

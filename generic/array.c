@@ -29,7 +29,7 @@ ExtraL_Array_lgetObjCmd(notUsed, interp, objc, objv)
 	int objc;						/* Number of arguments. */
 	Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
-	int listobjc;
+	Tcl_Size listobjc;
 	Tcl_Obj **listobjv;
 	int i;
 	/*
@@ -79,7 +79,7 @@ ExtraL_Array_lappendObjCmd(notUsed, interp, objc, objv)
 	int objc;						/* Number of arguments. */
 	Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
-	int listobjc;
+	Tcl_Size listobjc;
 	Tcl_Obj **listobjv;
 	int len;
 	int i;

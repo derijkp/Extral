@@ -21,7 +21,8 @@ Extral_inlist(Tcl_Interp *interp, Tcl_Obj *listObj, Tcl_Obj *testObj,int *result
 {
 	Tcl_Obj **listobjv;
 	char *teststring,*string;
-	int testlen, len, listobjc,j,error;
+	Tcl_Size testlen, listobjc, len;
+	int j,error;
 	teststring = Tcl_GetStringFromObj(testObj, &testlen);
 	error = Tcl_ListObjGetElements(interp, listObj, &listobjc, &listobjv);
 	if (error != TCL_OK) {return error;}
@@ -41,7 +42,8 @@ Extral_lcommon(Tcl_Interp *interp, Tcl_Obj *listObj, Tcl_Obj *testObj,int *resul
 {
 	Tcl_Obj **listobjv,**testobjv;
 	char *teststring,*string;
-	int testlen, len, listobjc,testobjc,i,j,error;
+	Tcl_Size testlen, len, listobjc, testobjc;
+	int i,j,error;
 	error = Tcl_ListObjGetElements(interp, listObj, &listobjc, &listobjv);
 	if (error != TCL_OK) {return error;}
 	error = Tcl_ListObjGetElements(interp, testObj, &testobjc, &testobjv);
@@ -91,7 +93,8 @@ ExtraL_List_findObjCmd(clientData, interp, objc, objv)
 #define OFLIST	4
 #define LCOMMON	5
 	char *bytes, *patternBytes;
-	int i, match, mode, result, listLen, length, elemLen;
+	Tcl_Size listLen, length, elemLen;
+	int i, match, mode, result;
 	Tcl_Obj **elemPtrs;
 	Tcl_Obj *indexObj, *resultObj;
 	static CONST char *switches[] =
@@ -196,11 +199,12 @@ ExtraL_List_subObjCmd(dummy, interp, objc, objv)
 	Tcl_Obj *indexlistPtr;
 	Tcl_Obj **indexelemPtrs;
 	Tcl_Obj *resultObj, *indexObj;
-	int listLen, indexlistLen, index, result;
+	Tcl_Size listLen, indexlistLen;
+	int index, result;
 	int i;
 	char *mode=NULL;
 	if (objc == 4) {
-		mode=Tcl_GetStringFromObj(objv[2],(int *)NULL);
+		mode=Tcl_GetStringFromObj(objv[2],(Tcl_Size *)NULL);
 		if (strcmp(mode,"-exclude")!=0) {
 		    Tcl_AppendResult(interp, "wrong arg: \"", mode, "\"", (char *) NULL);
 		    return TCL_ERROR;
@@ -293,14 +297,14 @@ ExtraL_List_corObjCmd(notUsed, interp, objc, objv)
 {
 #define INCLUDE		0
 #define EXCLUDE		1
-	int refArgc;
+	Tcl_Size refArgc;
 	Tcl_Obj **refArgv;
-	int listArgc;
+	Tcl_Size listArgc;
 	Tcl_Obj **listArgv;
 	Tcl_Obj *indexObj, *resultObj;
 	int *done;
 	char *refstring,*string;
-	int reflen,len;
+	Tcl_Size reflen,len;
 	int pos,result;
 	int i;
 	if (objc != 3) {
@@ -366,9 +370,11 @@ ExtraL_List_remdupObjCmd(dummy, interp, objc, objv)
 	Tcl_Obj *listPtr;
 	Tcl_Obj **elemPtrs;
 	Tcl_Obj *resultObj;
-	int listLen, result;
+	Tcl_Size listLen;
+	int result;
 	char *string,*checkstring;
-	int i,len,checklen,sort,var = 0;
+	Tcl_Size len,checklen;
+	int i,sort,var = 0;
 
 	sort = 0;
 	if (objc>2) {
@@ -467,13 +473,14 @@ ExtraL_List_lremoveObjCmd(notUsed, interp, objc, objv)
 	int objc;						/* Number of arguments. */
 	Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
-	int refArgc;
+	Tcl_Size refArgc;
 	Tcl_Obj **refArgv;
-	int listArgc;
+	Tcl_Size listArgc;
 	Tcl_Obj **listArgv;
 	Tcl_Obj *resultObj;
 	char *refstring,*string;
-	int reflen,len,sort,var=0,add;
+	Tcl_Size reflen,len;
+	int sort,var=0,add;
 	int pos,result;
 	int i;
 
@@ -604,7 +611,7 @@ ExtraL_List_unmergeObjCmd(notUsed, interp, objc, objv)
 	int objc;						/* Number of arguments. */
 	Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
-	int listArgc;
+	Tcl_Size listArgc;
 	Tcl_Obj **listArgv;
 	Tcl_Obj *resultObj;
 	int spacing=1;
@@ -675,9 +682,9 @@ ExtraL_List_mergeObjCmd(notUsed, interp, objc, objv)
 	int objc;						/* Number of arguments. */
 	Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
-	int list1Argc;
+	Tcl_Size list1Argc;
 	Tcl_Obj **list1Argv;
-	int list2Argc;
+	Tcl_Size list2Argc;
 	Tcl_Obj **list2Argv;
 	Tcl_Obj *resultObj;
 	Tcl_Obj *emptyObj;
@@ -759,7 +766,7 @@ ExtraL_List_reverseObjCmd(notUsed, interp, objc, objv)
 	Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
 	Tcl_Obj **Argv;
-	int Argc;
+	Tcl_Size Argc;
 	Tcl_Obj *resultObj;
 	int error;
 	if (objc != 2) {
@@ -805,9 +812,10 @@ ExtraL_List_changeObjCmd(dummy, interp, objc, objv)
 	Tcl_Obj *listPtr;
 	Tcl_Obj **elemPtrs, **changeObjv;
 	Tcl_Obj *resultObj;
-	int listLen, changeObjc, result;
+	Tcl_Size listLen, changeObjc,len,clen;
+	int result;
 	char *string,*cstring;
-	int i,y,len,clen;
+	int i,y;
 	if (objc != 3) {
 		Tcl_WrongNumArgs(interp, 1, objv, "list changelist");
 		return TCL_ERROR;
@@ -982,7 +990,8 @@ ExtraL_List_concatObjCmd(dummy, interp, objc, objv)
 	Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
 	Tcl_Obj *result,**listobjv;
-	int i,error,listobjc;
+	Tcl_Size listobjc;
+	int i,error;
 	if (objc == 2) {
 		error = Tcl_ListObjGetElements(interp,objv[1],&listobjc,&listobjv);
 		if (error) {return error;}
@@ -1024,10 +1033,11 @@ ExtraL_List_inlistObjCmd(dummy, interp, objc, objv)
 	int objc;			/* Number of arguments. */
 	Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
-	int listobjc;
+	Tcl_Size listobjc;
 	Tcl_Obj **listobjv;
 	char *string1,*string;
-	int i,len1,len;
+	Tcl_Size len1,len;
+	int i;
 	if (objc != 3) {
 		Tcl_WrongNumArgs(interp, 1, objv, "list value");
 		return TCL_ERROR;
@@ -1074,8 +1084,8 @@ ExtraL_List_subindexObjCmd(dummy, interp, objc, objv)
 	Tcl_Obj *tempObj = NULL,*nullObj = NULL;
 	Tcl_Obj **indexelemPtrs;
 	Tcl_Obj *resultObj;
-	int listLen, lineLen, error;
-	int i,j,*pos = NULL,posLen,result;
+	Tcl_Size listLen, lineLen,posLen;
+	int i,j,*pos = NULL,result, error;
 	if (objc < 3) {
 		Tcl_WrongNumArgs(interp, 1, objv, "list pos ?pos ...?");
 		return TCL_ERROR;
@@ -1187,17 +1197,17 @@ Extral_List_ForeachObjCmd(dummy, interp, objc, objv)
     Tcl_Obj **argObjv = argObjStorage;
     
 #define STATIC_LIST_SIZE 4
-    int varcListArray[STATIC_LIST_SIZE];
+    Tcl_Size varcListArray[STATIC_LIST_SIZE];
     Tcl_Obj **varvListArray[STATIC_LIST_SIZE];
-    int argcListArray[STATIC_LIST_SIZE];
+    Tcl_Size argcListArray[STATIC_LIST_SIZE];
     Tcl_Obj **argvListArray[STATIC_LIST_SIZE];
 
-    int *varcList = varcListArray;	   /* # loop variables per list */
+    Tcl_Size *varcList = varcListArray;	   /* # loop variables per list */
     Tcl_Obj ***varvList = varvListArray;   /* Array of var name lists */
-    int *argcList = argcListArray;	   /* Array of value list sizes */
+    Tcl_Size *argcList = argcListArray;	   /* Array of value list sizes */
     Tcl_Obj ***argvList = argvListArray;   /* Array of value lists */
 
-    int tempobjc;
+    Tcl_Size tempobjc;
     Tcl_Obj **tempobjv;
 
     if (objc < 4 || (objc%2 != 0)) {
@@ -1227,9 +1237,9 @@ Extral_List_ForeachObjCmd(dummy, interp, objc, objv)
 
     numLists = (objc-2)/2;
     if (numLists > STATIC_LIST_SIZE) {
-	varcList = (int *) ckalloc(numLists * sizeof(int));
+	varcList = (Tcl_Size *) ckalloc(numLists * sizeof(int));
 	varvList = (Tcl_Obj ***) ckalloc(numLists * sizeof(Tcl_Obj **));
-	argcList = (int *) ckalloc(numLists * sizeof(int));
+	argcList = (Tcl_Size *) ckalloc(numLists * sizeof(int));
 	argvList = (Tcl_Obj ***) ckalloc(numLists * sizeof(Tcl_Obj **));
     }
     for (i = 0;  i < numLists;  i++) {
@@ -1289,17 +1299,17 @@ Extral_List_ForeachObjCmd(dummy, interp, objc, objv)
 		result = Tcl_ListObjGetElements(interp, argObjv[1+i*2],
 			&varcList[i], &varvList[i]);
 		if (result != TCL_OK) {
-		panic("Extral_List_ForeachObjCmd: could not reconvert variable list %d to a list object\n", i);
+		Tcl_Panic("Extral_List_ForeachObjCmd: could not reconvert variable list %d to a list object\n", i);
 		}
 		result = Tcl_ListObjGetElements(interp, argObjv[2+i*2],
 			&argcList[i], &argvList[i]);
 		if (result != TCL_OK) {
-		panic("Extral_List_ForeachObjCmd: could not reconvert value list %d to a list object\n", i);
+		Tcl_Panic("Extral_List_ForeachObjCmd: could not reconvert value list %d to a list object\n", i);
 		}
 	 	   if (j < argcList[i]) {
 			result = Tcl_ListObjGetElements(interp, argvList[i][j], &tempobjc, &tempobjv);
 			if (result != TCL_OK) {
-			panic("Extral_List_ForeachObjCmd: could not reconvert value list %d to a list object\n", i);
+			Tcl_Panic("Extral_List_ForeachObjCmd: could not reconvert value list %d to a list object\n", i);
 			}
 		} else {
 			tempobjc = 0;

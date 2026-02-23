@@ -12,12 +12,18 @@
  * BUILD_Class should be undefined for Unix.
  */
 
+#ifndef _ANSI_ARGS_
+#define _ANSI_ARGS_(x) x
+#endif
+
 #ifdef BUILD_Extral
 #undef TCL_STORAGE_CLASS
 #define TCL_STORAGE_CLASS DLLEXPORT
 #endif /* BUILD_Extral */
 
+#if TCL_MAJOR_VERSION < 9
 #define EXTERN 
+#endif
 
 /*
  * format- and scantime functions and definitions
@@ -84,7 +90,7 @@ EXTERN int ExtraL_MapFindTag _ANSI_ARGS_((Tcl_Interp *interp,
 	char *tag,
 	int taglen,
 	Tcl_Obj **resultPtr,
-	int *posPtr));
+	Tcl_Size *posPtr));
 
 int ExtraL_ObjEqual _ANSI_ARGS_((Tcl_Obj *obj1,Tcl_Obj *obj2));
 

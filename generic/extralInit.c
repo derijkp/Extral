@@ -149,9 +149,15 @@ Extral_Init(interp)
 	Tcl_Interp *interp;		/* Interpreter to add extra commands */
 {
 #ifdef USE_TCL_STUBS
+#if TCL_MAJOR_VERSION > 8
+	if (Tcl_InitStubs(interp, "9.0", 0) == NULL) {
+		return TCL_ERROR;
+	}
+#else
 	if (Tcl_InitStubs(interp, "8.1", 0) == NULL) {
 		return TCL_ERROR;
 	}
+#endif
 #endif
 #ifdef unix
 	Tcl_CreateObjCommand(interp,"setuid",(Tcl_ObjCmdProc *)ExtraL_SetUidObjCmd,(ClientData)NULL,(Tcl_CmdDeleteProc *)NULL);

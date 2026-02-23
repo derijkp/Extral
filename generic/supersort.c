@@ -17,6 +17,7 @@
 #include <ctype.h>
 #include <string.h>
 #include "tcl.h"
+#include "general.h"
 
 /*
  * During execution of the "lsort" command, structures of the following
@@ -184,7 +185,8 @@ Extral_TclGetIntForIndex(interp, objPtr, endValue, indexPtr)
 				 * representing an index. */
 {
     char *bytes;
-    int length, offset;
+    Tcl_Size length;
+    int offset;
 
     if (objPtr->typePtr == Tcl_GetObjType("int")) {
 	*indexPtr = (int)objPtr->internalRep.longValue;
@@ -249,11 +251,12 @@ ExtraL_SSortObjCmd(clientData, interp, objc, objv)
     int objc;			/* Number of arguments. */
     Tcl_Obj *CONST objv[];	/* Argument values. */
 {
-    int i, index, dummy;
+    Tcl_Size dummy;
+    int i, index;
     Tcl_Obj *resultPtr;
 	Tcl_Obj *reflist = NULL, **reflistObjv;
-	int reflistObjc;
-    int length;
+	Tcl_Size reflistObjc;
+    Tcl_Size length;
     Tcl_Obj *cmdPtr, **listObjPtrs;
     SortElement *elementArray;
     SortElement *elementPtr;        
@@ -545,7 +548,8 @@ SortCompare(objPtr1, objPtr2, infoPtr)
     SortInfo *infoPtr;                  /* Information passed from the
                                          * top-level "lsort" command */
 {
-    int order, dummy, listLen, index;
+    Tcl_Size listLen, dummy;
+    int order, index;
     Tcl_Obj *objPtr;
     char buffer[30];
 
@@ -587,7 +591,7 @@ SortCompare(objPtr1, objPtr2, infoPtr)
 	    sprintf(buffer, "%d", infoPtr->index);
 	    Tcl_AppendStringsToObj(Tcl_GetObjResult(infoPtr->interp),
 			"element ", buffer, " missing from sublist \"",
-			Tcl_GetStringFromObj(objPtr, (int *) NULL),
+			Tcl_GetStringFromObj(objPtr, (Tcl_Size *) NULL),
 			"\"", (char *) NULL);
 	    infoPtr->resultCode = TCL_ERROR;
 	    return order;
@@ -624,7 +628,7 @@ SortCompare(objPtr1, objPtr2, infoPtr)
 		Tcl_GetStringFromObj(objPtr2, &dummy));
     } else if (infoPtr->sortMode == SORTMODE_NATURAL) {
 	char *a,*b;
-	int alen,blen;
+	Tcl_Size alen,blen;
 	a = Tcl_GetStringFromObj(objPtr1, &alen);
 	b = Tcl_GetStringFromObj(objPtr2, &blen);
 	order = naturalcompare(a,b,alen,blen);
@@ -657,7 +661,7 @@ SortCompare(objPtr1, objPtr2, infoPtr)
 	    order = -1;
 	}
     } else {
-	int oldLength;
+	Tcl_Size oldLength;
 
 	/*
 	 * Generate and evaluate a command to determine which string comes

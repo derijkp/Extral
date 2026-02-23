@@ -11,18 +11,12 @@
 #include "extral.h"
 #include <string.h>
 
-int ExtraL_MapSetInt(interp,map,data,oldvalue,tagsc,tagsv,value)
-	Tcl_Interp *interp;
-	Tcl_Obj *map;
-	Tcl_Obj *data;
-	Tcl_Obj *oldvalue;
-	int tagsc;
-	Tcl_Obj **tagsv;
-	Tcl_Obj **value;
+int ExtraL_MapSetInt(Tcl_Interp *interp, Tcl_Obj *map, Tcl_Obj *data, Tcl_Obj *oldvalue, int tagsc, Tcl_Obj **tagsv, Tcl_Obj **value)
 {
-	int temp, error;
+	int error;
+	int inttemp;
 	if (tagsc > 0) {
-		int temp;
+		Tcl_Size temp;
 		Tcl_ResetResult(interp);
 		Tcl_AppendResult(interp,"error: field \"", Tcl_GetStringFromObj(tagsv[0],&temp),
 		"\" not present in map \"", Tcl_GetStringFromObj(map,&temp), "\"",(char *)NULL);
@@ -30,7 +24,7 @@ int ExtraL_MapSetInt(interp,map,data,oldvalue,tagsc,tagsv,value)
 	}
 	{
 		Tcl_Obj *temp;
-		int pos;
+		Tcl_Size pos;
 		error = Tcl_ListObjLength(interp,map, &pos);
 		if (error != TCL_OK) {return error;}
 		error = Tcl_ListObjIndex(interp, map, pos-1, &temp);
@@ -40,24 +34,45 @@ int ExtraL_MapSetInt(interp,map,data,oldvalue,tagsc,tagsv,value)
 		}
 	}
 
-	error = Tcl_GetIntFromObj(interp,*value,&temp);
+	error = Tcl_GetIntFromObj(interp,*value,&inttemp);
 	if (error != TCL_OK) {return error;}
 	return TCL_OK;
 }
 
-int ExtraL_MapSetDouble(interp,map,data,oldvalue,tagsc,tagsv,value)
-	Tcl_Interp *interp;
-	Tcl_Obj *map;
-	Tcl_Obj *data;
-	Tcl_Obj *oldvalue;
-	int tagsc;
-	Tcl_Obj **tagsv;
-	Tcl_Obj **value;
+int ExtraL_MapSetDouble(Tcl_Interp *interp, Tcl_Obj *map, Tcl_Obj *data, Tcl_Obj *oldvalue, int tagsc, Tcl_Obj **tagsv, Tcl_Obj **value)
 {
-	double temp;
+	int error;
+	double doubletemp;
+	if (tagsc > 0) {
+		Tcl_Size temp;
+		Tcl_ResetResult(interp);
+		Tcl_AppendResult(interp,"error: field \"", Tcl_GetStringFromObj(tagsv[0],&temp),
+		"\" not present in map \"", Tcl_GetStringFromObj(map,&temp), "\"",(char *)NULL);
+		return TCL_ERROR;
+	}
+	{
+		Tcl_Obj *temp;
+		Tcl_Size pos;
+		error = Tcl_ListObjLength(interp,map, &pos);
+		if (error != TCL_OK) {return error;}
+		error = Tcl_ListObjIndex(interp, map, pos-1, &temp);
+		if (error != TCL_OK) {return error;}
+		if (ExtraL_ObjEqual(temp,*value)==1) {
+			return 5;
+		}
+	}
+
+	error = Tcl_GetDoubleFromObj(interp,*value,&doubletemp);
+	if (error != TCL_OK) {return error;}
+	return TCL_OK;
+}
+
+int ExtraL_MapSetBool(Tcl_Interp *interp, Tcl_Obj *map, Tcl_Obj *data, Tcl_Obj *oldvalue, int tagsc, Tcl_Obj **tagsv, Tcl_Obj **value)
+{
+	int booltemp;
 	int error;
 	if (tagsc > 0) {
-		int temp;
+		Tcl_Size temp;
 		Tcl_ResetResult(interp);
 		Tcl_AppendResult(interp,"error: field \"", Tcl_GetStringFromObj(tagsv[0],&temp),
 		"\" not present in map \"", Tcl_GetStringFromObj(map,&temp), "\"",(char *)NULL);
@@ -65,7 +80,7 @@ int ExtraL_MapSetDouble(interp,map,data,oldvalue,tagsc,tagsv,value)
 	}
 	{
 		Tcl_Obj *temp;
-		int pos;
+		Tcl_Size pos;
 		error = Tcl_ListObjLength(interp,map, &pos);
 		if (error != TCL_OK) {return error;}
 		error = Tcl_ListObjIndex(interp, map, pos-1, &temp);
@@ -75,63 +90,22 @@ int ExtraL_MapSetDouble(interp,map,data,oldvalue,tagsc,tagsv,value)
 		}
 	}
 
-	error = Tcl_GetDoubleFromObj(interp,*value,&temp);
+	error = Tcl_GetBooleanFromObj(interp,*value,&booltemp);
 	if (error != TCL_OK) {return error;}
-	return TCL_OK;
-}
-
-int ExtraL_MapSetBool(interp,map,data,oldvalue,tagsc,tagsv,value)
-	Tcl_Interp *interp;
-	Tcl_Obj *map;
-	Tcl_Obj *data;
-	Tcl_Obj *oldvalue;
-	int tagsc;
-	Tcl_Obj **tagsv;
-	Tcl_Obj **value;
-{
-	int temp, error;
-	if (tagsc > 0) {
-		int temp;
-		Tcl_ResetResult(interp);
-		Tcl_AppendResult(interp,"error: field \"", Tcl_GetStringFromObj(tagsv[0],&temp),
-		"\" not present in map \"", Tcl_GetStringFromObj(map,&temp), "\"",(char *)NULL);
-		return TCL_ERROR;
-	}
-	{
-		Tcl_Obj *temp;
-		int pos;
-		error = Tcl_ListObjLength(interp,map, &pos);
-		if (error != TCL_OK) {return error;}
-		error = Tcl_ListObjIndex(interp, map, pos-1, &temp);
-		if (error != TCL_OK) {return error;}
-		if (ExtraL_ObjEqual(temp,*value)==1) {
-			return 5;
-		}
-	}
-
-	error = Tcl_GetBooleanFromObj(interp,*value,&temp);
-	if (error != TCL_OK) {return error;}
-	if Tcl_IsShared(*value) {
+	if (Tcl_IsShared(*value)) {
 		*value = Tcl_DuplicateObj(*value);
 	}
-	Tcl_SetBooleanObj(*value,temp);
+	Tcl_SetIntObj(*value,booltemp);
 	return TCL_OK;
 }
 
-int ExtraL_MapSetRegexp(interp,map,data,oldvalue,tagsc,tagsv,value)
-	Tcl_Interp *interp;
-	Tcl_Obj *map;
-	Tcl_Obj *data;
-	Tcl_Obj *oldvalue;
-	int tagsc;
-	Tcl_Obj **tagsv;
-	Tcl_Obj **value;
+int ExtraL_MapSetRegexp(Tcl_Interp *interp, Tcl_Obj *map, Tcl_Obj *data, Tcl_Obj *oldvalue, int tagsc, Tcl_Obj **tagsv, Tcl_Obj **value)
 {
-	int temp,error;
+	Tcl_Size temp;
+	int error;
 	Tcl_Obj *patternObj;
 	char *string, *pattern;
 	if (tagsc > 0) {
-		int temp;
 		Tcl_ResetResult(interp);
 		Tcl_AppendResult(interp,"error: field \"", Tcl_GetStringFromObj(tagsv[0],&temp),
 		"\" not present in map \"", Tcl_GetStringFromObj(map,&temp), "\"",(char *)NULL);
@@ -139,7 +113,7 @@ int ExtraL_MapSetRegexp(interp,map,data,oldvalue,tagsc,tagsv,value)
 	}
 	{
 		Tcl_Obj *temp;
-		int pos;
+		Tcl_Size pos;
 		error = Tcl_ListObjLength(interp,map, &pos);
 		if (error != TCL_OK) {return error;}
 		error = Tcl_ListObjIndex(interp, map, pos-1, &temp);
@@ -179,20 +153,13 @@ int ExtraL_MapSetRegexp(interp,map,data,oldvalue,tagsc,tagsv,value)
 	return TCL_OK;
 }
 
-int ExtraL_MapSetBetween(interp,map,data,oldvalue,tagsc,tagsv,value)
-	Tcl_Interp *interp;
-	Tcl_Obj *map;
-	Tcl_Obj *data;
-	Tcl_Obj *oldvalue;
-	int tagsc;
-	Tcl_Obj **tagsv;
-	Tcl_Obj **value;
+int ExtraL_MapSetBetween(Tcl_Interp *interp, Tcl_Obj *map, Tcl_Obj *data, Tcl_Obj *oldvalue, int tagsc, Tcl_Obj **tagsv, Tcl_Obj **value)
 {
-	int temp,error;
+	int error;
+	Tcl_Size temp;
 	Tcl_Obj *startObj, *endObj;
-	int start,end;
+	int start,end,inttemp;
 	if (tagsc > 0) {
-		int temp;
 		Tcl_ResetResult(interp);
 		Tcl_AppendResult(interp,"error: field \"", Tcl_GetStringFromObj(tagsv[0],&temp),
 		"\" not present in map \"", Tcl_GetStringFromObj(map,&temp), "\"",(char *)NULL);
@@ -200,7 +167,7 @@ int ExtraL_MapSetBetween(interp,map,data,oldvalue,tagsc,tagsv,value)
 	}
 	{
 		Tcl_Obj *temp;
-		int pos;
+		Tcl_Size pos;
 		error = Tcl_ListObjLength(interp,map, &pos);
 		if (error != TCL_OK) {return error;}
 		error = Tcl_ListObjIndex(interp, map, pos-1, &temp);
@@ -217,7 +184,7 @@ int ExtraL_MapSetBetween(interp,map,data,oldvalue,tagsc,tagsv,value)
 		Tcl_AppendResult(interp,"error: wrong number of arguments in map \"", Tcl_GetStringFromObj(map,&temp), "\"",(char *)NULL);
 		return TCL_ERROR;
 	}
-	error = Tcl_GetIntFromObj(interp,*value,&temp);
+	error = Tcl_GetIntFromObj(interp,*value,&inttemp);
 	if (error != TCL_OK) {return error;}
 
 	error = Tcl_ListObjIndex(interp, map, 1, &startObj);
@@ -229,7 +196,7 @@ int ExtraL_MapSetBetween(interp,map,data,oldvalue,tagsc,tagsv,value)
 	if (error != TCL_OK) {return error;}
 	error = Tcl_GetIntFromObj(interp,endObj,&end);
 	if (error != TCL_OK) {return error;}
-	if ((temp<start)||(temp>end)) {
+	if ((inttemp<start)||(inttemp>end)) {
 		Tcl_ResetResult(interp);
 		Tcl_AppendResult(interp,"error: ", Tcl_GetStringFromObj(*value,&temp)," is not between ",
 			Tcl_GetStringFromObj(startObj,&temp), " and ", Tcl_GetStringFromObj(endObj,&temp), (char *)NULL);
@@ -239,20 +206,13 @@ int ExtraL_MapSetBetween(interp,map,data,oldvalue,tagsc,tagsv,value)
 
 }
 
-int ExtraL_MapSetDBetween(interp,map,data,oldvalue,tagsc,tagsv,value)
-	Tcl_Interp *interp;
-	Tcl_Obj *map;
-	Tcl_Obj *data;
-	Tcl_Obj *oldvalue;
-	int tagsc;
-	Tcl_Obj **tagsv;
-	Tcl_Obj **value;
+int ExtraL_MapSetDBetween(Tcl_Interp *interp, Tcl_Obj *map, Tcl_Obj *data, Tcl_Obj *oldvalue, int tagsc, Tcl_Obj **tagsv, Tcl_Obj **value)
 {
-	int temp,error;
+	int error;
+	Tcl_Size temp;
 	Tcl_Obj *startObj, *endObj;
 	double start, end, val;
 	if (tagsc > 0) {
-		int temp;
 		Tcl_ResetResult(interp);
 		Tcl_AppendResult(interp,"error: field \"", Tcl_GetStringFromObj(tagsv[0],&temp),
 		"\" not present in map \"", Tcl_GetStringFromObj(map,&temp), "\"",(char *)NULL);
@@ -260,7 +220,7 @@ int ExtraL_MapSetDBetween(interp,map,data,oldvalue,tagsc,tagsv,value)
 	}
 	{
 		Tcl_Obj *temp;
-		int pos;
+		Tcl_Size pos;
 		error = Tcl_ListObjLength(interp,map, &pos);
 		if (error != TCL_OK) {return error;}
 		error = Tcl_ListObjIndex(interp, map, pos-1, &temp);
@@ -298,19 +258,12 @@ int ExtraL_MapSetDBetween(interp,map,data,oldvalue,tagsc,tagsv,value)
 	return TCL_OK;
 }
 
-int ExtraL_MapSetDate(interp,map,data,oldvalue,tagsc,tagsv,value)
-	Tcl_Interp *interp;
-	Tcl_Obj *map;
-	Tcl_Obj *data;
-	Tcl_Obj *oldvalue;
-	int tagsc;
-	Tcl_Obj **tagsv;
-	Tcl_Obj **value;
+int ExtraL_MapSetDate(Tcl_Interp *interp, Tcl_Obj *map, Tcl_Obj *data, Tcl_Obj *oldvalue, int tagsc, Tcl_Obj **tagsv, Tcl_Obj **value)
 {
 	Tcl_Obj *result;
 	int error;
 	if (tagsc > 0) {
-		int temp;
+		Tcl_Size temp;
 		Tcl_ResetResult(interp);
 		Tcl_AppendResult(interp,"error: field \"", Tcl_GetStringFromObj(tagsv[0],&temp),
 		"\" not present in map \"", Tcl_GetStringFromObj(map,&temp), "\"",(char *)NULL);
@@ -318,7 +271,7 @@ int ExtraL_MapSetDate(interp,map,data,oldvalue,tagsc,tagsv,value)
 	}
 	{
 		Tcl_Obj *temp;
-		int pos;
+		Tcl_Size pos;
 		error = Tcl_ListObjLength(interp,map, &pos);
 		if (error != TCL_OK) {return error;}
 		error = Tcl_ListObjIndex(interp, map, pos-1, &temp);
@@ -334,17 +287,11 @@ int ExtraL_MapSetDate(interp,map,data,oldvalue,tagsc,tagsv,value)
 	return TCL_OK;
 }
 
-int ExtraL_MapGetDate(interp,map,data,tagsc,tagsv,value)
-	Tcl_Interp *interp;
-	Tcl_Obj *map;
-	Tcl_Obj *data;
-	int tagsc;
-	Tcl_Obj **tagsv;
-	Tcl_Obj **value;
+int ExtraL_MapGetDate(Tcl_Interp *interp, Tcl_Obj *map, Tcl_Obj *data, int tagsc, Tcl_Obj **tagsv, Tcl_Obj **value)
 {
 	char *result;
 	int error;
-	int len;
+	Tcl_Size len;
 
 	if (*value == NULL) {
 		len = 0;
@@ -375,19 +322,12 @@ int ExtraL_MapGetDate(interp,map,data,tagsc,tagsv,value)
 	return TCL_OK;
 }
 
-int ExtraL_MapSetTime(interp,map,data,oldvalue,tagsc,tagsv,value)
-	Tcl_Interp *interp;
-	Tcl_Obj *map;
-	Tcl_Obj *data;
-	Tcl_Obj *oldvalue;
-	int tagsc;
-	Tcl_Obj **tagsv;
-	Tcl_Obj **value;
+int ExtraL_MapSetTime(Tcl_Interp *interp, Tcl_Obj *map, Tcl_Obj *data, Tcl_Obj *oldvalue, int tagsc, Tcl_Obj **tagsv, Tcl_Obj **value)
 {
 	Tcl_Obj *result;
 	int error;
 	if (tagsc > 0) {
-		int temp;
+		Tcl_Size temp;
 		Tcl_ResetResult(interp);
 		Tcl_AppendResult(interp,"error: field \"", Tcl_GetStringFromObj(tagsv[0],&temp),
 		"\" not present in map \"", Tcl_GetStringFromObj(map,&temp), "\"",(char *)NULL);
@@ -395,7 +335,7 @@ int ExtraL_MapSetTime(interp,map,data,oldvalue,tagsc,tagsv,value)
 	}
 	{
 		Tcl_Obj *temp;
-		int pos;
+		Tcl_Size pos;
 		error = Tcl_ListObjLength(interp,map, &pos);
 		if (error != TCL_OK) {return error;}
 		error = Tcl_ListObjIndex(interp, map, pos-1, &temp);
@@ -410,17 +350,11 @@ int ExtraL_MapSetTime(interp,map,data,oldvalue,tagsc,tagsv,value)
 	return TCL_OK;
 }
 
-int ExtraL_MapGetTime(interp,map,data,tagsc,tagsv,value)
-	Tcl_Interp *interp;
-	Tcl_Obj *map;
-	Tcl_Obj *data;
-	int tagsc;
-	Tcl_Obj **tagsv;
-	Tcl_Obj **value;
+int ExtraL_MapGetTime(Tcl_Interp *interp, Tcl_Obj *map, Tcl_Obj *data, int tagsc, Tcl_Obj **tagsv, Tcl_Obj **value)
 {
 	char *result;
 	int error;
-	int len;
+	Tcl_Size len;
 
 	if (*value == NULL) {
 		len = 0;
@@ -451,20 +385,13 @@ int ExtraL_MapGetTime(interp,map,data,tagsc,tagsv,value)
 	return TCL_OK;
 }
 
-int ExtraL_MapSetList(interp,map,data,oldvalue,tagsc,tagsv,value)
-	Tcl_Interp *interp;
-	Tcl_Obj *map;
-	Tcl_Obj *data;
-	Tcl_Obj *oldvalue;
-	int tagsc;
-	Tcl_Obj **tagsv;
-	Tcl_Obj **value;
+int ExtraL_MapSetList(Tcl_Interp *interp, Tcl_Obj *map, Tcl_Obj *data, Tcl_Obj *oldvalue, int tagsc, Tcl_Obj **tagsv, Tcl_Obj **value)
 {
 	Tcl_Obj *struc, *result, *res, *tagObj;
 	Tcl_Obj **listv;
-	int listc,len;
+	Tcl_Size listc,len;
 	int error;
-	int taglen;
+	Tcl_Size taglen;
 	int i;
 	char *tag;
 
@@ -489,7 +416,7 @@ int ExtraL_MapSetList(interp,map,data,oldvalue,tagsc,tagsv,value)
 	if (error != TCL_OK) {return error;}
 	if (taglen==0) {
 		Tcl_Obj **oldv;
-		int oldc;
+		Tcl_Size oldc;
 		error = Tcl_ListObjGetElements(interp, *value, &listc, &listv);
 		if (error != TCL_OK) {return error;}
 		if (oldvalue != NULL) {
@@ -536,7 +463,7 @@ int ExtraL_MapSetList(interp,map,data,oldvalue,tagsc,tagsv,value)
 		return TCL_OK;
 	} else {
 		Tcl_Obj **tagv, *oldval;
-		int tagc,pos,len;
+		Tcl_Size tagc,pos,len;
 		if (tagObj == NULL) {
 			tagObj = Tcl_NewObj();
 			error = Tcl_ListObjGetElements(interp, tagObj, &tagc, &tagv);
@@ -560,7 +487,7 @@ int ExtraL_MapSetList(interp,map,data,oldvalue,tagsc,tagsv,value)
 				pos = len-1;
 				if (error != TCL_OK) {return error;}
 			} else {
-				error = Tcl_GetIntFromObj(interp, tagv[0], &pos);
+				error = Tcl_GetSizeIntFromObj(interp, tagv[0], &pos);
 				if (pos>=len) {
 					Tcl_ResetResult(interp);
 					Tcl_AppendResult(interp,"list doesn't contain element ",
@@ -590,18 +517,12 @@ int ExtraL_MapSetList(interp,map,data,oldvalue,tagsc,tagsv,value)
 	}
 }
 
-int ExtraL_MapUnsetList(interp,map,data,oldvalue,tagsc,tagsv,value)
-	Tcl_Interp *interp;
-	Tcl_Obj *map;
-	Tcl_Obj *data;
-	Tcl_Obj *oldvalue;
-	int tagsc;
-	Tcl_Obj **tagsv;
-	Tcl_Obj **value;
+int ExtraL_MapUnsetList(Tcl_Interp *interp, Tcl_Obj *map, Tcl_Obj *data, Tcl_Obj *oldvalue, int tagsc, Tcl_Obj **tagsv, Tcl_Obj **value)
 {
 	Tcl_Obj *struc, *result, *res, *tagObj;
-	int error,len;
-	int taglen;
+	int error;
+	Tcl_Size len;
+	Tcl_Size taglen;
 	char *tag;
 
 	if (oldvalue == NULL) {
@@ -629,7 +550,7 @@ int ExtraL_MapUnsetList(interp,map,data,oldvalue,tagsc,tagsv,value)
 	if (tagsc != 0) {
 		if (taglen == 0) {
 			Tcl_Obj **oldv;
-			int oldc,i;
+			Tcl_Size oldc,i;
 			error = Tcl_ListObjGetElements(interp, oldvalue, &oldc, &oldv);
 			if (error != TCL_OK) {return error;}
 			result = Tcl_NewObj();
@@ -650,7 +571,7 @@ int ExtraL_MapUnsetList(interp,map,data,oldvalue,tagsc,tagsv,value)
 			return TCL_OK;
 		} else {
 			Tcl_Obj **tagv, *oldval;
-			int tagc,pos,len;
+			Tcl_Size tagc,pos,len;
 			error = Tcl_ListObjGetElements(interp, tagObj, &tagc, &tagv);
 			if (error != TCL_OK) {return error;}
 			if (tagc==1) {
@@ -659,7 +580,7 @@ int ExtraL_MapUnsetList(interp,map,data,oldvalue,tagsc,tagsv,value)
 				if (strcmp(tag,"end") == 0) {
 					pos = len-1;
 				} else {
-					error = Tcl_GetIntFromObj(interp, tagv[0], &pos);
+					error = Tcl_GetSizeIntFromObj(interp, tagv[0], &pos);
 					if (error != TCL_OK) {return error;}
 					if (pos>=len) {
 						*value = oldvalue;
@@ -696,7 +617,7 @@ int ExtraL_MapUnsetList(interp,map,data,oldvalue,tagsc,tagsv,value)
 			return 5;
 		} else {
 			Tcl_Obj **tagv;
-			int tagc,pos,len;
+			Tcl_Size tagc,pos,len;
 			error = Tcl_ListObjGetElements(interp, tagObj, &tagc, &tagv);
 			if (error != TCL_OK) {return error;}
 			if (tagc==1) {
@@ -705,7 +626,7 @@ int ExtraL_MapUnsetList(interp,map,data,oldvalue,tagsc,tagsv,value)
 				if (strcmp(tag,"end") == 0) {
 					pos = len-1;
 				} else {
-					error = Tcl_GetIntFromObj(interp, tagv[0], &pos);
+					error = Tcl_GetSizeIntFromObj(interp, tagv[0], &pos);
 					if (error != TCL_OK) {return error;}
 					if (pos>=len) {
 						Tcl_ResetResult(interp);
@@ -735,19 +656,13 @@ int ExtraL_MapUnsetList(interp,map,data,oldvalue,tagsc,tagsv,value)
 	return TCL_OK;
 }
 
-int ExtraL_MapGetList(interp,map,data,tagsc,tagsv,value)
-	Tcl_Interp *interp;
-	Tcl_Obj *map;
-	Tcl_Obj *data;
-	int tagsc;
-	Tcl_Obj **tagsv;
-	Tcl_Obj **value;
+int ExtraL_MapGetList(Tcl_Interp *interp, Tcl_Obj *map, Tcl_Obj *data, int tagsc, Tcl_Obj **tagsv, Tcl_Obj **value)
 {
 	Tcl_Obj *struc, *result, *res, *tagObj;
 	Tcl_Obj **listv;
-	int listc,len;
+	Tcl_Size listc,len;
 	int error;
-	int taglen;
+	Tcl_Size taglen;
 	int i;
 	char *tag;
 
@@ -794,7 +709,7 @@ int ExtraL_MapGetList(interp,map,data,tagsc,tagsv,value)
 		return TCL_OK;
 	} else {
 		Tcl_Obj **tagv, *oldval;
-		int tagc,pos,len;
+		Tcl_Size tagc,pos,len;
 		if (tagObj == NULL) {
 			tagObj = Tcl_NewObj();
 			error = Tcl_ListObjGetElements(interp, tagObj, &tagc, &tagv);
@@ -813,7 +728,7 @@ int ExtraL_MapGetList(interp,map,data,tagsc,tagsv,value)
 				pos = len-1;
 				if (error != TCL_OK) {return error;}
 			} else {
-				error = Tcl_GetIntFromObj(interp, tagv[0], &pos);
+				error = Tcl_GetSizeIntFromObj(interp, tagv[0], &pos);
 				if (pos>=len) {
 					*value = Tcl_NewObj();
 					return TCL_OK;
@@ -841,7 +756,7 @@ int ExtraL_MapGetList(interp,map,data,tagsc,tagsv,value)
 					p[i] = len-1;
 					if (error != TCL_OK) {return error;}
 				} else {
-					error = Tcl_GetIntFromObj(interp, tagv[i], &pos);
+					error = Tcl_GetSizeIntFromObj(interp, tagv[i], &pos);
 					if (pos>=len) {
 						if (i==0) {
 							*value = Tcl_NewObj();
@@ -886,23 +801,16 @@ int ExtraL_MapGetList(interp,map,data,tagsc,tagsv,value)
 	}
 }
 
-int ExtraL_MapSetNamed(interp,map,data,oldvalue,tagsc,tagsv,value)
-	Tcl_Interp *interp;
-	Tcl_Obj *map;
-	Tcl_Obj *data;
-	Tcl_Obj *oldvalue;
-	int tagsc;
-	Tcl_Obj **tagsv;
-	Tcl_Obj **value;
+int ExtraL_MapSetNamed(Tcl_Interp *interp, Tcl_Obj *map, Tcl_Obj *data, Tcl_Obj *oldvalue, int tagsc, Tcl_Obj **tagsv, Tcl_Obj **value)
 {
 	Tcl_Obj *struc, *result, *res, *oldval;
 	int error;
-	int taglen;
-	int pos,len;
+	Tcl_Size taglen;
+	Tcl_Size pos,len;
 	char *tag;
 
 	if (tagsc == 0) {
-		int tempc;
+		Tcl_Size tempc;
 		Tcl_Obj **tempv;
 		if (Tcl_ListObjGetElements(interp, *value, &tempc, &tempv) != TCL_OK) {
 			return TCL_ERROR;
@@ -988,19 +896,12 @@ int ExtraL_MapSetNamed(interp,map,data,oldvalue,tagsc,tagsv,value)
 	}
 }
 
-int ExtraL_MapUnsetNamed(interp,map,data,oldvalue,tagsc,tagsv,value)
-	Tcl_Interp *interp;
-	Tcl_Obj *map;
-	Tcl_Obj *data;
-	Tcl_Obj *oldvalue;
-	int tagsc;
-	Tcl_Obj **tagsv;
-	Tcl_Obj **value;
+int ExtraL_MapUnsetNamed(Tcl_Interp *interp, Tcl_Obj *map, Tcl_Obj *data, Tcl_Obj *oldvalue, int tagsc, Tcl_Obj **tagsv, Tcl_Obj **value)
 {
 	Tcl_Obj *struc, *result, *res, *oldval, *def;
 	int error;
-	int taglen;
-	int pos,end,len;
+	Tcl_Size taglen;
+	Tcl_Size pos,end,len;
 	char *tag;
 
 	if (tagsc == 0) {
@@ -1069,20 +970,15 @@ int ExtraL_MapUnsetNamed(interp,map,data,oldvalue,tagsc,tagsv,value)
 	}
 }
 
-int ExtraL_MapGetNamed(interp,map,data,tagsc,tagsv,value)
-	Tcl_Interp *interp;
-	Tcl_Obj *map;
-	Tcl_Obj *data;
-	int tagsc;
-	Tcl_Obj **tagsv;
-	Tcl_Obj **value;
+int ExtraL_MapGetNamed(Tcl_Interp *interp, Tcl_Obj *map, Tcl_Obj *data, int tagsc, Tcl_Obj **tagsv, Tcl_Obj **value)
 {
 	Tcl_Obj *struc, *result, *res, *oldval;
 	Tcl_Obj **listv;
-	int listc;
+	Tcl_Size listc;
 	int error;
-	int taglen;
-	int i,pos;
+	Tcl_Size taglen;
+	int i;
+	Tcl_Size pos;
 	char *tag;
 
 	error = Tcl_ListObjIndex(interp, map, 1, &struc);

@@ -28,7 +28,7 @@ source "${dir}/start_hbb.sh"
 
 name=Extral
 version=2.1.0
-tclversion=8.6.14
+tclversion=9.0.3
 
 # Parse extra arguments
 # =====================

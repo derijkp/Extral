@@ -26,7 +26,7 @@ test lmanip {subindex multiple positions in list} {
 
 test lmanip {subindex error in 2 pos} {
 	list_subindex {{A a 1} {{B B} b 2} {C c}} 1 {2 0 1}
-} {expected integer but got "2 0 1"} error
+} {expected integer but got a list} error
 
 test lmanip {mangle} {
 	list_mangle {a b c} {1 2 3}

@@ -11,6 +11,7 @@
 #include <string.h>
 #include <malloc.h>
 #include "tcl.h"
+#include "general.h"
 /*
  *----------------------------------------------------------------------
  *
@@ -35,7 +36,7 @@ ExtraL_List_popObjCmd(dummy, interp, objc, objv)
 	register Tcl_Obj *listObjPtr;
 	Tcl_Obj *popPtr, *newValuePtr;
 	char *firstStr;
-	int listLen;
+	Tcl_Size listLen;
 	long index;
 	int result;
 
@@ -60,7 +61,7 @@ ExtraL_List_popObjCmd(dummy, interp, objc, objv)
 	if (objc==2) {
 		index = (listLen - 1);
 	} else {
-		firstStr = Tcl_GetStringFromObj(objv[2], (int *)NULL);
+		firstStr = Tcl_GetStringFromObj(objv[2], (Tcl_Size *)NULL);
 		if ((*firstStr == 'e') && (strcmp(firstStr, "end") == 0)) {
 			index = (listLen - 1);
 		} else {
@@ -127,7 +128,7 @@ ExtraL_List_shiftObjCmd(notUsed, interp, objc, objv)
 {
 	register Tcl_Obj *listObjPtr;
 	Tcl_Obj *popPtr, *newValuePtr;
-	int listLen;
+	Tcl_Size listLen;
 	long index;
 	int result;
 

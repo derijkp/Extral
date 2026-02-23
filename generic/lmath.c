@@ -30,7 +30,7 @@ ExtraL_Lmath_averageObjCmd(notUsed, interp, objc, objv)
 	int objc;						/* Number of arguments. */
 	Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
-	int listobjc;
+	Tcl_Size listobjc;
 	Tcl_Obj **listobjv;
 	double el,result;
 	int i,error;
@@ -66,7 +66,7 @@ ExtraL_Lmath_maxObjCmd(notUsed, interp, objc, objv)
 	int objc;						/* Number of arguments. */
 	Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
-	int listobjc;
+	Tcl_Size listobjc;
 	Tcl_Obj **listobjv;
 	double el,result;
 	int i,error,resultpos;
@@ -109,7 +109,7 @@ ExtraL_Lmath_minObjCmd(notUsed, interp, objc, objv)
 	int objc;						/* Number of arguments. */
 	Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
-	int listobjc;
+	Tcl_Size listobjc;
 	Tcl_Obj **listobjv;
 	double el,result;
 	int i,error,resultpos;
@@ -152,7 +152,7 @@ ExtraL_Lmath_sumObjCmd(notUsed, interp, objc, objv)
 	int objc;						/* Number of arguments. */
 	Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
-	int listobjc;
+	Tcl_Size listobjc;
 	Tcl_Obj **listobjv;
 	double el,result;
 	int i,error;
@@ -270,12 +270,13 @@ ExtraL_Lmath_calcObjCmd(notUsed, interp, objc, objv)
 	int objc;						/* Number of arguments. */
 	Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
-	int listobjc1,listobjc2;
+	Tcl_Size listobjc1,listobjc2;
 	Tcl_Obj **listobjv1,**listobjv2,*result,*resultEl;
 	char *string,t1,t2;
 	int el1i,el2i,startpos=-1;
 	double el1d,el2d;
-	int i,error,len;
+	Tcl_Size len;
+	int i,error;
 	if ((objc != 4) && (objc != 5)) {
 		Tcl_WrongNumArgs(interp, 1, objv, "list1 action list2 ?startpos?");
 		return TCL_ERROR;
@@ -377,7 +378,8 @@ ExtraL_Lmath_calcObjCmd(notUsed, interp, objc, objv)
 int ExtraL_vectorFromObj(Tcl_Interp *interp,Tcl_Obj *objv,double **resultPtr, int *resultlen) {
 	Tcl_Obj **listobjv;
 	double *result,el;
-	int error, len, i;
+	Tcl_Size len;
+	int error, i;
 	error = Tcl_ListObjGetElements(interp, objv, &len, &listobjv);
 	if (error) {return error;}
 	result = (double *)Tcl_Alloc(len*sizeof(double));

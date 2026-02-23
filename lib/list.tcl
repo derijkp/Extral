@@ -184,7 +184,7 @@ proc list_load {filename} {
 #}
 proc list_write {filename list} {
 	set f [open $filename "a"]
-	puts $f [join $list "\n"] nonewline
+	puts -nonewline $f [join $list "\n"]
 	close $f
 }
 

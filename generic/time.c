@@ -33,10 +33,11 @@ int ExtraL_ScanTime(interp,musthavedate,musthavetime,dateObj,resultObj)
 	char temp[8];
 	char *ctemp = NULL;
 	char ch;
+	Tcl_Size len;
 	int year=-1,month=-1,day=-1,bc=0,hour=-1,min=-1,sec=-1,ms=-1;
 	int first=-1,second=-1,days=-1,schrikkel = 0;
 	int busyhour=0;
-	int i,j,len,temppos;
+	int i,j,temppos;
 	int error,result;
 	date = Tcl_GetStringFromObj(dateObj,&len);
 	temppos = 0;
@@ -353,12 +354,12 @@ ExtraL_ScanTimeObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;				 /* Not used. */
 	Tcl_Interp *interp;					/* Current interpreter. */
 	int objc;						/* Number of arguments. */
-	Tcl_Obj *CONST objv[];	/* Argument objects. */
+	Tcl_Obj *const objv[];	/* Argument objects. */
 {
 	Tcl_Obj *result;
 	char *temp;
 	int musthavedate,musthavetime;
-	int error;
+	Tcl_Size error;
 
 	if ((objc != 2)&&(objc != 3)) {
 		Tcl_WrongNumArgs(interp, 1, objv, "time ?date/time/both?");
@@ -400,7 +401,7 @@ int
 ExtraL_FormatTime(Tcl_Interp *interp, Tcl_Obj *timeObj, char *format, char **result)
 {
 	Tcl_Obj **listv;
-	int listc;
+	Tcl_Size listc;
 	char *buffer, *fpos, *temp, *smonth;
 	char b[2];
 	int buffersize=1;
@@ -791,11 +792,11 @@ ExtraL_FormatTimeObjCmd(notUsed, interp, objc, objv)
 	ClientData notUsed;
 	Tcl_Interp *interp;
 	int objc;
-	Tcl_Obj *CONST objv[];
+	Tcl_Obj *const objv[];
 {
 	char *format, *result;
 	double time;
-	int len;
+	Tcl_Size len;
 	int error;
 
 	if ((objc != 2)&&(objc != 3)) {
