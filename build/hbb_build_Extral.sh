@@ -97,6 +97,7 @@ make distclean || true
 ../configure $prefixopt $configureopts
 # makedoc uses tclsh, which wont work for crosswin build, so make docs separately
 make binaries libraries
+
 $tcl /io/build/makedoc.tcl /io /io
 
 

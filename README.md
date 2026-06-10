@@ -106,8 +106,7 @@ VIB department of Molecular Genetics
 Universiteitsplein 1
 B-2610 Antwerp
 
-Tel. +32 3 265 10 30
-E-mail: Peter.DeRijk@molgen.vib-ua.be
+E-mail: Peter.DeRijk@uantwerpen.be
 
 Legalities
 ----------

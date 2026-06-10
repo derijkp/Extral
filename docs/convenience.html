@@ -18,6 +18,17 @@
 
 
 <dl><b><dt>
+invoke vars cmd ...
+</b><dd>
+ invoke simply evals $cmd in a private space. This eg. allows using
+ temporary variables in bindings without creating these in global scope.
+ It is also very convenient to use values appended to a command given
+ to a binding:
+ Further arguments (when given) are parameters that will be available in the
+ variables given in vars. If more parameters are supplied than vars are given,
+ the remaining parameters will be stored in the variable args.
+
+<b><dt>
 Extral::bgexec ?options? arg ?arg ...?
 </b><dd>
  Without the -command option, this command works like exec does, but runs the executed 
@@ -56,16 +67,18 @@ finishing the process will get an empty argument.</dd>
  vwait ::v
 </pre>
 <b><dt>
-invoke vars cmd ...
+varsubst string varlist valuelist
 </b><dd>
- invoke simply evals $cmd in a private space. This eg. allows using
- temporary variables in bindings without creating these in global scope.
- It is also very convenient to use values appended to a command given
- to a binding:
- Further arguments (when given) are parameters that will be available in the
- variables given in vars. If more parameters are supplied than vars are given,
- the remaining parameters will be stored in the variable args.
-
+	substitutes only the variables in varlist for their content
+	in the given string
+<br>eg.:<pre>
+	% set try {try it}
+	try it
+	% varsubst {try} {
+		puts [list $try $try2]
+	}
+		puts [list {try it} $try2]
+</pre>
 <b><dt>
 aproc args body
 </b><dd>
@@ -152,19 +165,6 @@ Extral::event debug command
  The command will be executed in global scope with the data (if any) given by the
  generate command appended
 
-<b><dt>
-varsubst string varlist valuelist
-</b><dd>
-	substitutes only the variables in varlist for their content
-	in the given string
-<br>eg.:<pre>
-	% set try {try it}
-	try it
-	% varsubst {try} {
-		puts [list $try $try2]
-	}
-		puts [list {try it} $try2]
-</pre>
 <b><dt>
 	list_iterate variableName list
 </b><dd>

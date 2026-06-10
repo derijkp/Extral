@@ -15,6 +15,7 @@ cd $srcdir
 
 namespace eval Extral {}
 lappend auto_path $srcdir $srcdir/lib $srcdir/libnoc
+source $srcdir/lib/doc.tcl
 puts $srcdir/lib
 
 # generate tml docs
